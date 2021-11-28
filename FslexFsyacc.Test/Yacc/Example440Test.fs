@@ -1,0 +1,149 @@
+﻿namespace FslexFsyacc.Yacc
+
+open Xunit
+open Xunit.Abstractions
+open FSharp.Literals
+open FSharp.xUnit
+open FSharp.Idioms
+
+type Example440Test(output:ITestOutputHelper) =
+    let show res = 
+        res 
+        |> Literal.stringify
+        |> output.WriteLine
+
+    ///表达式文法(4.1)
+    let E = "E"
+    let T = "T"
+    let F = "F"
+    let id = "id"
+
+    let mainProductions = [
+        [ E; E; "+"; T ]
+        [ E; T ]
+        [ T; T; "*"; F ]
+        [ T; F ]
+        [ F; "("; E; ")" ]
+        [ F; id ]
+    ]
+
+    let grammar = Grammar.from mainProductions
+
+    [<Fact>]
+    member this.``all of item cores``() =
+        let itemCores = 
+            ItemCoreFactory.make grammar.productions
+            |> Set.map(fun i -> i.production,i.dot)
+        //show itemCores
+        let y = set [
+            ["";"E"],0;
+            ["";"E"],1;
+            ["E";"E";"+";"T"],0;
+            ["E";"E";"+";"T"],1;
+            ["E";"E";"+";"T"],2;
+            ["E";"E";"+";"T"],3;
+            ["E";"T"],0;
+            ["E";"T"],1;
+            ["F";"(";"E";")"],0;
+            ["F";"(";"E";")"],1;
+            ["F";"(";"E";")"],2;["F";"(";"E";")"],3;
+            ["F";"id"],0;["F";"id"],1;
+            ["T";"F"],0;["T";"F"],1;
+            ["T";"T";"*";"F"],0;["T";"T";"*";"F"],1;["T";"T";"*";"F"],2;["T";"T";"*";"F"],3]
+        Should.equal y itemCores
+
+    [<Fact>]
+    member this.``item core attributes``() =
+        let itemCores = 
+            ItemCoreFactory.make grammar.productions
+
+        let itemCoreAttributes = 
+            ItemCoreAttributeFactory.make grammar.nonterminals grammar.nullables grammar.firsts itemCores
+            |> Map.mapEntry(fun i v -> (i.production,i.dot), v )
+            |> Map.map(fun _ sq -> Seq.exactlyOne sq)
+   
+        //show itemCoreAttributes
+        let y = Map.ofList [
+            (["";"E"],0),(true,Set.empty);
+            (["E";"E";"+";"T"],0),(false,set ["+"]);
+            (["E";"E";"+";"T"],2),(true,Set.empty);
+            (["E";"T"],0),(true,Set.empty);
+            (["F";"(";"E";")"],1),(false,set [")"]);
+            (["T";"F"],0),(true,Set.empty);
+            (["T";"T";"*";"F"],0),(false,set ["*"]);
+            (["T";"T";"*";"F"],2),(true,Set.empty)]
+        Should.equal y itemCoreAttributes
+
+    [<Fact>]
+    member this.``closures``() =
+        let itemCores = 
+            ItemCoreFactory.make grammar.productions
+
+        let itemCoreAttributes = 
+            ItemCoreAttributeFactory.make grammar.nonterminals grammar.nullables grammar.firsts itemCores
+   
+        let closures = 
+            CollectionFactory.make itemCores itemCoreAttributes grammar.productions
+            |> Set.map(fun (kernel,closure)->
+                let k = kernel |> Set.map(fun i -> i.production,i.dot)
+                let c = closure |> Set.map(fun (i,la)->(i.production,i.dot),la)
+                k,c
+            )
+
+        //show closures
+        let y = set [
+            set [["";"E"],0],set [(["";"E"],0),set [""];(["E";"E";"+";"T"],0),set ["";"+"];(["E";"T"],0),set ["";"+"];(["F";"(";"E";")"],0),set ["";"*";"+"];(["F";"id"],0),set ["";"*";"+"];(["T";"F"],0),set ["";"*";"+"];(["T";"T";"*";"F"],0),set ["";"*";"+"]];
+            set [["";"E"],1;["E";"E";"+";"T"],1],set [(["";"E"],1),set [""];(["E";"E";"+";"T"],1),set ["";"+"]];
+            set [["E";"E";"+";"T"],1;["F";"(";"E";")"],2],set [(["E";"E";"+";"T"],1),set [")";"+"];(["F";"(";"E";")"],2),set ["";")";"*";"+"]];
+            set [["E";"E";"+";"T"],2],set [(["E";"E";"+";"T"],2),set ["";")";"+"];(["F";"(";"E";")"],0),set ["";")";"*";"+"];(["F";"id"],0),set ["";")";"*";"+"];(["T";"F"],0),set ["";")";"*";"+"];(["T";"T";"*";"F"],0),set ["";")";"*";"+"]];
+            set [["E";"E";"+";"T"],3;["T";"T";"*";"F"],1],set [(["E";"E";"+";"T"],3),set ["";")";"+"];(["T";"T";"*";"F"],1),set ["";")";"*";"+"]];
+            set [["E";"T"],1;["T";"T";"*";"F"],1],set [(["E";"T"],1),set ["";")";"+"];(["T";"T";"*";"F"],1),set ["";")";"*";"+"]];
+            set [["F";"(";"E";")"],1],set [(["E";"E";"+";"T"],0),set [")";"+"];(["E";"T"],0),set [")";"+"];(["F";"(";"E";")"],0),set [")";"*";"+"];(["F";"(";"E";")"],1),set ["";")";"*";"+"];(["F";"id"],0),set [")";"*";"+"];(["T";"F"],0),set [")";"*";"+"];(["T";"T";"*";"F"],0),set [")";"*";"+"]];
+            set [["F";"(";"E";")"],3],set [(["F";"(";"E";")"],3),set ["";")";"*";"+"]];
+            set [["F";"id"],1],set [(["F";"id"],1),set ["";")";"*";"+"]];
+            set [["T";"F"],1],set [(["T";"F"],1),set ["";")";"*";"+"]];
+            set [["T";"T";"*";"F"],2],set [(["F";"(";"E";")"],0),set ["";")";"*";"+"];(["F";"id"],0),set ["";")";"*";"+"];(["T";"T";"*";"F"],2),set ["";")";"*";"+"]];
+            set [["T";"T";"*";"F"],3],set [(["T";"T";"*";"F"],3),set ["";")";"*";"+"]]]
+        Should.equal y closures
+
+    [<Fact>]
+    member this.``goto factory``() =
+        let itemCores = 
+            ItemCoreFactory.make grammar.productions
+
+        let itemCoreAttributes = 
+            ItemCoreAttributeFactory.make grammar.nonterminals grammar.nullables grammar.firsts itemCores
+   
+        let closures = 
+            CollectionFactory.make itemCores itemCoreAttributes grammar.productions
+
+        let y = 
+            GotoFactory.make closures
+            |> Set.map(fun(k1,s,k2)-> k1 |> Set.map(fun i -> i.production,i.dot),s,k2 |> Set.map(fun i -> i.production,i.dot))
+
+        //show y
+        let gotos = set [
+            set [["";"E"],0],"(",set [["F";"(";"E";")"],1];
+            set [["";"E"],0],"E",set [["";"E"],1;["E";"E";"+";"T"],1];
+            set [["";"E"],0],"F",set [["T";"F"],1];
+            set [["";"E"],0],"T",set [["E";"T"],1;["T";"T";"*";"F"],1];
+            set [["";"E"],0],"id",set [["F";"id"],1];
+            set [["";"E"],1;["E";"E";"+";"T"],1],"+",set [["E";"E";"+";"T"],2];
+            set [["E";"E";"+";"T"],1;["F";"(";"E";")"],2],")",set [["F";"(";"E";")"],3];
+            set [["E";"E";"+";"T"],1;["F";"(";"E";")"],2],"+",set [["E";"E";"+";"T"],2];
+            set [["E";"E";"+";"T"],2],"(",set [["F";"(";"E";")"],1];
+            set [["E";"E";"+";"T"],2],"F",set [["T";"F"],1];
+            set [["E";"E";"+";"T"],2],"T",set [["E";"E";"+";"T"],3;["T";"T";"*";"F"],1];
+            set [["E";"E";"+";"T"],2],"id",set [["F";"id"],1];
+            set [["E";"E";"+";"T"],3;["T";"T";"*";"F"],1],"*",set [["T";"T";"*";"F"],2];
+            set [["E";"T"],1;["T";"T";"*";"F"],1],"*",set [["T";"T";"*";"F"],2];
+            set [["F";"(";"E";")"],1],"(",set [["F";"(";"E";")"],1];
+            set [["F";"(";"E";")"],1],"E",set [["E";"E";"+";"T"],1;["F";"(";"E";")"],2];
+            set [["F";"(";"E";")"],1],"F",set [["T";"F"],1];
+            set [["F";"(";"E";")"],1],"T",set [["E";"T"],1;["T";"T";"*";"F"],1];
+            set [["F";"(";"E";")"],1],"id",set [["F";"id"],1];
+            set [["T";"T";"*";"F"],2],"(",set [["F";"(";"E";")"],1];
+            set [["T";"T";"*";"F"],2],"F",set [["T";"T";"*";"F"],3];
+            set [["T";"T";"*";"F"],2],"id",set [["F";"id"],1]]
+        Should.equal y gotos
+

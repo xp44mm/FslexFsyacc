@@ -1,0 +1,17 @@
+﻿%{
+open Expr.ExprToken
+%}
+expr : expr "+" expr         { s0 + s2 }
+     | expr "-" expr         { s0 - s2 }
+     | expr "*" expr         { s0 * s2 }
+     | expr "/" expr         { s0 / s2 }
+     | "(" expr ")"          { s1 }
+     | "-" expr %prec UMINUS { -s1 }
+     | NUMBER                { s0 }
+%%
+%left "+" "-"
+%left "*" "/"
+%right UMINUS
+%%
+NUMBER "float";
+expr "float"

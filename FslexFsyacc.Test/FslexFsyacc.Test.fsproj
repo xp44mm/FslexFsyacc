@@ -1,0 +1,82 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>netcoreapp3.1</TargetFramework>
+
+		<IsPackable>false</IsPackable>
+		<GenerateProgramFile>false</GenerateProgramFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Include="Lex\NFACombineTest.fs" />
+		<Compile Include="Lex\RegularExpressionNFATest.fs" />
+		<Compile Include="Lex\LookaheadTest.fs" />
+		<Compile Include="Lex\AnalyzerNFATest.fs" />
+		<Compile Include="Lex\NFAOperationsTest.fs" />
+		<Compile Include="Lex\DFATest.fs" />
+		<Compile Include="Lex\SubsetDFATest.fs" />
+		<Compile Include="Lex\PartitionTest.fs" />
+		<Compile Include="Lex\NFAtoDFATest.fs" />
+		<Compile Include="Lex\LexFileNormalizationTest.fs" />
+
+		<Compile Include="Yacc\Example427Test.fs" />
+		<Compile Include="Yacc\Example440Test.fs" />
+		<Compile Include="Yacc\Example448Test.fs" />
+		<Compile Include="Yacc\Example454Test.fs" />
+		<Compile Include="Yacc\LALRExpressionTest.fs" />
+		<Compile Include="Yacc\PrecedenceTest.fs" />
+		<Compile Include="Yacc\Section4_8_1Test.fs" />
+		<Compile Include="Yacc\Section4_8_2Test.fs" />
+		
+		<Compile Include="SourceTextTest.fs" />
+		
+		<Compile Include="Fslex\FslexTokenNormalizeTest.fs" />
+		<Compile Include="Fslex\FslexParseTableTest.fs" />
+		<Compile Include="Fslex\FslexDFATest.fs" />
+
+		<Compile Include="Fsyacc\SemanticGeneratorTest.fs" />
+		<Compile Include="Fsyacc\FsyaccTokenNormalizeTest.fs" />
+		<Compile Include="Fsyacc\FsyaccParseTableTest.fs" />
+		<Compile Include="Fsyacc\FsyaccDFATest.fs" />
+		<Compile Include="Expr\ExprToken.fs" />
+		<None Include="Expr\expr.fsyacc" />
+		<Compile Include="Expr\ExprParseTable.fs" />
+		<Compile Include="Expr\ExprParseTableTest.fs" />
+		<Compile Include="Expr\ExprCompilerTest.fs" />
+		
+		<Compile Include="PolynomialExpressions\Polynomials.fs" />
+		<Compile Include="PolynomialExpressions\Tokenizer.fs" />
+		<Compile Include="PolynomialExpressions\TokenizerTest.fs" />
+		<None Include="PolynomialExpressions\term.fslex" />
+		<Compile Include="PolynomialExpressions\TermDFA.fs" />
+		<Compile Include="PolynomialExpressions\TermDFATest.fs" />
+		<Compile Include="PolynomialExpressions\Parser.fs" />
+		<Compile Include="PolynomialExpressions\ParserTest.fs" />
+
+		<Compile Include="Program.fs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="FSharp.xUnit" Version="1.2.1" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.0.0" />
+		<PackageReference Include="xunit" Version="2.4.1" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="coverlet.collector" Version="3.1.0">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\FslexFsyacc.Runtime\FslexFsyacc.Runtime.fsproj" />
+	  <ProjectReference Include="..\FslexFsyacc\FslexFsyacc.fsproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Update="FSharp.Core" Version="6.0.1" />
+	</ItemGroup>
+
+</Project>

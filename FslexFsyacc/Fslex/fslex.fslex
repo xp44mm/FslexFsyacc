@@ -1,0 +1,14 @@
+﻿%{
+open FslexFsyacc.Fslex.FslexToken
+%}
+last = ")"|"*"|"+"|"?"|"HOLE"|"ID"|"QUOTE"|"]"
+first = "("|"HOLE"|"ID"|"QUOTE"|"["
+any = "\n"|"%%"|"&"|"("|")"|"*"|"+"|"/"|"="|"?"|"HOLE"|"ID"|"QUOTE"|"SEMANTIC"|"["|"]"|"|"|HEADER
+%%
+BOF ["\n" "%%"]*                 { [] }
+["\n" "%%"]* EOF                 { [] }
+["\n" "%%"]* HEADER ["\n" "%%"]* { lexbuf |> List.filter(function HEADER _ -> true | _ -> false) }
+"%%" "\n"+			             { [lexbuf.[0]] }
+"\n" "\n"+			             { [lexbuf.[0]] }
+{last} / {first}                 { [lexbuf.[0]; AMP] }
+{any}                            { lexbuf }

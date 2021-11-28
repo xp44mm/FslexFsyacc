@@ -1,0 +1,8 @@
+﻿%{
+open PolynomialExpressions.Tokenizer
+%}
+index = "**" INT
+sign = [ "+" "-" ]
+%%
+{sign}? INT              { toConst lexbuf }
+{sign}? INT? ID {index}? { toTerm lexbuf }

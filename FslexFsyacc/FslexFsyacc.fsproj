@@ -1,0 +1,94 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+		<Description>Tools for Fslex/Fsyacc analyzer/parser generation tools.</Description>
+		<PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
+		<Copyright>xp44mm</Copyright>
+		<PackageProjectUrl>https://github.com/xp44mm/FslexFsyacc</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/xp44mm/FslexFsyacc</RepositoryUrl>
+		<PackageTags>lex,yacc</PackageTags>
+		<PackageReleaseNotes>first version</PackageReleaseNotes>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Include="Lex\RegularExpression.fs" />
+		<Compile Include="Lex\Transition.fs" />
+		<Compile Include="Lex\RegularNFA.fs" />
+		<Compile Include="Lex\NFACombine.fs" />
+		<Compile Include="Lex\RegularExpressionNFA.fs" />
+		<Compile Include="Lex\PatternNFA.fs" />
+		<Compile Include="Lex\AnalyzerNFA.fs" />
+		<Compile Include="Lex\NFAOperations.fs" />
+		<Compile Include="Lex\SubsetDFA.fs" />
+		<Compile Include="Lex\Partition.fs" />
+		<Compile Include="Lex\PartitionDFA.fs" />
+		<Compile Include="Lex\DFATools.fs" />
+		<Compile Include="Lex\DFA.fs" />
+
+		<Compile Include="Yacc\NullableFactory.fs" />
+		<Compile Include="Yacc\FirstFactory.fs" />
+		<Compile Include="Yacc\LastFactory.fs" />
+		<Compile Include="Yacc\FollowFactory.fs" />
+		<Compile Include="Yacc\GrammarMemoiz.fs" />
+		<Compile Include="Yacc\Grammar.fs" />
+		<Compile Include="Yacc\ItemCore.fs" />
+		<Compile Include="Yacc\ItemCoreFactory.fs" />
+		<Compile Include="Yacc\ItemCoreAttributeFactory.fs" />
+		<Compile Include="Yacc\ClosureFactory.fs" />
+		<Compile Include="Yacc\ClosureOperators.fs" />
+		<Compile Include="Yacc\CollectionFactory.fs" />
+		<Compile Include="Yacc\GotoFactory.fs" />
+		<Compile Include="Yacc\Action.fs" />
+		<Compile Include="Yacc\AmbiguousTableFactory.fs" />
+		<Compile Include="Yacc\AmbiguousTable.fs" />
+		<Compile Include="Yacc\ConflictFactory.fs" />
+		<Compile Include="Yacc\Associativity.fs" />
+		<Compile Include="Yacc\PrecedenceKey.fs" />
+		<Compile Include="Yacc\ProductionPrecedence.fs" />
+		<Compile Include="Yacc\TerminalPrecedence.fs" />
+		<Compile Include="Yacc\EliminatingAmbiguity.fs" />
+		<Compile Include="Yacc\ParseTableTools.fs" />
+		<Compile Include="Yacc\ParseTable.fs" />
+		<Compile Include="SourceText.fs" />
+
+		<Compile Include="Fslex\LexSemanticGenerator.fs" />
+
+		<Compile Include="Fslex\LexFileNormalization.fs" />
+		<Compile Include="Fslex\FslexToken.fs" />
+		<None Include="Fslex\fslex.fsyacc" />
+		<Compile Include="Fslex\FslexParseTable.fs" />
+		<None Include="Fslex\fslex.fslex" />
+		<Compile Include="Fslex\FslexDFA.fs" />
+		<Compile Include="Fslex\FslexCompiler.fs" />
+		<Compile Include="Fslex\FslexDFAFile.fs" />
+		<Compile Include="Fslex\FslexFile.fs" />
+
+		<Compile Include="Fsyacc\SemanticGenerator.fs" />
+		<Compile Include="Fsyacc\FsyaccToken.fs" />
+		<None Include="Fsyacc\fsyacc.fsyacc" />
+		<Compile Include="Fsyacc\FsyaccParseTable.fs" />
+		<None Include="Fsyacc\fsyacc.fslex" />
+		<Compile Include="Fsyacc\FsyaccDFA.fs" />
+		<Compile Include="Fsyacc\FsyaccCompiler.fs" />
+		<Compile Include="Fsyacc\FsyaccParseTableFile.fs" />
+		<Compile Include="Fsyacc\FsyaccFile.fs" />
+
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="FSharp.Idioms" Version="1.1.15" />
+		<PackageReference Include="FSharp.Literals" Version="2.2.5" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\FslexFsyacc.Runtime\FslexFsyacc.Runtime.fsproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Update="FSharp.Core" Version="6.0.1" />
+	</ItemGroup>
+
+</Project>

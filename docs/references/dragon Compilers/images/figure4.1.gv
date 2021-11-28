@@ -1,0 +1,22 @@
+digraph html { 
+rankdir = LR; 
+start [shape=plaintext,label="source\nprogram"];
+lex [shape=record,label="Lexical\nAnalyzer"];
+parser [shape=record,label="Parser"];
+rest [shape=record,label="Rest of\nFront End"];
+rep [shape=plaintext,label="intermediate\nrepresentation"];
+st [shape=record,label="Symbol\nTable"];
+{
+start ->lex
+lex -> parser [label = token]
+parser -> lex [label = "get next token"]
+parser -> rest [label = "parse\ntree"]
+rest -> rep
+}
+{
+lex -> st[dir = both]
+parser -> st[dir = both]
+rest -> st[dir = both]
+}
+{rank = same; parser;st;} 
+} 
