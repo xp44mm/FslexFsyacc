@@ -12,12 +12,10 @@ type ExprCompilerTest(output:ITestOutputHelper) =
         |> Literal.stringify
         |> output.WriteLine
 
-
     let compile (inp:string) =
         inp
         |> ExprToken.tokenize
         |> ExprParseTable.parse
-        |> unbox<float>
 
     [<Fact>]
     member this.``0 - basis test``() =

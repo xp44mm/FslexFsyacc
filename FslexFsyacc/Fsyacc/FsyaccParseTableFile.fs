@@ -17,21 +17,22 @@ type FsyaccParseTableFile =
 
     /// 输入模块带名字空间的全名
     member this.generateParseTable(moduleName:string) =
+        let types = Map.ofList this.declarations // symbol -> type of symbol
         let semantics =
-            let types = Map.ofList this.declarations // symbol -> type of symbol
             this.semantics
             |> Map.map
                 (fun i semantic ->
                     let prod = this.productions.[i]
                     SemanticGenerator.decorateSemantic types prod semantic)
             |> Map.toArray
+
         let mappers =
             [ 
                 for i, fn in semantics do
                     yield $"    {i},{fn}" ]
             |> String.concat Environment.NewLine
             |> sprintf "Map [\r\n%s]"
-
+        let startSymbol = this.productions.[0].Tail.Head
         //解析表数据
         let result =
             [ 
@@ -48,6 +49,7 @@ type FsyaccParseTableFile =
                 "let parser = Parser(productions, actions, kernelSymbols, mappers)"
                 "let parse (tokens:seq<_>) ="
                 "    parser.parse(tokens, getTag, getLexeme)"
+                $"    |> unbox<{types.[startSymbol]}>"
             ]
             |> String.concat Environment.NewLine
         result

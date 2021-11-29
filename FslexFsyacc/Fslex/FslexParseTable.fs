@@ -156,3 +156,4 @@ open FslexFsyacc.Runtime
 let parser = Parser(productions, actions, kernelSymbols, mappers)
 let parse (tokens:seq<_>) =
     parser.parse(tokens, getTag, getLexeme)
+    |> unbox<string*(string*RegularExpression<string>)list*(RegularExpression<string>list*string)list>

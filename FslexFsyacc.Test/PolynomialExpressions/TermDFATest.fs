@@ -29,6 +29,7 @@ type TermDFATest(output:ITestOutputHelper) =
             |> Seq.concat
             |> List.ofSeq
         show tokens
+
     [<Fact(Skip="once and for all!")>] // 
     member this.``1 - generate DFA``() =
         let name = "TermDFA"

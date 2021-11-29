@@ -30,13 +30,10 @@ After `ParseTable` module is generated, you can use the parse function to work:
 
 ```F#
 let inp = "2 + 3 * 5"
-
 let y = 
     inp
     |> ExprToken.tokenize
     |> ExprParseTable.parse
-    |> unbox<float>
-
 Should.equal y 17.0
 ```
 

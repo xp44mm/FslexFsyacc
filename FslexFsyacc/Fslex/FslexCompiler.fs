@@ -1,7 +1,6 @@
 ﻿module FslexFsyacc.Fslex.FslexCompiler
 
 open FslexFsyacc.Lex
-open FslexFsyacc.Fslex.FslexToken
 
 //let normalize (tokens:seq<FslexToken>) = 
 //    FslexDFA.analyzer.split(tokens,getTag)
@@ -18,7 +17,7 @@ let parseToStructuralData (fslex:string) =
         |> FslexDFA.split
         |> Seq.concat
     FslexParseTable.parse tokens
-    |> unbox<string*(string*RegularExpression<string>)list*(RegularExpression<string>list*string)list>
+    //|> unbox<string*(string*RegularExpression<string>)list*(RegularExpression<string>list*string)list>
 
 ///获取被使用的正则定义名称
 let getUsedNames

@@ -106,7 +106,7 @@ type FsyaccFile =
             |> Set.filter (Triple.last >> Option.isSome)
             |> Set.map (fun (kernel, symbol, action) -> kernel, symbol, Option.get action)
         //sactions的索引
-        let rules =
+        let productions =
             ParseTableTools.getProductionsMap ambiguousTable.productions
 
         let kernelSymbols =
@@ -116,7 +116,7 @@ type FsyaccFile =
 
         let isemantics = 
             let mp = Map.ofList mainRules // prod -> semantic
-            rules
+            productions
             |> Map.filter (fun i prod -> i < 0 && prod.Head > "")
             |> Map.map(fun i prod -> mp.[prod])
 
@@ -126,7 +126,7 @@ type FsyaccFile =
 
         { 
             header = this.header
-            productions = rules
+            productions = productions
             actions = ParseTableTools.getActions encodeTable
             kernelSymbols = kernelSymbols
             semantics = isemantics 

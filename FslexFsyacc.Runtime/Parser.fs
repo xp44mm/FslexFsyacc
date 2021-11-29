@@ -73,5 +73,5 @@ type Parser
                 loop pushedTrees pushedStates element
             else failwith "never"
 
-        loop [] [0] (nextElement())
+        loop [] [0] <| nextElement()
         |> List.exactlyOne

@@ -16,4 +16,4 @@ let compile (inp:string) =
     |> FsyaccDFA.split
     |> Seq.concat
     |> FsyaccParseTable.parse
-    |> unbox<string*(string*((string list*string*string)list))list*(string*string list)list*(string*string)list>
+    //|> unbox<string*(string*((string list*string*string)list))list*(string*string list)list*(string*string)list>

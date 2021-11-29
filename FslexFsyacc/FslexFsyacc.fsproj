@@ -11,6 +11,9 @@
 		<RepositoryUrl>https://github.com/xp44mm/FslexFsyacc</RepositoryUrl>
 		<PackageTags>lex,yacc</PackageTags>
 		<PackageReleaseNotes>first version</PackageReleaseNotes>
+		<Company>34696643@qq.com</Company>
+		<Authors>xp44m</Authors>
+		<Version>1.0.1</Version>
 	</PropertyGroup>
 
 	<ItemGroup>
