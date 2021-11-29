@@ -20,6 +20,7 @@ type FslexDFATest(output:ITestOutputHelper) =
     let filePath = Path.Combine(sourcePath, @"fslex.fslex")
     let text = File.ReadAllText(filePath)
     let fslex = FslexFile.parse text
+
     [<Fact>]
     member this.``0 - compiler test``() =
         let hdr,dfs,rls = FslexCompiler.parseToStructuralData text

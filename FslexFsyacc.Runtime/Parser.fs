@@ -1,6 +1,7 @@
 ﻿namespace FslexFsyacc.Runtime
 
 open FSharp.Idioms
+open FSharp.Literals
 
 type Parser 
     (
@@ -13,7 +14,7 @@ type Parser
     ///
     member this.parse<'tok>(tokens: seq<'tok>,getTag:'tok -> string,getLexeme:'tok->obj) =
         let iterator = tokens.GetEnumerator()
-        let nextElement() =
+        let nextToken() =
             if iterator.MoveNext() then
                 Some iterator.Current
             else //EOF
@@ -22,13 +23,13 @@ type Parser
         let rec loop
             (trees: obj list)
             (states: int list)
-            (element:'tok option) 
+            (maybeToken:'tok option) 
             =
 
             let sm = states.Head
 
             let ai = // ,remainInput
-                element
+                maybeToken
                 |> Option.map getTag
                 |> Option.defaultValue ""
 
@@ -40,18 +41,18 @@ type Parser
                         "<undefined>"
                     else
                         kernelSymbols.[sm]
-                let ai = if ai = "" then "EOF" else ai
-                failwithf "syntactic error: symbol='%s'; lookahead='%s'; state='%d'" symbol ai sm
+                let la = if maybeToken.IsNone then "EOF" else Literal.stringify maybeToken.Value
+                failwithf "syntactic error: lookahead='%s'; symbol='%s'; state='%d'" la symbol sm
 
             let action = actions.[sm].[ai]
             if action = 0 then
                 trees
             elif action > 0 then
                 let state = action
-                let tree = getLexeme(element.Value)
+                let tree = getLexeme(maybeToken.Value)
                 let pushedTrees = tree::trees
                 let newStates = state::states //状态以及对应的票根
-                loop pushedTrees newStates (nextElement())
+                loop pushedTrees newStates (nextToken())
             elif action < 0 then // 非结合性弹出错误？
                 let symbols = productions.[action] //产生式符号列表。比如产生式 e-> e + e 的列表为 [e,e,+,e]
                 let leftside = symbols.[0]
@@ -70,8 +71,8 @@ type Parser
                     let newstate = actions.[smr].[leftside]
                     newstate :: popedStates
 
-                loop pushedTrees pushedStates element
+                loop pushedTrees pushedStates maybeToken
             else failwith "never"
 
-        loop [] [0] <| nextElement()
+        loop [] [0] <| nextToken()
         |> List.exactlyOne

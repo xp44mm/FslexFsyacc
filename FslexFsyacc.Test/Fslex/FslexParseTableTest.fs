@@ -27,7 +27,7 @@ type FslexParseTableTest(output:ITestOutputHelper) =
     let parseTbl = fsyacc.toFsyaccParseTable()
 
     [<Fact(Skip="once for all!")>] // 
-    member this.``0 - fslex ParseTable``() =
+    member this.``0 - generate ParseTable``() =
         let name = "FslexParseTable"
         let moduleName = $"FslexFsyacc.Fslex.{name}"
         //解析表数据
