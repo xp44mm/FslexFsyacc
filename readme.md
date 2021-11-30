@@ -1,6 +1,6 @@
 # FslexFsyacc & Runtime
 
-Tools and Runtime for Fslex/Fsyacc analyzer/parser generation tools. Fslex is a code generator that uses regular expression techniques to divide the token sequence into groups at a higher level. Fsyacc is a code generator that leverages BPF technology and specifies priority to resolve the token sequence to an abstract syntax tree.
+Tools and Runtime for Fslex/Fsyacc analyzer/parser generation tools. Fslex is a code generator that uses regular expression techniques to divide the token sequence into groups at a higher level. Fsyacc is a code generator that use BNF productions and precedences to resolve the token sequence to an abstract syntax tree.
 
 ## Fsyacc Example
 

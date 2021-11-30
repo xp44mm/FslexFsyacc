@@ -13,7 +13,7 @@ type StateContext<'state, 'tag when 'state:comparison> =
         canMoveNext: bool
     }
 
-    /// 回退到第一个位于集合中的状态
+    /// 回退到第一个位于输入集合中的状态
     member context.backword (states:Set<'state>) =
         //找到接受狀態
         if states.Contains context.state then

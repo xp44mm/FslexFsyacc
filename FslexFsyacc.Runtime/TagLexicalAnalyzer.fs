@@ -3,20 +3,19 @@
 /// 3.8 Lex DFA 模擬器，解析标签
 type TagLexicalAnalyzer<'tag when 'tag:comparison>
     (
-        nextStates:Map<uint32,Map<'tag,uint32>>,
-        lexemesFromFinal:Map<uint32,Set<uint32>>,
-        universalFinals:Set<uint32>,
-        indeciesFromFinal:Map<uint32,int>
+        nextStates       :Map<uint32,Map<'tag,uint32>>, // state -> symbol -> nextState
+        lexemesFromFinal :Map<uint32,Set<uint32>>, // final state -> lexeme state set
+        universalFinals  :Set<uint32>, // all of the final state
+        indeciesFromFinal:Map<uint32,int> // final state -> index
     ) =
-    (*
-    final状态是包括向前看的最长状态。
-    lexeme状态是回退后最终匹配的较短状态。
-    *)
+    //final状态是包括向前看的最长状态。
+    //lexeme状态是回退后最终匹配的较短状态。
     let tryNextState state elem =
         if nextStates.ContainsKey(state) && nextStates.[state].ContainsKey(elem) then
             let nextState = nextStates.[state].[elem]
             Some nextState
-        else None //死狀態 todo:当死状态时，默认前进一个token，索引号为dfinalLexemes.Length
+        else None //死狀態 
+        //todo:当死状态时，默认前进一个token，索引号为dfinalLexemes.Length
 
     /// 從臨死狀態(死狀態的前一個狀態)回溯到lexeme狀態
     let retract (context: StateContext<uint32,'tag>) =
@@ -57,6 +56,7 @@ type TagLexicalAnalyzer<'tag when 'tag:comparison>
     ///截取詞素前綴后，剩餘的輸入序列作爲輸入，重新開始迭代，直到耗盡序列。
     member this.simulate<'tag> (inp:seq<'tag>) =
         let iterator = inp.GetEnumerator()
+
         let nextTag() =
             if iterator.MoveNext() then
                 Some iterator.Current
