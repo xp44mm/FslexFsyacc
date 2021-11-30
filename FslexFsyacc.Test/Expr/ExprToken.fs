@@ -10,8 +10,6 @@ type ExprToken =
 | STAR
 | DIV
 
-open FSharp.Idioms.StringOps
-
 let getTag = function
 | NUMBER _ -> "NUMBER"
 | LPAREN   -> "("
@@ -24,6 +22,8 @@ let getTag = function
 let getLexeme = function
 | NUMBER n -> box n
 | _   -> null
+
+open FSharp.Idioms.StringOps
 
 let tokenize(inp:string) =
     let rec loop (inp:string) =
