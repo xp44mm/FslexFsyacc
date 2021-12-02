@@ -10,14 +10,14 @@ type TagLexicalAnalyzer<'tag when 'tag:comparison>
     ) =
     //final状态是包括向前看的最长状态。
     //lexeme状态是回退后最终匹配的较短状态。
-    let tryNextState state elem =
-        if nextStates.ContainsKey(state) && nextStates.[state].ContainsKey(elem) then
-            let nextState = nextStates.[state].[elem]
+    let tryNextState state symbol =
+        if nextStates.ContainsKey(state) && nextStates.[state].ContainsKey(symbol) then
+            let nextState = nextStates.[state].[symbol]
             Some nextState
         else None //死狀態 
         //todo:当死状态时，默认前进一个token，索引号为dfinalLexemes.Length
 
-    /// 從臨死狀態(死狀態的前一個狀態)回溯到lexeme狀態
+    /// 從臨死狀態(死狀態的前一個狀態)回溯经过final状态，最后到lexeme狀態
     let retract (context: StateContext<uint32,'tag>) =
         //回溯查找接受狀態
         let finalContext = context.backword universalFinals
