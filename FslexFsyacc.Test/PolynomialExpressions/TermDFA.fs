@@ -6,13 +6,15 @@ let indicesFromFinal = Map [2u,0;3u,1;5u,1]
 let header = "open PolynomialExpressions.Tokenizer"
 let semantics = ["toConst lexbuf";"toTerm lexbuf"]
 open PolynomialExpressions.Tokenizer
-let mappers = [|
-    fun (lexbuf:_ list) ->
+let finalMappers = Map [
+    2u, fun (lexbuf:_ list) ->
         toConst lexbuf
-    fun (lexbuf:_ list) ->
+    3u, fun (lexbuf:_ list) ->
         toTerm lexbuf
-|]
+    5u, fun (lexbuf:_ list) ->
+        toTerm lexbuf
+]
 open FslexFsyacc.Runtime
-let analyzer = LexicalAnalyzer(nextStates, lexemesFromFinal, universalFinals, indicesFromFinal, mappers)
-let split (tokens:seq<_>) = 
-    analyzer.split(tokens,getTag)
+let analyzer = Analyzer(nextStates, lexemesFromFinal, universalFinals, finalMappers)
+let analyze (tokens:seq<_>) = 
+    analyzer.analyze(tokens,getTag)

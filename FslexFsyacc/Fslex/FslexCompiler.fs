@@ -2,13 +2,6 @@
 
 open FslexFsyacc.Lex
 
-//let normalize (tokens:seq<FslexToken>) = 
-//    FslexDFA.analyzer.split(tokens,getTag)
-//    |> Seq.concat
-
-//let treeParse (tokens:seq<FslexToken>) = 
-//    FslexParseTable.parser.parse(tokens,getTag,getLexeme)
-
 /// 解析文本为结构化数据
 let parseToStructuralData (fslex:string) =
     let tokens = 
@@ -17,7 +10,6 @@ let parseToStructuralData (fslex:string) =
         |> FslexDFA.split
         |> Seq.concat
     FslexParseTable.parse tokens
-    //|> unbox<string*(string*RegularExpression<string>)list*(RegularExpression<string>list*string)list>
 
 ///获取被使用的正则定义名称
 let getUsedNames

@@ -29,7 +29,8 @@ type FsyaccParseTableFile =
         let mappers =
             [ 
                 for i, fn in semantics do
-                    yield $"    {i},{fn}" ]
+                    yield $"    {i},{fn}" 
+            ]
             |> String.concat Environment.NewLine
             |> sprintf "Map [\r\n%s]"
         let startSymbol = this.productions.[0].Tail.Head

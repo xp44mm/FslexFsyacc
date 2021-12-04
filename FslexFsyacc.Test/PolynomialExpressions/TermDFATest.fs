@@ -30,17 +30,19 @@ type TermDFATest(output:ITestOutputHelper) =
             |> List.ofSeq
         show tokens
 
-    [<Fact(Skip="once and for all!")>] // 
+    [<Fact>] // (Skip="once and for all!")
     member this.``1 - generate DFA``() =
         let name = "TermDFA"
         let moduleName = $"PolynomialExpressions.{name}"
 
-        let y = fslex.toFslexDFA()
-        let result = y.generateModule(moduleName)
-
+        let dfafile = fslex.toFslexDFA()
+        let result = dfafile.generate(moduleName)
         let outputDir = Path.Combine(__SOURCE_DIRECTORY__, $"{name}.fs")
+
         File.WriteAllText(outputDir, result)
         output.WriteLine("output lex:" + outputDir)
+
+
 
     [<Fact>]
     member this.``2 - valid DFA``() =

@@ -30,11 +30,11 @@ type FslexDFATest(output:ITestOutputHelper) =
 
     [<Fact(Skip="once and for all!")>] // 
     member this.``1 - generate DFA``() =
-        let name = "FslexDFA"
+        let name = "FslexDFA2"
         let moduleName = $"FslexFsyacc.Fslex.{name}"
 
         let y = fslex.toFslexDFA()
-        let result = y.generateModule(moduleName)
+        let result = y.generate(moduleName)
 
         let outputDir = Path.Combine(sourcePath, $"{name}.fs")
         File.WriteAllText(outputDir, result)

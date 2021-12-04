@@ -8,7 +8,7 @@ let tab i =
 
 let decorateSemantic (semantic:string) =
     [
-        $"{tab 1}fun (lexbuf:_ list) ->"
+        $"fun (lexbuf:_ list) ->"
         $"{tab 2}{semantic}"
     ] |> String.concat Environment.NewLine
 

@@ -5,6 +5,6 @@ open PolynomialExpressions
 
 let parse (tokens:seq<Token>) = 
     tokens
-    |> TermDFA.split
+    |> TermDFA.analyze
     |> Seq.toList
 

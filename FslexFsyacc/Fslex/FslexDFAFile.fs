@@ -34,3 +34,32 @@ type FslexDFAFile =
         ]
         |> String.concat Environment.NewLine
 
+    member this.generate(moduleName:string) =
+        let dfa = this.dfa
+        let finalMappers = // final -> mapper
+            dfa.indicesFromFinal
+            |> Map.map(fun final i ->
+                let fn = this.semantics.[i]
+                LexSemanticGenerator.decorateSemantic fn
+                )
+            |> Map.toList
+
+        [
+            $"module {moduleName}"
+            "let nextStates = " + Literal.stringify dfa.nextStates
+            "let lexemesFromFinal = " + Literal.stringify dfa.lexemesFromFinal
+            "let universalFinals = " + Literal.stringify dfa.universalFinals
+            "let indicesFromFinal = " + Literal.stringify dfa.indicesFromFinal
+            $"let header = {Literal.stringify this.header}"
+            $"let semantics = {Literal.stringify this.semantics}"
+            this.header
+            "let finalMappers = Map ["
+            for (final,mapper) in finalMappers do
+                $"    {Literal.stringify final}, {mapper.TrimStart()}"
+            "]"
+            "open FslexFsyacc.Runtime"
+            "let analyzer = Analyzer(nextStates, lexemesFromFinal, universalFinals, finalMappers)"
+            "let analyze (tokens:seq<_>) = "
+            "    analyzer.analyze(tokens,getTag)"
+        ]
+        |> String.concat Environment.NewLine

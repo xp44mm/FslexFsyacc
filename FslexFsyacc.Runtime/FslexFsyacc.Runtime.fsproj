@@ -8,11 +8,11 @@
     <PackageProjectUrl>https://github.com/xp44mm/FslexFsyacc</PackageProjectUrl>
     <RepositoryUrl>https://github.com/xp44mm/FslexFsyacc</RepositoryUrl>
     <PackageTags>lex,yacc</PackageTags>
-    <PackageReleaseNotes>first version</PackageReleaseNotes>
+    <PackageReleaseNotes>analyzer</PackageReleaseNotes>
     <Authors>xp44m</Authors>
     <Company>34696643@qq.com</Company>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <Version>1.0.1</Version>
+    <Version>1.0.3</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,10 +20,11 @@
     <Compile Include="TagLexicalAnalyzer.fs" />
     <Compile Include="LexicalAnalyzer.fs" />
     <Compile Include="Parser.fs" />
+    <Compile Include="Analyzer.fs" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FSharp.Idioms" Version="1.1.15" />
+    <PackageReference Include="FSharp.Idioms" Version="1.1.16" />
     <PackageReference Include="FSharp.Literals" Version="2.2.5" />
   </ItemGroup>
 
