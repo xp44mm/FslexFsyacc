@@ -48,8 +48,8 @@ open PolynomialExpressions.Tokenizer
 index = "**" INT
 sign = [ "+" "-" ]
 %%
-{sign}? INT              { toConst lexbuf }
-{sign}? INT? ID {index}? { toTerm lexbuf }
+<sign>? INT              { toConst lexbuf }
+<sign>? INT? ID <index>? { toTerm lexbuf }
 ```
 
 After `DFA` module is generated, you can use the split function to work:
@@ -59,7 +59,7 @@ let x = "2x**2+3x-5"
 let y = 
     x 
     |> Tokenizer.tokenize
-    |> TermDFA.split
+    |> TermDFA.analyze
     |> Seq.toList
 
 Should.equal y [Term(2,"x",2);Term(3,"x",1);Const -5]
