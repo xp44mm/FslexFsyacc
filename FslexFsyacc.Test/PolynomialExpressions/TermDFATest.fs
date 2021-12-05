@@ -25,12 +25,12 @@ type TermDFATest(output:ITestOutputHelper) =
         let tokens = 
             text
             |> FslexToken.tokenize
-            |> FslexDFA.split
+            |> FslexDFA.analyze
             |> Seq.concat
             |> List.ofSeq
         show tokens
 
-    [<Fact>] // (Skip="once and for all!")
+    [<Fact(Skip="once and for all!")>] // 
     member this.``1 - generate DFA``() =
         let name = "TermDFA"
         let moduleName = $"PolynomialExpressions.{name}"

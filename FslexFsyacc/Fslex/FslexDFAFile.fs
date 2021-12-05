@@ -27,6 +27,7 @@ type FslexDFAFile =
             for m in this.semantics do
                 LexSemanticGenerator.decorateSemantic m
             "|]"
+
             "open FslexFsyacc.Runtime"
             "let analyzer = LexicalAnalyzer(nextStates, lexemesFromFinal, universalFinals, indicesFromFinal, mappers)"
             "let split (tokens:seq<_>) = "
@@ -36,14 +37,6 @@ type FslexDFAFile =
 
     member this.generate(moduleName:string) =
         let dfa = this.dfa
-        let finalMappers = // final -> mapper
-            dfa.indicesFromFinal
-            |> Map.map(fun final i ->
-                let fn = this.semantics.[i]
-                LexSemanticGenerator.decorateSemantic fn
-                )
-            |> Map.toList
-
         [
             $"module {moduleName}"
             "let nextStates = " + Literal.stringify dfa.nextStates
@@ -53,10 +46,13 @@ type FslexDFAFile =
             $"let header = {Literal.stringify this.header}"
             $"let semantics = {Literal.stringify this.semantics}"
             this.header
-            "let finalMappers = Map ["
-            for (final,mapper) in finalMappers do
-                $"    {Literal.stringify final}, {mapper.TrimStart()}"
-            "]"
+            "let mappers = [|"
+            for fn in this.semantics do
+                LexSemanticGenerator.decorateSemantic fn
+            "|]"
+            "let finalMappers ="
+            "    indicesFromFinal"
+            "    |> Map.map(fun _ i -> mappers.[i])"
             "open FslexFsyacc.Runtime"
             "let analyzer = Analyzer(nextStates, lexemesFromFinal, universalFinals, finalMappers)"
             "let analyze (tokens:seq<_>) = "

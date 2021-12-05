@@ -2,13 +2,13 @@
 
 open System
 
-let tab i = 
+let indent i = 
     let space i = String.replicate i " "
     space (4*i)
 
 let decorateSemantic (semantic:string) =
     [
-        $"fun (lexbuf:_ list) ->"
-        $"{tab 2}{semantic}"
+        $"{indent 1}fun (lexbuf:_ list) ->"
+        $"{indent 2}{semantic}"
     ] |> String.concat Environment.NewLine
 

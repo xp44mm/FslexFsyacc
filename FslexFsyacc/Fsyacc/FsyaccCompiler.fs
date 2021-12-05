@@ -3,6 +3,6 @@
 let compile (inp:string) =
     inp
     |> FsyaccToken.tokenize
-    |> FsyaccDFA.split
+    |> FsyaccDFA.analyze
     |> Seq.concat
     |> FsyaccParseTable.parse

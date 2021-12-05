@@ -30,7 +30,7 @@ type FsyaccDFATest(output:ITestOutputHelper) =
         let name = "FsyaccDFA"
         let moduleName = $"FslexFsyacc.Fsyacc.{name}"
 
-        let result = y.generateModule( moduleName )
+        let result = y.generate(moduleName)
         let outputDir = Path.Combine(sourcePath, $"{name}.fs")
         File.WriteAllText(outputDir, result)
         output.WriteLine("output lex:" + outputDir)

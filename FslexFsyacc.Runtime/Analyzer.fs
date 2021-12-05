@@ -1,6 +1,8 @@
 ﻿namespace FslexFsyacc.Runtime
 
+open System
 open FSharp.Idioms
+open FSharp.Literals
 
 ///解析带数据的对象
 //final状态是包括向前看的最长状态。
@@ -28,7 +30,6 @@ type Analyzer<'tok,'u>
         let finalStates =
             revStates
             |> List.skipWhile(universalFinals.Contains>>not)
-
         let finalState = finalStates.Head
 
         let lexemeStates =
@@ -40,7 +41,7 @@ type Analyzer<'tok,'u>
                 if lexemeStates.IsEmpty then
                     failwithf "no found: %A" revStates
                 lexemeStates
-            else revStates
+            else finalStates
         finalState, lexemeStates.Length
 
     member this.analyze(inputs:seq<'tok>, getTag:'tok -> string) =
@@ -59,7 +60,7 @@ type Analyzer<'tok,'u>
                 | None -> nextStates //没有下一状态
                 | Some nextState ->
                     forward nextState nextStates
-        let getSection () =
+        let getDivision () =
             let revStates = forward 0u []
             let finalState,stateCount =
                 try
@@ -75,5 +76,5 @@ type Analyzer<'tok,'u>
 
         seq {
             while iterator.allDone()|> not do
-                yield getSection()
+                yield getDivision()
         }

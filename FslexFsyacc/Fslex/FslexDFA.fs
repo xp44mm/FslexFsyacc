@@ -22,7 +22,10 @@ let mappers = [|
     fun (lexbuf:_ list) ->
         lexbuf
 |]
+let finalMappers =
+    indicesFromFinal
+    |> Map.map(fun _ i -> mappers.[i])
 open FslexFsyacc.Runtime
-let analyzer = LexicalAnalyzer(nextStates, lexemesFromFinal, universalFinals, indicesFromFinal, mappers)
-let split (tokens:seq<_>) = 
-    analyzer.split(tokens,getTag)
+let analyzer = Analyzer(nextStates, lexemesFromFinal, universalFinals, finalMappers)
+let analyze (tokens:seq<_>) = 
+    analyzer.analyze(tokens,getTag)

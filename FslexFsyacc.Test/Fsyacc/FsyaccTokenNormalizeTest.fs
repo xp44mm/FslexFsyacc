@@ -17,7 +17,7 @@ type FsyaccTokenNormalizeTest(output:ITestOutputHelper) =
 
     let norm tokens = 
         tokens
-        |> FsyaccDFA.split
+        |> FsyaccDFA.analyze
         |> Seq.concat
         |> Seq.toList
 

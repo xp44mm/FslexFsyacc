@@ -65,7 +65,6 @@
 		<Compile Include="Fslex\FslexParseTable.fs" />
 		<None Include="Fslex\fslex.fslex" />
 		<Compile Include="Fslex\FslexDFA.fs" />
-		<Compile Include="Fslex\FslexDFA2.fs" />
 		<Compile Include="Fslex\FslexCompiler.fs" />
 		<Compile Include="Fslex\FslexDFAFile.fs" />
 		<Compile Include="Fslex\FslexFile.fs" />

@@ -17,7 +17,7 @@ type AnalyzeTest(output:ITestOutputHelper) =
 
     let norm tokens =
         tokens
-        |> FslexDFA2.analyze
+        |> FslexDFA.analyze
         |> Seq.concat
         |> List.ofSeq
 
@@ -65,3 +65,15 @@ type AnalyzeTest(output:ITestOutputHelper) =
 
         let e = [LF; ]
         Should.equal e y
+
+    [<Fact>]
+    member this.``percent ``() =
+        let tokens = [LF;PERCENT;LF];
+        let y =
+            tokens
+            |> FslexDFA.analyze
+            |> Seq.toList
+
+        show y
+
+

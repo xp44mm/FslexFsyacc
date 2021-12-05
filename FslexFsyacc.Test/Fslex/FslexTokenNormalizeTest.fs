@@ -17,7 +17,7 @@ type FslexTokenNormalizeTest(output:ITestOutputHelper) =
 
     let norm tokens =
         tokens
-        |> FslexDFA.split
+        |> FslexDFA.analyze
         |> Seq.concat
         |> List.ofSeq
 
