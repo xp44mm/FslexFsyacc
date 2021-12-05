@@ -10,5 +10,5 @@ BOF ["\n" "%%"]*                 { [] }
 HEADER ["\n" "%%"]*              { [lexbuf.[0]] }
 "%%" "\n"+			             { [lexbuf.[0]] }
 "\n" "\n"+			             { [lexbuf.[0]] }
-{last} / {first}                 { [lexbuf.[0]; AMP] }
-{any}                            { lexbuf }
+<last> / <first>                 { [lexbuf.[0]; AMP] }
+<any>                            { lexbuf }

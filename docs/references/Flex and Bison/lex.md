@@ -15,7 +15,7 @@ By default, any text not matched by a Lex/Flex scanner is copied to the output, 
 
 Here’s another simple example:
 
-```livescript
+```js
 int num_lines = 0, num_chars = 0;
 %%
 \n ++num_lines; ++num_chars;
@@ -34,7 +34,7 @@ There are two rules, one which matches a newline (“`\n`”) and increments bot
 
 A somewhat more complicated example:
 
-```livescript
+```js
 /* scanner for a toy Pascal-like language */
 %{
 /* need this for the call to atof() below */
@@ -79,7 +79,7 @@ The details of this example will be explained in the following sections.
 
 The Lex/Flex input file consists of three sections, separated by a line with just `%%` in it:
 
-```livescript
+```js
 definitions
 %%
 rules
@@ -93,7 +93,7 @@ The definitions section contains declarations of simple *name* definitions to si
 
 Name definitions have the form:
 
-```
+```js
 name definition
 ```
 
@@ -106,13 +106,13 @@ ID    [a-z][a-z0-9]*
 
 defines “`DIGIT`” to be a regular expression which matches a single digit, and “`ID`” to be a regular expression which matches a letter followed by zero-or-more letters-or-digits. A subsequent reference to
 
-```C
+```js
 {DIGIT}+"."{DIGIT}*
 ```
 
 is identical to
 
-```C
+```js
 ([0-9])+"."([0-9])*
 ```
 
@@ -122,7 +122,7 @@ and matches one-or-more digits followed by a `‘.’` followed by zero-or-more 
 
 The rules section of the Lex/Flex input contains a series of rules of the form:
 
-```
+```js
 pattern action
 ```
 
@@ -144,121 +144,119 @@ In the definitions section, an unindented comment (i.e., a line beginning with �
 
 The patterns in the input are written using an extended set of regular expressions. These are:
 
-```js
-`x` 
+`x`
 
 match the character ‘x’
 
-`.` 
+`.`
 
 any character except newline
 
-`[xyz]` 
+`[xyz]`
 
 a “character class”; in this case, the pattern matches either an ’x’, a ’y’, or a ‘z’
 
-`[abj-oZ]` 
+`[abj-oZ]`
 
 a “character class” with a range in it; matches an ‘a’, a ‘b’, any letter from ‘j’ through ‘o’, or a ‘Z’
 
-`[^A-Z]` 
+`[^A-Z]`
 
 a “negated character class”, i.e., any character but those in the class. In this case, any character EXCEPT an uppercase letter.
 
-`[^A-Z\n]` 
+`[^A-Z\n]`
 
 any character EXCEPT an uppercase letter or a newline 
 
-`r*` 
+`r*`
 
 zero or more r’s, where r is any regular expression
 
-`r+` 
+`r+`
 
 one or more r’s
 
-`r?` 
+`r?`
 
 or one r’s (that is, “an optional r”)
 
-`r{2,5}` 
+`r{2,5}`
 
 anywhere from two to five r’s
 
-`r{2,}` 
+`r{2,}`
 
 two or more r’s
 
-`r{4}` 
+`r{4}`
 
 exactly 4 r’s
 
-`{name}` 
+`{name}`
 
 the expansion of the “name” definition (see above)
 
-`[+xyz]\"foo"` 
+`[+xyz]\"foo"`
 
 the literal string: [xyz]"foo"
 
-`\X` 
+`\X`
 
 if X is an ‘a’, ‘b’, ‘f’, ‘n’, ‘r’, ‘t’, or ‘v’, then the ANSI-C interpretation of \x. Otherwise, a literal ‘X’ (used to escape operators such as ‘*’)
 
-`\123` 
+`\123`
 
 the character with octal value 123
 
-`\x2a` 
+`\x2a`
 
 the character with hexadecimal value 2a
 
-`(r)` 
+`(r)`
 
 match an r; parentheses are used to override precedence (see below)
 
-`rs` 
+`rs`
 
 the regular expression r followed by the regular expression s; called “concatenation”
 
-`r|s` 
+`r|s`
 
 either an r or an s
 
-`r/s` 
+`r/s`
 
 an r but only if it is followed by an s. The s is not part of the matched text. This type of pattern is called as “trailing context”.
 
-`^r` 
+`^r`
 
 an r, but only at the beginning of a line
 
-`r$` 
+`r$`
 
 an r, but only at the end of a line. Equivalent to “r/\n”.
-```
 
 The regular expressions listed above are grouped according to precedence, from highest precedence at the top to lowest at the bottom. Those grouped together have equal precedence. For example,
 
-```c
+```js
 foo|bar*
 ```
 
 is the same as
 
-```c
+```js
 (foo)|(ba(r*))
 ```
 
 since the ‘`*`’ operator has higher precedence than concatenation, and concatenation higher than alternation (‘`|`’). This pattern therefore matches either the string `“foo”` or the string `“ba”` followed by zero-or-more r’s. To match `“foo”` or zero-or-more `“bar”`’s, use:
 
-```c
+```js
 foo|(bar)*
 ```
 
 and to match zero-or-more `“foo”`’s-or-`“bar”`’s:
 
-```
+```js
 (foo|bar)*
 ```
 
@@ -272,7 +270,7 @@ Once the match is determined, the text corresponding to the match (called the to
 
 If no match is found, then the default rule is executed: the next character in the input is considered matched and copied to the standard output. Thus, the simplest legal Lex/Flex input is:
 
-```livescript
+```js
 %%
 ```
 
@@ -282,7 +280,7 @@ which generates a scanner that simply copies its input (one character at a time)
 
 Each pattern in a rule has a corresponding action, which can be any arbitrary C statement. The pattern ends at the first non-escaped whitespace character; the remainder of the line is its action. If the action is empty, then when the pattern is matched the input token is simply discarded. For example, here is the specification for a program which deletes all occurrences of `“zap me”` from its input:
 
-```livescript
+```js
 %%
 "zap me"
 ```
@@ -291,7 +289,7 @@ Each pattern in a rule has a corresponding action, which can be any arbitrary C 
 
 Here is a program which compresses multiple blanks and tabs down to a single blank, and throws away whitespace found at the end of a line:
 
-```livescript
+```js
 %%
 [ \t]+ putchar( ' ' );
 [ \t]+$ /* ignore this token */
@@ -311,7 +309,7 @@ The code section contains the definitions of the routines called by the action p
 
 The output of Lex/Flex is the file `lex.yy.c`, which contains the scanning routine `yylex()`, a number of tables used by it for matching tokens, and a number of auxiliary routines and macros. By default, `yylex()` is declared as follows:
 
-```c
+```cpp
 int yylex()
 {
 ... various definitions and the actions in here ...
@@ -322,7 +320,7 @@ int yylex()
 
 For example, you could use:
 
-```Cs
+```cpp
 #undef YY_DECL
 #define YY_DECL float lexscan( a, b ) float a, b;
 ```
@@ -335,11 +333,10 @@ Whenever `yylex()` is called, it scans tokens from the global input file `yyin` 
 
 One of the main uses of Lex/Flex is as a companion to the Yacc/Bison parser-generator. Yacc/Bison parsers expect to call a routine named `yylex()` to find the next input token. The routine is supposed to return the type of the next token as well as putting any associated value in the global `yylval`. To use Lex/Flex with Yacc/Bison, one specifies the `-d` option to Yacc/Bison to instruct it to generate the file `y.tab.h` containing definitions of all the `%tokens` appearing in the Yacc/Bison input. This file is then included in the Lex/Flex scanner. For example, if one of the tokens is “`TOK_NUMBER`”, part of the scanner might look like:
 
-```cs
+```cpp
 %{
 #include "y.tab.h"
 %}
 %%
 [0-9]+ yylval = atoi( yytext ); return TOK_NUMBER;
 ```
-

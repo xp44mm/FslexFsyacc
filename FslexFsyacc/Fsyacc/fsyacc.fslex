@@ -12,5 +12,5 @@ HEADER [";" "%%"]*               { [lexbuf.[0]] }
 ";"* "%%" ";"* 				     { [PERCENT] }
 ";" ";"+			             { [SEMICOLON] }
 SEMANTIC IDENTIFIER ":"	         { lexbuf.Head :: SEMICOLON :: lexbuf.Tail }
-{any}			                 { lexbuf }
+<any>			                 { lexbuf }
 

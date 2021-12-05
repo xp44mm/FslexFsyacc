@@ -76,9 +76,8 @@ open System.Text.RegularExpressions
 open FslexFsyacc.SourceText
 
 let tryHole =
-    Regex @"^\{\w+\}"
+    Regex @"^\<\w+\>"
     |> tryRegexMatch
-
 
 let tokenize inp =
     let rec loop (inp:string) =
@@ -86,7 +85,7 @@ let tokenize inp =
             match inp with
             | "" -> ()
 
-            | Prefix @"[\s-[\n]]+" (_,rest) // 空白
+            | Prefix @"[\s-[\n]]+" (_,rest)
                 -> yield! loop rest
 
             | On trySingleLineComment (_,rest)

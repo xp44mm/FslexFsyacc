@@ -12,7 +12,6 @@ Parser generators have a long history, including tools like **lex** and **yacc**
 
 Parsing is a broad and often intricate topic, and our purpose here is not to teach all of the theoretical issues, but to provide a pragmatic introduction of how to build a parser in OCaml.
 
-
 # Menhir Versus ocamlyacc
 
 Menhir is an alternative parser generator that is generally superior to the venerable **ocamlyacc**, which dates back quite a few years. Menhir is mostly compatible with **ocamlyacc** grammars, and so you can usually just switch to Menhir and expect older code to work (with some minor differences described in the Menhir manual).
@@ -41,7 +40,7 @@ Let's consider lexing and parsing in the context of the JSON format. Here's a sn
 
 At a syntactic level, we can think of a JSON file as a series of simple logical units, like curly braces, square brackets, commas, colons, identifiers, numbers, and quoted strings. Thus, we could represent our JSON text as a sequence of tokens of the following type:
 
-```ocaml
+```F#
 type token =
   | NULL
   | TRUE
@@ -63,13 +62,13 @@ Note that this representation loses some information about the original text. Fo
 
 If we converted the preceding example into a list of these tokens, it would look something like this:
 
-```OCaml
+```F#
 [ LEFT_BRACE; ID("title"); COLON; STRING("Cities"); COMMA; ID("cities"); ...
 ```
 
 This kind of representation is easier to work with than the original text, since it gets rid of some unimportant syntactic details and adds useful structure. But it's still a good deal more low-level than the simple AST we used for representing JSON data in [Chapter 15, *Handling JSON Data*](https://v1.realworldocaml.org/v1/en/html/handling-json-data.html):
 
-```OCaml
+```F#
 type value = 
   | Assoc of (string * value) list
   | Bool of bool
@@ -82,7 +81,7 @@ type value =
 
 This representation is much richer than our token stream, capturing the fact that JSON values can be nested inside each other and that JSON has a variety of value types, including numbers, strings, arrays, and objects. The parser we'll write will convert a token stream into a value of this AST type, as shown below for our earlier JSON example:
 
-```OCaml
+```F#
 Assoc
   ["title", String "Cities";
    "cities", List
@@ -90,14 +89,13 @@ Assoc
       Assoc ["name", String "New York"; "zips", List [Int 10004]]]]
 ```
 
-
 # DEFINING A PARSER
 
 A parser-specification file has suffix `.mly` and contains two sections that are broken up by separator lines consisting of the characters `%%` on a line by themselves. The first section of the file is for declarations, including token and type specifications, precedence directives, and other output directives; and the second section is for specifying the grammar of the language to be parsed.
 
 We'll start by declaring the list of tokens. A token is declared using the syntax `%token <type> uid`, where the `<type>` is optional and `uid` is a capitalized identifier. For JSON, we need tokens for numbers, strings, identifiers, and punctuation:
 
-```lex
+```yacc
 %token <int> INT
 %token <float> FLOAT
 %token <string> ID
@@ -122,14 +120,14 @@ The next thing we need to do is to specify the grammar of a JSON expression. **m
 
 We'll start describing the JSON grammar by declaring the start symbol to be the non-terminal symbol `prog`, and by declaring that when parsed, a `prog` value should be converted into an OCaml value of type `Json.value option`. We then end the declaration section of the parser with a `%%`:
 
-```
+```yacc
 %start <Json.value option> prog
 %%
 ```
 
 Once that's in place, we can start specifying the productions. In **menhir**, productions are organized into *rules*, where each rule lists all the possible productions for a given nonterminal symbols. Here, for example, is the rule for `prog`:
 
-```OCaml
+```F#
 prog:
   | EOF       { None }
   | v = value { Some v }
@@ -142,7 +140,7 @@ We have two cases for `prog`: either there's an `EOF`, which means the text is e
 
 Now let's consider a more complex example, the rule for the `value` symbol:
 
-```OCaml
+```F#
 value:
   | LEFT_BRACE; obj = object_fields; RIGHT_BRACE
     { Assoc obj }
@@ -175,7 +173,7 @@ In each of the productions, the OCaml code in curly braces shows what to transfo
 
 The rule for `object_fields` follows, and is really just a thin wrapper that reverses the list returned by the following rule for `rev_object_fields`. Note that the first production in `rev_object_fields` has an empty lefthand side, because what we're matching on in this case is an empty sequence of tokens. The comment `(* empty *)` is used to make this clear:
 
-```OCaml
+```F#
 object_fields: obj = rev_object_fields { List.rev obj };
 
 rev_object_fields:
@@ -187,7 +185,7 @@ rev_object_fields:
 
 The rules are structured as they are because **menhir** generates left-recursive parsers, which means that the constructed pushdown automaton uses less stack space with left-recursive definitions. The following right-recursive rule accepts the same input, but during parsing, it requires linear stack space to read object field definitions:
 
-```OCaml
+```F#
 (* Inefficient right-recursive rule *)
 object_fields:
   | (* empty *) { [] }
@@ -197,7 +195,7 @@ object_fields:
 
 Alternatively, we could keep the left-recursive definition and simply construct the returned value in left-to-right order. This is even less efficient, since the complexity of building the list incrementally in this way is quadratic in the length of the list:
 
-```OCaml
+```F#
 (* Quadratic left-recursive rule *)
 object_fields:
   | (* empty *) { [] }
@@ -210,7 +208,7 @@ Assembling lists like this is a pretty common requirement in most realistic gram
 
 A version of the JSON grammar using these more succinct Menhir rules follows. Notice the use of `separated_list` to parse both JSON objects and lists with one rule:
 
-```OCaml
+```F#
 prog:
   | v = value { Some v }
   | EOF       { None   } ;
@@ -241,7 +239,6 @@ We can invoke **menhir** by using **corebuild** with the `-use-menhir` flag. Thi
 $ corebuild -use-menhir short_parser.mli
 ```
 
-
 # DEFINING A LEXER
 
 Now we can define a lexer, using **ocamllex**, to convert our input text into a stream of tokens. The specification of the lexer is placed in a file with an `.mll` suffix.
@@ -250,7 +247,7 @@ Now we can define a lexer, using **ocamllex**, to convert our input text into a 
 
 Let's walk through the definition of a lexer section by section. The first section is on optional chunk of OCaml code that is bounded by a pair of curly braces:
 
-```OCaml
+```F#
 {
 open Lexing
 open Parser
@@ -274,7 +271,7 @@ We also define a utility function `next_line` for tracking the location of token
 
 The next section of the lexing file is a collection of named regular expressions. These look syntactically like ordinary OCaml `let` bindings, but really this is a specialized syntax for declaring regular expressions. Here's an example:
 
-```OCaml
+```F#
 let int = '-'? ['0'-'9'] ['0'-'9']*
 ```
 
@@ -283,7 +280,7 @@ The syntax here is something of a hybrid between OCaml syntax and traditional re
 
 Floating-point numbers are specified similarly, but we deal with decimal points and exponents. We make the expression easier to read by building up a sequence of named regular expressions, rather than creating one big and impenetrable expression:
 
-```OCaml
+```F#
 let digit = ['0'-'9']
 let frac = '.' digit*
 let exp = ['e' 'E'] ['-' '+']? digit+
@@ -292,12 +289,11 @@ let float = digit* frac? exp?
 
 Finally, we define whitespace, newlines, and identifiers:
 
-```OCaml
+```F#
 let white = [' ' '\t']+
 let newline = '\r' | '\n' | "\r\n"
 let id = ['a'-'z' 'A'-'Z' '_'] ['a'-'z' 'A'-'Z' '0'-'9' '_']*
 ```
-
 
 The `newline` introduces the `|` operator, which lets one of several alternative regular expressions match (in this case, the various carriage-return combinations of CR, LF, or CRLF).
 
@@ -305,7 +301,7 @@ The `newline` introduces the `|` operator, which lets one of several alternative
 
 The lexing rules are essentially functions that consume the data, producing OCaml expressions that evaluate to tokens. These OCaml expressions can be quite complicated, using side effects and invoking other rules as part of the body of the rule. Let's look at the `read` rule for parsing a JSON expression:
 
-```OCaml
+```F#
 rule read =
   parse
   | white    { read lexbuf }
@@ -330,7 +326,7 @@ The rules are structured very similarly to pattern matches, except that the vari
 
 The first `white { read lexbuf }` calls the lexer recursively. That is, it skips the input whitespace and returns the following token. The action `newline { next_line lexbuf; read lexbuf }` is similar, but we use it to advance the line number for the lexer using the utility function that we defined at the top of the file. Let's skip to the third action:
 
-```OCaml
+```F#
 | int { INT (int_of_string (Lexing.lexeme lexbuf)) }
 ```
 
@@ -347,7 +343,7 @@ Some of these patterns overlap. For example, the regular expression `"true"` is 
 
 Unlike many other lexer generators, **ocamllex** allows the definition of multiple lexers in the same file, and the definitions can be recursive. In this case, we use recursion to match string literals using the following rule definition:
 
-```OCaml
+```F#
 and read_string buf =
   parse
   | '"'       { STRING (Buffer.contents buf) }
@@ -388,13 +384,13 @@ All of these libraries are available via OPAM under their respective names.
 
 For the final part, we need to compose the lexer and parser. As we saw in the type definition in `parser.mli`, the parsing function expects a lexer of type `Lexing.lexbuf -> token`, and a `lexbuf`:
 
-```OCaml
+```F#
 val prog:(Lexing.lexbuf -> token) -> Lexing.lexbuf -> Json.value option
 ```
 
 Before we start with the lexing, let's first define some functions to handle parsing errors. There are currently two errors: `Parser.Error` and `Lexer.SyntaxError`. A simple solution when encountering an error is to print the error and give up:
 
-```OCaml
+```F#
 open Core.Std
 open Lexer
 open Lexing
@@ -418,7 +414,7 @@ The "give up on the first error" approach is easy to implement but isn't very fr
 
 The standard lexing library `Lexing` provides a function `from_channel` to read the input from a channel. The following function describes the structure, where the `Lexing.from_channel`function is used to construct a `lexbuf`, which is passed with the lexing function `Lexer.read` to the `Parser.prog` function. `Parsing.prog` returns `None` when it reaches end of file. We define a function `Json.output_value`, not shown here, to print a `Json.value`:
 
-```OCaml
+```F#
 let rec parse_and_print lexbuf =
   match parse_with_error lexbuf with
   | Some value ->
@@ -436,7 +432,7 @@ let loop filename () =
 
 Here's a test input file we can use to test the code we just wrote:
 
-```OCaml
+```F#
 true
 false
 null
@@ -467,7 +463,6 @@ null
   "field4": { "fieldA": 1,
   "fieldB": "Hello" } }
 ```
-
 
 With our simple error handling scheme, errors are fatal and cause the program to terminate with a nonzero exit code:
 
