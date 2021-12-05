@@ -12,13 +12,8 @@ type Analyzer<'tok,'u>
         nextStates:Map<uint32,Map<string,uint32>>, // state -> tag -> state
         lexemesFromFinal:Map<uint32,Set<uint32>>, // final -> lexemes
         universalFinals:Set<uint32>,
-        //indicesFromFinal:Map<uint32,int>,
-        //mappers: ('tok list -> 'u) []
         finalMappers: Map<uint32,('tok list -> 'u)> // final -> mapper
     ) =
-    //let finalMappers: Map<uint32,('tok list -> 'u)> =
-    //    indicesFromFinal
-    //    |> Map.map(fun final i -> mappers.[i])
 
     let tryNextState state symbol =
         if nextStates.ContainsKey(state) && nextStates.[state].ContainsKey(symbol) then

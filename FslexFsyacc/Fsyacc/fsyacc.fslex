@@ -2,14 +2,14 @@
 open FslexFsyacc.Fsyacc.FsyaccToken
 %}
 
-any = [ "%%" "%left" "%nonassoc" "%prec" "%right" ":" ";" "IDENTIFIER" "QUOTE" "SEMANTIC" "|" HEADER]
+any = ["%%" "%left" "%nonassoc" "%prec" "%right" ":" ";" "IDENTIFIER" "QUOTE" "SEMANTIC" "|" HEADER]
 
 %%
 
 BOF [";" "%%"]*			         { [] }
 [";" "%%"]* EOF			         { [] }
-["\n" "%%"]* HEADER ["\n" "%%"]* { lexbuf |> List.filter(function HEADER _ -> true | _ -> false) }
-";"+ "%%"				         { [PERCENT] }
+HEADER [";" "%%"]*               { [lexbuf.[0]] }
+";"* "%%" ";"* 				     { [PERCENT] }
 ";" ";"+			             { [SEMICOLON] }
 SEMANTIC IDENTIFIER ":"	         { lexbuf.Head :: SEMICOLON :: lexbuf.Tail }
 {any}			                 { lexbuf }

@@ -9,13 +9,13 @@ open FSharp.Literals
 open FslexFsyacc.Fsyacc.FsyaccToken
 open FSharp.xUnit
 
-type FsyaccTokenNormalizeTest(output:ITestOutputHelper) =
+type FsyaccTokenAnalyzeTest(output:ITestOutputHelper) =
     let show res =
         res
         |> Literal.stringify
         |> output.WriteLine
 
-    let norm tokens = 
+    let analyze tokens = 
         tokens
         |> FsyaccDFA.analyze
         |> Seq.concat
@@ -24,7 +24,7 @@ type FsyaccTokenNormalizeTest(output:ITestOutputHelper) =
     [<Fact>]
     member this.``clear bof sep test``() =
         let tokens = [BOF; SEMICOLON; PERCENT; SEMICOLON]
-        let y = norm tokens
+        let y = analyze tokens
         //show y
 
         let e = []
@@ -33,7 +33,7 @@ type FsyaccTokenNormalizeTest(output:ITestOutputHelper) =
     [<Fact>]
     member this.``clear EOF test``() =
         let tokens = [SEMICOLON; PERCENT; SEMICOLON; EOF]
-        let y = norm tokens
+        let y = analyze tokens
         //show y
 
         let e = []
@@ -42,7 +42,7 @@ type FsyaccTokenNormalizeTest(output:ITestOutputHelper) =
     [<Fact>]
     member this.``clear SEMICOLON before percent test``() =
         let tokens = [ SEMICOLON; PERCENT]
-        let y = norm tokens
+        let y = analyze tokens
         //show y
 
         let e = [PERCENT]
@@ -51,7 +51,7 @@ type FsyaccTokenNormalizeTest(output:ITestOutputHelper) =
     [<Fact>]
     member this.``collapse many SEMICOLON test``() =
         let tokens = [ SEMICOLON; SEMICOLON]
-        let y = norm tokens
+        let y = analyze tokens
         //show y
 
         let e = [SEMICOLON]

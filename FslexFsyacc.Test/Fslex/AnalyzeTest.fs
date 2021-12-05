@@ -15,7 +15,7 @@ type AnalyzeTest(output:ITestOutputHelper) =
         |> Literal.stringify
         |> output.WriteLine
 
-    let norm tokens =
+    let analyze tokens =
         tokens
         |> FslexDFA.analyze
         |> Seq.concat
@@ -24,7 +24,7 @@ type AnalyzeTest(output:ITestOutputHelper) =
     [<Fact>]
     member this.``explicit amp test``() =
         let tokens = [LPAREN;ID "";RPAREN;LBRACK;RBRACK;STAR;QUOTE ""]
-        let y = norm tokens
+        let y = analyze tokens
         //show y
 
         let e = [LPAREN;ID "";RPAREN;AMP;LBRACK;RBRACK;STAR;AMP;QUOTE ""]
@@ -33,7 +33,7 @@ type AnalyzeTest(output:ITestOutputHelper) =
     [<Fact>]
     member this.``clear bof test``() =
         let tokens = [BOF; LF; PERCENT; LF; ID ""]
-        let y = norm tokens
+        let y = analyze tokens
         //show y
 
         let e = [ID ""]
@@ -42,7 +42,7 @@ type AnalyzeTest(output:ITestOutputHelper) =
     [<Fact>]
     member this.``clear EOF test``() =
         let tokens = [LF; PERCENT; LF; EOF]
-        let y = norm tokens
+        let y = analyze tokens
         //show y
 
         let e = []
@@ -51,7 +51,7 @@ type AnalyzeTest(output:ITestOutputHelper) =
     [<Fact>]
     member this.``clear lf after percent test``() =
         let tokens = [ PERCENT; LF]
-        let y = norm tokens
+        let y = analyze tokens
         //show y
 
         let e = [PERCENT; ]
@@ -60,7 +60,7 @@ type AnalyzeTest(output:ITestOutputHelper) =
     [<Fact>]
     member this.``collapse many LF test``() =
         let tokens = [ LF; LF]
-        let y = norm tokens
+        let y = analyze tokens
         //show y
 
         let e = [LF; ]

@@ -2,7 +2,6 @@
 
 type FslexToken =
     | HEADER of string
-
     /// \w+
     | ID of string
     /// quote string literal(unquoted)
@@ -71,10 +70,6 @@ let getLexeme = function
     | SEMANTIC x -> box x
     | HOLE x -> box x
     | _ -> null
-
-let isHeader = function
-    | HEADER _ -> true
-    | _ -> false
 
 open FSharp.Idioms
 open System.Text.RegularExpressions

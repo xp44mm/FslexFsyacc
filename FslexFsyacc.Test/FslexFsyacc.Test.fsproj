@@ -29,17 +29,14 @@
 		<Compile Include="Yacc\Section4_8_2Test.fs" />
 		
 		<Compile Include="SourceTextTest.fs" />
-		
-		<Compile Include="Fslex\FslexTokenNormalizeTest.fs" />
 		<Compile Include="Fslex\FslexParseTableTest.fs" />
 		<Compile Include="Fslex\FslexDFATest.fs" />
 		<Compile Include="Fslex\AnalyzeTest.fs" />
-		<Compile Include="Fslex\FslexDFAAnalyzerTest.fs" />
 
 		<Compile Include="Fsyacc\SemanticGeneratorTest.fs" />
-		<Compile Include="Fsyacc\FsyaccTokenNormalizeTest.fs" />
 		<Compile Include="Fsyacc\FsyaccParseTableTest.fs" />
 		<Compile Include="Fsyacc\FsyaccDFATest.fs" />
+		<Compile Include="Fsyacc\FsyaccTokenAnalyzeTest.fs" />
 		<Compile Include="Expr\ExprToken.fs" />
 		<None Include="Expr\expr.fsyacc" />
 		<Compile Include="Expr\ExprParseTable.fs" />
