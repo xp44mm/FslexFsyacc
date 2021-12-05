@@ -95,4 +95,4 @@ let tryRegularExpressionLiteral =
 
 let trySemanticAction = Regex @"^\{[^}]*\}" |> tryRegexMatch
 
-let tryHeader = Regex @"^%\{[\S\s]*?%\}\s*" |> tryRegexMatch
+let tryHeader = Regex @"^%\{[\S\s]*?%\}" |> tryRegexMatch

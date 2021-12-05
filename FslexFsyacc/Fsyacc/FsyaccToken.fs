@@ -92,9 +92,8 @@ let tokenize inp =
                 let x = x.[1..x.Length-2].Trim()
                 yield SEMANTIC x
                 yield! loop rest
-            | On tryHeader (x, rest) ->
+            | On tryHeader (y, rest) ->
                 let x = 
-                    let y = x.Trim()
                     y.[2..y.Length-3].Trim()
                 yield HEADER x
                 yield! loop rest
