@@ -16,8 +16,6 @@ The semantic value has all the rest of the information about the meaning of the 
 
 For example, an input token might be classified as token type `INTEGER` and have the semantic value 4. Another input token might have the same token type `INTEGER` but value 3989. When a grammar rule says that `INTEGER` is allowed, either of these tokens is acceptable because each is an `INTEGER`. When the parser accepts the token, it keeps track of the token’s semantic value.
 
-
-
 Each grouping can also have a semantic value as well as its nonterminal symbol. For example, in a calculator, an expression typically has a semantic value that is a number. In a compiler for a programming language, an expression typically has a semantic value that is a tree structure describing the meaning of the expression.
 
 As Yacc/Bison reads tokens, it pushes them onto a stack along with their semantic values. The stack is called the **parser stack**. Pushing a token is traditionally called **shifting**.
