@@ -5,10 +5,9 @@ last = ")"|"*"|"+"|"?"|"HOLE"|"ID"|"QUOTE"|"]"
 first = "("|"HOLE"|"ID"|"QUOTE"|"["
 any = "\n"|"%%"|"&"|"("|")"|"*"|"+"|"/"|"="|"?"|"HOLE"|"ID"|"QUOTE"|"SEMANTIC"|"["|"]"|"|"|HEADER
 %%
-BOF ["\n" "%%"]*                 { [] }
-["\n" "%%"]* EOF                 { [] }
-HEADER ["\n" "%%"]*              { [lexbuf.[0]] }
-"%%" "\n"+			             { [lexbuf.[0]] }
-"\n" "\n"+			             { [lexbuf.[0]] }
-<last> / <first>                 { [lexbuf.[0]; AMP] }
-<any>                            { lexbuf }
+HEADER "\n"+              { lexbuf |> List.take 1 }
+"%%" "\n"+			      { lexbuf |> List.take 1 }
+["\n" "%%"]* EOF          { [] }
+"\n" "\n"+			      { lexbuf |> List.take 1 }
+<last> / <first>          { [lexbuf.[0]; (-1,AMP)] }
+<any>                     { lexbuf }

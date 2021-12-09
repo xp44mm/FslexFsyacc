@@ -20,37 +20,21 @@ type FsyaccTokenAnalyzeTest(output:ITestOutputHelper) =
         |> FsyaccDFA.analyze
         |> Seq.concat
         |> Seq.toList
-
-    [<Fact>]
-    member this.``clear bof sep test``() =
-        let tokens = [BOF; SEMICOLON; PERCENT; SEMICOLON]
-        let y = analyze tokens
-        //show y
-
-        let e = []
-        Should.equal e y
+        |> List.map snd
 
     [<Fact>]
     member this.``clear EOF test``() =
-        let tokens = [SEMICOLON; PERCENT; SEMICOLON; EOF]
+        let tokens = [SEMICOLON; PERCENT; SEMICOLON; EOF] |> List.map(fun t -> 0,t)
         let y = analyze tokens
         //show y
 
         let e = []
         Should.equal e y
 
-    [<Fact>]
-    member this.``clear SEMICOLON before percent test``() =
-        let tokens = [ SEMICOLON; PERCENT]
-        let y = analyze tokens
-        //show y
-
-        let e = [PERCENT]
-        Should.equal e y
 
     [<Fact>]
     member this.``collapse many SEMICOLON test``() =
-        let tokens = [ SEMICOLON; SEMICOLON]
+        let tokens = [ SEMICOLON; SEMICOLON] |> List.map(fun t -> 0,t)
         let y = analyze tokens
         //show y
 

@@ -6,38 +6,37 @@ file       : HEADER rules                                    {s0, List.rev s1,[]
            | HEADER rules "%%" precedences                   {s0, List.rev s1,List.rev s3,[]}
            | HEADER rules "%%"                  declarations {s0, List.rev s1,[],List.rev s3}
            | HEADER rules "%%" precedences "%%" declarations {s0, List.rev s1,List.rev s3,List.rev s5}
-           ;
-rules:                 rule  {[s0]}
-           | rules ";" rule  {s2::s0}
-           ;
+
+rules:             rule  {[s0]}
+           | rules rule  {s1::s0}
+
 rule       : IDENTIFIER ":" bodies  {s0,List.rev s2}
-           ;
+
 precedences:             precedence    {[s0]}
            | precedences precedence    {s1::s0}
-           ;
+
 precedence : assoc symbols { s0,List.rev s1}
-           ;
+
 bodies     :            body    {[s0]}
            | bodies "|" body    {s2::s0}
-           ;
+
 body       :                            SEMANTIC   {[],"",s0}
            | symbols                    SEMANTIC   {List.rev s0,"",s1}
            | symbols "%prec" IDENTIFIER SEMANTIC   {List.rev s0,s2,s3}
-           ;
+
 symbols    :         symbol    {[s0]}
            | symbols symbol    {s1::s0}
-           ;
+
 symbol     : IDENTIFIER   { s0 }
            | QUOTE        { s0 }
-           ;
+
 assoc      : "%left"         { "left"     }
            | "%right"        { "right"    }
            | "%nonassoc"     { "nonassoc" }
-           ;
 
 declarations:                  declaration   {[s0]}
             | declarations ";" declaration   {s2::s0}
-            ;
+
 declaration: symbol QUOTE { s0,s1 }
            
 %%
@@ -57,5 +56,5 @@ precedences  "(string*string list)list" ;
 rule         "string*((string list*string*string)list)" ;
 rules        "(string*((string list*string*string)list))list" ;
 symbol       "string" ;
-symbols      "string list"
+symbols      "string list";
 

@@ -8,7 +8,8 @@ type Token =
     | PLUS
     | MINUS
 
-let getTag = function
+let getTag(pos,token) = 
+    match token with
     | ID _ -> "ID"
     | INT _ -> "INT"
     | HAT   -> "**"
@@ -23,7 +24,8 @@ let regex s = new Regex(s)
 let tokenR = regex @"((?<token>(\d+|\w+|\*\*|\+|-))\s*)*"
 
 let tokenize (s: string) =
-    [for x in tokenR.Match(s).Groups.["token"].Captures do
+    seq {
+        for x in tokenR.Match(s).Groups.["token"].Captures do
         let token =
             match x.Value with
             | "**" -> HAT
@@ -31,16 +33,18 @@ let tokenize (s: string) =
             | "+" -> PLUS
             | s when Char.IsDigit s.[0] -> INT (int s)
             | s -> ID s
-        yield token]
+        yield x.Index, token
+    }
 
-
-let toConst = function
+let toConst (lexbuf:(int*Token)list) = 
+    match lexbuf |> List.map snd with
     | [      INT n] 
     | [PLUS ;INT n] ->  Const n
     | [MINUS;INT n] ->  Const -n
     | tokens -> failwithf "%A" tokens
     
-let toTerm = function
+let toTerm (lexbuf:(int*Token)list) = 
+    match lexbuf |> List.map snd with
     |[      ID x] -> Term(1,x,1)
     |[PLUS ;ID x] -> Term(1,x,1)
     |[MINUS;ID x] -> Term(-1,x,1)

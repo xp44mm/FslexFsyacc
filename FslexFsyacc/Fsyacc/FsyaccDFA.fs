@@ -1,25 +1,17 @@
 module FslexFsyacc.Fsyacc.FsyaccDFA
-let nextStates = Map [0u,Map ["%%",3u;"%left",11u;"%nonassoc",11u;"%prec",11u;"%right",11u;":",11u;";",5u;"BOF",1u;"EOF",6u;"HEADER",7u;"IDENTIFIER",11u;"QUOTE",11u;"SEMANTIC",8u;"|",11u];1u,Map ["%%",1u;";",1u];2u,Map ["%%",2u;";",2u;"EOF",6u];3u,Map ["%%",2u;";",3u;"EOF",6u];4u,Map ["%%",3u;";",4u;"EOF",6u];5u,Map ["%%",3u;";",4u;"EOF",6u];7u,Map ["%%",7u;";",7u];8u,Map ["IDENTIFIER",9u];9u,Map [":",10u]]
+let nextStates = Map [0u,Map ["%%",4u;"%left",6u;"%nonassoc",6u;"%prec",6u;"%right",6u;":",6u;";",2u;"EOF",5u;"HEADER",6u;"IDENTIFIER",6u;"QUOTE",6u;"SEMANTIC",6u;"|",6u];1u,Map ["%%",3u;";",1u;"EOF",5u];2u,Map ["%%",3u;";",1u;"EOF",5u];3u,Map ["%%",3u;";",3u;"EOF",5u];4u,Map ["%%",3u;";",3u;"EOF",5u]]
 let lexemesFromFinal = Map.empty
-let universalFinals = set [1u;3u;4u;5u;6u;7u;8u;10u;11u]
-let indicesFromFinal = Map [1u,0;3u,3;4u,4;5u,6;6u,1;7u,2;8u,6;10u,5;11u,6]
+let universalFinals = set [1u;2u;4u;5u;6u]
+let indicesFromFinal = Map [1u,0;2u,2;4u,2;5u,1;6u,2]
 let header = "open FslexFsyacc.Fsyacc.FsyaccToken"
-let semantics = ["[]";"[]";"[lexbuf.[0]]";"[PERCENT]";"[SEMICOLON]";"lexbuf.Head :: SEMICOLON :: lexbuf.Tail";"lexbuf"]
+let semantics = ["lexbuf |> List.take 1";"[]";"lexbuf"]
 open FslexFsyacc.Fsyacc.FsyaccToken
 let mappers = [|
-    fun (lexbuf:_ list) ->
+    fun (lexbuf:(int*_) list) ->
+        lexbuf |> List.take 1
+    fun (lexbuf:(int*_) list) ->
         []
-    fun (lexbuf:_ list) ->
-        []
-    fun (lexbuf:_ list) ->
-        [lexbuf.[0]]
-    fun (lexbuf:_ list) ->
-        [PERCENT]
-    fun (lexbuf:_ list) ->
-        [SEMICOLON]
-    fun (lexbuf:_ list) ->
-        lexbuf.Head :: SEMICOLON :: lexbuf.Tail
-    fun (lexbuf:_ list) ->
+    fun (lexbuf:(int*_) list) ->
         lexbuf
 |]
 let finalMappers =

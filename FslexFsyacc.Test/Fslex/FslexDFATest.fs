@@ -27,7 +27,7 @@ type FslexDFATest(output:ITestOutputHelper) =
         show hdr
         show dfs
         show rls
-
+        
     [<Fact(Skip="once and for all!")>] // 
     member this.``1 - generate DFA``() =
         let name = "FslexDFA"

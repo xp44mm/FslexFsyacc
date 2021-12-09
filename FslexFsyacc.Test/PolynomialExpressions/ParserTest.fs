@@ -23,14 +23,14 @@ type ParserTest(output:ITestOutputHelper) =
     [<Fact>]
     member this.``tokens``() =
         let x = "2x**2+3x-5"
-        let tokens = x |> Tokenizer.tokenize
+        let tokens = x |> Tokenizer.tokenize |> Seq.map snd |> Seq.toList
         show tokens
         Should.equal tokens [INT 2;ID "x";HAT;INT 2;PLUS;INT 3;ID "x";MINUS;INT 5]
 
     [<Fact>]
     member this.``split``() =
         let tokens = [INT 2;ID "x";HAT;INT 2;PLUS;INT 3;ID "x";MINUS;INT 5]
-        let y = tokens |> Parser.parse
+        let y = tokens |> Seq.map(fun tok -> 0,tok) |> Parser.parse
         show y
         Should.equal y [Term(2,"x",2);Term(3,"x",1);Const -5]
 

@@ -3,8 +3,8 @@
 open PolynomialExpressions.Tokenizer
 open PolynomialExpressions
 
-let parse (tokens:seq<Token>) = 
-    tokens
+let parse (posTokens:seq<int*Token>) = 
+    posTokens
     |> TermDFA.analyze
     |> Seq.toList
 
