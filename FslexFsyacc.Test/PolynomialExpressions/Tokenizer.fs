@@ -1,4 +1,5 @@
 ﻿module PolynomialExpressions.Tokenizer
+open PolynomialExpressions
 
 type Token =
     | ID of string
@@ -14,28 +15,24 @@ let getTag = function
     | PLUS  -> "+"
     | MINUS -> "-"
 
-let getLexeme = function
-    | ID x -> box x
-    | INT x -> box x
-    | _ -> null
+open System
+open System.Text.RegularExpressions
 
-
-let regex s = new System.Text.RegularExpressions.Regex(s)
+let regex s = new Regex(s)
 
 let tokenR = regex @"((?<token>(\d+|\w+|\*\*|\+|-))\s*)*"
 
-let tokenize (s : string) =
+let tokenize (s: string) =
     [for x in tokenR.Match(s).Groups.["token"].Captures do
         let token =
             match x.Value with
             | "**" -> HAT
             | "-" -> MINUS
             | "+" -> PLUS
-            | s when System.Char.IsDigit s.[0] -> INT (int s)
+            | s when Char.IsDigit s.[0] -> INT (int s)
             | s -> ID s
         yield token]
 
-open PolynomialExpressions
 
 let toConst = function
     | [      INT n] 
