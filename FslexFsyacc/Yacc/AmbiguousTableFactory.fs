@@ -22,9 +22,11 @@ let make (closures:Set<Set<ItemCore>*Set<ItemCore*Set<string>>>) (gotos:Set<Set<
         )
         |> Set.unionMany
 
-    Set.union shifts reduces
-    |> Set.groupBy(Triple.firstTwo)
-    |> Set.map(fun((src,symbol),st) -> 
-        let targets = Set.map Triple.last st
-        src, symbol, targets
-    )
+    let result:Set<Set<ItemCore>*string*Set<Action>> =
+        Set.union shifts reduces
+        |> Set.groupBy(Triple.firstTwo)
+        |> Set.map(fun((src,symbol),st) -> 
+            let targets = Set.map Triple.last st
+            src, symbol, targets
+        )
+    result

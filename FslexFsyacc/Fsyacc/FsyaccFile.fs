@@ -107,7 +107,7 @@ type FsyaccFile =
             |> Set.map (fun (kernel, symbol, action) -> kernel, symbol, Option.get action)
         //sactions的索引
         let productions =
-            ParseTableTools.getProductionsMap ambiguousTable.productions
+            ParseTableUtils.getProductionsMap ambiguousTable.productions
 
         let kernelSymbols =
             ambiguousTable.kernelSymbols
@@ -127,7 +127,7 @@ type FsyaccFile =
         { 
             header = this.header
             productions = productions
-            actions = ParseTableTools.getActions encodeTable
+            actions = ParseTableUtils.getActions encodeTable
             kernelSymbols = kernelSymbols
             semantics = isemantics 
             declarations = declarations

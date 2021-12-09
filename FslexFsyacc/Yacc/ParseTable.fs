@@ -57,8 +57,8 @@ type ParseTable =
             |> Set.map(fun(kernel,symbol,action)->kernel,symbol,Option.get action)
 
         {
-            productions = ParseTableTools.getProductionsMap ambiguousTable.productions
-            actions = ParseTableTools.getActions encodeTable
+            productions = ParseTableUtils.getProductionsMap ambiguousTable.productions
+            actions = ParseTableUtils.getActions encodeTable
             kernelSymbols = 
                 ambiguousTable.kernelSymbols
                 |> Map.mapKey(fun kernel symbol -> kernelIndexes.[kernel])

@@ -70,6 +70,6 @@ type Analyzer<'tok,'u>
             mapper lexbuf
 
         seq {
-            while iterator.allDone()|> not do
+            while iterator.allDone() |> not do
                 yield getDivision()
         }

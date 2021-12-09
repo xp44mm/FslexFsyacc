@@ -53,7 +53,7 @@
 		<Compile Include="Yacc\ProductionPrecedence.fs" />
 		<Compile Include="Yacc\TerminalPrecedence.fs" />
 		<Compile Include="Yacc\EliminatingAmbiguity.fs" />
-		<Compile Include="Yacc\ParseTableTools.fs" />
+		<Compile Include="Yacc\ParseTableUtils.fs" />
 		<Compile Include="Yacc\ParseTable.fs" />
 		<Compile Include="SourceText.fs" />
 

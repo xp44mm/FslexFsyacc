@@ -1,8 +1,11 @@
 ﻿[<RequireQualifiedAccess>]
 module FslexFsyacc.Yacc.ItemCoreAttributeFactory
 
-/// 
-let make (nonterminals:Set<string>) (nullables:Set<string>) (firsts:Map<string,Set<string>>) (itemCores:Set<ItemCore>) =
+/// 所有ItemCore的propagatable,spontaneous属性
+let make 
+    (nonterminals:Set<string>) (nullables:Set<string>) (firsts:Map<string,Set<string>>) 
+    (itemCores:Set<ItemCore>) =
+
     let nullable = NullableFactory.nullable nullables
     let first = FirstFactory.first nullables firsts
 

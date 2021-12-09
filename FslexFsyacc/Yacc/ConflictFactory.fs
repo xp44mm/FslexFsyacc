@@ -6,8 +6,8 @@ open FSharp.Idioms
 /// 列出了需修改产生式规则的冲突
 let productionConflict(parseTable:Set<_*_*Set<Action>>)=
     parseTable
-    |> Set.filter(fun(src,sym,targets) ->
-        match Set.toList targets with
+    |> Set.filter(fun(src,sym,tgts) ->
+        match Set.toList tgts with
         | [_] -> false
         | [Shift _ ; Reduce _ ] -> false
         | _ -> true
@@ -20,7 +20,7 @@ let overloadsWarning (ambiguousTable:AmbiguousTable) =
     |> List.map snd
     |> List.filter(fun st -> st.Count > 1)
 
-/// 列出了需使用优先级解决的冲突，需要先固定产生式规则
+/// 列出了需使用优先级解决的冲突，需要先解决产生式冲突
 let shiftReduceConflict (ambiguousTable:AmbiguousTable) =
     ambiguousTable.ambiguousTable
     |> Set.toList

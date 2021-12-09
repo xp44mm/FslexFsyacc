@@ -1,6 +1,7 @@
 ﻿[<RequireQualifiedAccess>]
 module FslexFsyacc.Yacc.ItemCoreFactory
 
+/// 语法中的所有ItemCore
 let make (productions:Set<string list>) =
     productions
     |> Seq.collect(fun prod ->

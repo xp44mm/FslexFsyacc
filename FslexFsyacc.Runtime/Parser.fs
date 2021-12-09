@@ -12,13 +12,13 @@ type Parser
     ) =
 
     ///
-    member this.parse<'tok>(tokens: seq<'tok>,getTag:'tok -> string,getLexeme:'tok->obj) =
-        let iterator = tokens.GetEnumerator()
-        let nextToken() =
-            if iterator.MoveNext() then
-                Some iterator.Current
-            else //EOF
-                None
+    member this.parse<'tok>(tokens: seq<'tok>, getTag:'tok -> string, getLexeme:'tok->obj) =
+        let iterator = Iterator(tokens.GetEnumerator())
+        //let nextToken() =
+        //    if iterator.MoveNext() then
+        //        Some iterator.Current
+        //    else //EOF
+        //        None
 
         let rec loop
             (trees: obj list)
@@ -28,7 +28,7 @@ type Parser
 
             let sm = states.Head
 
-            let ai = // ,remainInput
+            let ai =
                 maybeToken
                 |> Option.map getTag
                 |> Option.defaultValue ""
@@ -42,7 +42,7 @@ type Parser
                     else
                         kernelSymbols.[sm]
                 let la = if maybeToken.IsNone then "EOF" else Literal.stringify maybeToken.Value
-                failwithf "syntactic error: lookahead='%s'; symbol='%s'; state='%d'" la symbol sm
+                failwithf "syntactic error: lookahead='%s' symbol='%s' state='%d'" la symbol sm
 
             let action = actions.[sm].[ai]
             if action = 0 then
@@ -51,9 +51,9 @@ type Parser
                 let state = action
                 let tree = getLexeme(maybeToken.Value)
                 let pushedTrees = tree::trees
-                let newStates = state::states //状态以及对应的票根
-                loop pushedTrees newStates (nextToken())
-            elif action < 0 then // 非结合性弹出错误？
+                let newStates = state::states
+                loop pushedTrees newStates (iterator.tryNext())
+            elif action < 0 then
                 let symbols = productions.[action] //产生式符号列表。比如产生式 e-> e + e 的列表为 [e,e,+,e]
                 let leftside = symbols.[0]
                 let len = symbols.Length-1 // 产生式右侧的长度
@@ -74,5 +74,5 @@ type Parser
                 loop pushedTrees pushedStates maybeToken
             else failwith "never"
 
-        loop [] [0] <| nextToken()
+        loop [] [0] <| iterator.tryNext()
         |> List.exactlyOne

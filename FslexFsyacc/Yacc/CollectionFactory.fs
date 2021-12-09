@@ -2,6 +2,7 @@
 
 open FSharp.Idioms
 
+///kernel中的每一项lookahead集合都是kernels的相同ItemCore的子集。
 let isSubsetOf (kernels:Set<Set<ItemCore*Set<string>>>) (kernel:Set<ItemCore*Set<string>>) =
     let slrKernel0 = Set.map fst kernel
     let lookaheadsets0 = kernel |> Set.toList |> List.map snd
@@ -18,8 +19,8 @@ let isSubsetOf (kernels:Set<Set<ItemCore*Set<string>>>) (kernel:Set<ItemCore*Set
     |> Option.isSome
 
 //合并同一slrkernel下的所有clrKernel
-let mergeClrKernels (slrKernel:Set<ItemCore>) (clrKernels:seq<Set<_*Set<string>>>) =
-    // 等价代码
+let mergeClrKernels (slrKernel:Set<ItemCore>) (clrKernels:seq<Set<ItemCore*Set<string>>>) =
+    // lookaheadsArray的等价代码
     //clrKernels
     //|> Set.unionMany
     //|> Set.unionByKey
@@ -40,9 +41,10 @@ let mergeClrKernels (slrKernel:Set<ItemCore>) (clrKernels:seq<Set<_*Set<string>>
 
 /// 
 let make (itemCores:Set<ItemCore>) (itemCoreAttributes:Map<ItemCore, bool*Set<string>>) (productions:Set<string list>) =
-
+    // kernel -> closure
     let getClosure = ClosureFactory.make itemCoreAttributes productions
 
+    // 获取语法集合中所有的kernels
     let rec loop (oldKernels:Set<Set<ItemCore*Set<string>>>) (newKernels:Set<Set<ItemCore*Set<string>>>) =
         let fullKernels = oldKernels + newKernels
         // 新增的clrkernel，有重复的slrkernel
@@ -87,7 +89,10 @@ let make (itemCores:Set<ItemCore>) (itemCoreAttributes:Map<ItemCore, bool*Set<st
             loop oldKernels newKernels
 
     let k0 = Set.singleton (itemCores.MinimumElement, Set.singleton "")
-    loop Set.empty (Set.singleton k0)
-    |> Set.map(fun kernel ->
-        ClosureOperators.getCore kernel, getClosure kernel
-        )
+    /// kernel*closure的集合
+    let result = 
+        loop Set.empty (Set.singleton k0)
+        |> Set.map(fun kernel ->
+            ClosureOperators.getCore kernel, getClosure kernel
+            )
+    result

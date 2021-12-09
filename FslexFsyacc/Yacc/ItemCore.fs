@@ -18,6 +18,7 @@ type ItemCore =
     /// 产生式体的长度
     member this.length = this.body |> List.length
 
+    ///前进一半，留一半
     member this.status =
         let valueFactory(production,dot) =
             let body = List.tail production
@@ -37,6 +38,7 @@ type ItemCore =
     /// 点号右侧的产生式体的切片
     member this.rest = snd this.status
 
+    /// 点号在最右，所有符号之后
     member this.gone = List.isEmpty this.rest
 
     /// 点号紧右侧的符号，终结符，或者非终结符

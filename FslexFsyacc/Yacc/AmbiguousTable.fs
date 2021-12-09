@@ -17,13 +17,10 @@ type AmbiguousTable =
     static member create(mainProductions:string list list) =
         let grammar = Grammar.from mainProductions
         let itemCores = ItemCoreFactory.make grammar.productions
-
         let itemCoreAttributes = 
             ItemCoreAttributeFactory.make grammar.nonterminals grammar.nullables grammar.firsts itemCores
-   
         let closures = 
             CollectionFactory.make itemCores itemCoreAttributes grammar.productions
-
         let gotos = GotoFactory.make closures
 
         let kernelSymbols = 
@@ -32,7 +29,8 @@ type AmbiguousTable =
 
         /// Normally, the precedence of a production is taken to be the same as
         /// that of its rightmost terminal.
-        let productionOperators =
+        // production -> symbol
+        let productionOperators:Map<string list,string> =
             grammar.productions
             |> Seq.choose(fun prod -> 
                 prod
@@ -57,7 +55,7 @@ type AmbiguousTable =
                 if Set.isEmpty ps then
                     None
                 else
-                    Some( kernel,ps) // 有时一个符号代表不同的含义，比如分号分隔语句，也分隔列表元素
+                    Some(kernel,ps) // 有时一个符号代表不同的含义，比如分号分隔语句，也分隔列表元素
             )
             |> Map.ofSeq
 
