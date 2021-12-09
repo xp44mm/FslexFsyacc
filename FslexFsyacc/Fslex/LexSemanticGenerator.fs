@@ -8,7 +8,7 @@ let indent i =
 
 let decorateSemantic (semantic:string) =
     [
-        $"{indent 1}fun (lexbuf:(int*_) list) ->"
+        $"{indent 1}fun (lexbuf:(int*int*_)list) ->"
         $"{indent 2}{semantic}"
     ] |> String.concat Environment.NewLine
 

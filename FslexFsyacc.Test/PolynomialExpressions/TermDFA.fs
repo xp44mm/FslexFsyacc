@@ -7,9 +7,9 @@ let header = "open PolynomialExpressions.Tokenizer"
 let semantics = ["toConst lexbuf";"toTerm lexbuf"]
 open PolynomialExpressions.Tokenizer
 let mappers = [|
-    fun (lexbuf:_ list) ->
+    fun (lexbuf:(int*int*_) list) ->
         toConst lexbuf
-    fun (lexbuf:_ list) ->
+    fun (lexbuf:(int*int*_) list) ->
         toTerm lexbuf
 |]
 let finalMappers =

@@ -8,7 +8,7 @@ type Token =
     | PLUS
     | MINUS
 
-let getTag(pos,token) = 
+let getTag(pos,len,token) = 
     match token with
     | ID _ -> "ID"
     | INT _ -> "INT"
@@ -18,6 +18,7 @@ let getTag(pos,token) =
 
 open System
 open System.Text.RegularExpressions
+open FSharp.Idioms
 
 let regex s = new Regex(s)
 
@@ -33,18 +34,18 @@ let tokenize (s: string) =
             | "+" -> PLUS
             | s when Char.IsDigit s.[0] -> INT (int s)
             | s -> ID s
-        yield x.Index, token
+        yield x.Index, x.Length, token
     }
 
-let toConst (lexbuf:(int*Token)list) = 
-    match lexbuf |> List.map snd with
+let toConst (lexbuf:(int*int*Token)list) = 
+    match lexbuf |> List.map Triple.last with
     | [      INT n] 
     | [PLUS ;INT n] ->  Const n
     | [MINUS;INT n] ->  Const -n
     | tokens -> failwithf "%A" tokens
     
-let toTerm (lexbuf:(int*Token)list) = 
-    match lexbuf |> List.map snd with
+let toTerm (lexbuf:(int*int*Token)list) = 
+    match lexbuf |> List.map Triple.last with
     |[      ID x] -> Term(1,x,1)
     |[PLUS ;ID x] -> Term(1,x,1)
     |[MINUS;ID x] -> Term(-1,x,1)
