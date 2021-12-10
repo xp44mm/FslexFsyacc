@@ -9,5 +9,5 @@ HEADER "\n"+              { lexbuf |> List.take 1 }
 "%%" "\n"+			      { lexbuf |> List.take 1 }
 ["\n" "%%"]* EOF          { [] }
 "\n" "\n"+			      { lexbuf |> List.take 1 }
-<last> / <first>          { [lexbuf.[0]; (-1,AMP)] }
+<last> / <first>          { appendAMP lexbuf }
 <any>                     { lexbuf }

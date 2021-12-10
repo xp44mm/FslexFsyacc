@@ -17,7 +17,7 @@ type FsyaccToken =
     | EOF
 
 /// the tag of token
-let getTag(pos,token) = 
+let getTag(pos,len,token) = 
     match token with
     | HEADER _ -> "HEADER"
     | IDENTIFIER _ -> "IDENTIFIER"
@@ -35,7 +35,7 @@ let getTag(pos,token) =
     | EOF          -> "EOF"
 
 ///用于求解的栈
-let getLexeme(pos,token) = 
+let getLexeme(pos,len,token) = 
     match token with
     | HEADER x -> box x
     | IDENTIFIER x -> box x
@@ -52,45 +52,47 @@ let tokenize inp =
         seq {
             match inp with
             | "" -> ()
-            | On tryWhiteSpace         (x, rest) -> 
-                let pos = pos + x.Length
-                yield! loop pos rest
-            | On tryLineTerminator     (x, rest) ->
-                let pos = pos + x.Length
-                yield! loop pos rest
+            | On tryWhiteSpace (x, rest) -> 
+                let len = x.Length
+                yield! loop (pos+len) rest
+            | On tryLineTerminator (x, rest) ->
+                let len = x.Length
+                yield! loop (pos+len) rest
+
             | On trySingleLineComment  (x, rest) ->
-                let pos = pos + x.Length
-                yield! loop pos rest
+                let len = x.Length
+                yield! loop (pos+len) rest
+
             | On tryFsMultiLineComment (x, rest) ->
-                let pos = pos + x.Length
-                yield! loop pos rest
+                let len = x.Length
+                yield! loop (pos+len) rest
 
             | Prefix @"\w+" (x, rest) ->
-                yield pos, IDENTIFIER x
-                let pos = pos + x.Length
-                yield! loop pos rest
+                let len = x.Length
+                yield pos, len, IDENTIFIER x
+                yield! loop (pos+len) rest
 
             | On tryDoubleStringLiteral (x, rest) ->
-                yield pos,QUOTE <| unquote x
-                let pos = pos + x.Length
-                yield! loop pos rest
+                let len = x.Length
+                yield pos,len,QUOTE(unquote x)
+                yield! loop (pos+len) rest
 
             | On (tryFirstChar ':') rest ->
-                yield pos, COLON
+                yield pos, 1, COLON
                 yield! loop (pos+1) rest
 
             | On (tryFirstChar '|') rest ->
-                yield pos,BAR
+                yield pos,1,BAR
                 yield! loop (pos+1) rest
 
             | On (tryFirstChar ';') rest ->
-                yield pos,SEMICOLON
+                yield pos,1,SEMICOLON
                 yield! loop (pos+1) rest
 
             | Prefix "%%+" (x, rest) ->
-                yield pos,PERCENT
-                let pos = pos + x.Length
-                yield! loop pos rest
+                let len = x.Length
+                yield pos,len,PERCENT
+                yield! loop (pos+len) rest
 
             | Prefix "%[a-z]+" (x, rest) ->
                 let tok =
@@ -100,31 +102,24 @@ let tokenize inp =
                     | "%nonassoc" -> NONASSOC
                     | "%prec" -> PREC
                     | never -> failwith ""
-                yield pos,tok
-                let pos = pos + x.Length
-                yield! loop pos rest
+                let len = x.Length
+                yield pos,len,tok
+                yield! loop (pos+len) rest
 
             | On trySemanticAction (x, rest) ->
-                let y = x.[1..x.Length-2].Trim()
-                yield pos, SEMANTIC y
-                let pos = pos + x.Length
-                yield! loop pos rest
+                let len = x.Length
+                yield pos, len, SEMANTIC(x.[1..x.Length-2].Trim())
+                yield! loop (pos+len) rest
 
             | On tryHeader (x, rest) ->
-                let z = x.[2..x.Length-3].Trim()
-                yield pos,HEADER z
-                let pos = pos + x.Length
-                yield! loop pos rest
+                let len = x.Length                
+                yield pos,len,HEADER (x.[2..x.Length-3].Trim())
+                yield! loop (pos+len) rest
             | never -> failwithf "%A" never
         }
-
-    //seq {
-    //    //yield (0,BOF)
-    //    yield! loop 0 inp
-    //    yield (inp.Length,EOF)
-    //}
     loop 0 inp
-let isPercent(pos,token) = 
-    match token with
-    | PERCENT -> true
-    | _       -> false
+
+//let isPercent(pos,token) = 
+//    match token with
+//    | PERCENT -> true
+//    | _       -> false

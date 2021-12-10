@@ -49,7 +49,7 @@ let tryHole =
     Regex @"^\<\w+\>"
     |> tryRegexMatch
 
-let getTag(pos,token) = 
+let getTag(pos,len,token) = 
     match token with
     | HEADER _ -> "HEADER"
     | ID _ -> "ID"
@@ -72,7 +72,7 @@ let getTag(pos,token) =
     | BOF       -> "BOF"
     | EOF       -> "EOF"
 
-let getLexeme (pos,token) = 
+let getLexeme (pos,len,token) = 
     match token with
     | HEADER x -> box x
     | ID x -> box x
@@ -85,104 +85,115 @@ let tokenize inp =
     let rec loop pos (inp:string) =
         seq {
             match inp with
-            | "" -> ()
+            | "" -> yield pos, 0, EOF
 
             | Prefix @"[\s-[\n]]+" (x,rest) ->
-                let pos = pos + x.Length
-                yield! loop pos rest
+                let len = x.Length
+                yield! loop (pos+len) rest
 
             | On trySingleLineComment (x,rest) ->
-                let pos = pos + x.Length
-                yield! loop pos rest
+                let len = x.Length
+                yield! loop (pos+len) rest
 
             | On tryFsMultiLineComment (x,rest) ->
-                let pos = pos + x.Length
-                yield! loop pos rest
+                let len = x.Length
+                yield! loop (pos+len) rest
 
             | PrefixChar '\n' rest ->
-                yield pos,LF
-                yield! loop (pos+1) rest
+                let len = 1
+                yield pos,len,LF
+                yield! loop (pos+len) rest
 
-            | Prefix @"\w+" (lexeme,rest) ->
-                yield pos,ID lexeme
-                let pos = pos + lexeme.Length
-                yield! loop pos rest
+            | Prefix @"\w+" (x,rest) ->
+                let len = x.Length
+                yield pos,len,ID x
+                yield! loop (pos+len) rest
 
-            | Prefix """(?:"(\\[/'"bfnrt\\]|\\u[0-9a-fA-F]{4}|[^\\"])*")""" (lexeme,rest) ->
-                yield pos,QUOTE <| unquote lexeme
-                let pos = pos + lexeme.Length
-                yield! loop pos rest
+            | Prefix """(?:"(\\[/'"bfnrt\\]|\\u[0-9a-fA-F]{4}|[^\\"])*")""" (x,rest) ->
+                let len = x.Length
+                yield pos,len,QUOTE(unquote x)
+                yield! loop (pos+len) rest
 
             | Prefix @"%%+" (x,rest) ->
-                yield pos,PERCENT
-                let pos = pos + x.Length
-                yield! loop pos rest
+                let len = x.Length
+                yield pos,len,PERCENT
+                yield! loop (pos+len) rest
 
             | PrefixChar '=' rest ->
-                yield pos,EQUALS
-                yield! loop (pos+1) rest
+                let len = 1
+                yield pos,len,EQUALS
+                yield! loop (pos+len) rest
 
             | PrefixChar '(' rest ->
-                yield pos,LPAREN
-                yield! loop (pos+1) rest
+                let len = 1
+                yield pos,len,LPAREN
+                yield! loop (pos+len) rest
 
             | PrefixChar ')' rest ->
-                yield pos,RPAREN
-                yield! loop (pos+1) rest
+                let len = 1
+                yield pos,len,RPAREN
+                yield! loop (pos+len) rest
+
 
             | PrefixChar '[' rest ->
-                yield pos,LBRACK
-                yield! loop (pos+1) rest
+                let len = 1
+                yield pos,len,LBRACK
+                yield! loop (pos+len) rest
 
             | PrefixChar ']' rest ->
-                yield pos,RBRACK
-                yield! loop (pos+1) rest
+                let len = 1
+                yield pos,len,RBRACK
+                yield! loop (pos+len) rest
 
             | PrefixChar '+' rest ->
-                yield pos,PLUS
-                yield! loop (pos+1) rest
+                let len = 1
+                yield pos,len,PLUS
+                yield! loop (pos+len) rest
 
             | PrefixChar '*' rest ->
-                yield pos,STAR
-                yield! loop (pos+1) rest
+                let len = 1
+                yield pos,len,STAR
+                yield! loop (pos+len) rest
 
             | PrefixChar '/' rest ->
-                yield pos,SLASH
-                yield! loop (pos+1) rest
+                let len = 1
+                yield pos,len,SLASH
+                yield! loop (pos+len) rest
 
             | PrefixChar '|' rest ->
-                yield pos,BAR
-                yield! loop (pos+1) rest
+                let len = 1
+                yield pos,len,BAR
+                yield! loop (pos+len) rest
 
             | PrefixChar '?' rest ->
-                yield pos,QMARK
-                yield! loop (pos+1) rest
+                let len = 1
+                yield pos,len,QMARK
+                yield! loop (pos+len) rest
 
             | On tryHole (x, rest) ->
-                let x = x.[1..x.Length-2]
-                yield pos,HOLE x
-                let pos = pos + x.Length
-                yield! loop pos rest
+                let len = x.Length
+                yield pos,len,HOLE x.[1..x.Length-2]
+                yield! loop (pos+len) rest
 
             | On trySemanticAction (x, rest) ->
-                let x = x.[1..x.Length-2].Trim()
-                yield pos,SEMANTIC x
-                let pos = pos + x.Length
-                yield! loop pos rest
+                let len = x.Length
+                yield pos,len,SEMANTIC(x.[1..x.Length-2].Trim())
+                yield! loop (pos+len) rest
+
 
             | On tryHeader (x, rest) ->
-                let y = 
-                    x.[2..x.Length-3].Trim()
-                yield pos,HEADER y
-                let pos = pos + x.Length
-                yield! loop pos rest
+                let len = x.Length
+                yield pos,len,HEADER(x.[2..x.Length-3].Trim())
+                yield! loop (pos+len) rest
 
             | never -> failwith never
         }
     
-    seq {
-        //yield (0,BOF)
-        yield! loop 0 inp
-        yield (inp.Length,EOF)
-    }
+    loop 0 inp
 
+let appendAMP (lexbuf:(int*int*_)list) =
+    let last = 
+        lexbuf
+        |> List.exactlyOne
+    let pos,len,_ = last
+    [last;pos + len,0,AMP]

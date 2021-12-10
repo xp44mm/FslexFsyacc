@@ -8,6 +8,7 @@ open Xunit.Abstractions
 open FSharp.Literals
 open FslexFsyacc.Fslex.FslexToken
 open FSharp.xUnit
+open FSharp.Idioms
 
 type AnalyzeTest(output:ITestOutputHelper) =
     let show res =
@@ -23,8 +24,8 @@ type AnalyzeTest(output:ITestOutputHelper) =
 
     [<Fact>]
     member this.``explicit amp test``() =
-        let tokens = [LPAREN;ID "";RPAREN;LBRACK;RBRACK;STAR;QUOTE ""] |> List.map(fun t -> 0,t)
-        let y = analyze tokens |> List.map snd
+        let tokens = [LPAREN;ID "";RPAREN;LBRACK;RBRACK;STAR;QUOTE ""] |> List.map(fun t -> 0,0,t)
+        let y = analyze tokens |> List.map Triple.last
         //show y
 
         let e = [LPAREN;ID "";RPAREN;AMP;LBRACK;RBRACK;STAR;AMP;QUOTE ""]
@@ -33,7 +34,7 @@ type AnalyzeTest(output:ITestOutputHelper) =
     //[<Fact>]
     //member this.``clear bof test``() =
     //    let tokens = [BOF; LF; PERCENT; LF; ID ""] |> List.map(fun t -> 0,t)
-    //    let y = analyze tokens |> List.map snd
+    //    let y = analyze tokens |> List.map Triple.last
     //    //show y
 
     //    let e = [ID ""]
@@ -41,8 +42,8 @@ type AnalyzeTest(output:ITestOutputHelper) =
 
     [<Fact>]
     member this.``clear EOF test``() =
-        let tokens = [LF; PERCENT; LF; EOF] |> List.map(fun t -> 0,t)
-        let y = analyze tokens |> List.map snd
+        let tokens = [LF; PERCENT; LF; EOF] |> List.map(fun t -> 0,0,t)
+        let y = analyze tokens |> List.map Triple.last
         //show y
 
         let e = []
@@ -50,8 +51,8 @@ type AnalyzeTest(output:ITestOutputHelper) =
 
     [<Fact>]
     member this.``clear lf after percent test``() =
-        let tokens = [ PERCENT; LF] |> List.map(fun t -> 0,t)
-        let y = analyze tokens |> List.map snd
+        let tokens = [ PERCENT; LF] |> List.map(fun t -> 0,0,t)
+        let y = analyze tokens |> List.map Triple.last
         //show y
 
         let e = [PERCENT; ]
@@ -59,8 +60,8 @@ type AnalyzeTest(output:ITestOutputHelper) =
 
     [<Fact>]
     member this.``collapse many LF test``() =
-        let tokens = [ LF; LF] |> List.map(fun t -> 0,t)
-        let y = analyze tokens |> List.map snd
+        let tokens = [ LF; LF] |> List.map(fun t -> 0,0,t)
+        let y = analyze tokens |> List.map Triple.last
         //show y
 
         let e = [LF; ]
@@ -68,7 +69,7 @@ type AnalyzeTest(output:ITestOutputHelper) =
 
     [<Fact>]
     member this.``percent ``() =
-        let tokens = [LF;PERCENT;LF] |> List.map(fun t -> 0,t)
+        let tokens = [LF;PERCENT;LF] |> List.map(fun t -> 0,0,t)
         let y =
             tokens
             |> FslexDFA.analyze
