@@ -79,7 +79,7 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
         show tokens
 
 
-    [<Fact>] // (Skip="once for all!")
+    [<Fact(Skip="once for all!")>] // 
     member this.``6 - generate ParseTable``() =
         let parseTbl = fsyacc.toFsyaccParseTable()
 

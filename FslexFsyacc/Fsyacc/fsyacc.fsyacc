@@ -41,20 +41,20 @@ declaration: symbol ":" QUOTE { s0,s2 }
            
 %%
 
-HEADER       "string" ;
-IDENTIFIER   "string" ;
-QUOTE        "string" ;
-SEMANTIC     "string" ;
-assoc        "string" ;
-bodies       "(string list*string*string)list" ;
-body         "string list*string*string" ;
-declaration  "string*string" ;
-declarations "(string*string)list" ;
-file         "string*(string*((string list*string*string)list))list*(string*string list)list*(string*string)list" ;
-precedence   "string*string list" ;
-precedences  "(string*string list)list" ;
-rule         "string*((string list*string*string)list)" ;
-rules        "(string*((string list*string*string)list))list" ;
-symbol       "string" ;
-symbols      "string list";
+HEADER       : "string"
+IDENTIFIER   : "string"
+QUOTE        : "string"
+SEMANTIC     : "string"
+assoc        : "string"
+bodies       : "(string list*string*string)list"
+body         : "string list*string*string"
+declaration  : "string*string"
+declarations : "(string*string)list"
+file         : "string*(string*((string list*string*string)list))list*(string*string list)list*(string*string)list"
+precedence   : "string*string list"
+precedences  : "(string*string list)list"
+rule         : "string*((string list*string*string)list)"
+rules        : "(string*((string list*string*string)list))list"
+symbol       : "string"
+symbols      : "string list"
 

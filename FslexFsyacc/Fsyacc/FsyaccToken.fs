@@ -118,12 +118,12 @@ let tokenize inp =
             | never -> failwithf "%A" never
         }
 
-    seq {
-        //yield (0,BOF)
-        yield! loop 0 inp
-        yield (inp.Length,EOF)
-    }
-
+    //seq {
+    //    //yield (0,BOF)
+    //    yield! loop 0 inp
+    //    yield (inp.Length,EOF)
+    //}
+    loop 0 inp
 let isPercent(pos,token) = 
     match token with
     | PERCENT -> true

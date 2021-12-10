@@ -41,17 +41,17 @@ characters : characters "&" character {s2::s0}
 
 %%
 
-HEADER      "string";
-ID          "string";
-QUOTE       "string";
-SEMANTIC    "string";
-HOLE        "string";
-character   "RegularExpression<string>";
-characters  "RegularExpression<string> list";
-definition  "string*RegularExpression<string>";
-definitions "(string*RegularExpression<string>)list";
-expr        "RegularExpression<string>";
-file        "string*(string*RegularExpression<string>)list*(RegularExpression<string>list*string)list";
-rule        "RegularExpression<string>list*string";
-rules       "(RegularExpression<string>list*string)list";
+HEADER      : "string"
+ID          : "string"
+QUOTE       : "string"
+SEMANTIC    : "string"
+HOLE        : "string"
+character   : "RegularExpression<string>"
+characters  : "RegularExpression<string> list"
+definition  : "string*RegularExpression<string>"
+definitions : "(string*RegularExpression<string>)list"
+expr        : "RegularExpression<string>"
+file        : "string*(string*RegularExpression<string>)list*(RegularExpression<string>list*string)list"
+rule        : "RegularExpression<string>list*string"
+rules       : "(RegularExpression<string>list*string)list"
 
