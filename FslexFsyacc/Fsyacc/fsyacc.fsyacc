@@ -34,10 +34,10 @@ assoc      : "%left"         { "left"     }
            | "%right"        { "right"    }
            | "%nonassoc"     { "nonassoc" }
 
-declarations:                  declaration   {[s0]}
-            | declarations ";" declaration   {s2::s0}
+declarations:              declaration   {[s0]}
+            | declarations declaration   {s1::s0}
 
-declaration: symbol QUOTE { s0,s1 }
+declaration: symbol ":" QUOTE { s0,s2 }
            
 %%
 
