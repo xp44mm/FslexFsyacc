@@ -43,7 +43,7 @@ type FslexToken =
 
 open FSharp.Idioms
 open System.Text.RegularExpressions
-open FslexFsyacc.SourceText
+open FslexFsyacc.FSharpSourceText
 
 let tryHole =
     Regex @"^\<\w+\>"
@@ -87,29 +87,29 @@ let tokenize inp =
             match inp with
             | "" -> yield pos, 0, EOF
 
-            | Prefix @"[\s-[\n]]+" (x,rest) ->
+            | On tryWhiteSpace (x, rest) ->
                 let len = x.Length
+                yield! loop (pos+len) rest
+
+            | On tryLineTerminator (x, rest) ->
+                let len = x.Length
+                yield pos,len,LF
                 yield! loop (pos+len) rest
 
             | On trySingleLineComment (x,rest) ->
                 let len = x.Length
                 yield! loop (pos+len) rest
 
-            | On tryFsMultiLineComment (x,rest) ->
+            | On tryMultiLineComment (x,rest) ->
                 let len = x.Length
                 yield! loop (pos+len) rest
 
-            | PrefixChar '\n' rest ->
-                let len = 1
-                yield pos,len,LF
-                yield! loop (pos+len) rest
-
-            | Prefix @"\w+" (x,rest) ->
+            | On tryWord (x,rest) ->
                 let len = x.Length
                 yield pos,len,ID x
                 yield! loop (pos+len) rest
 
-            | Prefix """(?:"(\\[/'"bfnrt\\]|\\u[0-9a-fA-F]{4}|[^\\"])*")""" (x,rest) ->
+            | On trySingleQuoteString (x,rest) ->
                 let len = x.Length
                 yield pos,len,QUOTE(unquote x)
                 yield! loop (pos+len) rest
@@ -175,11 +175,10 @@ let tokenize inp =
                 yield pos,len,HOLE x.[1..x.Length-2]
                 yield! loop (pos+len) rest
 
-            | On trySemanticAction (x, rest) ->
+            | On tryAction (x, rest) ->
                 let len = x.Length
                 yield pos,len,SEMANTIC(x.[1..x.Length-2].Trim())
                 yield! loop (pos+len) rest
-
 
             | On tryHeader (x, rest) ->
                 let len = x.Length

@@ -45,7 +45,7 @@ let getLexeme(pos,len,token) =
 
 open FSharp.Idioms
 open System.Text.RegularExpressions
-open FslexFsyacc.SourceText
+open FslexFsyacc.FSharpSourceText
 
 let tokenize inp =
     let rec loop (pos:int) (inp: string) =
@@ -63,16 +63,16 @@ let tokenize inp =
                 let len = x.Length
                 yield! loop (pos+len) rest
 
-            | On tryFsMultiLineComment (x, rest) ->
+            | On tryMultiLineComment (x, rest) ->
                 let len = x.Length
                 yield! loop (pos+len) rest
 
-            | Prefix @"\w+" (x, rest) ->
+            | On tryWord (x, rest) ->
                 let len = x.Length
                 yield pos, len, IDENTIFIER x
                 yield! loop (pos+len) rest
 
-            | On tryDoubleStringLiteral (x, rest) ->
+            | On trySingleQuoteString (x, rest) ->
                 let len = x.Length
                 yield pos,len,QUOTE(unquote x)
                 yield! loop (pos+len) rest
@@ -106,7 +106,7 @@ let tokenize inp =
                 yield pos,len,tok
                 yield! loop (pos+len) rest
 
-            | On trySemanticAction (x, rest) ->
+            | On tryAction (x, rest) ->
                 let len = x.Length
                 yield pos, len, SEMANTIC(x.[1..x.Length-2].Trim())
                 yield! loop (pos+len) rest
@@ -115,6 +115,7 @@ let tokenize inp =
                 let len = x.Length                
                 yield pos,len,HEADER (x.[2..x.Length-3].Trim())
                 yield! loop (pos+len) rest
+
             | never -> failwithf "%A" never
         }
     loop 0 inp

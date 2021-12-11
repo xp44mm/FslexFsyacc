@@ -119,3 +119,17 @@ type FSharpSourceTextTest(output:ITestOutputHelper) =
         let y1 = FSharpSourceText.getNestedActionLength x1
         let z1 = x1.[0..y1-1]
         Should.equal x1 z1
+
+    [<Fact>]
+    member this.``tryHeader``() =
+        let x = "%{%}"
+        let y = FSharpSourceText.tryHeader x
+        //show y
+        Should.equal y <| Some(x,"")
+
+    [<Fact>]
+    member this.``tryAction``() =
+        let x = "{{}}"
+        let y = FSharpSourceText.tryAction x
+        //show y
+        Should.equal y <| Some(x,"")

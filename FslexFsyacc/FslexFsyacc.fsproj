@@ -55,7 +55,6 @@
 		<Compile Include="Yacc\EliminatingAmbiguity.fs" />
 		<Compile Include="Yacc\ParseTableUtils.fs" />
 		<Compile Include="Yacc\ParseTable.fs" />
-		<Compile Include="SourceText.fs" />
 		<Compile Include="FSharpSourceText.fs" />
 
 		<Compile Include="Fslex\LexSemanticGenerator.fs" />
@@ -77,6 +76,7 @@
 		<Compile Include="Fsyacc\FsyaccCompiler.fs" />
 		<Compile Include="Fsyacc\FsyaccParseTableFile.fs" />
 		<Compile Include="Fsyacc\FsyaccFile.fs" />
+		<Compile Include="SourceText.fs" />
 
 	</ItemGroup>
 

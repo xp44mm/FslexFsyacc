@@ -4,7 +4,11 @@ open FSharp.Idioms
 open System.Text.RegularExpressions
 
 let tryWhiteSpace =
-    Regex @"^\s+"
+    Regex @"^[\s-[\n]]+"
+    |> tryRegexMatch
+
+let tryLineTerminator =
+    Regex @"^\r?\n"
     |> tryRegexMatch
 
 let trySingleLineComment =
@@ -46,6 +50,7 @@ let tryWord =
 let tries = 
     [
         tryWhiteSpace
+        tryLineTerminator
         trySingleLineComment
         tryMultiLineComment
         tryDoubleTick
@@ -63,12 +68,12 @@ let tryPercentRBrace = tryPrefix "%}" >> Option.map(fun(x,rest)-> 1,x,rest)
 let tryHeaderTokens = tryPercentRBrace :: tries
 
 let getHeaderLength (inp:string) =
-    let rec loop len inp =
-        if inp = "" then failwith ""
+    let rec loop len seed =
+        if seed = "" then failwithf "%A" (len,inp)
         let i,x,rest =
             tryHeaderTokens
             |> List.pick(fun tryToken ->
-                tryToken inp
+                tryToken seed
                 )
         let len = len+x.Length
         if i = 0 then
@@ -82,12 +87,12 @@ let tryRBrace = tryFirstChar '}' >> Option.map(fun rest -> 1,"}",rest)
 let tryActionTokens = tryLBrace :: tryRBrace :: tries
 
 let getNestedActionLength(inp:string) =
-    let rec loop depth len inp =
-        if inp = "" then failwithf "%A" (depth,len,inp)
+    let rec loop depth len seed =
+        if seed = "" then failwithf "%A" (depth,len,inp)
         let i,x,rest =
             tryActionTokens
             |> List.pick(fun tryToken ->
-                tryToken inp
+                tryToken seed
                 )
         let depth = depth + i
         let len = len + x.Length
@@ -96,3 +101,23 @@ let getNestedActionLength(inp:string) =
         else
             loop depth len rest
     loop -1 0 inp
+
+let tryHeader(inp:string) =
+    let start = "%{"
+    inp 
+    |> tryStartWith(start)
+    |> Option.map(fun rest ->
+        let len = getHeaderLength rest
+        let hdr = start + rest.[0..len-1]
+        hdr,rest.[len..]
+    )
+
+let tryAction(inp:string) =
+    let start = "{"
+    inp 
+    |> tryStartWith(start)
+    |> Option.map(fun rest ->
+        let len = getNestedActionLength rest
+        let hdr = start + rest.[0..len-1]
+        hdr,rest.[len..]
+    )
