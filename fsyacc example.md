@@ -4,7 +4,7 @@ This example is Dragon book fig 4-59 example `expr.fsyacc`.
 
 build a xUnit project, and install NuGet packages:
 
-```
+```nuget
 install-package FslexFsyacc
 ```
 

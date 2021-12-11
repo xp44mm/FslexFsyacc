@@ -22,8 +22,8 @@ expr : expr "+" expr         { s0 + s2 }
 %left "*" "/"
 %right UMINUS
 %%
-NUMBER "float";
-expr "float"
+NUMBER : "float"
+expr   : "float"
 ```
 
 After `ParseTable` module is generated, you can use the parse function to work:
