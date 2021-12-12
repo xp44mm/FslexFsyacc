@@ -8,6 +8,8 @@ type PatternNFA<'a when 'a:comparison> =
         lexemeState:uint32
         maxState:uint32
     }
+
+    //Ordinary and Exotic
     /// s/t: an s but only if it is followed by an t. The t is not part of the matched text.
     static member lookahead(s:RegularNFA<'a>, trailingContext:RegularNFA<'a>) =
         {

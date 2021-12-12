@@ -84,13 +84,13 @@ let getHeaderLength (inp:string) =
 
 let tryLBrace = tryFirstChar '{' >> Option.map(fun rest -> -1,"{",rest)
 let tryRBrace = tryFirstChar '}' >> Option.map(fun rest -> 1,"}",rest)
-let tryActionTokens = tryLBrace :: tryRBrace :: tries
+let trySemanticTokens = tryLBrace :: tryRBrace :: tries
 
-let getNestedActionLength(inp:string) =
+let getSemanticLength(inp:string) =
     let rec loop depth len seed =
         if seed = "" then failwithf "%A" (depth,len,inp)
         let i,x,rest =
-            tryActionTokens
+            trySemanticTokens
             |> List.pick(fun tryToken ->
                 tryToken seed
                 )
@@ -112,12 +112,54 @@ let tryHeader(inp:string) =
         hdr,rest.[len..]
     )
 
-let tryAction(inp:string) =
+let trySemantic(inp:string) =
     let start = "{"
     inp 
     |> tryStartWith(start)
     |> Option.map(fun rest ->
-        let len = getNestedActionLength rest
+        let len = getSemanticLength rest
         let hdr = start + rest.[0..len-1]
         hdr,rest.[len..]
     )
+
+/// pos是x第一个字符的位置
+let rec getColumnAndRest (start:int, inp:string) (pos:int) =
+    match inp with
+    | "" -> failwithf "length:%d < pos:%d" start pos
+    | On (tryPrefix @"[^\n]*\n") (x, rest) ->
+        let nextStart = start + x.Length
+        if pos < nextStart then
+            let col = pos - start
+            col, nextStart, rest
+        else
+            getColumnAndRest (nextStart, rest) pos
+    | _ ->
+        let nextStart = start + inp.Length
+        if pos < nextStart then
+            let col = pos - start
+            col,nextStart, ""
+        else
+            failwithf "length:%d < pos:%d" nextStart pos
+
+//let col,nextstart,rest =
+//    getColumnAndRest start inp pos
+
+// spaceCount是code前面填补的空格数
+// code 不带开括号，也不带闭括号
+let formatNestedCode (spaceCount:int) (code:string) =
+    let lines =
+        space spaceCount + code //补齐首行
+        |> splitLines //分行
+        |> Seq.map(fun (i,line) -> line.TrimEnd()) //去掉行尾空格
+        |> Seq.filter(fun line -> line > "") // 删除空行
+        |> Seq.toArray
+
+    //行首空格数
+    let spaces =
+        lines
+        |> Seq.map(fun line -> Regex.Match(line,"^ *").Length)
+        |> Seq.min
+
+    lines
+    |> Array.map(fun line -> line.[spaces..])
+    |> String.concat System.Environment.NewLine

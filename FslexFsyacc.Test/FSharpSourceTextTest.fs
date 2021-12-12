@@ -23,7 +23,6 @@ type FSharpSourceTextTest(output:ITestOutputHelper) =
         let y = FSharpSourceText.tryWhiteSpace x
         Should.equal y <| Some(x,"")
 
-
     [<Fact>]
     member this.``trySingleLineComment``() =
         let x = "// xdfasdf\r\n   "
@@ -111,12 +110,12 @@ type FSharpSourceTextTest(output:ITestOutputHelper) =
     [<Fact>]
     member this.``getNestedActionLength``() =
         let x = "}"
-        let y = FSharpSourceText.getNestedActionLength x
+        let y = FSharpSourceText.getSemanticLength x
         let z = x.[0..y-1]
         Should.equal x z
 
         let x1 = "(*}*){}}"
-        let y1 = FSharpSourceText.getNestedActionLength x1
+        let y1 = FSharpSourceText.getSemanticLength x1
         let z1 = x1.[0..y1-1]
         Should.equal x1 z1
 
@@ -128,8 +127,37 @@ type FSharpSourceTextTest(output:ITestOutputHelper) =
         Should.equal y <| Some(x,"")
 
     [<Fact>]
-    member this.``tryAction``() =
+    member this.``trySemantic``() =
         let x = "{{}}"
-        let y = FSharpSourceText.tryAction x
+        let y = FSharpSourceText.trySemantic x
         //show y
         Should.equal y <| Some(x,"")
+
+    [<Fact>]
+    member this.``getColumnAndRest``() =
+        let start = 19
+        let inp = "0123456789\nabc"
+        let pos = 20
+        let col,nextStart,rest = 
+            FSharpSourceText.getColumnAndRest (start, inp) pos
+        //show (col,nextStart,rest)
+        Should.equal col 1 //20-19,col base on 0
+        Should.equal nextStart 30 //19+11
+        Should.equal rest "abc" // rest after first \n
+
+    [<Fact>]
+    member this.``formatNestedCode``() =
+        let col = 3
+        let code = 
+            [
+                " let a = 0";
+                "    let b = 1";
+            ]
+            |> String.concat System.Environment.NewLine
+        let result = 
+            FSharpSourceText.formatNestedCode col code
+        //show result
+        Should.equal result "let a = 0\r\nlet b = 1"
+
+
+

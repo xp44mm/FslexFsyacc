@@ -28,8 +28,6 @@
 		<Compile Include="Yacc\Section4_8_1Test.fs" />
 		<Compile Include="Yacc\Section4_8_2Test.fs" />
 		
-		<Compile Include="SourceTextTest.fs" />
-		
 		<Compile Include="FSharpSourceTextTest.fs" />
 		<Compile Include="Fslex\FslexParseTableTest.fs" />
 		<Compile Include="Fslex\FslexDFATest.fs" />
@@ -37,6 +35,7 @@
 
 		<Compile Include="Fsyacc\SemanticGeneratorTest.fs" />
 		<Compile Include="Fsyacc\FsyaccParseTableTest.fs" />
+		<Compile Include="SourceTextTest.fs" />
 		<Compile Include="Expr\ExprToken.fs" />
 		<None Include="Expr\expr.fsyacc" />
 		<Compile Include="Expr\ExprParseTable.fs" />

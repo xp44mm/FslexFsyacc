@@ -106,7 +106,7 @@ let tokenize inp =
                 yield pos,len,tok
                 yield! loop (pos+len) rest
 
-            | On tryAction (x, rest) ->
+            | On trySemantic (x, rest) ->
                 let len = x.Length
                 yield pos, len, SEMANTIC(x.[1..x.Length-2].Trim())
                 yield! loop (pos+len) rest
