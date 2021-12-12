@@ -172,17 +172,19 @@ let tokenize inp =
 
             | On tryHole (x, rest) ->
                 let len = x.Length
-                yield pos,len,HOLE x.[1..x.Length-2]
+                yield pos,len,HOLE x.[1..len-2]
                 yield! loop (pos+len) rest
 
             | On trySemantic (x, rest) ->
                 let len = x.Length
-                yield pos,len,SEMANTIC(x.[1..x.Length-2].Trim())
+                let code = x.[1..len-2]
+                yield pos,len,SEMANTIC(code.Trim())
                 yield! loop (pos+len) rest
 
             | On tryHeader (x, rest) ->
                 let len = x.Length
-                yield pos,len,HEADER(x.[2..x.Length-3].Trim())
+                let code = x.[2..len-3]
+                yield pos,len,HEADER(code.Trim())
                 yield! loop (pos+len) rest
 
             | never -> failwith never

@@ -17,7 +17,7 @@ type FsyaccToken =
     | EOF
 
 /// the tag of token
-let getTag(pos,len,token) = 
+let getTag(pos,len,token) =
     match token with
     | HEADER _ -> "HEADER"
     | IDENTIFIER _ -> "IDENTIFIER"
@@ -35,7 +35,7 @@ let getTag(pos,len,token) =
     | EOF          -> "EOF"
 
 ///用于求解的栈
-let getLexeme(pos,len,token) = 
+let getLexeme(pos,len,token) =
     match token with
     | HEADER x -> box x
     | IDENTIFIER x -> box x
@@ -52,14 +52,14 @@ let tokenize inp =
         seq {
             match inp with
             | "" -> ()
-            | On tryWhiteSpace (x, rest) -> 
+            | On tryWhiteSpace (x, rest) ->
                 let len = x.Length
                 yield! loop (pos+len) rest
             | On tryLineTerminator (x, rest) ->
                 let len = x.Length
                 yield! loop (pos+len) rest
 
-            | On trySingleLineComment  (x, rest) ->
+            | On trySingleLineComment (x, rest) ->
                 let len = x.Length
                 yield! loop (pos+len) rest
 
@@ -108,19 +108,21 @@ let tokenize inp =
 
             | On trySemantic (x, rest) ->
                 let len = x.Length
-                yield pos, len, SEMANTIC(x.[1..x.Length-2].Trim())
+                let code = x.[1..len-2]
+                yield pos, len, SEMANTIC(code.Trim())
                 yield! loop (pos+len) rest
 
             | On tryHeader (x, rest) ->
-                let len = x.Length                
-                yield pos,len,HEADER (x.[2..x.Length-3].Trim())
+                let len = x.Length
+                let code = x.[2..len-3]
+                yield pos,len,HEADER(code.Trim())
                 yield! loop (pos+len) rest
 
             | never -> failwithf "%A" never
         }
     loop 0 inp
 
-//let isPercent(pos,token) = 
+//let isPercent(pos,token) =
 //    match token with
 //    | PERCENT -> true
 //    | _       -> false
