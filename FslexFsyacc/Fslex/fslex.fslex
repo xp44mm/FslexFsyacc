@@ -1,5 +1,6 @@
 ﻿%{
-open FslexFsyacc.Fslex.FslexToken
+open FslexFsyacc.Fslex
+open FslexFsyacc.Fslex.FslexTokenUtils
 %}
 last = ")"|"*"|"+"|"?"|"HOLE"|"ID"|"QUOTE"|"]"
 first = "("|"HOLE"|"ID"|"QUOTE"|"["

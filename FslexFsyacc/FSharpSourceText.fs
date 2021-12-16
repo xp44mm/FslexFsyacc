@@ -1,5 +1,6 @@
 ﻿module FslexFsyacc.FSharpSourceText
 
+open System
 open FSharp.Idioms
 open System.Text.RegularExpressions
 
@@ -125,7 +126,8 @@ let trySemantic(inp:string) =
 /// pos是x第一个字符的位置
 let rec getColumnAndRest (start:int, inp:string) (pos:int) =
     match inp with
-    | "" -> failwithf "length:%d < pos:%d" start pos
+    | "" -> 
+        failwithf "length:%d < pos:%d" start pos
     | On (tryPrefix @"[^\n]*\n") (x, rest) ->
         let nextStart = start + x.Length
         if pos < nextStart then
@@ -157,9 +159,9 @@ let formatNestedCode (spaceCount:int) (code:string) =
     //行首空格数
     let spaces =
         lines
-        |> Seq.map(fun line -> Regex.Match(line,"^ *").Length)
-        |> Seq.min
+        |> Array.map(fun line -> Regex.Match(line,"^ *").Length)
+        |> Array.min
 
     lines
     |> Array.map(fun line -> line.[spaces..])
-    |> String.concat System.Environment.NewLine
+    |> String.concat Environment.NewLine

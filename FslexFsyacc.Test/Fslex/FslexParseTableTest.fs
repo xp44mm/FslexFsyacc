@@ -87,14 +87,12 @@ type FslexParseTableTest(output:ITestOutputHelper) =
         let tokens = grammar.symbols - grammar.nonterminals
         show tokens
 
-
-
     [<Fact(Skip="once for all!")>] // 
     member this.``6 - generate ParseTable``() =
         let name = "FslexParseTable"
         let moduleName = $"FslexFsyacc.Fslex.{name}"
         //解析表数据
-        let fsharpCode = parseTbl.generateParseTable(moduleName)
+        let fsharpCode = parseTbl.generate(moduleName)
 
         let outputDir = Path.Combine(sourcePath, $"{name}.fs")
         File.WriteAllText(outputDir,fsharpCode)

@@ -6,7 +6,6 @@ open Xunit
 open Xunit.Abstractions
 
 open FSharp.Literals
-open FslexFsyacc.Fslex.FslexToken
 open FSharp.xUnit
 open FSharp.Idioms
 

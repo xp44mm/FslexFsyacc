@@ -2,7 +2,5 @@
 
 let compile (inp:string) =
     inp
-    |> FsyaccToken.tokenize
-    //|> FsyaccDFA.analyze
-    //|> Seq.concat
+    |> FsyaccTokenUtils.tokenize
     |> FsyaccParseTable.parse

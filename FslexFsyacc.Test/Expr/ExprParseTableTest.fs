@@ -26,13 +26,6 @@ type ExprParseTableTest(output:ITestOutputHelper) =
         show fsyacc.rules
         show fsyacc.precedences
         show fsyacc.declarations
-        let r = ["expr",[["expr";"+";"expr"],"","s0 + s2";["expr";"-";"expr"],"","s0 - s2";["expr";"*";"expr"],"","s0 * s2";["expr";"/";"expr"],"","s0 / s2";["(";"expr";")"],"","s1";["-";"expr"],"UMINUS","-s1";["NUMBER"],"","s0"]]
-        let p = ["left",["+";"-"];"left",["*";"/"];"right",["UMINUS"]]
-        let d = ["NUMBER","float";"expr","float"]
-
-        Should.equal r fsyacc.rules
-        Should.equal p fsyacc.precedences
-        Should.equal d fsyacc.declarations
 
     [<Fact(Skip="once for all!")>] // 
     member this.``1 - fsyacc generateParseTable``() =
@@ -40,7 +33,7 @@ type ExprParseTableTest(output:ITestOutputHelper) =
         let moduleName = $"Expr.{name}"
 
         //解析表数据
-        let fsharpCode = parseTbl.generateParseTable(moduleName)
+        let fsharpCode = parseTbl.generate(moduleName)
 
         let outputDir = Path.Combine(__SOURCE_DIRECTORY__, $"{name}.fs")
         File.WriteAllText(outputDir,fsharpCode)
@@ -64,3 +57,4 @@ type ExprParseTableTest(output:ITestOutputHelper) =
         //show tokens
         let y = set ["(";")";"*";"+";"-";"/";"NUMBER"]
         Should.equal y tokens
+

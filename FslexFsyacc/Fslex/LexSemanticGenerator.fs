@@ -1,14 +1,11 @@
 ﻿module FslexFsyacc.Fslex.LexSemanticGenerator
 
 open System
-
-let indent i = 
-    let space i = String.replicate i " "
-    space (4*i)
+open FSharp.Idioms.StringOps
 
 let decorateSemantic (semantic:string) =
     [
         $"{indent 1}fun (lexbuf:(int*int*_)list) ->"
-        $"{indent 2}{semantic}"
+        (2*4,semantic) ||> indentCodeBlock 
     ] |> String.concat Environment.NewLine
 

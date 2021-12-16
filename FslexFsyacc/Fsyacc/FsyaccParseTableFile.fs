@@ -16,7 +16,7 @@ type FsyaccParseTableFile =
       }
 
     /// 输入模块带名字空间的全名
-    member this.generateParseTable(moduleName:string) =
+    member this.generate(moduleName:string) =
         let types = Map.ofList this.declarations // symbol -> type of symbol
         let semantics =
             this.semantics

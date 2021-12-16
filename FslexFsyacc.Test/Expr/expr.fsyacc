@@ -1,7 +1,9 @@
 ﻿%{
-open Expr.ExprToken
+    open Expr.ExprToken
+    open System
 %}
-expr : expr "+" expr         { s0 + s2 }
+expr : expr "+" expr         { //multiline test
+                               s0 + s2 }
      | expr "-" expr         { s0 - s2 }
      | expr "*" expr         { s0 * s2 }
      | expr "/" expr         { s0 / s2 }

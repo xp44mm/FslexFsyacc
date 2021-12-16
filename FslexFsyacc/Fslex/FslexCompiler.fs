@@ -6,7 +6,7 @@ open FslexFsyacc.Lex
 let parseToStructuralData (fslex:string) =
     let tokens = 
         fslex
-        |> FslexToken.tokenize
+        |> FslexTokenUtils.tokenize
         |> FslexDFA.analyze
         |> Seq.concat
     FslexParseTable.parse tokens

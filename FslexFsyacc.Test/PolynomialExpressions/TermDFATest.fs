@@ -24,7 +24,7 @@ type TermDFATest(output:ITestOutputHelper) =
     member this.``0 - compiler test``() =
         let tokens = 
             text
-            |> FslexToken.tokenize
+            |> FslexTokenUtils.tokenize
             |> FslexDFA.analyze
             |> Seq.concat
             |> List.ofSeq
@@ -42,8 +42,6 @@ type TermDFATest(output:ITestOutputHelper) =
         File.WriteAllText(outputDir, result)
         output.WriteLine("output lex:" + outputDir)
 
-
-
     [<Fact>]
     member this.``2 - valid DFA``() =
         let y = fslex.toFslexDFA()
@@ -54,4 +52,19 @@ type TermDFATest(output:ITestOutputHelper) =
         Should.equal y.dfa.indicesFromFinal TermDFA.indicesFromFinal
         Should.equal y.header               TermDFA.header
         Should.equal y.semantics            TermDFA.semantics
+
+    [<Fact>]
+    member this.``3 - tokenize``() =
+        let y = 
+            text
+            |> FslexTokenUtils.tokenize 
+            |> Seq.filter(fun (pos,len,token)->
+                match token with
+                | HEADER _ 
+                | SEMANTIC _
+                    -> true
+                | _ -> false
+            )
+            |> Seq.toList
+        show y
 

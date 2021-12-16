@@ -3,9 +3,10 @@ let nextStates = Map [0u,Map ["\n",7u;"%%",4u;"&",11u;"(",11u;")",9u;"*",9u;"+",
 let lexemesFromFinal = Map [10u,set [9u]]
 let universalFinals = set [1u;2u;3u;4u;6u;7u;8u;9u;10u;11u]
 let indicesFromFinal = Map [1u,0;2u,5;3u,1;4u,5;6u,3;7u,5;8u,2;9u,5;10u,4;11u,5]
-let header = "open FslexFsyacc.Fslex.FslexToken"
+let header = "open FslexFsyacc.Fslex\r\nopen FslexFsyacc.Fslex.FslexTokenUtils"
 let semantics = ["lexbuf |> List.take 1";"lexbuf |> List.take 1";"[]";"lexbuf |> List.take 1";"appendAMP lexbuf";"lexbuf"]
-open FslexFsyacc.Fslex.FslexToken
+open FslexFsyacc.Fslex
+open FslexFsyacc.Fslex.FslexTokenUtils
 let mappers = [|
     fun (lexbuf:(int*int*_)list) ->
         lexbuf |> List.take 1
