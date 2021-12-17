@@ -35,11 +35,7 @@ let tokenize inp =
         seq {
             match inp with
             | "" -> ()
-            | On tryWhiteSpace (x, rest) ->
-                let len = x.Length
-                yield! loop (lpos,linp) (pos+len,rest)
-
-            | On tryLineTerminator (x, rest) ->
+            | On tryWS (x, rest) ->
                 let len = x.Length
                 yield! loop (lpos,linp) (pos+len,rest)
 
@@ -78,7 +74,7 @@ let tokenize inp =
                 yield pos,1,SEMICOLON
                 yield! loop (lpos,linp) (pos+1,rest)
 
-            | Prefix "%[a-z]+" (x, rest) ->
+            | Prefix @"%[a-z]+" (x, rest) ->
                 let tok =
                     match x with
                     | "%left" -> LEFT

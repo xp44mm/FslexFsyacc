@@ -4,6 +4,10 @@ open System
 open FSharp.Idioms
 open System.Text.RegularExpressions
 
+let tryWS =
+    Regex @"^\s+"
+    |> tryRegexMatch
+
 let tryWhiteSpace =
     Regex @"^[\s-[\n]]+"
     |> tryRegexMatch
