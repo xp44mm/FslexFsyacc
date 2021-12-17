@@ -11,25 +11,25 @@ file       : HEADER rules                                    {s0, List.rev s1,[]
 rules:             rule  {[s0]}
            | rules rule  {s1::s0}
 
-rule       : IDENTIFIER ":" bodies  {s0,List.rev s2}
+rule       : ID ":" bodies  {s0,List.rev s2}
 
 precedences:             precedence    {[s0]}
            | precedences precedence    {s1::s0}
 
 precedence : assoc symbols { s0,List.rev s1}
 
-bodies     :            body    {[s0]}
-           | bodies "|" body    {s2::s0}
+bodies     :            body {[s0]}
+           | bodies "|" body {s2::s0}
 
-body       :                            SEMANTIC   {[],"",s0}
-           | symbols                    SEMANTIC   {List.rev s0,"",s1}
-           | symbols "%prec" IDENTIFIER SEMANTIC   {List.rev s0,s2,s3}
+body       :                    SEMANTIC {[],"",s0}
+           | symbols            SEMANTIC {List.rev s0,"",s1}
+           | symbols "%prec" ID SEMANTIC {List.rev s0,s2,s3}
 
 symbols    :         symbol    {[s0]}
            | symbols symbol    {s1::s0}
 
-symbol     : IDENTIFIER   { s0 }
-           | QUOTE        { s0 }
+symbol     : ID    { s0 }
+           | QUOTE { s0 }
 
 assoc      : "%left"         { "left"     }
            | "%right"        { "right"    }
@@ -43,7 +43,7 @@ declaration: symbol ":" QUOTE { s0,s2 }
 %%
 
 HEADER       : "string"
-IDENTIFIER   : "string"
+ID   : "string"
 QUOTE        : "string"
 SEMANTIC     : "string"
 assoc        : "string"

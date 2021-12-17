@@ -4,7 +4,7 @@
 let getTag(pos,len,token) =
     match token with
     | HEADER _ -> "HEADER"
-    | IDENTIFIER _ -> "IDENTIFIER"
+    | ID _ -> "ID"
     | QUOTE _    -> "QUOTE"
     | SEMANTIC _ -> "SEMANTIC"
     | COLON        -> ":"
@@ -15,14 +15,14 @@ let getTag(pos,len,token) =
     | RIGHT        -> "%right"
     | NONASSOC     -> "%nonassoc"
     | PREC         -> "%prec"
-    | BOF          -> "BOF"
-    | EOF          -> "EOF"
+    //| BOF          -> "BOF"
+    //| EOF          -> "EOF"
 
 /// 获取token携带的语义信息
 let getLexeme(pos,len,token) =
     match token with
     | HEADER x -> box x
-    | IDENTIFIER x -> box x
+    | ID x -> box x
     | QUOTE x    -> box x
     | SEMANTIC x -> box x
     | _        -> null
@@ -49,7 +49,7 @@ let tokenize inp =
 
             | On tryWord (x, rest) ->
                 let len = x.Length
-                yield pos, len, IDENTIFIER x
+                yield pos, len, ID x
                 yield! loop (lpos,linp) (pos+len,rest)
 
             | On trySingleQuoteString (x, rest) ->
