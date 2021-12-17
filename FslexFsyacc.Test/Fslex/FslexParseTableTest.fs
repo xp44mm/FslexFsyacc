@@ -89,7 +89,7 @@ type FslexParseTableTest(output:ITestOutputHelper) =
 
     [<Fact(Skip="once for all!")>] // 
     member this.``6 - generate ParseTable``() =
-        let name = "FslexParseTable"
+        let name = "FslexParseTable2"
         let moduleName = $"FslexFsyacc.Fslex.{name}"
         //解析表数据
         let fsharpCode = parseTbl.generate(moduleName)

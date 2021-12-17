@@ -30,7 +30,7 @@ type FslexDFATest(output:ITestOutputHelper) =
         
     [<Fact(Skip="once and for all!")>] // 
     member this.``1 - generate DFA``() =
-        let name = "FslexDFA"
+        let name = "FslexDFA2"
         let moduleName = $"FslexFsyacc.Fslex.{name}"
 
         let y = fslex.toFslexDFA()

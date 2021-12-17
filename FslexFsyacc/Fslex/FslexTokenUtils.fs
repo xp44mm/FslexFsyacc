@@ -9,6 +9,7 @@ let getTag(pos,len,token) =
     match token with
     | HEADER _ -> "HEADER"
     | ID _ -> "ID"
+    | CAP _ -> "CAP"
     | QUOTE _ -> "QUOTE"
     | SEMANTIC _ -> "SEMANTIC"
     | HOLE _ -> "HOLE"
@@ -32,6 +33,7 @@ let getLexeme (pos,len,token) =
     match token with
     | HEADER x -> box x
     | ID x -> box x
+    | CAP x -> box x
     | QUOTE x -> box x
     | SEMANTIC x -> box x
     | HOLE x -> box x
