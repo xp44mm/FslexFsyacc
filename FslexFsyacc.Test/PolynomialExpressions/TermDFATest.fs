@@ -25,7 +25,7 @@ type TermDFATest(output:ITestOutputHelper) =
         let tokens = 
             text
             |> FslexTokenUtils.tokenize
-            |> FslexDFA.analyze
+            |> FslexDFA2.analyze
             |> Seq.concat
             |> List.ofSeq
         show tokens

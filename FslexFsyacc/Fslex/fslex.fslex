@@ -2,13 +2,13 @@
 open FslexFsyacc.Fslex
 open FslexFsyacc.Fslex.FslexTokenUtils
 %}
-last = ")"|"*"|"+"|"?"|"HOLE"|"ID"|"QUOTE"|"]"
-first = "("|"HOLE"|"ID"|"QUOTE"|"["
-any = "\n"|"%%"|"&"|"("|")"|"*"|"+"|"/"|"="|"?"|"HOLE"|"ID"|"QUOTE"|"SEMANTIC"|"["|"]"|"|"|HEADER
+
+last = [")" "*" "+" "?" HOLE ID QUOTE "]"]
+first = ["(" HOLE ID QUOTE "["]
+any = ["%%" "&" "(" ")" "*" "+" "/" "=" "?" CAP HEADER HOLE ID QUOTE SEMANTIC "[" "]" "|"]
+
 %%
-HEADER "\n"+              { lexbuf |> List.take 1 }
-"%%" "\n"+			      { lexbuf |> List.take 1 }
-["\n" "%%"]* EOF          { [] }
-"\n" "\n"+			      { lexbuf |> List.take 1 }
-<last> / <first>          { appendAMP lexbuf }
-<any>                     { lexbuf }
+
+HEADER "%%"+     { [lexbuf.Head] }
+<last> / <first> { appendAMP lexbuf }
+<any>            { lexbuf }

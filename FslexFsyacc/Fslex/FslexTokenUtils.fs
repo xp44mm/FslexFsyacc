@@ -3,18 +3,15 @@ open FSharp.Idioms
 open System.Text.RegularExpressions
 open FslexFsyacc.FSharpSourceText
 
-//open FslexFsyacc.Fslex.FslexToken
-
 let getTag(pos,len,token) = 
     match token with
-    | HEADER _ -> "HEADER"
-    | ID _ -> "ID"
-    | CAP _ -> "CAP"
-    | QUOTE _ -> "QUOTE"
+    | HEADER   _ -> "HEADER"
+    | ID       _ -> "ID"
+    | CAP      _ -> "CAP"
+    | QUOTE    _ -> "QUOTE"
     | SEMANTIC _ -> "SEMANTIC"
-    | HOLE _ -> "HOLE"
+    | HOLE     _ -> "HOLE"
     | EQUALS    -> "="
-    | LF        -> "\n"
     | LPAREN    -> "("
     | RPAREN    -> ")"
     | LBRACK    -> "["
@@ -26,8 +23,9 @@ let getTag(pos,len,token) =
     | QMARK     -> "?"
     | AMP       -> "&"
     | PERCENT   -> "%%"
-    | BOF       -> "BOF"
-    | EOF       -> "EOF"
+    //| LF        -> "\n"
+    //| BOF       -> "BOF"
+    //| EOF       -> "EOF"
 
 let getLexeme (pos,len,token) = 
     match token with
@@ -44,17 +42,12 @@ let tryHole =
     |> tryRegexMatch
 
 let tokenize inp =
-    let rec loop  (lpos:int,linp:string)(pos:int,inp:string) =
+    let rec loop (lpos:int,linp:string)(pos:int,inp:string) =
         seq {
             match inp with
-            | "" -> yield pos, 0, EOF
-            | On tryWhiteSpace (x, rest) ->
+            | "" -> ()//yield pos, 0, EOF
+            | On tryWS (x, rest) ->
                 let len = x.Length
-                yield! loop (lpos,linp) (pos+len,rest)
-
-            | On tryLineTerminator (x, rest) ->
-                let len = x.Length
-                yield pos, len, LF
                 yield! loop (lpos,linp) (pos+len,rest)
 
             | On trySingleLineComment (x, rest) ->
@@ -67,7 +60,10 @@ let tokenize inp =
 
             | On tryWord (x, rest) ->
                 let len = x.Length
-                yield pos, len, ID x
+                if Regex.IsMatch(rest,@"^\s*=") then
+                    yield pos, len, CAP x
+                else
+                    yield pos, len, ID x
                 yield! loop (lpos,linp) (pos+len,rest)
 
             | On trySingleQuoteString (x, rest) ->
@@ -94,7 +90,6 @@ let tokenize inp =
                 let len = 1
                 yield pos,len,RPAREN
                 yield! loop (lpos,linp) (pos+len,rest)
-
 
             | PrefixChar '[' rest ->
                 let len = 1

@@ -66,7 +66,6 @@ type FslexParseTableTest(output:ITestOutputHelper) =
 
     [<Fact>]
     member this.``4 - print the template of type annotaitions``() =
-        
         let grammar = Grammar.from fsyacc.mainProductions
 
         let symbols = 
@@ -83,11 +82,12 @@ type FslexParseTableTest(output:ITestOutputHelper) =
     [<Fact>]
     member this.``5 - list all tokens``() =
         let grammar = Grammar.from fsyacc.mainProductions
-
+        let y = set ["%%";"&";"(";")";"*";"+";"/";"=";"?";"CAP";"HEADER";"HOLE";"ID";"QUOTE";"SEMANTIC";"[";"]";"|"]
+        
         let tokens = grammar.symbols - grammar.nonterminals
         show tokens
 
-    [<Fact(Skip="once for all!")>] // 
+    [<Fact>] // (Skip="once for all!")
     member this.``6 - generate ParseTable``() =
         let name = "FslexParseTable2"
         let moduleName = $"FslexFsyacc.Fslex.{name}"
@@ -102,12 +102,12 @@ type FslexParseTableTest(output:ITestOutputHelper) =
     member this.``7 - valid ParseTable``() =
         let t = parseTbl
 
-        Should.equal t.header        FslexParseTable.header
-        Should.equal t.productions   FslexParseTable.productions
-        Should.equal t.actions       FslexParseTable.actions
-        Should.equal t.kernelSymbols FslexParseTable.kernelSymbols
-        Should.equal t.semantics     FslexParseTable.semantics
-        Should.equal t.declarations  FslexParseTable.declarations
+        Should.equal t.header        FslexParseTable2.header
+        Should.equal t.productions   FslexParseTable2.productions
+        Should.equal t.actions       FslexParseTable2.actions
+        Should.equal t.kernelSymbols FslexParseTable2.kernelSymbols
+        Should.equal t.semantics     FslexParseTable2.semantics
+        Should.equal t.declarations  FslexParseTable2.declarations
 
     [<Fact>]
     member this.``8 - regex first or last token test``() =

@@ -8,13 +8,13 @@ let tryWS =
     Regex @"^\s+"
     |> tryRegexMatch
 
-let tryWhiteSpace =
-    Regex @"^[\s-[\n]]+"
-    |> tryRegexMatch
+//let tryWhiteSpace =
+//    Regex @"^[\s-[\n]]+"
+//    |> tryRegexMatch
 
-let tryLineTerminator =
-    Regex @"^\r?\n"
-    |> tryRegexMatch
+//let tryLineTerminator =
+//    Regex @"^\r?\n"
+//    |> tryRegexMatch
 
 let trySingleLineComment =
     Regex @"^//.*"
@@ -54,8 +54,7 @@ let tryWord =
 
 let tries = 
     [
-        tryWhiteSpace
-        tryLineTerminator
+        tryWS
         trySingleLineComment
         tryMultiLineComment
         tryDoubleTick

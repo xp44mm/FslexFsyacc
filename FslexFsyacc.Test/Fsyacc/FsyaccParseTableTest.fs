@@ -57,7 +57,6 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
 
     [<Fact>]
     member this.``4 - print the template of type annotaitions``() =
-        
         let grammar = Grammar.from fsyacc.mainProductions
 
         let symbols = 

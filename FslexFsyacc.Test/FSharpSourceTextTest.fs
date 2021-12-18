@@ -18,9 +18,9 @@ type FSharpSourceTextTest(output:ITestOutputHelper) =
         Should.equal y <| Some(x,"")
 
     [<Fact>]
-    member this.``tryWhiteSpace``() =
+    member this.``tryWS``() =
         let x = "  "
-        let y = FSharpSourceText.tryWhiteSpace x
+        let y = FSharpSourceText.tryWS x
         Should.equal y <| Some(x,"")
 
     [<Fact>]

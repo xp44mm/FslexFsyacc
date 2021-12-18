@@ -9,13 +9,13 @@ file       : HEADER definitions "%%" rules {s0,List.rev s1,List.rev s3}
 definitions: definitions definition {s1::s0}
            | definition             {[s0]}
 
-definition : ID "=" expr "\n" {s0,s2}
+definition : CAP "=" expr {s0,s2}
 
-rules      : rules "\n" rule  {s2::s0}
-           | rule             {[s0]}
+rules      : rules rule   {s1::s0}
+           | rule         {[s0]}
 
-rule       : expr "/" expr  SEMANTIC  {[s0;s2],s3}
-           | expr           SEMANTIC  {[s0],s1}
+rule       : expr "/" expr  SEMANTIC {[s0;s2],s3}
+           | expr           SEMANTIC {[s0],s1}
 
 expr       : character          {s0}
            | expr "|" expr      {Uion(s0,s2)}
@@ -27,8 +27,8 @@ expr       : character          {s0}
            | HOLE               {Hole s0}
            | "[" characters "]" {s1 |> List.rev |> List.reduce(fun a b -> Uion(a,b))}
 
-character  : ID          {Character s0}
-           | QUOTE       {Character s0}
+character  : ID    { Character s0 }
+           | QUOTE { Character s0 }
 
 characters : characters "&" character {s2::s0}
            | character                {[s0]}
@@ -43,6 +43,7 @@ characters : characters "&" character {s2::s0}
 
 HEADER      : "string"
 ID          : "string"
+CAP         : "string"
 QUOTE       : "string"
 SEMANTIC    : "string"
 HOLE        : "string"
@@ -54,4 +55,3 @@ expr        : "RegularExpression<string>"
 file        : "string*(string*RegularExpression<string>)list*(RegularExpression<string>list*string)list"
 rule        : "RegularExpression<string>list*string"
 rules       : "(RegularExpression<string>list*string)list"
-
