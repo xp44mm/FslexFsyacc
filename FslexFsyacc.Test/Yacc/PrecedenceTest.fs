@@ -86,13 +86,13 @@ type PrecedenceTest(output:ITestOutputHelper) =
             TerminalKey "/",9979;
             ProductionKey ["E";"-";"E"],9991]
 
-        let precOfProd = ProductionPrecedence.resolvePrecOfProd tbl.productionOperators precedences
+        let precOfProd = PrecedenceResolver.resolvePrecOfProd tbl.productionOperators precedences
 
 
         let precOfProd = precOfProd ["E";"-";"E"]
         Should.equal precOfProd 9991
 
-        let precOfTerm = TerminalPrecedence.resolvePrecOfTerminal tbl.kernelProductions precedences
+        let precOfTerm = PrecedenceResolver.resolvePrecOfTerminal tbl.kernelProductions precedences
         let precOfTerms = 
             [
                 set [{production=["E";"-";"E"];dot=1}],"-";

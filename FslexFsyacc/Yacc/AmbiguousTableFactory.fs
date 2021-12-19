@@ -3,7 +3,8 @@ module FslexFsyacc.Yacc.AmbiguousTableFactory
 
 open FSharp.Idioms
 
-let make (closures:Set<Set<ItemCore>*Set<ItemCore*Set<string>>>) (gotos:Set<Set<ItemCore>*_*Set<ItemCore>>) =
+let make (closures:Set<Set<ItemCore>*Set<ItemCore*Set<string>>>) 
+         (gotos:Set<Set<ItemCore>*string*Set<ItemCore>>) =
     let shifts =
         gotos
         |> Set.map(fun(src,symbol,tgt)-> 

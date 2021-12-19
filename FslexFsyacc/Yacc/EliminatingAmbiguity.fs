@@ -6,10 +6,10 @@ let eliminateActions
     (precedences: Map<PrecedenceKey,int>)
     =
 
-    let precOfProd = ProductionPrecedence.resolvePrecOfProd productionOperators precedences
-    let precOfTerm = TerminalPrecedence.resolvePrecOfTerminal kernelProductions precedences
+    let precOfProd = PrecedenceResolver.resolvePrecOfProd productionOperators precedences
+    let precOfTerm = PrecedenceResolver.resolvePrecOfTerminal kernelProductions precedences
 
-    fun (source:Set<ItemCore>,symbol:string,actions:Set<Action>) ->
+    fun (source:Set<ItemCore>, symbol:string, actions:Set<Action>) ->
         let action =
             match Set.toList actions with
             | [action] -> action

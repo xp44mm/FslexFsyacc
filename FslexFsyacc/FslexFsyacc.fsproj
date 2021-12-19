@@ -4,16 +4,18 @@
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-		<Description>Tools for Fslex/Fsyacc analyzer/parser generation tools.</Description>
+		<Description>Tools for Fslex/Fsyacc analyzer/parser generation.</Description>
 		<PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
 		<Copyright>xp44mm</Copyright>
 		<PackageProjectUrl>https://github.com/xp44mm/FslexFsyacc</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/xp44mm/FslexFsyacc</RepositoryUrl>
-		<PackageTags>lex,yacc</PackageTags>
-		<PackageReleaseNotes>fslex {id} -&gt; &lt;id&gt;</PackageReleaseNotes>
+		<PackageTags>lex;yacc</PackageTags>
+		<PackageReleaseNotes>fslex syntax changed</PackageReleaseNotes>
 		<Company>34696643@qq.com</Company>
 		<Authors>xp44m</Authors>
-		<Version>1.0.4</Version>
+		<Version>1.1.0</Version>
+		<IsPublishable>True</IsPublishable>
+		<PackageReadmeFile>readme.md</PackageReadmeFile>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -50,24 +52,21 @@
 		<Compile Include="Yacc\ConflictFactory.fs" />
 		<Compile Include="Yacc\Associativity.fs" />
 		<Compile Include="Yacc\PrecedenceKey.fs" />
-		<Compile Include="Yacc\ProductionPrecedence.fs" />
-		<Compile Include="Yacc\TerminalPrecedence.fs" />
+		<Compile Include="Yacc\PrecedenceResolver.fs" />
 		<Compile Include="Yacc\EliminatingAmbiguity.fs" />
 		<Compile Include="Yacc\ParseTableUtils.fs" />
 		<Compile Include="Yacc\ParseTable.fs" />
+		
 		<Compile Include="FSharpSourceText.fs" />
 
 		<Compile Include="Fslex\LexSemanticGenerator.fs" />
-
 		<Compile Include="Fslex\LexFileNormalization.fs" />
 		<Compile Include="Fslex\FslexToken.fs" />
 		<Compile Include="Fslex\FslexTokenUtils.fs" />
 		<None Include="Fslex\fslex.fsyacc" />
 		<Compile Include="Fslex\FslexParseTable.fs" />
-		<Compile Include="Fslex\FslexParseTable2.fs" />
 		<None Include="Fslex\fslex.fslex" />
 		<Compile Include="Fslex\FslexDFA.fs" />
-		<Compile Include="Fslex\FslexDFA2.fs" />
 		<Compile Include="Fslex\FslexCompiler.fs" />
 		<Compile Include="Fslex\FslexDFAFile.fs" />
 		<Compile Include="Fslex\FslexFile.fs" />
@@ -76,10 +75,15 @@
 		<Compile Include="Fsyacc\FsyaccToken.fs" />
 		<Compile Include="Fsyacc\FsyaccTokenUtils.fs" />
 		<None Include="Fsyacc\fsyacc.fsyacc" />
+		<None Include="..\readme.md">
+		  <Pack>True</Pack>
+		  <PackagePath>\</PackagePath>
+		</None>
 		<Compile Include="Fsyacc\FsyaccParseTable.fs" />
 		<Compile Include="Fsyacc\FsyaccCompiler.fs" />
 		<Compile Include="Fsyacc\FsyaccParseTableFile.fs" />
 		<Compile Include="Fsyacc\FsyaccFile.fs" />
+		
 		<Compile Include="SourceText.fs" />
 
 	</ItemGroup>

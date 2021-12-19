@@ -87,9 +87,9 @@ type FslexParseTableTest(output:ITestOutputHelper) =
         let tokens = grammar.symbols - grammar.nonterminals
         show tokens
 
-    [<Fact>] // (Skip="once for all!")
+    [<Fact(Skip="once for all!")>] // 
     member this.``6 - generate ParseTable``() =
-        let name = "FslexParseTable2"
+        let name = "FslexParseTable"
         let moduleName = $"FslexFsyacc.Fslex.{name}"
         //解析表数据
         let fsharpCode = parseTbl.generate(moduleName)
@@ -102,12 +102,12 @@ type FslexParseTableTest(output:ITestOutputHelper) =
     member this.``7 - valid ParseTable``() =
         let t = parseTbl
 
-        Should.equal t.header        FslexParseTable2.header
-        Should.equal t.productions   FslexParseTable2.productions
-        Should.equal t.actions       FslexParseTable2.actions
-        Should.equal t.kernelSymbols FslexParseTable2.kernelSymbols
-        Should.equal t.semantics     FslexParseTable2.semantics
-        Should.equal t.declarations  FslexParseTable2.declarations
+        Should.equal t.header        FslexParseTable.header
+        Should.equal t.productions   FslexParseTable.productions
+        Should.equal t.actions       FslexParseTable.actions
+        Should.equal t.kernelSymbols FslexParseTable.kernelSymbols
+        Should.equal t.semantics     FslexParseTable.semantics
+        Should.equal t.declarations  FslexParseTable.declarations
 
     [<Fact>]
     member this.``8 - regex first or last token test``() =

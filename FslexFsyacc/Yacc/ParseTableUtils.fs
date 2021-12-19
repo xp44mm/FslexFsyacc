@@ -9,6 +9,7 @@ let getProductionsMap (productions:Set<string list>) =
         |> Array.mapi(fun i prod -> -i, prod) // 产生式负数编号
         |> Map.ofArray
     mp
+
 let getActions (parsingTable:Set<int*string*int>) =
     let mp: Map<int,Map<string,int>> =
         parsingTable

@@ -13,13 +13,6 @@ let productionConflict(parseTable:Set<_*_*Set<Action>>)=
         | _ -> true
     )
 
-/// 运算符重载警告，运算符被用于多个目的
-let overloadsWarning (ambiguousTable:AmbiguousTable) =
-    ambiguousTable.kernelProductions
-    |> Map.toList
-    |> List.map snd
-    |> List.filter(fun st -> st.Count > 1)
-
 /// 列出了需使用优先级解决的冲突，需要先解决产生式冲突
 let shiftReduceConflict (ambiguousTable:AmbiguousTable) =
     ambiguousTable.ambiguousTable
@@ -33,4 +26,10 @@ let shiftReduceConflict (ambiguousTable:AmbiguousTable) =
         | _ -> failwithf "请先解决产生式冲突：%A" (src,sym,targets)
     )
     |> Set.ofList
- 
+
+/// 运算符重载警告，运算符被用于多个目的
+let overloadsWarning (ambiguousTable:AmbiguousTable) =
+    ambiguousTable.kernelProductions
+    |> Map.toList
+    |> List.map snd
+    |> List.filter(fun st -> st.Count > 1)
