@@ -15,7 +15,7 @@ By default, any text not matched by a Lex/Flex scanner is copied to the output, 
 
 Here’s another simple example:
 
-```js
+```fs
 int num_lines = 0, num_chars = 0;
 %%
 \n ++num_lines; ++num_chars;
@@ -34,7 +34,7 @@ There are two rules, one which matches a newline (“`\n`”) and increments bot
 
 A somewhat more complicated example:
 
-```js
+```fs
 /* scanner for a toy Pascal-like language */
 %{
 /* need this for the call to atof() below */
@@ -79,7 +79,7 @@ The details of this example will be explained in the following sections.
 
 The Lex/Flex input file consists of three sections, separated by a line with just `%%` in it:
 
-```js
+```fs
 definitions
 %%
 rules
@@ -93,26 +93,26 @@ The definitions section contains declarations of simple *name* definitions to si
 
 Name definitions have the form:
 
-```js
+```fs
 name definition
 ```
 
 The “`name`” is a word beginning with a letter or an underscore (‘`_`’) followed by zero or more letters, digits, underscore, or dash(‘-’). The definition is taken to begin at the first non-white-space character following the name and continuing to the end of the line. The definition can subsequently be referred to using `{name}`, which will expand to “`(definition)`”. For example,
 
-```js
+```fs
 DIGIT [0-9]
 ID    [a-z][a-z0-9]*
 ```
 
 defines “`DIGIT`” to be a regular expression which matches a single digit, and “`ID`” to be a regular expression which matches a letter followed by zero-or-more letters-or-digits. A subsequent reference to
 
-```js
+```fs
 {DIGIT}+"."{DIGIT}*
 ```
 
 is identical to
 
-```js
+```fs
 ([0-9])+"."([0-9])*
 ```
 
@@ -122,7 +122,7 @@ and matches one-or-more digits followed by a `‘.’` followed by zero-or-more 
 
 The rules section of the Lex/Flex input contains a series of rules of the form:
 
-```js
+```fs
 pattern action
 ```
 
@@ -238,25 +238,25 @@ an r, but only at the end of a line. Equivalent to “r/\n”.
 
 The regular expressions listed above are grouped according to precedence, from highest precedence at the top to lowest at the bottom. Those grouped together have equal precedence. For example,
 
-```js
+```fs
 foo|bar*
 ```
 
 is the same as
 
-```js
+```fs
 (foo)|(ba(r*))
 ```
 
 since the ‘`*`’ operator has higher precedence than concatenation, and concatenation higher than alternation (‘`|`’). This pattern therefore matches either the string `“foo”` or the string `“ba”` followed by zero-or-more r’s. To match `“foo”` or zero-or-more `“bar”`’s, use:
 
-```js
+```fs
 foo|(bar)*
 ```
 
 and to match zero-or-more `“foo”`’s-or-`“bar”`’s:
 
-```js
+```fs
 (foo|bar)*
 ```
 
@@ -270,7 +270,7 @@ Once the match is determined, the text corresponding to the match (called the to
 
 If no match is found, then the default rule is executed: the next character in the input is considered matched and copied to the standard output. Thus, the simplest legal Lex/Flex input is:
 
-```js
+```fs
 %%
 ```
 
@@ -280,7 +280,7 @@ which generates a scanner that simply copies its input (one character at a time)
 
 Each pattern in a rule has a corresponding action, which can be any arbitrary C statement. The pattern ends at the first non-escaped whitespace character; the remainder of the line is its action. If the action is empty, then when the pattern is matched the input token is simply discarded. For example, here is the specification for a program which deletes all occurrences of `“zap me”` from its input:
 
-```js
+```fs
 %%
 "zap me"
 ```
@@ -289,7 +289,7 @@ Each pattern in a rule has a corresponding action, which can be any arbitrary C 
 
 Here is a program which compresses multiple blanks and tabs down to a single blank, and throws away whitespace found at the end of a line:
 
-```js
+```fs
 %%
 [ \t]+ putchar( ' ' );
 [ \t]+$ /* ignore this token */
