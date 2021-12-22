@@ -1,6 +1,10 @@
 # FslexFsyacc & Runtime
 
-Tools and Runtime for Fslex/Fsyacc analyzer/parser generation tools. Fslex is a code generator that uses regular expression techniques to divide the token sequence into groups at a higher level. Fsyacc is a code generator that use BNF productions and precedences to resolve the token sequence to an abstract syntax tree.
+Tools and Runtime for Fslex/Fsyacc analyzer/parser generation tools.
+
+Fslex is a code generator that uses regular expression syntax as a rule to generate a function, which divides the input token sequence into groups at a higher level. The Fslex is often used to remove redundant delimiters, add omitted delimiters or other syntax components, and so on. The Fslex is also used to determine context somewhere in the stream.
+
+Fsyacc is a code generator that use BNF productions and precedences as a rule to generate a function, which resolves the input token sequence to an abstract syntax tree.
 
 ## Fsyacc Example
 
@@ -65,14 +69,16 @@ let y =
 Should.equal y [Term(2,"x",2);Term(3,"x",1);Const -5]
 ```
 
-## Why use these packages
+## Why use this package?
 
-Decoupling with token. You can use modern language handwriting tokenize program.
+- You can use your existing handwriting tokenizer.
 
-Minimize syntax rules, minimal information input, and be more compatible with standard lex and yacc standards.
+- This package uses standard lex/yacc syntax to minimize your learning costs.
 
-The method of generating code is simple, without command lines and without the need to configure projects.
+- fslex/fsyacc generates respectively an independent, side-effect-free function that can be called flexibly.
 
-The resulting code is highly readable.
+- The method of generating code is simple, without command lines and without the need to configure projects.
 
-Flexiblely compose of tokenize, regular expressions, BNF technology.
+- The result code is data-driven and highly readable.
+
+- Flexiblely compose of tokenize, regular expressions, BNF technology.
