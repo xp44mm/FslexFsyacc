@@ -41,7 +41,7 @@ assoc      : "%left"         { "left"     }
 declarations:              declaration   {[s0]}
             | declarations declaration   {s1::s0}
 
-declaration: symbol ":" QUOTE { s0,s2 }
+declaration: symbol ":" symbol { s0,s2 }
            
 %%
 
