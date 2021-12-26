@@ -20,7 +20,7 @@ let decorateSemantic (typeAnnotations:Map<string,string>) (prodSymbols:string li
         prodSymbols
         |> List.tail
         |> List.mapi(fun i s -> i,s)
-        |> List.filter(fun(i,s)-> typeAnnotations.ContainsKey s)
+        |> List.filter(fun(i,s)-> typeAnnotations.ContainsKey s && s <> "unit")
 
     [
         "fun (ss:obj[]) ->"
