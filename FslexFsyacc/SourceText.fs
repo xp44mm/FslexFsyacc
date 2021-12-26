@@ -8,7 +8,7 @@ let tryWhiteSpace =
     |> tryRegexMatch
 
 let tryLineTerminator =
-    Regex @"^\r?\n"
+    Regex @"^(\r?\n|\r)"
     |> tryRegexMatch
 
 let trySingleLineComment =

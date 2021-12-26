@@ -11,7 +11,10 @@ file       : HEADER rules                                    {s0, List.rev s1,[]
 rules:             rule  {[s0]}
            | rules rule  {s1::s0}
 
-rule       : ID ":" bodies  {s0,List.rev s2}
+rule       : ID sep bodies  {s0,List.rev s2}
+
+sep : ":" {0}
+    | ":" "|" {0}
 
 precedences:             precedence    {[s0]}
            | precedences precedence    {s1::s0}
@@ -42,20 +45,21 @@ declaration: symbol ":" QUOTE { s0,s2 }
            
 %%
 
-HEADER       : "string"
-ID   : "string"
-QUOTE        : "string"
-SEMANTIC     : "string"
-assoc        : "string"
-bodies       : "(string list*string*string)list"
-body         : "string list*string*string"
-declaration  : "string*string"
-declarations : "(string*string)list"
-file         : "string*(string*((string list*string*string)list))list*(string*string list)list*(string*string)list"
-precedence   : "string*string list"
-precedences  : "(string*string list)list"
-rule         : "string*((string list*string*string)list)"
-rules        : "(string*((string list*string*string)list))list"
-symbol       : "string"
-symbols      : "string list"
+HEADER      : "string"
+ID          : "string"
+QUOTE       : "string"
+SEMANTIC    : "string"
+assoc       : "string"
+bodies      : "(string list*string*string)list"
+body        : "string list*string*string"
+declaration : "string*string"
+declarations: "(string*string)list"
+file        : "string*(string*((string list*string*string)list))list*(string*string list)list*(string*string)list"
+precedence  : "string*string list"
+precedences : "(string*string list)list"
+rule        : "string*((string list*string*string)list)"
+rules       : "(string*((string list*string*string)list))list"
+symbol      : "string"
+symbols     : "string list"
+sep : "int"
 

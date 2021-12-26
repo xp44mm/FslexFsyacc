@@ -38,7 +38,7 @@ There is one other alternative: the table can say that the look-ahead token is e
 
 The following is a Yacc/Bison input file which defines a Reverse Polish notation calculator. The file created by Yacc/Bison simulates the calculator. The details of the example are explained in later sections.
 
-```livescript
+```c++
 /* Reverse Polish notation calculator. */
 %{
 #define YYSTYPE double
@@ -110,7 +110,7 @@ Yacc/Bison takes as input a context-free grammar specification and produces a C-
 
 A Yacc/Bison grammar file has four main sections, shown here with the appropriate delimiters:
 
-```livescript
+```c++
 %{
 C declarations
 %}
@@ -165,13 +165,9 @@ There are two ways of writing terminal symbols in the grammar:
 
 How you choose to write a terminal symbol has no effect on its grammatical meaning. That depends only on where it appears in rules and on when the parser function returns that symbol.
 
-
-
 The value returned by `yylex` is always one of the terminal symbols (or 0 for end-of-input). Whichever way you write the token type in the grammar rules, you write it the same way in the definition of `yylex`. The numeric code for a character token type is simply the ASCII code for the character, so `yylex` can use the identical character constant to generate the requisite code. Each named token type becomes a C macro in the parser file, so `yylex` can use the name to stand for the code. (This is why periods don’t make sense in terminal symbols.) 
 
 If `yylex` is defined in a separate file, you need to arrange for the token-type macro definitions to be available there. Use the `-d` option when you run Yacc/Bison, so that it will write these macro definitions into a separate header file `name.tab.h` which you can include in the other source files that need it.
-
-
 
 A **nonterminal symbol** stands for a class of syntactically equivalent groupings. The symbol name is used in writing grammar rules. By convention, it should be all lower case, such as `expr`, `stmt` or `declaration`. Nonterminal symbols must be declared if you need to specify which data type to use for the semantic value.
 
@@ -179,7 +175,7 @@ A **nonterminal symbol** stands for a class of syntactically equivalent grouping
 
 The basic way to declare a token type name (terminal symbol) is as follows:
 
-```livescript
+```c
 %token name
 ```
 
@@ -189,7 +185,7 @@ Alternatively you can use `%left`, `%right`, or `%nonassoc` instead of `%token`,
 
 You can explicitly specify the numeric code for a token type by appending an integer value in the field immediately following the token name:
 
-```livescript
+```c
 %token NUM 300
 ```
 
@@ -197,7 +193,7 @@ It is generally best, however, to let Yacc/Bison choose the numeric codes for al
 
 In the event that the stack type is a union, you must augment the `%token` or other token declaration to include the data type alternative delimited by angle-brackets. For example:
 
-```livescript
+```c++
 %union {/* define stack type */
     double val;
     symrec *tptr;
@@ -248,31 +244,31 @@ Note that, unlike making a union declaration in C, you do not write a semicolon 
 
 Here is a summary of all Yacc/Bison declarations:
 
-`%union` 
+`%union`
 
 Declare the collection of data types that semantic values may have.
 
-`%token` 
+`%token`
 
 Declare a terminal symbol (token type name) with no precedence or associativity specified.
 
-`%right` 
+`%right`
 
 Declare a terminal symbol (token type name) that is right-associative.
 
-`%left` 
+`%left`
 
 Declare a terminal symbol (token type name) that is left-associative.
 
-`%nonassoc` 
+`%nonassoc`
 
 Declare a terminal symbol (token type name) that is nonassociative (using it in a way that would be associative is a syntax error).
 
-`%type <nonterminal>` 
+`%type <nonterminal>`
 
 Declare the type of semantic values for a nonterminal symbol. When you use `%union` to specify multiple value types, you must declare the value type of each nonterminal symbol for which values are used. This is done with a `%type` declaration. Here `nonterminal` is the name of a nonterminal symbol, and type is the name given in the `%union` to the alternative that you want. You can give any number of nonterminal symbols in the same `%type` declaration, if they have the same value type. Use spaces to separate the symbol names.
 
-`%start <nonterminal>` 
+`%start <nonterminal>`
 
 Specify the grammar’s start symbol. Yacc/Bison assumes by default that the start symbol for the grammar is the first nonterminal specified in the grammar specification section. The programmer may override this restriction with the `%start` declaration.
 
@@ -321,7 +317,7 @@ They are still considered distinct rules even when joined in this way.
 
 If components in a rule is empty, it means that result can match the empty string. For example, here is how to define a comma-separated sequence of zero or more `exp` groupings:
 
-```c
+```cpp
 expseq : /* empty */
        | expseq1
 ;
@@ -334,7 +330,7 @@ It is customary to write a comment `/* empty */` in each rule with no components
 
 A rule is called recursive when its result nonterminal appears also on its right hand side. Nearly all Yacc/Bison grammars need to use recursion, because that is the only way to define a sequence of any number of somethings. Consider this recursive definition of a comma-separated sequence of one or more expressions:
 
-```c
+```cpp
 expseq1 : exp
         | expseq1 ',' exp
 ;
@@ -342,7 +338,7 @@ expseq1 : exp
 
 Since the recursive use of `expseq1` is the leftmost symbol in the right hand side, we call this **left recursion**. ~~By contrast, here the same construct is defined using **right recursion**:~~
 
-```c
+```cpp
 expseq1 : exp
         | exp ',' expseq1 
 ;
@@ -407,8 +403,6 @@ To use more than one data type for semantic values in one parser, Yacc/Bison req
 An action accompanies a syntactic rule and contains C code to be executed each time an instance of that rule is recognized. The task of most actions is to compute a semantic value for the grouping built by the rule from the semantic values associated with tokens or smaller groupings.
 
 An action consists of C statements surrounded by braces, much like a compound statement in C. It can be placed at any position in the rule; it is executed at that position. Most rules have just one action at the end of the rule, following all the components. ~~Actions in the middle of a rule are tricky and used only for special purposes.~~
-
-
 
 The C code in an action can refer to the semantic values of the components matched by the rule with the construct `$n`, which stands for the value of the **nth** component. The semantic value for the grouping being constructed is `$$`. (Yacc/Bison translates both of these constructs into array element references when it copies the actions into the parser file.)
 
