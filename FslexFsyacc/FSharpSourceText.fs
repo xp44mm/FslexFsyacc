@@ -8,14 +8,6 @@ let tryWS =
     Regex @"^\s+"
     |> tryRegexMatch
 
-//let tryWhiteSpace =
-//    Regex @"^[\s-[\n]]+"
-//    |> tryRegexMatch
-
-//let tryLineTerminator =
-//    Regex @"^\r?\n"
-//    |> tryRegexMatch
-
 let trySingleLineComment =
     Regex @"^//.*"
     |> tryRegexMatch
@@ -146,15 +138,13 @@ let rec getColumnAndRest (start:int, inp:string) (pos:int) =
         else
             failwithf "length:%d < pos:%d" nextStart pos
 
-//let col,nextstart,rest =
-//    getColumnAndRest start inp pos
 
 // spaceCount是code前面填补的空格数
 // code 不带开括号，也不带闭括号
 let formatNestedCode (spaceCount:int) (code:string) =
     let lines =
         space spaceCount + code //补齐首行
-        |> splitLines //分行
+        |> Line.splitLines //分行
         |> Seq.map(fun (i,line) -> line.TrimEnd()) //去掉行尾空格
         |> Seq.filter(fun line -> line > "") // 删除空行
         |> Seq.toArray

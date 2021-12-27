@@ -68,7 +68,7 @@ let tokenize inp =
 
             | On trySingleQuoteString (x, rest) ->
                 let len = x.Length
-                yield pos,len,QUOTE(unquote x)
+                yield pos,len,QUOTE(Quotation.unquote x)
                 yield! loop (lpos,linp) (pos+len,rest)
 
             | Prefix "%%+" (x, rest) ->

@@ -54,7 +54,7 @@ let tokenize inp =
 
             | On trySingleQuoteString (x, rest) ->
                 let len = x.Length
-                yield pos,len,QUOTE(unquote x)
+                yield pos,len,QUOTE(Quotation.unquote x)
                 yield! loop (lpos,linp) (pos+len,rest)
 
             | Prefix "%%+" (x, rest) ->
@@ -89,8 +89,14 @@ let tokenize inp =
             | On trySemantic (x, rest) ->
                 let len = x.Length
                 let code = x.[1..len-2]
-                let col,nlpos,nlinp = getColumnAndRest (lpos,linp) (pos+1)
-                let fcode = formatNestedCode col code
+
+                let nlpos,nlinp,fcode =
+                    if System.String.IsNullOrWhiteSpace(code) then
+                        lpos,linp,""
+                    else
+                        let col,nlpos,nlinp = getColumnAndRest (lpos,linp) (pos+1)
+                        let fcode = formatNestedCode col code
+                        nlpos,nlinp,fcode
 
                 yield pos, len, SEMANTIC fcode
                 yield! loop (nlpos,nlinp) (pos+len,rest)
@@ -98,8 +104,14 @@ let tokenize inp =
             | On tryHeader (x, rest) ->
                 let len = x.Length
                 let code = x.[2..len-3]
-                let col,nlpos,nlinp = getColumnAndRest (lpos,linp) (pos+2)
-                let fcode = formatNestedCode col code
+
+                let nlpos,nlinp,fcode =
+                    if System.String.IsNullOrWhiteSpace(code) then
+                        lpos,linp,""
+                    else
+                        let col,nlpos,nlinp = getColumnAndRest (lpos,linp) (pos+2)
+                        let fcode = formatNestedCode col code
+                        nlpos,nlinp,fcode
 
                 yield pos,len,HEADER fcode
                 yield! loop (nlpos,nlinp) (pos+len,rest)

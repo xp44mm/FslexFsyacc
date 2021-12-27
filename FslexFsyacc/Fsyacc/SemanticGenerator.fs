@@ -4,6 +4,7 @@ open System.Text.RegularExpressions
 open System
 open FSharp.Literals
 open FSharp.Idioms.StringOps
+open FSharp.Idioms
 
 let printProduction (symbols:string list) =
     let symbols =
@@ -13,7 +14,7 @@ let printProduction (symbols:string list) =
                 sym
             else Literal.stringify sym
             )
-    sprintf "%s : %s" symbols.Head (symbols.Tail |> String.concat " ")
+    sprintf "%s -> %s" symbols.Head (symbols.Tail |> String.concat " ")
 
 let decorateSemantic (typeAnnotations:Map<string,string>) (prodSymbols:string list) (semantic:string) =
     let bodySymbols =
@@ -22,13 +23,26 @@ let decorateSemantic (typeAnnotations:Map<string,string>) (prodSymbols:string li
         |> List.mapi(fun i s -> i,s)
         |> List.filter(fun(i,s)-> typeAnnotations.ContainsKey s && s <> "unit")
 
-    [
-        "fun (ss:obj[]) ->"
-        $"{indent 2}// {printProduction prodSymbols}"
-        for (i,sym) in bodySymbols do
-            $"{indent 2}let s{i} = unbox<{typeAnnotations.[sym]}> ss.[{i}]"
-        $"{indent 2}let result:{typeAnnotations.[prodSymbols.Head]} ="
-        semantic |> indentCodeBlock (3*4)
-        $"{indent 2}box result"
-    ] |> String.concat Environment.NewLine
+    let mainLines =
+        [
+            for (i,sym) in bodySymbols do
+                $"let s{i} = unbox<{typeAnnotations.[sym]}> ss.[{i}]"
+            if typeAnnotations.ContainsKey prodSymbols.Head && typeAnnotations.[prodSymbols.Head] <> "unit" then
+                $"let result:{typeAnnotations.[prodSymbols.Head]} ="
+                semantic |> Line.indentCodeBlock (4)
+                $"box result"
+            else
+                semantic
+                "null"
+        ]|> String.concat Environment.NewLine
 
+    let funcDef =
+        [
+            "fun (ss:obj[]) ->"
+            $"{space4 2}// {printProduction prodSymbols}"
+            if semantic = "" then
+                $"{space4 2}null"
+            else
+                mainLines |> Line.indentCodeBlock (4*2)
+        ] |> String.concat Environment.NewLine
+    funcDef
