@@ -150,10 +150,7 @@ let formatNestedCode (spaceCount:int) (code:string) =
         |> Seq.toArray
 
     //行首空格数
-    let spaces =
-        lines
-        |> Array.map(fun line -> Regex.Match(line,"^ *").Length)
-        |> Array.min
+    let spaces = Line.startSpaces lines
 
     lines
     |> Array.map(fun line -> line.[spaces..])

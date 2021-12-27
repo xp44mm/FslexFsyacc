@@ -13,8 +13,8 @@ rules:             rule  {[s0]}
 
 rule       : ID sep bodies  {s0,List.rev s2}
 
-sep : ":" {0}
-    | ":" "|" {0}
+sep : ":" {}
+    | ":" "|" {}
 
 precedences:             precedence    {[s0]}
            | precedences precedence    {s1::s0}
@@ -61,5 +61,4 @@ rule        : "string*((string list*string*string)list)"
 rules       : "(string*((string list*string*string)list))list"
 symbol      : "string"
 symbols     : "string list"
-sep : "int"
 
