@@ -32,7 +32,7 @@ type FsyaccParseTableFile =
                     yield $"    {i},{fn}" 
             ]
             |> String.concat Environment.NewLine
-            |> sprintf "Map [\r\n%s]"
+            |> sprintf "Map [|\r\n%s|]"
         let startSymbol = this.productions.[0].Tail.Head
         //解析表数据
         let result =
@@ -43,7 +43,7 @@ type FsyaccParseTableFile =
                 $"let actions = {Literal.stringify this.actions}"
                 $"let kernelSymbols = {Literal.stringify this.kernelSymbols}"
                 $"let semantics = {Literal.stringify this.semantics}"
-                $"let declarations = {Literal.stringify this.declarations}"
+                $"let declarations = List.ofArray {Literal.stringify(List.toArray this.declarations)}"
                 this.header
                 $"let mappers:Map<int,(obj[]->obj)> = {mappers}"
                 "open FslexFsyacc.Runtime"
