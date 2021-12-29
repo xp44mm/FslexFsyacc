@@ -48,11 +48,13 @@ The ch8.6 Some Recursive Descent Parsing in Expert F# 4.0, the fslex input file:
 ```fslex
 %{
 open PolynomialExpressions.Tokenizer
+type token = int*int*Token
 %}
 index = "**" INT
 sign = [ "+" "-" ]
 %%
-<sign>? INT              { toConst lexbuf }
+<sign>? INT { // multiline test
+              toConst lexbuf }
 <sign>? INT? ID <index>? { toTerm lexbuf }
 ```
 
