@@ -1,6 +1,7 @@
 ﻿%{
 open System
 open PolynomialExpressions.Tokenizer
+type token = int*int*Token
 %}
 index = "**" INT
 sign = [ "+" "-" ]

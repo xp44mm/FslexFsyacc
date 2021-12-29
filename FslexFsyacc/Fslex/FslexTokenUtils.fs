@@ -23,9 +23,6 @@ let getTag(pos,len,token) =
     | QMARK     -> "?"
     | AMP       -> "&"
     | PERCENT   -> "%%"
-    //| LF        -> "\n"
-    //| BOF       -> "BOF"
-    //| EOF       -> "EOF"
 
 let getLexeme (pos,len,token) = 
     match token with
@@ -45,7 +42,7 @@ let tokenize inp =
     let rec loop (lpos:int,linp:string)(pos:int,inp:string) =
         seq {
             match inp with
-            | "" -> ()//yield pos, 0, EOF
+            | "" -> ()
             | On tryWS (x, rest) ->
                 let len = x.Length
                 yield! loop (lpos,linp) (pos+len,rest)
@@ -160,25 +157,6 @@ let tokenize inp =
 
                 yield pos,len,HEADER fcode
                 yield! loop (nlpos,nlinp) (pos+len,rest)
-
-
-            //| On trySemantic (x, rest) ->
-            //    let len = x.Length
-            //    let code = x.[1..len-2]
-            //    let col,nlpos,nlinp = getColumnAndRest (lpos,linp) (pos+1)
-            //    let fcode = formatNestedCode col code
-
-            //    yield pos, len, SEMANTIC fcode
-            //    yield! loop (nlpos,nlinp) (pos+len,rest)
-
-            //| On tryHeader (x, rest) ->
-            //    let len = x.Length
-            //    let code = x.[2..len-3]
-            //    let col,nlpos,nlinp = getColumnAndRest (lpos,linp) (pos+2)
-            //    let fcode = formatNestedCode col code
-
-            //    yield pos,len,HEADER fcode
-            //    yield! loop (nlpos,nlinp) (pos+len,rest)
 
             | never -> failwith never
         }

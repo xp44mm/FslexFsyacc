@@ -1,6 +1,7 @@
 ﻿%{
 open FslexFsyacc.Fslex
 open FslexFsyacc.Fslex.FslexTokenUtils
+type token = int*int*FslexToken
 %}
 
 last = [")" "*" "+" "?" HOLE ID QUOTE "]"]

@@ -1,17 +1,18 @@
 module PolynomialExpressions.TermDFA
-let nextStates = Map [0u,Map ["+",1u;"-",1u;"ID",3u;"INT",2u];1u,Map ["ID",3u;"INT",2u];2u,Map ["ID",3u];3u,Map ["**",4u];4u,Map ["INT",5u]]
+let nextStates = Map [|0u,Map [|"+",1u;"-",1u;"ID",3u;"INT",2u|];1u,Map [|"ID",3u;"INT",2u|];2u,Map [|"ID",3u|];3u,Map [|"**",4u|];4u,Map [|"INT",5u|]|]
 let lexemesFromFinal = Map.empty
-let universalFinals = set [2u;3u;5u]
-let indicesFromFinal = Map [2u,0;3u,1;5u,1]
-let header = "open System\r\nopen PolynomialExpressions.Tokenizer"
+let universalFinals = set [|2u;3u;5u|]
+let indicesFromFinal = Map [|2u,0;3u,1;5u,1|]
+let header = "open System\r\nopen PolynomialExpressions.Tokenizer\r\ntype token = int*int*Token"
 let semantics = ["// multiline test\r\ntoConst lexbuf";"toTerm lexbuf"]
 open System
 open PolynomialExpressions.Tokenizer
+type token = int*int*Token
 let mappers = [|
-    fun (lexbuf:(int*int*_)list) ->
+    fun (lexbuf:token list) ->
         // multiline test
         toConst lexbuf
-    fun (lexbuf:(int*int*_)list) ->
+    fun (lexbuf:token list) ->
         toTerm lexbuf
 |]
 let finalMappers =
