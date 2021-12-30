@@ -12,7 +12,7 @@ type PartitionTest(output:ITestOutputHelper) =
         |> output.WriteLine
 
     [<Fact>]
-    member this.``example 3-40 minimize test``() = 
+    member _.``example 3-40 minimize test``() = 
         // fig 3-36
         let dtran = set [
             (set [0u;1u;2u;4u;7u],'a',set [1u;2u;3u;4u;6u;7u;8u]);
@@ -64,7 +64,7 @@ type PartitionTest(output:ITestOutputHelper) =
         Should.equal mdfa.dfinals dfinals
 
     [<Fact>]
-    member this.``example 3-41 firstPartitions``() =
+    member _.``example 3-41 firstPartitions``() =
         let allStates = set [
             set [0u;1u;3u;7u];
             set [2u;4u;7u];
@@ -98,7 +98,7 @@ type PartitionTest(output:ITestOutputHelper) =
         Should.equal y firstPartitions
 
     [<Fact>]
-    member this.``example 3-41 minimize test``() = 
+    member _.``example 3-41 minimize test``() = 
         let dtran = set [
             (set [0u;1u;3u;7u],'a',set [2u;4u;7u]);
             (set [0u;1u;3u;7u],'b',set [8u]);

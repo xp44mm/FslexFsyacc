@@ -21,14 +21,14 @@ type ExprParseTableTest(output:ITestOutputHelper) =
     let fsyacc = FsyaccFile.parse text
 
     [<Fact>]
-    member this.``0 - compiler test``() =
+    member _.``0 - compiler test``() =
         show fsyacc.rules
         show fsyacc.precedences
         show fsyacc.declarations
 
     [<Fact(Skip="once for all!")>] // 
-    member this.``1 - fsyacc generateParseTable``() =
-        let parseTbl = fsyacc.toFsyaccParseTable()
+    member _.``1 - fsyacc generateParseTable``() =
+        let parseTbl = fsyacc.toFsyaccParseTable2()
         let name = "ExprParseTable"
         let moduleName = $"Expr.{name}"
 
@@ -40,8 +40,8 @@ type ExprParseTableTest(output:ITestOutputHelper) =
         output.WriteLine("output yacc:"+outputDir)
 
     [<Fact>]
-    member this.``2 - verify parsing table``() =
-        let parseTbl = fsyacc.toFsyaccParseTable()
+    member _.``2 - verify parsing table``() =
+        let parseTbl = fsyacc.toFsyaccParseTable2()
 
         Should.equal parseTbl.productions   ExprParseTable.productions
         Should.equal parseTbl.kernelSymbols ExprParseTable.kernelSymbols
@@ -50,7 +50,7 @@ type ExprParseTableTest(output:ITestOutputHelper) =
         Should.equal parseTbl.declarations  ExprParseTable.declarations
 
     [<Fact>]
-    member this.``3 - all tokens``() =
+    member _.``3 - all tokens``() =
         let grammar = Grammar.from fsyacc.mainProductions
 
         let tokens = 

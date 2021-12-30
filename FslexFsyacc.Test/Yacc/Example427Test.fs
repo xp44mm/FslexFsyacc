@@ -33,7 +33,7 @@ type Example427Test(output:ITestOutputHelper) =
     let grammar = Grammar.from mainProductions
 
     [<Fact>]
-    member this.``augment grammar productions``() =
+    member _.``augment grammar productions``() =
         //show grammar.productions
         let y = set [
             ["";"E"];
@@ -49,7 +49,7 @@ type Example427Test(output:ITestOutputHelper) =
         Should.equal y grammar.productions 
 
     [<Fact>]
-    member this.``symbols``() =
+    member _.``symbols``() =
         //show grammar.symbols
 
         let y = set ["(";")";"*";"+";"E";"E'";"F";"T";"T'";"id"]
@@ -57,7 +57,7 @@ type Example427Test(output:ITestOutputHelper) =
         Should.equal y grammar.symbols
 
     [<Fact>]
-    member this.``nonterminals``() =
+    member _.``nonterminals``() =
         //show grammar.nonterminals
 
         let y = set ["E";"E'";"F";"T";"T'"]
@@ -65,13 +65,13 @@ type Example427Test(output:ITestOutputHelper) =
         Should.equal y grammar.nonterminals
 
     [<Fact>]
-    member this.``nullables``() =
+    member _.``nullables``() =
         //show grammar.nullables
         let y = set ["E'";"T'"]
         Should.equal y grammar.nullables
 
     [<Fact>]
-    member this.``firsts``() =
+    member _.``firsts``() =
         show grammar.firsts
         let y = Map.ofList [
             "E",set ["(";"id"];
@@ -84,7 +84,7 @@ type Example427Test(output:ITestOutputHelper) =
         Should.equal y grammar.firsts
 
     [<Fact>]
-    member this.``lasts``() =
+    member _.``lasts``() =
         //show grammar.lasts
         let y = Map.ofList [
             "E",set [")";"id"];
@@ -97,7 +97,7 @@ type Example427Test(output:ITestOutputHelper) =
         Should.equal y grammar.lasts
 
     [<Fact>]
-    member this.``follows``() =
+    member _.``follows``() =
         //show grammar.follows
 
         //空字符串代表书中的$
@@ -111,7 +111,7 @@ type Example427Test(output:ITestOutputHelper) =
         Should.equal y grammar.follows
 
     [<Fact>]
-    member this.``closures``() =
+    member _.``closures``() =
         let itemCores = 
             ItemCoreFactory.make grammar.productions
 
@@ -148,7 +148,7 @@ type Example427Test(output:ITestOutputHelper) =
         Should.equal y closures
     
     [<Fact>]
-    member this.``goto factory``() =
+    member _.``goto factory``() =
         let itemCores = 
             ItemCoreFactory.make grammar.productions
 

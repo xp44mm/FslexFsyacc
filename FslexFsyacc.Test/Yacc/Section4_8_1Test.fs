@@ -22,7 +22,7 @@ type Section4_8_1Test(output:ITestOutputHelper) =
     ]
 
     [<Fact>]
-    member this.``fig4-49: parsing table test``() =
+    member _.``fig4-49: parsing table test``() =
 
         let tbl = AmbiguousTable.create mainProductions
 
@@ -101,7 +101,7 @@ type Section4_8_1Test(output:ITestOutputHelper) =
         Should.equal rsc rsconflicts
 
     [<Fact>]
-    member this.``grammar 4-1: ProductionPrecedence``() =
+    member _.``grammar 4-1: ProductionPrecedence``() =
         let tbl = AmbiguousTable.create mainProductions
 
         let operators = tbl.productionOperators

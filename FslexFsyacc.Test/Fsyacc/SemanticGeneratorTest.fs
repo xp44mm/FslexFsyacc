@@ -13,7 +13,7 @@ type SemanticGeneratorTest(output:ITestOutputHelper) =
         |> output.WriteLine
 
     [<Fact>]
-    member this.``semantic actions``() =
+    member _.``semantic actions``() =
         let typeAnnotations = Map[
             "expr", "float"
         ]

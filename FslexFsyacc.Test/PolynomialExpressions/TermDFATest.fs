@@ -21,7 +21,7 @@ type TermDFATest(output:ITestOutputHelper) =
     let fslex = FslexFile.parse text
 
     [<Fact>]
-    member this.``0 - compiler test``() =
+    member _.``0 - compiler test``() =
         let tokens = 
             text
             |> FslexTokenUtils.tokenize
@@ -30,12 +30,12 @@ type TermDFATest(output:ITestOutputHelper) =
             |> List.ofSeq
         show tokens
 
-    [<Fact (Skip="once and for all!")>] //
-    member this.``1 - generate DFA``() =
+    [<Fact(Skip="once and for all!")>] // 
+    member _.``1 - generate DFA``() =
         let name = "TermDFA"
         let moduleName = $"PolynomialExpressions.{name}"
 
-        let dfafile = fslex.toFslexDFA()
+        let dfafile = fslex.toFslexDFA2()
         let result = dfafile.generate(moduleName)
         let outputDir = Path.Combine(__SOURCE_DIRECTORY__, $"{name}.fs")
 
@@ -43,18 +43,18 @@ type TermDFATest(output:ITestOutputHelper) =
         output.WriteLine("output lex:" + outputDir)
 
     [<Fact>]
-    member this.``2 - valid DFA``() =
-        let y = fslex.toFslexDFA()
+    member _.``2 - valid DFA``() =
+        let y = fslex.toFslexDFA2()
 
-        Should.equal y.dfa.nextStates       TermDFA.nextStates
-        Should.equal y.dfa.lexemesFromFinal TermDFA.lexemesFromFinal
-        Should.equal y.dfa.universalFinals  TermDFA.universalFinals
-        Should.equal y.dfa.indicesFromFinal TermDFA.indicesFromFinal
-        Should.equal y.header               TermDFA.header
-        Should.equal y.semantics            TermDFA.semantics
+        Should.equal y.nextStates       TermDFA.nextStates
+        Should.equal y.lexemesFromFinal TermDFA.lexemesFromFinal
+        Should.equal y.universalFinals  TermDFA.universalFinals
+        Should.equal y.indicesFromFinal TermDFA.indicesFromFinal
+        Should.equal y.header           TermDFA.header
+        Should.equal y.semantics        TermDFA.semantics
 
     [<Fact>]
-    member this.``3 - tokenize``() =
+    member _.``3 - tokenize``() =
         let y = 
             text
             |> FslexTokenUtils.tokenize 

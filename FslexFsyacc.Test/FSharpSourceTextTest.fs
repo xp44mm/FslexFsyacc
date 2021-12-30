@@ -12,25 +12,25 @@ type FSharpSourceTextTest(output:ITestOutputHelper) =
         |> output.WriteLine
 
     [<Fact>]
-    member this.``tryWord``() =
+    member _.``tryWord``() =
         let x = "xyz"
         let y = FSharpSourceText.tryWord x
         Should.equal y <| Some(x,"")
 
     [<Fact>]
-    member this.``tryWS``() =
+    member _.``tryWS``() =
         let x = "  "
         let y = FSharpSourceText.tryWS x
         Should.equal y <| Some(x,"")
 
     [<Fact>]
-    member this.``trySingleLineComment``() =
+    member _.``trySingleLineComment``() =
         let x = "// xdfasdf\r\n   "
         let y = FSharpSourceText.trySingleLineComment x
         Should.equal y <| Some("// xdfasdf\r","\n   ")
 
     [<Fact>]
-    member this.``tryMultiLineComment``() =
+    member _.``tryMultiLineComment``() =
         let x = "(* empty *) "
         let y = FSharpSourceText.tryMultiLineComment x
         Should.equal y <| Some("(* empty *)"," ")
@@ -40,21 +40,21 @@ type FSharpSourceTextTest(output:ITestOutputHelper) =
         Should.equal y1 None
 
     [<Fact>]
-    member this.``tryChar``() =
+    member _.``tryChar``() =
         let xs = [@"'\\'";@"'\''";@"'\u0000'";@"'{'"]
         for x in xs do
             let y = FSharpSourceText.tryChar x
             Should.equal y <| Some(x,"")
 
     [<Fact>]
-    member this.``tryDoubleTick``() =
+    member _.``tryDoubleTick``() =
         let xs = ["``xs ys``"]
         for x in xs do
             let y = FSharpSourceText.tryDoubleTick x
             Should.equal y <| Some(x,"")
 
     [<Fact>]
-    member this.``tryTypeParameter``() =
+    member _.``tryTypeParameter``() =
         let xs = ["'a";"'abc"]
         for x in xs do
             let y = FSharpSourceText.tryTypeParameter x
@@ -66,7 +66,7 @@ type FSharpSourceTextTest(output:ITestOutputHelper) =
             Should.equal m None
 
     [<Fact>]
-    member this.``trySingleQuoteString``() =
+    member _.``trySingleQuoteString``() =
         let xs = 
             [""" "" """;""" "\\" """;""" "\"" """;""" "\u1234" """;""" "{" """;]
             |> List.map (fun x -> x.Trim())
@@ -76,7 +76,7 @@ type FSharpSourceTextTest(output:ITestOutputHelper) =
             Should.equal y <| Some(x,"")
 
     [<Fact>]
-    member this.``tryVerbatimString``() =
+    member _.``tryVerbatimString``() =
         let xs = 
             [""" @"" """;""" @"\""x" """;]
             |> List.map (fun x -> x.Trim())
@@ -86,7 +86,7 @@ type FSharpSourceTextTest(output:ITestOutputHelper) =
             Should.equal y <| Some(x,"")
 
     [<Fact>]
-    member this.``tryTripleQuoteString``() =
+    member _.``tryTripleQuoteString``() =
         let xs = 
             ["\"\"\"xyz\"\"\""]
 
@@ -96,7 +96,7 @@ type FSharpSourceTextTest(output:ITestOutputHelper) =
 
 
     [<Fact>]
-    member this.``getHeaderLength``() =
+    member _.``getHeaderLength``() =
         let x = "%}"
         let y = FSharpSourceText.getHeaderLength x
         let z = x.[0..y-1]
@@ -108,7 +108,7 @@ type FSharpSourceTextTest(output:ITestOutputHelper) =
         Should.equal x1 z1
 
     [<Fact>]
-    member this.``getNestedActionLength``() =
+    member _.``getNestedActionLength``() =
         let x = "}"
         let y = FSharpSourceText.getSemanticLength x
         let z = x.[0..y-1]
@@ -120,21 +120,21 @@ type FSharpSourceTextTest(output:ITestOutputHelper) =
         Should.equal x1 z1
 
     [<Fact>]
-    member this.``tryHeader``() =
+    member _.``tryHeader``() =
         let x = "%{%}"
         let y = FSharpSourceText.tryHeader x
         //show y
         Should.equal y <| Some(x,"")
 
     [<Fact>]
-    member this.``trySemantic``() =
+    member _.``trySemantic``() =
         let x = "{{}}"
         let y = FSharpSourceText.trySemantic x
         //show y
         Should.equal y <| Some(x,"")
 
     [<Fact>]
-    member this.``getColumnAndRest``() =
+    member _.``getColumnAndRest``() =
         let start = 19
         let inp = "0123456789\nabc"
         let pos = 20
@@ -146,7 +146,7 @@ type FSharpSourceTextTest(output:ITestOutputHelper) =
         Should.equal rest "abc" // rest after first \n
 
     [<Fact>]
-    member this.``formatNestedCode``() =
+    member _.``formatNestedCode``() =
         let col = 3
         let code = 
             [

@@ -27,7 +27,7 @@ type PrecedenceTest(output:ITestOutputHelper) =
     let tbl = AmbiguousTable.create mainProductions 
 
     [<Fact>]
-    member this.``整理优先级输入``() =
+    member _.``整理优先级输入``() =
         let E = "E"
 
         // 相同优先级的符号在同一行输入，且具有相同的结合性
@@ -49,7 +49,7 @@ type PrecedenceTest(output:ITestOutputHelper) =
         Should.equal y precedences
 
     [<Fact>]
-    member this.``项集符号是终结符号的项集``() =
+    member _.``项集符号是终结符号的项集``() =
 
         // 优先级运算符
         let ops = set [
@@ -76,7 +76,7 @@ type PrecedenceTest(output:ITestOutputHelper) =
         Should.equal y kernels
 
     [<Fact>]
-    member this.``precOfProd and precOfTerm``() =
+    member _.``precOfProd and precOfTerm``() =
 
         // 没有冲突的运算符不必输入优先级和结合性。
         let precedences = Map.ofList [
@@ -110,7 +110,7 @@ type PrecedenceTest(output:ITestOutputHelper) =
 
 
     [<Fact>]
-    member this.``fig4-49: eliminate parsing table test``() =
+    member _.``fig4-49: eliminate parsing table test``() =
         let tbl = AmbiguousTable.create mainProductions
 
         //固定产生式，先把非移动/归纳冲突解决掉。

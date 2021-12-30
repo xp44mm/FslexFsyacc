@@ -12,7 +12,7 @@ type SubsetDFATest(output:ITestOutputHelper) =
         |> output.WriteLine
 
     [<Fact>]
-    member this.``from ntran 52 to subset DFA fig 54``() =
+    member _.``from ntran 52 to subset DFA fig 54``() =
         //fig 3-52
         let ntran = set [
             (0u,None,1u);
@@ -58,7 +58,7 @@ type SubsetDFATest(output:ITestOutputHelper) =
         Should.equal yf dfinals
 
     [<Fact>]
-    member this.``from ntran to subset DFA``() =
+    member _.``from ntran to subset DFA``() =
         ///figure 3.34
         let ntran = set [
             (0u, None, 1u);
@@ -101,7 +101,7 @@ type SubsetDFATest(output:ITestOutputHelper) =
         Should.equal y dfa
 
     [<Fact>]
-    member this.``get dfinals``() = 
+    member _.``get dfinals``() = 
         let dfa = {
             dtran=set [];
             allStates=set [

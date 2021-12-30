@@ -24,22 +24,21 @@ type FslexParseTableTest(output:ITestOutputHelper) =
     let filePath = Path.Combine(sourcePath, @"fslex.fsyacc")
     let text = File.ReadAllText(filePath)
     let fsyacc = FsyaccFile.parse text
-    let parseTbl = fsyacc.toFsyaccParseTable()
 
     [<Fact>]
-    member this.``0 - compiler test``() =
+    member _.``0 - compiler test``() =
         let result = FsyaccCompiler.compile text
         show result
 
     [<Fact>]
-    member this.``1 - 产生式冲突``() =
+    member _.``1 - 产生式冲突``() =
         let tbl = AmbiguousTable.create fsyacc.mainProductions
         let pconflicts = ConflictFactory.productionConflict tbl.ambiguousTable
         show pconflicts
         Assert.True(pconflicts.IsEmpty)
 
     [<Fact>]
-    member this.``2 - 符号多用警告``() =
+    member _.``2 - 符号多用警告``() =
         let tbl = AmbiguousTable.create fsyacc.mainProductions
         let warning = ConflictFactory.overloadsWarning tbl
         show warning
@@ -47,7 +46,7 @@ type FslexParseTableTest(output:ITestOutputHelper) =
         Should.equal y warning
 
     [<Fact>]
-    member this.``3 - 优先级冲突``() =
+    member _.``3 - 优先级冲突``() =
         let tbl = AmbiguousTable.create fsyacc.mainProductions
         let srconflicts = ConflictFactory.shiftReduceConflict tbl
 
@@ -65,7 +64,7 @@ type FslexParseTableTest(output:ITestOutputHelper) =
         Should.equal y srconflicts
 
     [<Fact>]
-    member this.``4 - print the template of type annotaitions``() =
+    member _.``4 - print the template of type annotaitions``() =
         let grammar = Grammar.from fsyacc.mainProductions
 
         let symbols = 
@@ -80,7 +79,7 @@ type FslexParseTableTest(output:ITestOutputHelper) =
         output.WriteLine(sourceCode)
 
     [<Fact>]
-    member this.``5 - list all tokens``() =
+    member _.``5 - list all tokens``() =
         let grammar = Grammar.from fsyacc.mainProductions
         let y = set ["%%";"&";"(";")";"*";"+";"/";"=";"?";"CAP";"HEADER";"HOLE";"ID";"QUOTE";"SEMANTIC";"[";"]";"|"]
         
@@ -88,10 +87,11 @@ type FslexParseTableTest(output:ITestOutputHelper) =
         show tokens
 
     [<Fact(Skip="once for all!")>] // 
-    member this.``6 - generate ParseTable``() =
+    member _.``6 - generate ParseTable``() =
         let name = "FslexParseTable"
         let moduleName = $"FslexFsyacc.Fslex.{name}"
         //解析表数据
+        let parseTbl = fsyacc.toFsyaccParseTable2()
         let fsharpCode = parseTbl.generate(moduleName)
 
         let outputDir = Path.Combine(sourcePath, $"{name}.fs")
@@ -99,8 +99,8 @@ type FslexParseTableTest(output:ITestOutputHelper) =
         output.WriteLine("output yacc:"+outputDir)
 
     [<Fact>]
-    member this.``7 - valid ParseTable``() =
-        let t = parseTbl
+    member _.``7 - valid ParseTable``() =
+        let t = fsyacc.toFsyaccParseTable2()
 
         Should.equal t.header        FslexParseTable.header
         Should.equal t.productions   FslexParseTable.productions
@@ -110,7 +110,7 @@ type FslexParseTableTest(output:ITestOutputHelper) =
         Should.equal t.declarations  FslexParseTable.declarations
 
     [<Fact>]
-    member this.``8 - regex first or last token test``() =
+    member _.``8 - regex first or last token test``() =
         let grammar = Grammar.from fsyacc.mainProductions
         let lastsOfExpr = grammar.lasts.["expr"]
         let firstsOfExpr = grammar.firsts.["expr"]

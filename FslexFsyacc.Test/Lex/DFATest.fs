@@ -12,7 +12,7 @@ type DFATest(output:ITestOutputHelper) =
         |> output.WriteLine
 
     [<Fact>]
-    member this.``dfinals``() =
+    member _.``dfinals``() =
         ///dfa的状态表，每个dfa状态，是一个nfa的状态集，
         let allStates = set [
             set [0u;1u;3u;7u];

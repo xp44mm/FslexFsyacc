@@ -26,7 +26,7 @@ type Example454Test(output:ITestOutputHelper) =
     let grammar = Grammar.from mainProductions
 
     [<Fact>]
-    member this.``closures``() =
+    member _.``closures``() =
         let itemCores = 
             ItemCoreFactory.make grammar.productions
 
@@ -57,7 +57,7 @@ type Example454Test(output:ITestOutputHelper) =
         Should.equal y closures
 
     [<Fact>]
-    member this.``goto factory``() =
+    member _.``goto factory``() =
         let itemCores = 
             ItemCoreFactory.make grammar.productions
 

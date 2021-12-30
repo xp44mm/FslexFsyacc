@@ -69,6 +69,7 @@
 		<Compile Include="Fslex\FslexDFA.fs" />
 		<Compile Include="Fslex\FslexCompiler.fs" />
 		<Compile Include="Fslex\FslexDFAFile.fs" />
+		<Compile Include="Fslex\FslexDFAFile2.fs" />
 		<Compile Include="Fslex\FslexFile.fs" />
 
 		<Compile Include="Fsyacc\SemanticGenerator.fs" />
@@ -82,6 +83,7 @@
 		<Compile Include="Fsyacc\FsyaccParseTable.fs" />
 		<Compile Include="Fsyacc\FsyaccCompiler.fs" />
 		<Compile Include="Fsyacc\FsyaccParseTableFile.fs" />
+		<Compile Include="Fsyacc\FsyaccParseTableFile2.fs" />
 		<Compile Include="Fsyacc\FsyaccFile.fs" />
 		
 		<Compile Include="SourceText.fs" />

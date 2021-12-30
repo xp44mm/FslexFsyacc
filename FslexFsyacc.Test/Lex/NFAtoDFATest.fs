@@ -12,7 +12,7 @@ type NFAtoDFATest(output:ITestOutputHelper) =
         |> output.WriteLine
 
     [<Fact>]
-    member this.``get nfinals``() =
+    member _.``get nfinals``() =
         // fig 3-34
         let ntran = set [
             (0u,None,1u);
@@ -45,7 +45,7 @@ type NFAtoDFATest(output:ITestOutputHelper) =
         Should.equal nfinals [|10u|]
 
     [<Fact>]
-    member this.``Example 3-21: nfa to dfa``() =
+    member _.``Example 3-21: nfa to dfa``() =
         // fig 3-34
         let ntran = set [
             (0u,None,1u);
@@ -93,7 +93,7 @@ type NFAtoDFATest(output:ITestOutputHelper) =
 
 
     [<Fact>]
-    member this.``Example 3-26: r3 to dfa``() =
+    member _.``Example 3-26: r3 to dfa``() =
         // a*b+
         let n3 = set [
             0u,None,1u;
@@ -125,7 +125,7 @@ type NFAtoDFATest(output:ITestOutputHelper) =
         Should.equal dfa.indicesFromFinal (DFATools.getIndeciesFromFinal finalLexemes)
 
     [<Fact>]
-    member this.``Example 3-28: fig3-52 to fig3-54``() =
+    member _.``Example 3-28: fig3-52 to fig3-54``() =
         //fig 3-52
         let ntran = set [
             (0u,None,1u);

@@ -13,7 +13,7 @@ type FsyaccParseTableFile =
         kernelSymbols: Map<int, string>
         semantics: Map<int, string> 
         declarations:(string*string)list
-      }
+    }
 
     /// 输入模块带名字空间的全名
     member this.generate(moduleName:string) =

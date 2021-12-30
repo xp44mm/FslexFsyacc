@@ -30,7 +30,7 @@ type Example440Test(output:ITestOutputHelper) =
     let grammar = Grammar.from mainProductions
 
     [<Fact>]
-    member this.``all of item cores``() =
+    member _.``all of item cores``() =
         let itemCores = 
             ItemCoreFactory.make grammar.productions
             |> Set.map(fun i -> i.production,i.dot)
@@ -53,7 +53,7 @@ type Example440Test(output:ITestOutputHelper) =
         Should.equal y itemCores
 
     [<Fact>]
-    member this.``item core attributes``() =
+    member _.``item core attributes``() =
         let itemCores = 
             ItemCoreFactory.make grammar.productions
 
@@ -75,7 +75,7 @@ type Example440Test(output:ITestOutputHelper) =
         Should.equal y itemCoreAttributes
 
     [<Fact>]
-    member this.``closures``() =
+    member _.``closures``() =
         let itemCores = 
             ItemCoreFactory.make grammar.productions
 
@@ -107,7 +107,7 @@ type Example440Test(output:ITestOutputHelper) =
         Should.equal y closures
 
     [<Fact>]
-    member this.``goto factory``() =
+    member _.``goto factory``() =
         let itemCores = 
             ItemCoreFactory.make grammar.productions
 

@@ -27,7 +27,7 @@ type LALRExpressionTest(output:ITestOutputHelper) =
     ]
 
     [<Fact>]
-    member this.``fig4-38: parsing table yacc test``() =
+    member _.``fig4-38: parsing table yacc test``() =
 
         let precedences =
             [

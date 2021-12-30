@@ -14,7 +14,7 @@ type LookaheadTest(output:ITestOutputHelper) =
     //fig. 3-55 省略括號中的路徑
 
     [<Fact>]
-    member this.``combine test``() =
+    member _.``combine test``() =
         let n1 = {
             transition = set [
                 0u, Some 'I', 1u 

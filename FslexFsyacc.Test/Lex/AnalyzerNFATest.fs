@@ -13,7 +13,7 @@ type AnalyzerNFATest(output:ITestOutputHelper) =
         |> output.WriteLine
 
     [<Fact>]
-    member this.``regex to nfa``() =
+    member _.``regex to nfa``() =
         let lookaheads = 
             [
                [Character 'a'                                    ]
@@ -42,7 +42,7 @@ type AnalyzerNFATest(output:ITestOutputHelper) =
         Should.equal y nfa
         
     [<Fact>]
-    member this.``exercise 3-8-4-2: lookahead 0``() =
+    member _.``exercise 3-8-4-2: lookahead 0``() =
         //(a|ab)/ba
         //a+
         //b+

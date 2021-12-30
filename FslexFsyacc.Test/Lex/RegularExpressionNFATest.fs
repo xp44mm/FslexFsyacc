@@ -13,7 +13,7 @@ type RegularExpressionNFATest(output:ITestOutputHelper) =
         |> output.WriteLine
     
     [<Fact>]
-    member this.``Leaf test``() =
+    member _.``Leaf test``() =
         let r1 = Character 'a'
         let nfa1 = RegularExpressionNFA.convertToNFA 0u r1
         let y = {
@@ -24,7 +24,7 @@ type RegularExpressionNFATest(output:ITestOutputHelper) =
         Should.equal y nfa1
 
     [<Fact>]
-    member this.``nfa3: leaf union``() =
+    member _.``nfa3: leaf union``() =
         let r3 = Uion(Character 'a', Character 'b') // a | b
         let nfa3 = RegularExpressionNFA.convertToNFA 0u r3
         let y = {
@@ -40,7 +40,7 @@ type RegularExpressionNFATest(output:ITestOutputHelper) =
         Should.equal y nfa3
 
     [<Fact>]
-    member this.``leaf concat test``() =
+    member _.``leaf concat test``() =
         let x = Concat(Character 'a', Character 'b') // a b
         let y = RegularExpressionNFA.convertToNFA 0u x
 
@@ -53,7 +53,7 @@ type RegularExpressionNFATest(output:ITestOutputHelper) =
         Should.equal y nfa
 
     [<Fact>]
-    member this.``leaf natrual test``() =
+    member _.``leaf natrual test``() =
         let x = Natural(Character 'a') // a *
         let y = RegularExpressionNFA.convertToNFA 0u x
 
@@ -69,7 +69,7 @@ type RegularExpressionNFATest(output:ITestOutputHelper) =
         Should.equal y nfa
 
     [<Fact>]
-    member this.``leaf positive test``() =
+    member _.``leaf positive test``() =
         let x = Positive(Character 'a') // a +
         let y = RegularExpressionNFA.convertToNFA 0u x
 
@@ -82,7 +82,7 @@ type RegularExpressionNFATest(output:ITestOutputHelper) =
         Should.equal y nfa
 
     [<Fact>]
-    member this.``leaf maybe test``() =
+    member _.``leaf maybe test``() =
         let x = Maybe(Character 'a') // a ?
         let y = RegularExpressionNFA.convertToNFA 0u x
 
@@ -97,7 +97,7 @@ type RegularExpressionNFATest(output:ITestOutputHelper) =
         Should.equal y nfa
 
     [<Fact>]
-    member this.``nfa5:natrual``() =
+    member _.``nfa5:natrual``() =
         let r5 = Natural(Uion(Character 'a',Character 'b'))
         let nfa5 = RegularExpressionNFA.convertToNFA 0u r5
         let y = {
@@ -117,7 +117,7 @@ type RegularExpressionNFATest(output:ITestOutputHelper) =
         Should.equal y nfa5
 
     [<Fact>]
-    member this.``nfa7: concat``() =
+    member _.``nfa7: concat``() =
         let r7 = Concat(Natural(Uion(Character 'a',Character 'b')),Character 'a')
         let nfa7 = RegularExpressionNFA.convertToNFA 0u r7
         let y = {
@@ -138,7 +138,7 @@ type RegularExpressionNFATest(output:ITestOutputHelper) =
         Should.equal y nfa7
 
     [<Fact>]
-    member this.``Example 3-26: regex to nfa 2``() =
+    member _.``Example 3-26: regex to nfa 2``() =
         let n2 = RegularExpressionNFA.convertToNFA 0u (Concat(Concat(Character 'a',Character 'b'),Character 'b'))
         let y2 = {
             transition=set [
@@ -150,7 +150,7 @@ type RegularExpressionNFATest(output:ITestOutputHelper) =
 
 
     [<Fact>]
-    member this.``Example 3-26: regex to nfa 3``() =
+    member _.``Example 3-26: regex to nfa 3``() =
         let n3 = RegularExpressionNFA.convertToNFA 0u (Concat(Natural(Character 'a'),Positive(Character 'b')))
         let y3 = {
             transition=set [
@@ -165,7 +165,7 @@ type RegularExpressionNFATest(output:ITestOutputHelper) =
         Should.equal y3 n3
 
     [<Fact>]
-    member this.``fig 3-34: regex to nfa``() =
+    member _.``fig 3-34: regex to nfa``() =
         let r1 = Uion(Character 'a',Character 'b')
         let r2 = Concat(Concat(Character 'a',Character 'b'),Character 'b')
         let r3 = Concat(Natural r1,r2)

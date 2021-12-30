@@ -22,7 +22,7 @@ type AnalyzeTest(output:ITestOutputHelper) =
         |> List.ofSeq
 
     [<Fact>]
-    member this.``explicit amp test``() =
+    member _.``explicit amp test``() =
         let tokens = [LPAREN;ID "";RPAREN;LBRACK;RBRACK;STAR;QUOTE ""] |> List.map(fun t -> 0,0,t)
         let y = analyze tokens |> List.map Triple.last
         //show y

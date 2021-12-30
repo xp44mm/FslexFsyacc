@@ -18,21 +18,21 @@ type ExprCompilerTest(output:ITestOutputHelper) =
         |> ExprParseTable.parse
 
     [<Fact>]
-    member this.``0 - basis test``() =
+    member _.``0 - basis test``() =
         let inp = "2 + 3"
         let y = compile inp
         //show result
         Should.equal y 5.0
 
     [<Fact>]
-    member this.``1 - prec test``() =
+    member _.``1 - prec test``() =
         let inp = "2 + 3 * 5"
         let y = compile inp
         //show result
         Should.equal y 17.0
 
     [<Fact>]
-    member this.``2 - named prod test``() =
+    member _.``2 - named prod test``() =
         let inp = "2 + 3 * -5"
         let y = compile inp
         //show result

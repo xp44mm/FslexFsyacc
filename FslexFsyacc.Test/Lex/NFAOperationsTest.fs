@@ -12,7 +12,7 @@ type NFAOperationsTest(output:ITestOutputHelper) =
         |> output.WriteLine
 
     [<Fact>]
-    member this.``example 3-21 closures & moves``() =
+    member _.``example 3-21 closures & moves``() =
         ///figure 3.34
         let ntran = set [
             (0, None, 1);

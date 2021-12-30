@@ -12,7 +12,7 @@ type Section4_8_2Test(output:ITestOutputHelper) =
         |> output.WriteLine
 
     [<Fact>]
-    member this.``fig4-51: conflicts test``() =
+    member _.``fig4-51: conflicts test``() =
         let S = "S"
         let i = "i"
         let e = "e"

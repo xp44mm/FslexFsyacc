@@ -13,7 +13,7 @@ type NFACombineTest(output:ITestOutputHelper) =
         |> output.WriteLine
     
     [<Fact>]
-    member this.``union``() =
+    member _.``union``() =
         let i = 0u
         let s = 
             {
@@ -48,7 +48,7 @@ type NFACombineTest(output:ITestOutputHelper) =
         Should.equal y res
 
     [<Fact>]
-    member this.``concat``() =
+    member _.``concat``() =
         let s = 
             {
                 transition =  set [0u, Some 'a', 1u]
@@ -76,7 +76,7 @@ type NFACombineTest(output:ITestOutputHelper) =
         Should.equal y res
 
     [<Fact>]
-    member this.``natrual``() =
+    member _.``natrual``() =
         let i = 0u
         let s = 
             {
@@ -100,7 +100,7 @@ type NFACombineTest(output:ITestOutputHelper) =
         Should.equal y res
 
     [<Fact>]
-    member this.``positive``() =
+    member _.``positive``() =
         let s = 
             {
                 transition =  set [0u, Some 'a', 1u]
@@ -120,7 +120,7 @@ type NFACombineTest(output:ITestOutputHelper) =
         Should.equal y res
 
     [<Fact>]
-    member this.``maybe``() =
+    member _.``maybe``() =
         let i = 0u
         let s = 
             {
