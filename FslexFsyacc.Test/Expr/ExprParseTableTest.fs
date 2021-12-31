@@ -28,7 +28,7 @@ type ExprParseTableTest(output:ITestOutputHelper) =
 
     [<Fact(Skip="once for all!")>] // 
     member _.``1 - fsyacc generateParseTable``() =
-        let parseTbl = fsyacc.toFsyaccParseTable2()
+        let parseTbl = fsyacc.toFsyaccParseTable()
         let name = "ExprParseTable"
         let moduleName = $"Expr.{name}"
 
@@ -41,7 +41,7 @@ type ExprParseTableTest(output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``2 - verify parsing table``() =
-        let parseTbl = fsyacc.toFsyaccParseTable2()
+        let parseTbl = fsyacc.toFsyaccParseTable()
 
         Should.equal parseTbl.productions   ExprParseTable.productions
         Should.equal parseTbl.kernelSymbols ExprParseTable.kernelSymbols

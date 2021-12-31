@@ -1,24 +1,26 @@
 ﻿namespace FslexFsyacc.Fslex
 
-open FslexFsyacc.Lex
-open FSharp.Literals
 open System
+open FSharp.Literals
 
 type FslexDFAFile = 
     {
-        dfa:DFA<string>
+        nextStates      : (uint32*(string*uint32)[])[]
+        lexemesFromFinal: (uint32*uint32[])[]
+        universalFinals : uint32[]
+        indicesFromFinal: (uint32*int)[]
+
         header:string
-        semantics: string list
+        semantics: string[]
     }
 
     member this.generate(moduleName:string) =
-        let dfa = this.dfa
         [
             $"module {moduleName}"
-            "let nextStates = " + Literal.stringify dfa.nextStates
-            "let lexemesFromFinal = " + Literal.stringify dfa.lexemesFromFinal
-            "let universalFinals = " + Literal.stringify dfa.universalFinals
-            "let indicesFromFinal = " + Literal.stringify dfa.indicesFromFinal
+            "let nextStates = " + Literal.stringify this.nextStates
+            "let lexemesFromFinal = " + Literal.stringify this.lexemesFromFinal
+            "let universalFinals = " + Literal.stringify this.universalFinals
+            "let indicesFromFinal = " + Literal.stringify this.indicesFromFinal
             $"let header = {Literal.stringify this.header}"
             $"let semantics = {Literal.stringify this.semantics}"
             this.header
@@ -28,7 +30,7 @@ type FslexDFAFile =
             "|]"
             "let finalMappers ="
             "    indicesFromFinal"
-            "    |> Map.map(fun _ i -> mappers.[i])"
+            "    |> Array.map(fun(fnl, i) -> fnl,mappers.[i])"
             "open FslexFsyacc.Runtime"
             "let analyzer = Analyzer(nextStates, lexemesFromFinal, universalFinals, finalMappers)"
             "let analyze (tokens:seq<_>) = "

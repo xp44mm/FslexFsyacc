@@ -181,7 +181,7 @@ let mappers:(int*(obj[]->obj))[] = [|
             s1::s0
         box result|]
 open FslexFsyacc.Runtime
-let parser = Parser2(productions, actions, kernelSymbols, mappers)
+let parser = Parser(productions, actions, kernelSymbols, mappers)
 let parse (tokens:seq<_>) =
     parser.parse(tokens, getTag, getLexeme)
     |> unbox<string*(string*((string list*string*string)list))list*(string*string list)list*(string*string)list>

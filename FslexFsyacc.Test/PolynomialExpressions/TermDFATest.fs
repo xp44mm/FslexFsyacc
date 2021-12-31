@@ -35,7 +35,7 @@ type TermDFATest(output:ITestOutputHelper) =
         let name = "TermDFA"
         let moduleName = $"PolynomialExpressions.{name}"
 
-        let dfafile = fslex.toFslexDFA2()
+        let dfafile = fslex.toFslexDFA()
         let result = dfafile.generate(moduleName)
         let outputDir = Path.Combine(__SOURCE_DIRECTORY__, $"{name}.fs")
 
@@ -44,7 +44,7 @@ type TermDFATest(output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``2 - valid DFA``() =
-        let y = fslex.toFslexDFA2()
+        let y = fslex.toFslexDFA()
 
         Should.equal y.nextStates       TermDFA.nextStates
         Should.equal y.lexemesFromFinal TermDFA.lexemesFromFinal

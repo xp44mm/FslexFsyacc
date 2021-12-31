@@ -48,18 +48,6 @@ type FslexFile =
     member this.toFslexDFA() =
         let this = this.eliminateHoles()
         let patterns = this.rules |> List.map fst
-        let semantics = this.rules |> List.map snd
-        let dfa = DFA.fromRgx patterns
-
-        {
-            header = this.header
-            dfa = dfa
-            semantics = semantics 
-        }
-
-    member this.toFslexDFA2() =
-        let this = this.eliminateHoles()
-        let patterns = this.rules |> List.map fst
         let dfa = DFA.fromRgx patterns
         let nextStates : (uint32*(string*uint32)[])[] =
             dfa.nextStates

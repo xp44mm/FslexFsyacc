@@ -5,11 +5,34 @@ open FSharp.Literals
 
 type Parser 
     (
-        productions  : Map<int,string list>,
-        actions      : Map<int,Map<string,int>>,
-        kernelSymbols: Map<int,string>,
-        mappers      : Map<int,(obj[]->obj)>
+        productions  : (int*string[])[], 
+        actions      : (int*(string*int)[])[],
+        kernelSymbols: (int*string)[],
+        mappers      : (int*(obj[]->obj))[]
     ) =
+    /// action(reduce) -> production
+    let productions =
+        let t = new System.Collections.Generic.Dictionary<_,_>(HashIdentity.Structural)
+        for k,v in productions do t.Add(k,v)
+        t
+    /// state -> lookahead -> action
+    let actions =
+        let t = new System.Collections.Generic.Dictionary<_,_>(HashIdentity.Structural)
+        for k,v in actions do 
+            let tt = new System.Collections.Generic.Dictionary<_,_>(HashIdentity.Structural)
+            for kk,vv in v do tt.Add(kk,vv)
+            t.Add(k,tt)
+        t
+    /// state -> symbol
+    let kernelSymbols =
+        let t = new System.Collections.Generic.Dictionary<_,_>(HashIdentity.Structural)
+        for k,v in kernelSymbols do t.Add(k,v)
+        t
+    /// action(reduce) -> mapper
+    let mappers =
+        let t = new System.Collections.Generic.Dictionary<_,_>(HashIdentity.Structural)
+        for k,v in mappers do t.Add(k,v)
+        t
 
     ///
     member _.parse<'tok>(tokens: seq<'tok>, getTag:'tok -> string, getLexeme:'tok->obj) =

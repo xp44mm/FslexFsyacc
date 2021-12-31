@@ -20,6 +20,6 @@ let finalMappers =
     indicesFromFinal
     |> Array.map(fun(fnl, i) -> fnl,mappers.[i])
 open FslexFsyacc.Runtime
-let analyzer = Analyzer2(nextStates, lexemesFromFinal, universalFinals, finalMappers)
+let analyzer = Analyzer(nextStates, lexemesFromFinal, universalFinals, finalMappers)
 let analyze (tokens:seq<_>) = 
     analyzer.analyze(tokens,getTag)

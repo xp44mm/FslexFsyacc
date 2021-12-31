@@ -84,7 +84,7 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
         let moduleName = $"FslexFsyacc.Fsyacc.{name}"
 
         //解析表数据
-        let parseTbl = fsyacc.toFsyaccParseTable2()
+        let parseTbl = fsyacc.toFsyaccParseTable()
         let fsharpCode = parseTbl.generate(moduleName)
 
         let outputDir = Path.Combine(sourcePath, $"{name}.fs")
@@ -93,7 +93,7 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``7 - valid ParseTable``() =
-        let t = fsyacc.toFsyaccParseTable2()
+        let t = fsyacc.toFsyaccParseTable()
 
         Should.equal t.header        FsyaccParseTable.header
         Should.equal t.productions   FsyaccParseTable.productions
