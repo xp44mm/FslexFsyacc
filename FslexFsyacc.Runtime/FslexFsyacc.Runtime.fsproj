@@ -30,7 +30,7 @@
 
   <ItemGroup>
     <PackageReference Include="FSharp.Idioms" Version="1.1.20" />
-    <PackageReference Include="FSharp.Literals" Version="2.2.6" />
+    <PackageReference Include="FSharp.Literals" Version="2.2.8" />
   </ItemGroup>
 
   <ItemGroup>

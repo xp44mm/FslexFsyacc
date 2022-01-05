@@ -86,7 +86,7 @@ type Parser
                     let popedStates = List.skip len states
                     let smr = popedStates.Head // = s_{m-r}
                     //压入状态，产生式的头
-                    let newstate = actions.[smr].[leftside]
+                    let newstate = actions.[smr].[leftside] // GOTO
                     newstate :: popedStates
 
                 loop pushedTrees pushedStates maybeToken

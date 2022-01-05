@@ -37,9 +37,7 @@ let mergeClrKernels (slrKernel:Set<ItemCore>) (clrKernels:seq<Set<ItemCore*Set<s
     |> Array.zip <| lookaheadsArray
     |> Set.ofArray
 
-
-
-/// 
+/// the collection of sets of items
 let make (itemCores:Set<ItemCore>) (itemCoreAttributes:Map<ItemCore, bool*Set<string>>) (productions:Set<string list>) =
     // kernel -> closure
     let getClosure = ClosureFactory.make itemCoreAttributes productions

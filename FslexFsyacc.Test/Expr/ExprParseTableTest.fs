@@ -59,3 +59,45 @@ type ExprParseTableTest(output:ITestOutputHelper) =
         let y = set ["(";")";"*";"+";"-";"/";"NUMBER"]
         Should.equal y tokens
 
+    [<Fact>]
+    member _.``4 - state details``() =
+        let grammar = Grammar.from fsyacc.mainProductions
+
+        let terminals = 
+            grammar.symbols - grammar.nonterminals
+
+        let states = 
+            ItemCore2.create fsyacc.mainProductions
+        //show states
+        let conflictedClosures =
+            states
+            |> Array.choose(fun (i,items)->
+                let detector = ClosureConflictDetector(terminals, items)
+                let conflicts = detector.conflicts
+                if conflicts.IsEmpty then
+                    None
+                else
+                    Some (i,conflicts |> Set.toList)
+            )
+        show conflictedClosures
+
+    [<Fact>]
+    member _.``5 - %prec of productions``() =
+        let grammar = Grammar.from fsyacc.mainProductions
+
+        let terminals = 
+            grammar.symbols - grammar.nonterminals
+
+        let states = 
+            ItemCore2.create fsyacc.mainProductions
+
+        let prods =
+            states
+            |> Array.map(fun (i,items)->
+                let detector = ClosureConflictDetector(terminals, items)
+                detector.productions
+            )
+            |> Set.unionMany
+
+        let pprods = PrecedenceResolver.precedenceOfProductions terminals prods
+        show pprods

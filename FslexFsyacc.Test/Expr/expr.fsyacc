@@ -1,19 +1,14 @@
 ﻿%{
-    open Expr.ExprToken
-    open System
+open Expr.ExprToken
 %}
 expr : 
-     | expr "+" expr         { //multiline test
-                               s0 + s2 }
+     | expr "+" expr         { s0 + s2 }
      | expr "-" expr         { s0 - s2 }
      | expr "*" expr         { s0 * s2 }
      | expr "/" expr         { s0 / s2 }
-     | lparen expr rparen    { s1 }
+     | "(" expr ")"    { s1 }
      | "-" expr %prec UMINUS { -s1 }
      | NUMBER                { s0 }
-
-lparen : "(" {}
-rparen : ")" {(*this semantic return unit*)}
 
 %%
 %left "+" "-"

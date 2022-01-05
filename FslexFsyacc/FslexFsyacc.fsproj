@@ -32,6 +32,7 @@
 		<Compile Include="Lex\PartitionDFA.fs" />
 		<Compile Include="Lex\DFATools.fs" />
 		<Compile Include="Lex\DFA.fs" />
+		<Compile Include="Yacc\ProductionUtils.fs" />
 
 		<Compile Include="Yacc\NullableFactory.fs" />
 		<Compile Include="Yacc\FirstFactory.fs" />
@@ -45,14 +46,16 @@
 		<Compile Include="Yacc\ClosureFactory.fs" />
 		<Compile Include="Yacc\ClosureOperators.fs" />
 		<Compile Include="Yacc\CollectionFactory.fs" />
+		<Compile Include="Yacc\ItemCoreLookaheads.fs" />
+		<Compile Include="Yacc\ItemCore2.fs" />
 		<Compile Include="Yacc\GotoFactory.fs" />
+		<Compile Include="Yacc\PrecedenceKey.fs" />
+		<Compile Include="Yacc\PrecedenceResolver.fs" />
 		<Compile Include="Yacc\Action.fs" />
 		<Compile Include="Yacc\AmbiguousTableFactory.fs" />
 		<Compile Include="Yacc\AmbiguousTable.fs" />
 		<Compile Include="Yacc\ConflictFactory.fs" />
 		<Compile Include="Yacc\Associativity.fs" />
-		<Compile Include="Yacc\PrecedenceKey.fs" />
-		<Compile Include="Yacc\PrecedenceResolver.fs" />
 		<Compile Include="Yacc\EliminatingAmbiguity.fs" />
 		<Compile Include="Yacc\ParseTableUtils.fs" />
 		<Compile Include="Yacc\ParseTable.fs" />
@@ -90,7 +93,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="FSharp.Idioms" Version="1.1.20" />
-		<PackageReference Include="FSharp.Literals" Version="2.2.6" />
+		<PackageReference Include="FSharp.Literals" Version="2.2.8" />
 	</ItemGroup>
 
 	<ItemGroup>

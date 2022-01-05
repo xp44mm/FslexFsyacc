@@ -1,0 +1,23 @@
+Invite you to try FslexFsyacc
+
+Compiler/Parser programming enthusiasts, I am very pleased to invite you to try a new series of lex/yacc tools. 
+
+Fslex is a code generator that uses regular expression syntax as a rule to generate a function, which divides the input token sequence into groups at a higher level. The Fslex is often used to remove redundant delimiters, add omitted delimiters or other syntax components, and so on. The Fslex is also used to determine context somewhere in the stream.
+
+Fsyacc is a code generator that use BNF productions and precedences as a rule to generate a function, which resolves the input token sequence to an abstract syntax tree.
+
+Why use FslexFsyacc?
+
+- You can use your existing handwriting tokenizer.
+
+- This package uses standard lex/yacc syntax to minimize your learning costs.
+
+- fslex/fsyacc generates respectively an independent, side-effect-free function that can be called flexibly.
+
+- The method of generating code is simple, without command lines and without the need to configure projects.
+
+- The result code is data-driven and highly readable.
+
+- Flexiblely compose of tokenize, regular expressions, BNF technology.
+
+The project is hosted on [GitHub](https://github.com/xp44mm/FslexFsyacc) where you can report issues, fork the project and submit pull requests.

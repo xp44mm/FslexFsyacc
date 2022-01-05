@@ -21,6 +21,7 @@ type AmbiguousTable =
             ItemCoreAttributeFactory.make grammar.nonterminals grammar.nullables grammar.firsts itemCores
         let closures = 
             CollectionFactory.make itemCores itemCoreAttributes grammar.productions
+
         let gotos = GotoFactory.make closures
 
         let kernelSymbols = 
@@ -32,7 +33,7 @@ type AmbiguousTable =
         // production -> symbol
         let productionOperators:Map<string list,string> =
             grammar.productions
-            |> Seq.choose(fun prod -> 
+            |> Seq.choose(fun prod ->
                 prod
                 |> List.tail
                 |> List.tryFindBack(grammar.nonterminals.Contains>>not)
@@ -43,7 +44,7 @@ type AmbiguousTable =
         ///kernel中，产生式优先级符号与kernel输入符号相同的产生式。
         let kernelProductions =
             kernelSymbols
-            |> Set.filter(snd>>grammar.nonterminals.Contains>>not)
+            |> Set.filter(snd>>grammar.nonterminals.Contains>>not) // terminal
             |> Seq.choose(fun(kernel,terminal)->
                 let ps =
                     kernel

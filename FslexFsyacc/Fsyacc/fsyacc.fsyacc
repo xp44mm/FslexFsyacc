@@ -11,10 +11,10 @@ file       : HEADER rules                                    {s0, List.rev s1,[]
 rules:             rule  {[s0]}
            | rules rule  {s1::s0}
 
-rule       : ID sep bodies  {s0,List.rev s2}
+rule       : ID derive bodies  {s0,List.rev s2}
 
-sep : ":" {}
-    | ":" "|" {}
+derive : ":" {}
+       | ":" "|" {}
 
 precedences:             precedence    {[s0]}
            | precedences precedence    {s1::s0}
