@@ -91,6 +91,21 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
         File.WriteAllText(outputDir,fsharpCode)
         output.WriteLine("output yacc:"+outputDir)
 
+    [<Fact>] // (Skip="once for all!")
+    member _.``6 - generate ParseTable2``() =
+        let name = "FsyaccParseTable2"
+        let moduleName = $"FslexFsyacc.Fsyacc.{name}"
+
+        //解析表数据
+        let fsyacc = AlteredFsyaccFile.fromRaw fsyacc
+        let parseTbl = fsyacc.toFsyaccParseTable()
+        let fsharpCode = parseTbl.generate(moduleName)
+
+        let outputDir = Path.Combine(sourcePath, $"{name}.fs")
+        File.WriteAllText(outputDir,fsharpCode)
+        output.WriteLine("output yacc:"+outputDir)
+
+
     [<Fact>]
     member _.``7 - valid ParseTable``() =
         let t = fsyacc.toFsyaccParseTable()

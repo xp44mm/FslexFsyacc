@@ -5,7 +5,7 @@ open FSharp.Idioms
 /// 一个状态的闭包能goto的所有状态，以kernel表示新状态。
 let getNextKernels(closure:Set<ItemCore*Set<string>>) =
     closure
-    |> Set.filter(fun(itemCore,lookahead) -> not itemCore.gone)
+    |> Set.filter(fun(itemCore,lookahead) -> not itemCore.dotmax)
     |> Set.map(fun(itemCore,lookahead) -> itemCore.dotIncr(),lookahead)
     |> Set.groupBy(fun(itemCore,lookahead) -> itemCore.prevSymbol)
 

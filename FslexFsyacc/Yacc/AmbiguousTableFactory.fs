@@ -14,7 +14,7 @@ let make (closures:Set<Set<ItemCore>*Set<ItemCore*Set<string>>>)
         closures
         |> Set.map(fun(kernel,closure) ->
             closure
-            |> Set.filter(fun(i,_) -> i.gone)
+            |> Set.filter(fun(i,_) -> i.dotmax)
             |> Set.map(fun(i,lookahead) ->
                 lookahead
                 |> Set.map(fun terminal -> kernel, terminal, Reduce i.production)

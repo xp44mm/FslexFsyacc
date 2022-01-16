@@ -15,7 +15,7 @@ type ExprCompilerTest(output:ITestOutputHelper) =
     let compile (inp:string) =
         inp
         |> ExprToken.tokenize
-        |> ExprParseTable.parse
+        |> ExprParseTable2.parse
 
     [<Fact>]
     member _.``0 - basis test``() =
@@ -38,3 +38,9 @@ type ExprCompilerTest(output:ITestOutputHelper) =
         //show result
         Should.equal y (-13.0)
 
+    [<Fact>]
+    member _.``2 - exception test``() =
+        let inp = "2* + 4*3"
+        let y = compile inp
+        show y
+        //Should.equal y (-13.0)

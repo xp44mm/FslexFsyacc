@@ -20,7 +20,7 @@ let isSubsetOf (kernels:Set<Set<ItemCore*Set<string>>>) (kernel:Set<ItemCore*Set
 
 //合并同一slrkernel下的所有clrKernel
 let mergeClrKernels (slrKernel:Set<ItemCore>) (clrKernels:seq<Set<ItemCore*Set<string>>>) =
-    // lookaheadsArray的等价代码
+    //// lookaheadsArray的等价代码
     //clrKernels
     //|> Set.unionMany
     //|> Set.unionByKey

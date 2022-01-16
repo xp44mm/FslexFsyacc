@@ -44,6 +44,8 @@ type Grammar =
             Func<_,_> (fun _ -> Set.map List.head this.mainProductions)
             )
     
+    member this.terminals = this.symbols - this.nonterminals
+
     member this.nullables =
         GrammarMemoiz.nullables.GetOrAdd(
             this.productions, 

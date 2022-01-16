@@ -36,7 +36,7 @@ type LALRExpressionTest(output:ITestOutputHelper) =
                 LeftAssoc , [TerminalKey "+";TerminalKey "-"]
             ]
 
-        let yacc = ParseTable.create(mainProductions,precedences)
+        //let yacc = ParseTable.create(mainProductions,precedences)
 
         //show yacc.originalTable
         //show yacc.encodeTable

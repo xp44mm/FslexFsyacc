@@ -27,7 +27,7 @@ type ExprParseTableTest(output:ITestOutputHelper) =
         show fsyacc.declarations
 
     [<Fact(Skip="once for all!")>] // 
-    member _.``1 - fsyacc generateParseTable``() =
+    member _.``1 - expr generateParseTable``() =
         let parseTbl = fsyacc.toFsyaccParseTable()
         let name = "ExprParseTable"
         let moduleName = $"Expr.{name}"
@@ -38,6 +38,23 @@ type ExprParseTableTest(output:ITestOutputHelper) =
         let outputDir = Path.Combine(__SOURCE_DIRECTORY__, $"{name}.fs")
         File.WriteAllText(outputDir,fsharpCode)
         output.WriteLine("output yacc:"+outputDir)
+
+    [<Fact>] // (Skip="once for all!")
+    member _.``1 - expr generateParseTable2``() =
+        let fsyacc = AlteredFsyaccFile.fromRaw(fsyacc)
+        let tbl = fsyacc.toFsyaccParseTable()
+        //show tbl
+
+        let name = "ExprParseTable2"
+        let moduleName = $"Expr.{name}"
+
+        //解析表数据
+        let fsharpCode = tbl.generate(moduleName)
+
+        let outputDir = Path.Combine(__SOURCE_DIRECTORY__, $"{name}.fs")
+        File.WriteAllText(outputDir,fsharpCode)
+        output.WriteLine($"output yacc:{outputDir}")
+
 
     [<Fact>]
     member _.``2 - verify parsing table``() =
@@ -60,44 +77,36 @@ type ExprParseTableTest(output:ITestOutputHelper) =
         Should.equal y tokens
 
     [<Fact>]
-    member _.``4 - state details``() =
-        let grammar = Grammar.from fsyacc.mainProductions
-
-        let terminals = 
-            grammar.symbols - grammar.nonterminals
-
+    member _.``4 - ambiguous state details``() =
         let states = 
-            ItemCore2.create fsyacc.mainProductions
-        //show states
+            AmbiguousCollection.create fsyacc.mainProductions
+        show states
+
+    [<Fact>]
+    member _.``5 - conflicted items``() =
+        let collection = 
+            AmbiguousCollection.create fsyacc.mainProductions
+
+        // 显示冲突状态的冲突项目
         let conflictedClosures =
-            states
-            |> Array.choose(fun (i,items)->
-                let detector = ClosureConflictDetector(terminals, items)
-                let conflicts = detector.conflicts
-                if conflicts.IsEmpty then
-                    None
-                else
-                    Some (i,conflicts |> Set.toList)
-            )
+            collection.filterConflictedClosures()
+
         show conflictedClosures
 
     [<Fact>]
-    member _.``5 - %prec of productions``() =
-        let grammar = Grammar.from fsyacc.mainProductions
+    member _.``6 - %prec of productions``() =          
+        let collection = 
+            AmbiguousCollection.create fsyacc.mainProductions
 
-        let terminals = 
-            grammar.symbols - grammar.nonterminals
+        // 显示冲突状态的冲突项目
+        let conflictedClosures =
+            collection.filterConflictedClosures() 
 
-        let states = 
-            ItemCore2.create fsyacc.mainProductions
+        // 提取冲突的产生式
+        let productions =
+            AmbiguousCollection.gatherProductions conflictedClosures
 
-        let prods =
-            states
-            |> Array.map(fun (i,items)->
-                let detector = ClosureConflictDetector(terminals, items)
-                detector.productions
-            )
-            |> Set.unionMany
-
-        let pprods = PrecedenceResolver.precedenceOfProductions terminals prods
+        let pprods = 
+            ProductionUtils.precedenceOfProductions collection.grammar.terminals productions
         show pprods
+

@@ -11,7 +11,7 @@ let make
 
     itemCores
     |> Seq.choose(fun itemCore ->
-        if itemCore.gone then
+        if itemCore.dotmax then
             None
         elif nonterminals.Contains itemCore.nextSymbol then
             let propagatable = nullable itemCore.beta

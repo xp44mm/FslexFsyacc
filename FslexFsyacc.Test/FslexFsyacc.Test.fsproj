@@ -38,6 +38,7 @@
 		<Compile Include="Expr\ExprToken.fs" />
 		<None Include="Expr\expr.fsyacc" />
 		<Compile Include="Expr\ExprParseTable.fs" />
+		<Compile Include="Expr\ExprParseTable2.fs" />
 		<Compile Include="Expr\ExprParseTableTest.fs" />
 		<Compile Include="Expr\ExprCompilerTest.fs" />
 		

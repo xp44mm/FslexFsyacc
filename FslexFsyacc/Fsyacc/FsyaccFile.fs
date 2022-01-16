@@ -19,6 +19,7 @@ type FsyaccFile =
             rules = rules
             precedences = precedences
             declarations = declarations
+
         }
 
     member this.mainRules =
@@ -35,7 +36,9 @@ type FsyaccFile =
         this.mainRules |> List.map Triple.first
 
     member this.toFsyaccParseTable() = 
-        let mainRules: (string list * string) list = this.mainRules |> List.map Triple.ends
+        let mainRules: (string list * string) list = 
+            this.mainRules 
+            |> List.map Triple.ends
 
         // name -> production
         let namedProds =
@@ -53,6 +56,7 @@ type FsyaccFile =
                     | "right" -> RightAssoc
                     | "nonassoc" -> NonAssoc
                     | _ -> failwith assoc
+
                 let keys =
                     symbols
                     |> List.map(fun symbol ->
@@ -109,7 +113,6 @@ type FsyaccFile =
         //sactions的索引
         let productions =
             ambiguousTable.productions 
-            // |> ParseTableUtils.getProductionsMap 
             |> Set.toArray
             |> Array.mapi(fun i prod -> -i, Array.ofList prod) // 产生式负数编号
 
@@ -118,6 +121,7 @@ type FsyaccFile =
             |> Map.mapKey (fun kernel symbol -> kernelIndexes.[kernel])
             |> Map.map (fun i sq -> Seq.exactlyOne sq)
             |> Map.toArray
+
         let isemantics = 
             let mp =  // prod -> semantic
                 mainRules
@@ -142,7 +146,6 @@ type FsyaccFile =
                     |> Array.map Triple.lastTwo
                 x,arr)
 
-
         { 
             header = this.header
             productions = productions
@@ -150,4 +153,4 @@ type FsyaccFile =
             kernelSymbols = kernelSymbols
             semantics = isemantics 
             declarations = declarations
-        }: FsyaccParseTableFile
+        }

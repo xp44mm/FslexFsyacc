@@ -1,20 +1,10 @@
 ﻿module FslexFsyacc.Fsyacc.SemanticGenerator
 
-open System.Text.RegularExpressions
+open FslexFsyacc.Runtime.Utils
 open System
 open FSharp.Literals
 open FSharp.Idioms.StringOps
 open FSharp.Idioms
-
-let printProduction (symbols:string list) =
-    let symbols =
-        symbols
-        |> List.map(fun sym ->
-            if Regex.IsMatch(sym,@"^\w+$") then
-                sym
-            else Literal.stringify sym
-            )
-    sprintf "%s -> %s" symbols.Head (symbols.Tail |> String.concat " ")
 
 let decorateSemantic (typeAnnotations:Map<string,string>) (prodSymbols:string list) (semantic:string) =
     let bodySymbols =
@@ -39,7 +29,7 @@ let decorateSemantic (typeAnnotations:Map<string,string>) (prodSymbols:string li
     let funcDef =
         [
             "fun (ss:obj[]) ->"
-            $"{space4 2}// {printProduction prodSymbols}"
+            $"{space4 2}// {renderProduction prodSymbols}"
             if semantic = "" then
                 $"{space4 2}null"
             else

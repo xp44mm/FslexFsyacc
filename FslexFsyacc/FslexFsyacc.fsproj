@@ -46,19 +46,24 @@
 		<Compile Include="Yacc\ClosureFactory.fs" />
 		<Compile Include="Yacc\ClosureOperators.fs" />
 		<Compile Include="Yacc\CollectionFactory.fs" />
-		<Compile Include="Yacc\ItemCoreLookaheads.fs" />
-		<Compile Include="Yacc\ItemCore2.fs" />
+		<Compile Include="Yacc\ItemCoreUtils.fs" />
+		<Compile Include="Yacc\LALRCollection.fs" />
+		<Compile Include="Yacc\AmbiguityEliminator.fs" />
+		<Compile Include="Yacc\AmbiguousCollection.fs" />
+		<Compile Include="Yacc\UnambiguousCollection.fs" />
+		<Compile Include="Yacc\Action.fs" />
+		<Compile Include="Yacc\ParsingTable.fs" />
+		<Compile Include="Yacc\ParseTableEncoder.fs" />
+		<Compile Include="Yacc\ParseTable.fs" />
 		<Compile Include="Yacc\GotoFactory.fs" />
+		<Compile Include="Yacc\Associativity.fs" />
 		<Compile Include="Yacc\PrecedenceKey.fs" />
 		<Compile Include="Yacc\PrecedenceResolver.fs" />
-		<Compile Include="Yacc\Action.fs" />
 		<Compile Include="Yacc\AmbiguousTableFactory.fs" />
 		<Compile Include="Yacc\AmbiguousTable.fs" />
 		<Compile Include="Yacc\ConflictFactory.fs" />
-		<Compile Include="Yacc\Associativity.fs" />
 		<Compile Include="Yacc\EliminatingAmbiguity.fs" />
 		<Compile Include="Yacc\ParseTableUtils.fs" />
-		<Compile Include="Yacc\ParseTable.fs" />
 		
 		<Compile Include="FSharpSourceText.fs" />
 
@@ -78,16 +83,20 @@
 		<Compile Include="Fsyacc\FsyaccToken.fs" />
 		<Compile Include="Fsyacc\FsyaccTokenUtils.fs" />
 		<None Include="Fsyacc\fsyacc.fsyacc" />
+		<Compile Include="Fsyacc\FsyaccParseTable.fs" />
+		<Compile Include="Fsyacc\FsyaccParseTable2.fs" />
+		<Compile Include="Fsyacc\FsyaccCompiler.fs" />
+		<Compile Include="Fsyacc\FsyaccParseTableFile.fs" />
+		<Compile Include="Fsyacc\FsyaccParseTableModule.fs" />
+		<Compile Include="Fsyacc\FsyaccFile.fs" />
+		<Compile Include="Fsyacc\AlteredFsyaccFile.fs" />
+		
+		<Compile Include="SourceText.fs" />
+		
 		<None Include="..\readme.md">
 		  <Pack>True</Pack>
 		  <PackagePath>\</PackagePath>
 		</None>
-		<Compile Include="Fsyacc\FsyaccParseTable.fs" />
-		<Compile Include="Fsyacc\FsyaccCompiler.fs" />
-		<Compile Include="Fsyacc\FsyaccParseTableFile.fs" />
-		<Compile Include="Fsyacc\FsyaccFile.fs" />
-		
-		<Compile Include="SourceText.fs" />
 
 	</ItemGroup>
 
