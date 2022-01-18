@@ -24,95 +24,48 @@ type Section4_8_1Test(output:ITestOutputHelper) =
     [<Fact>]
     member _.``fig4-49: parsing table test``() =
 
-        let tbl = AmbiguousTable.create mainProductions
+        let collection = AmbiguousCollection.create mainProductions
 
-        //show tbl.ambiguousTable
+        // 显示冲突状态的冲突项目
+        let conflictedClosures =
+            collection.filterConflictedClosures() 
 
-        let y = set [
-            set [{production=["";"E"];dot=0}],"(",set [Shift(set [{production=["E";"(";"E";")"];dot=1}])];
-            set [{production=["";"E"];dot=0}],"E",set [Shift(set [{production=["";"E"];dot=1};{production=["E";"E";"*";"E"];dot=1};{production=["E";"E";"+";"E"];dot=1}])];
-            set [{production=["";"E"];dot=0}],"id",set [Shift(set [{production=["E";"id"];dot=1}])];
-            set [{production=["";"E"];dot=1};{production=["E";"E";"*";"E"];dot=1};{production=["E";"E";"+";"E"];dot=1}],"",set [Reduce ["";"E"]];
-            set [{production=["";"E"];dot=1};{production=["E";"E";"*";"E"];dot=1};{production=["E";"E";"+";"E"];dot=1}],"*",set [Shift(set [{production=["E";"E";"*";"E"];dot=2}])];
-            set [{production=["";"E"];dot=1};{production=["E";"E";"*";"E"];dot=1};{production=["E";"E";"+";"E"];dot=1}],"+",set [Shift(set [{production=["E";"E";"+";"E"];dot=2}])];
-            set [{production=["E";"(";"E";")"];dot=1}],"(",set [Shift(set [{production=["E";"(";"E";")"];dot=1}])];
-            set [{production=["E";"(";"E";")"];dot=1}],"E",set [Shift(set [{production=["E";"(";"E";")"];dot=2};{production=["E";"E";"*";"E"];dot=1};{production=["E";"E";"+";"E"];dot=1}])];
-            set [{production=["E";"(";"E";")"];dot=1}],"id",set [Shift(set [{production=["E";"id"];dot=1}])];
-            set [{production=["E";"(";"E";")"];dot=2};{production=["E";"E";"*";"E"];dot=1};{production=["E";"E";"+";"E"];dot=1}],")",set [Shift(set [{production=["E";"(";"E";")"];dot=3}])];
-            set [{production=["E";"(";"E";")"];dot=2};{production=["E";"E";"*";"E"];dot=1};{production=["E";"E";"+";"E"];dot=1}],"*",set [Shift(set [{production=["E";"E";"*";"E"];dot=2}])];
-            set [{production=["E";"(";"E";")"];dot=2};{production=["E";"E";"*";"E"];dot=1};{production=["E";"E";"+";"E"];dot=1}],"+",set [Shift(set [{production=["E";"E";"+";"E"];dot=2}])];
-            set [{production=["E";"(";"E";")"];dot=3}],"",set [Reduce ["E";"(";"E";")"]];
-            set [{production=["E";"(";"E";")"];dot=3}],")",set [Reduce ["E";"(";"E";")"]];
-            set [{production=["E";"(";"E";")"];dot=3}],"*",set [Reduce ["E";"(";"E";")"]];
-            set [{production=["E";"(";"E";")"];dot=3}],"+",set [Reduce ["E";"(";"E";")"]];
-            set [{production=["E";"E";"*";"E"];dot=1};{production=["E";"E";"*";"E"];dot=3};{production=["E";"E";"+";"E"];dot=1}],"",set [Reduce ["E";"E";"*";"E"]];
-            set [{production=["E";"E";"*";"E"];dot=1};{production=["E";"E";"*";"E"];dot=3};{production=["E";"E";"+";"E"];dot=1}],")",set [Reduce ["E";"E";"*";"E"]];
-            set [{production=["E";"E";"*";"E"];dot=1};{production=["E";"E";"*";"E"];dot=3};{production=["E";"E";"+";"E"];dot=1}],"*",set [Shift(set [{production=["E";"E";"*";"E"];dot=2}]);Reduce ["E";"E";"*";"E"]];
-            set [{production=["E";"E";"*";"E"];dot=1};{production=["E";"E";"*";"E"];dot=3};{production=["E";"E";"+";"E"];dot=1}],"+",set [Shift(set [{production=["E";"E";"+";"E"];dot=2}]);Reduce ["E";"E";"*";"E"]];
-            set [{production=["E";"E";"*";"E"];dot=1};{production=["E";"E";"+";"E"];dot=1};{production=["E";"E";"+";"E"];dot=3}],"",set [Reduce ["E";"E";"+";"E"]];
-            set [{production=["E";"E";"*";"E"];dot=1};{production=["E";"E";"+";"E"];dot=1};{production=["E";"E";"+";"E"];dot=3}],")",set [Reduce ["E";"E";"+";"E"]];
-            set [{production=["E";"E";"*";"E"];dot=1};{production=["E";"E";"+";"E"];dot=1};{production=["E";"E";"+";"E"];dot=3}],"*",set [Shift(set [{production=["E";"E";"*";"E"];dot=2}]);Reduce ["E";"E";"+";"E"]];
-            set [{production=["E";"E";"*";"E"];dot=1};{production=["E";"E";"+";"E"];dot=1};{production=["E";"E";"+";"E"];dot=3}],"+",set [Shift(set [{production=["E";"E";"+";"E"];dot=2}]);Reduce ["E";"E";"+";"E"]];
-            set [{production=["E";"E";"*";"E"];dot=2}],"(",set [Shift(set [{production=["E";"(";"E";")"];dot=1}])];
-            set [{production=["E";"E";"*";"E"];dot=2}],"E",set [Shift(set [{production=["E";"E";"*";"E"];dot=1};{production=["E";"E";"*";"E"];dot=3};{production=["E";"E";"+";"E"];dot=1}])];
-            set [{production=["E";"E";"*";"E"];dot=2}],"id",set [Shift(set [{production=["E";"id"];dot=1}])];
-            set [{production=["E";"E";"+";"E"];dot=2}],"(",set [Shift(set [{production=["E";"(";"E";")"];dot=1}])];
-            set [{production=["E";"E";"+";"E"];dot=2}],"E",set [Shift(set [{production=["E";"E";"*";"E"];dot=1};{production=["E";"E";"+";"E"];dot=1};{production=["E";"E";"+";"E"];dot=3}])];
-            set [{production=["E";"E";"+";"E"];dot=2}],"id",set [Shift(set [{production=["E";"id"];dot=1}])];
-            set [{production=["E";"id"];dot=1}],"",set [Reduce ["E";"id"]];
-            set [{production=["E";"id"];dot=1}],")",set [Reduce ["E";"id"]];
-            set [{production=["E";"id"];dot=1}],"*",set [Reduce ["E";"id"]];
-            set [{production=["E";"id"];dot=1}],"+",set [Reduce ["E";"id"]]]
-        
-        Should.equal y tbl.ambiguousTable
+        // 提取冲突的产生式
+        let productions =
+            AmbiguousCollection.gatherProductions conflictedClosures
 
-        let ambiguousTable = 
-            tbl.ambiguousTable
-            |> Set.map(fun(k,s,a)-> 
-                let k = k |> Set.map(fun i -> i.production,i.dot)
-                k,s,a)
+        //show productions
+        let y =set[
+            ["E";"E";"*";"E"];
+            ["E";"E";"+";"E"]]
 
-        //固定产生式
-        let pconflicts = 
-            ambiguousTable
-            |> ConflictFactory.productionConflict 
-
-        Assert.True(pconflicts.IsEmpty)
-
-        // 符号多用警告
-        let warning = ConflictFactory.overloadsWarning tbl
-
-        //show warning
-        Assert.True(warning.IsEmpty)
-
-        //用于优先级
-        let rsconflicts =
-            tbl
-            |> ConflictFactory.shiftReduceConflict
-
-        //show rsconflicts
-
-        let rsc = set [
-            set [["E";"E";"*";"E"]];
-            set [["E";"E";"*";"E"];["E";"E";"+";"E"]];
-            set [["E";"E";"+";"E"]]]
+        Should.equal y productions
 
 
-        Should.equal rsc rsconflicts
 
     [<Fact>]
     member _.``grammar 4-1: ProductionPrecedence``() =
-        let tbl = AmbiguousTable.create mainProductions
+        let collection = AmbiguousCollection.create mainProductions
 
-        let operators = tbl.productionOperators
+        // 显示冲突状态的冲突项目
+        let conflictedClosures =
+            collection.filterConflictedClosures() 
 
+        // 提取冲突的产生式
+        let productions =
+            AmbiguousCollection.gatherProductions conflictedClosures
+
+        //产生式的优先级操作符
+        let operators = 
+            ProductionUtils.precedenceOfProductions 
+                collection.grammar.terminals 
+                productions
+            
         //show operators
-        let y = Map.ofList [
-            ["E"; "("; "E"; ")"],")"
+        let y = [|
             ["E"; "E"; "*"; "E"],"*"
             ["E"; "E"; "+"; "E"],"+"
-            ["E"; "id"         ],"id"
-        ]
+        |]
 
         Should.equal y operators
 

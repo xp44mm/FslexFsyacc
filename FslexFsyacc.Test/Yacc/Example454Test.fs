@@ -67,21 +67,4 @@ type Example454Test(output:ITestOutputHelper) =
         let closures = 
             CollectionFactory.make itemCores itemCoreAttributes grammar.productions
 
-        let gotos = 
-            GotoFactory.make closures
-            |> Set.map(fun(k1,s,k2)-> k1 |> Set.map(fun i -> i.production,i.dot),s,k2 |> Set.map(fun i -> i.production,i.dot))
-
-        //show gotos
-        let y = set [
-            set [["";"S"],0],"C",set [["S";"C";"C"],1];
-            set [["";"S"],0],"S",set [["";"S"],1];
-            set [["";"S"],0],"c",set [["C";"c";"C"],1];
-            set [["";"S"],0],"d",set [["C";"d"],1];
-            set [["C";"c";"C"],1],"C",set [["C";"c";"C"],2];
-            set [["C";"c";"C"],1],"c",set [["C";"c";"C"],1];
-            set [["C";"c";"C"],1],"d",set [["C";"d"],1];
-            set [["S";"C";"C"],1],"C",set [["S";"C";"C"],2];
-            set [["S";"C";"C"],1],"c",set [["C";"c";"C"],1];
-            set [["S";"C";"C"],1],"d",set [["C";"d"],1]]
-        Should.equal y gotos
-
+        ()

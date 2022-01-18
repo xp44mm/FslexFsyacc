@@ -29,12 +29,12 @@ type LALRExpressionTest(output:ITestOutputHelper) =
     [<Fact>]
     member _.``fig4-38: parsing table yacc test``() =
 
-        let precedences =
-            [
-                RightAssoc, [ProductionKey mainProductions.[5]]
-                LeftAssoc , [TerminalKey "*";TerminalKey "/"]
-                LeftAssoc , [TerminalKey "+";TerminalKey "-"]
-            ]
+        //let precedences =
+        //    [
+        //        RightAssoc, [ProductionKey mainProductions.[5]]
+        //        LeftAssoc , [TerminalKey "*";TerminalKey "/"]
+        //        LeftAssoc , [TerminalKey "+";TerminalKey "-"]
+        //    ]
 
         //let yacc = ParseTable.create(mainProductions,precedences)
 

@@ -53,7 +53,7 @@ type FsyaccParseTableModule =
                     $"{space 4}{mpr}"
                 "|]"
                 "open FslexFsyacc.Runtime"
-                "let parser = Parser2(productions, closures, actions, mappers)"
+                "let parser = Parser(productions, closures, actions, mappers)"
                 "let parse (tokens:seq<_>) ="
                 "    parser.parse(tokens, getTag, getLexeme)"
                 $"    |> unbox<{types.[startSymbol]}>"

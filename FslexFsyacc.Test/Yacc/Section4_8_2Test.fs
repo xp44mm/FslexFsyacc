@@ -24,51 +24,32 @@ type Section4_8_2Test(output:ITestOutputHelper) =
             [ S; a; ]
         ]
 
-        let tbl = AmbiguousTable.create mainProductions
+        let collection = AmbiguousCollection.create mainProductions
 
-        show tbl.ambiguousTable
+        // 显示冲突状态的冲突项目
+        let conflictedClosures =
+            collection.filterConflictedClosures() 
 
-        let y = set [
-            set [{production=["";"S"];dot=0}],"S",set [Shift(set [{production=["";"S"];dot=1}])];
-            set [{production=["";"S"];dot=0}],"a",set [Shift(set [{production=["S";"a"];dot=1}])];
-            set [{production=["";"S"];dot=0}],"i",set [Shift(set [{production=["S";"i";"S"];dot=1};{production=["S";"i";"S";"e";"S"];dot=1}])];
-            set [{production=["";"S"];dot=1}],"",set [Reduce ["";"S"]];
-            set [{production=["S";"a"];dot=1}],"",set [Reduce ["S";"a"]];
-            set [{production=["S";"a"];dot=1}],"e",set [Reduce ["S";"a"]];
-            set [{production=["S";"i";"S"];dot=1};{production=["S";"i";"S";"e";"S"];dot=1}],"S",set [Shift(set [{production=["S";"i";"S"];dot=2};{production=["S";"i";"S";"e";"S"];dot=2}])];
-            set [{production=["S";"i";"S"];dot=1};{production=["S";"i";"S";"e";"S"];dot=1}],"a",set [Shift(set [{production=["S";"a"];dot=1}])];
-            set [{production=["S";"i";"S"];dot=1};{production=["S";"i";"S";"e";"S"];dot=1}],"i",set [Shift(set [{production=["S";"i";"S"];dot=1};{production=["S";"i";"S";"e";"S"];dot=1}])];
-            set [{production=["S";"i";"S"];dot=2};{production=["S";"i";"S";"e";"S"];dot=2}],"",set [Reduce ["S";"i";"S"]];
-            set [{production=["S";"i";"S"];dot=2};{production=["S";"i";"S";"e";"S"];dot=2}],"e",set [Shift(set [{production=["S";"i";"S";"e";"S"];dot=3}]);Reduce ["S";"i";"S"]];
-            set [{production=["S";"i";"S";"e";"S"];dot=3}],"S",set [Shift(set [{production=["S";"i";"S";"e";"S"];dot=4}])];
-            set [{production=["S";"i";"S";"e";"S"];dot=3}],"a",set [Shift(set [{production=["S";"a"];dot=1}])];
-            set [{production=["S";"i";"S";"e";"S"];dot=3}],"i",set [Shift(set [{production=["S";"i";"S"];dot=1};{production=["S";"i";"S";"e";"S"];dot=1}])];
-            set [{production=["S";"i";"S";"e";"S"];dot=4}],"",set [Reduce ["S";"i";"S";"e";"S"]];
-            set [{production=["S";"i";"S";"e";"S"];dot=4}],"e",set [Reduce ["S";"i";"S";"e";"S"]]]
+        // 提取冲突的产生式
+        let productions =
+            AmbiguousCollection.gatherProductions conflictedClosures
 
-        Should.equal y tbl.ambiguousTable
 
-        //固定产生式
-        let pconflicts = 
-            tbl.ambiguousTable
-            |> ConflictFactory.productionConflict 
+        show productions
 
-        Assert.True(pconflicts.IsEmpty)
+        //产生式的优先级操作符: production -> symbol
+        let productionSymbols = 
+            ProductionUtils.precedenceOfProductions
+                collection.grammar.terminals
+                productions
 
-        // 符号多用警告
-        let warning = ConflictFactory.overloadsWarning tbl
+        show productionSymbols
 
-        //show warning
-        Assert.True(warning.IsEmpty)
-
-        //用于优先级
-        let rsconflicts =
-            tbl
-            |> ConflictFactory.shiftReduceConflict
-
-        //show rsconflicts
-        let rsc = set [
-            set [["S";"i";"S"];["S";"i";"S";"e";"S"]]]
-
-        Should.equal rsc rsconflicts
-
+        ////
+        //let eliminator = 
+        //    {
+        //        terminals = x.grammar.terminals
+        //        names = names
+        //        precedences = precedences
+        
+        //    } : AmbiguityEliminator

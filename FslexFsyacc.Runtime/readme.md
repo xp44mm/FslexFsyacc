@@ -4,5 +4,13 @@ Runtime for Fslex/Fsyacc analyzer/parser generation tools. It includes several t
 
 ```F#
 Analyzer(nextStates, lexemesFromFinal, universalFinals, finalMappers)
-Parser(productions, actions, kernelSymbols, mappers)
+
+type Parser
+    (
+        productions: (string list)[],
+        closures   : (int*int*string[])[][],
+        actions    : (string*int)[][],
+        mappers    : (obj[]->obj)[]
+    )
+
 ```

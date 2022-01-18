@@ -3,45 +3,51 @@
 open FSharp.Idioms
 open FSharp.Literals
 
-type Parser 
+type Parser
     (
-        productions  : (int*string[])[], 
-        actions      : (int*(string*int)[])[],
-        kernelSymbols: (int*string)[],
-        mappers      : (int*(obj[]->obj))[]
+        productions: (string list)[],
+        closures   : (int*int*string[])[][],
+        actions    : (string*int)[][],
+        mappers    : (obj[]->obj)[]
     ) =
     /// action(reduce) -> production
     let productions =
-        let t = new System.Collections.Generic.Dictionary<_,_>(HashIdentity.Structural)
-        for k,v in productions do t.Add(k,v)
-        t
+        productions
+        |> Array.mapi(fun i prod -> -i,prod)
+        |> Map.ofArray
+
+    let closures =
+        closures
+        |> Array.map(fun closure ->
+            closure
+            |> Array.map(fun(prod,dot,las)->
+                productions.[prod],dot,las
+            )
+        )
+
     /// state -> lookahead -> action
     let actions =
-        let t = new System.Collections.Generic.Dictionary<_,_>(HashIdentity.Structural)
-        for k,v in actions do 
-            let tt = new System.Collections.Generic.Dictionary<_,_>(HashIdentity.Structural)
-            for kk,vv in v do tt.Add(kk,vv)
-            t.Add(k,tt)
-        t
-    /// state -> symbol
-    let kernelSymbols =
-        let t = new System.Collections.Generic.Dictionary<_,_>(HashIdentity.Structural)
-        for k,v in kernelSymbols do t.Add(k,v)
-        t
-    /// action(reduce) -> mapper
-    let mappers =
-        let t = new System.Collections.Generic.Dictionary<_,_>(HashIdentity.Structural)
-        for k,v in mappers do t.Add(k,v)
-        t
+        actions
+        |> Array.mapi(fun src pairs ->
+            let mp = Map.ofArray pairs
+            src,mp)
+        |> Map.ofArray
 
+    let mappers =
+        mappers
+        |> Array.mapi(fun i mpr ->
+            let iprod = -(i+1)
+            iprod,mpr
+        )
+        |> Map.ofArray
     ///
-    member _.parse<'tok>(tokens: seq<'tok>, getTag:'tok -> string, getLexeme:'tok->obj) =
+    member _.parse<'tok>(tokens:seq<'tok>, getTag:'tok -> string, getLexeme:'tok->obj) =
         let iterator = Iterator(tokens.GetEnumerator())
 
         let rec loop
             (trees: obj list)
             (states: int list)
-            (maybeToken:'tok option) 
+            (maybeToken:'tok option)
             =
 
             let sm = states.Head
@@ -54,13 +60,11 @@ type Parser
             if actions.ContainsKey sm && actions.[sm].ContainsKey ai then
                 ()
             else
-                let symbol =
-                    if sm = 0 then
-                        "<undefined>"
-                    else
-                        kernelSymbols.[sm]
-                let la = if maybeToken.IsNone then "EOF" else Literal.stringify maybeToken.Value
-                failwithf "syntactic error: lookahead='%s' symbol='%s' state='%d'" la symbol sm
+                let closure = Utils.renderClosure closures.[sm]
+                let tok =
+                    if maybeToken.IsNone then "EOF"
+                    else Literal.stringify maybeToken.Value
+                failwithf "lookahead:%s\r\nstate:\r\n%s" tok closure
 
             let action = actions.[sm].[ai]
             if action = 0 then
