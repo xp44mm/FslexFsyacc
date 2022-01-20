@@ -3,7 +3,7 @@
 open FSharp.Idioms
 
 /// DFA
-type DFA2<'tag when 'tag: comparison> =
+type DFA<'tag when 'tag: comparison> =
     {
         /// DFA nextState(s,a)
         nextStates:Map<uint32,Map<'tag,uint32>>
@@ -63,5 +63,5 @@ type DFA2<'tag when 'tag: comparison> =
 
     static member fromRgx(patterns:RegularExpression<'tag> list list) =
         let nfa = AnalyzerNFA.fromRgx patterns
-        DFA2.fromNFA(nfa.transition, nfa.finalLexemes)
+        DFA.fromNFA(nfa.transition, nfa.finalLexemes)
     

@@ -67,7 +67,7 @@ type NFAtoDFATest(output:ITestOutputHelper) =
             10u, 10u
             ]
 
-        let dfa = DFA2.fromNFA(ntran, nfinalLexemes)
+        let dfa = DFA.fromNFA(ntran, nfinalLexemes)
 
         //fig 3-36
         let dtran = set [
@@ -104,7 +104,7 @@ type NFAtoDFATest(output:ITestOutputHelper) =
 
         let nfinalLexemes = [4u,4u]
 
-        let dfa = DFA2.fromNFA(n3, nfinalLexemes)
+        let dfa = DFA.fromNFA(n3, nfinalLexemes)
 
         let dtran = set [
             0u,'a',0u;
@@ -140,7 +140,7 @@ type NFAtoDFATest(output:ITestOutputHelper) =
             8u,8u
             ]
 
-        let dfa = DFA2.fromNFA(ntran, finalLexemes)
+        let dfa = DFA.fromNFA(ntran, finalLexemes)
 
         // fig 3-54
         let dtran =set [

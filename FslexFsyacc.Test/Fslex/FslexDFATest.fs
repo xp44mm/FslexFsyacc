@@ -27,7 +27,7 @@ type FslexDFATest(output:ITestOutputHelper) =
         show dfs
         show rls
         
-    [<Fact>] // (Skip="once and for all!")
+    [<Fact(Skip="once and for all!")>] // 
     member _.``1 - generate DFA``() =
         let name = "FslexDFA"
         let moduleName = $"FslexFsyacc.Fslex.{name}"

@@ -9,7 +9,6 @@ type FslexFile =
         header:string
         definitions: (string*RegularExpression<string>)list
         rules: (RegularExpression<string>list*string)list
-
     }
 
     /// parse from file input to structural data
@@ -84,7 +83,7 @@ type FslexFile =
     member this.toFslexDFA() =
         let this = this.eliminateHoles()
         let patterns = this.rules |> List.map fst
-        let dfa = DFA2.fromRgx patterns
+        let dfa = DFA.fromRgx patterns
         let nextStates : (uint32*(string*uint32)[])[] =
             dfa.nextStates
             |> Map.toArray

@@ -13,6 +13,6 @@ let mappers = [|
         toTerm lexbuf
 |]
 open FslexFsyacc.Runtime
-let analyzer = Analyzer2(nextStates, finalLexemes, mappers)
+let analyzer = Analyzer(nextStates, finalLexemes, mappers)
 let analyze (tokens:seq<_>) = 
     analyzer.analyze(tokens,getTag)
