@@ -2,13 +2,13 @@
 
 open FSharp.Idioms
 
-///解析带数据的对象
-//final状态是包括向前看的最长状态。
-//lexeme状态是回退后最终匹配的较短状态。
+/// 解析带数据的对象
+/// final状态是包括向前看的最长状态。
+/// lexeme状态是回退后最终匹配的较短状态。
 type Analyzer2<'tok,'u>
     (
-        nextStates      : (uint32*(string*uint32)[])[], // state -> tag -> state
-        finalLexemes:(uint32[]*uint32[])[],
+        nextStates: (uint32*(string*uint32)[])[], // state -> tag -> state
+        finalLexemes: (uint32[]*uint32[])[],
         mappers : ('tok list -> 'u)[]
     ) =
 

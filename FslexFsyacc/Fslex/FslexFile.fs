@@ -45,7 +45,7 @@ type FslexFile =
             rules = rules
         }
 
-    //member this.toFslexDFA() =
+    //member this.toFslexDFA_old() =
     //    let this = this.eliminateHoles()
     //    let patterns = this.rules |> List.map fst
     //    let dfa = DFA.fromRgx patterns
@@ -81,7 +81,7 @@ type FslexFile =
     //        semantics = semantics 
     //    }
 
-    member this.toFslexDFA2() =
+    member this.toFslexDFA() =
         let this = this.eliminateHoles()
         let patterns = this.rules |> List.map fst
         let dfa = DFA2.fromRgx patterns

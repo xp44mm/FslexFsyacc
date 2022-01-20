@@ -15,7 +15,7 @@ type FslexDFAModule =
     member this.generate(moduleName:string) =
         let mappers = 
             this.semantics
-            |> Array.map(fun sem -> LexSemanticGenerator2.decorateSemantic sem)
+            |> Array.map(fun sem -> LexSemanticGenerator.decorateSemantic sem)
 
         [
             $"module {moduleName}"

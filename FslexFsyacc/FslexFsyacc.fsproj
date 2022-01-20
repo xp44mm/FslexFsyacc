@@ -32,7 +32,6 @@
 		<Compile Include="Lex\PartitionDFA.fs" />
 		<Compile Include="Lex\DFATools.fs" />
 		<Compile Include="Lex\DFA2.fs" />
-		<Compile Include="Lex\DFA.fs" />
 		<Compile Include="Yacc\ProductionUtils.fs" />
 
 		<Compile Include="Yacc\NullableFactory.fs" />
@@ -56,20 +55,9 @@
 		<Compile Include="Yacc\ParsingTable.fs" />
 		<Compile Include="Yacc\ParseTableEncoder.fs" />
 		<Compile Include="Yacc\ParseTable.fs" />
-		<Compile Include="Yacc\GotoFactory.fs" />
-		<Compile Include="Yacc\Associativity.fs" />
-		<Compile Include="Yacc\PrecedenceKey.fs" />
-		<Compile Include="Yacc\PrecedenceResolver.fs" />
-		<Compile Include="Yacc\AmbiguousTableFactory.fs" />
-		<Compile Include="Yacc\AmbiguousTable.fs" />
-		<Compile Include="Yacc\ConflictFactory.fs" />
-		<Compile Include="Yacc\EliminatingAmbiguity.fs" />
-		<Compile Include="Yacc\ParseTableUtils.fs" />
 		
 		<Compile Include="FSharpSourceText.fs" />
 		
-		<Compile Include="Fslex\LexSemanticGenerator2.fs" />
-
 		<Compile Include="Fslex\LexSemanticGenerator.fs" />
 		<Compile Include="Fslex\LexFileNormalization.fs" />
 		<Compile Include="Fslex\FslexToken.fs" />
@@ -78,10 +66,8 @@
 		<Compile Include="Fslex\FslexParseTable.fs" />
 		<None Include="Fslex\fslex.fslex" />
 		<Compile Include="Fslex\FslexDFA.fs" />
-		<Compile Include="Fslex\FslexDFA2.fs" />
 		<Compile Include="Fslex\FslexCompiler.fs" />
 		<Compile Include="Fslex\FslexDFAModule.fs" />
-		<Compile Include="Fslex\FslexDFAFile.fs" />
 		<Compile Include="Fslex\FslexFile.fs" />
 
 		<Compile Include="Fsyacc\SemanticGenerator.fs" />
