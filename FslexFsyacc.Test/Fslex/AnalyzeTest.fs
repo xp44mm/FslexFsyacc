@@ -17,7 +17,7 @@ type AnalyzeTest(output:ITestOutputHelper) =
 
     let analyze tokens =
         tokens
-        |> FslexDFA.analyze
+        |> FslexDFA2.analyze
         |> Seq.concat
         |> List.ofSeq
 

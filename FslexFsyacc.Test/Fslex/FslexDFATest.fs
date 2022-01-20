@@ -27,12 +27,12 @@ type FslexDFATest(output:ITestOutputHelper) =
         show dfs
         show rls
         
-    [<Fact(Skip="once and for all!")>] // 
+    [<Fact>] // (Skip="once and for all!")
     member _.``1 - generate DFA``() =
-        let name = "FslexDFA"
+        let name = "FslexDFA2"
         let moduleName = $"FslexFsyacc.Fslex.{name}"
 
-        let y = fslex.toFslexDFA()
+        let y = fslex.toFslexDFA2()
         let result = y.generate(moduleName)
 
         let outputDir = Path.Combine(sourcePath, $"{name}.fs")
@@ -41,12 +41,10 @@ type FslexDFATest(output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``2 - valid DFA``() =
-        let y = fslex.toFslexDFA()
+        let y = fslex.toFslexDFA2()
 
-        Should.equal y.nextStates       FslexDFA.nextStates
-        Should.equal y.lexemesFromFinal FslexDFA.lexemesFromFinal
-        Should.equal y.universalFinals  FslexDFA.universalFinals
-        Should.equal y.indicesFromFinal FslexDFA.indicesFromFinal
-        Should.equal y.header           FslexDFA.header
-        Should.equal y.semantics        FslexDFA.semantics
+        Should.equal y.nextStates       FslexDFA2.nextStates
+        Should.equal y.finalLexemes     FslexDFA2.finalLexemes
+        Should.equal y.header           FslexDFA2.header
+        Should.equal y.semantics        FslexDFA2.semantics
 

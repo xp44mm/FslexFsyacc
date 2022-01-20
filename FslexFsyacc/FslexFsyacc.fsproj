@@ -31,6 +31,7 @@
 		<Compile Include="Lex\Partition.fs" />
 		<Compile Include="Lex\PartitionDFA.fs" />
 		<Compile Include="Lex\DFATools.fs" />
+		<Compile Include="Lex\DFA2.fs" />
 		<Compile Include="Lex\DFA.fs" />
 		<Compile Include="Yacc\ProductionUtils.fs" />
 
@@ -66,6 +67,8 @@
 		<Compile Include="Yacc\ParseTableUtils.fs" />
 		
 		<Compile Include="FSharpSourceText.fs" />
+		
+		<Compile Include="Fslex\LexSemanticGenerator2.fs" />
 
 		<Compile Include="Fslex\LexSemanticGenerator.fs" />
 		<Compile Include="Fslex\LexFileNormalization.fs" />
@@ -75,6 +78,7 @@
 		<Compile Include="Fslex\FslexParseTable.fs" />
 		<None Include="Fslex\fslex.fslex" />
 		<Compile Include="Fslex\FslexDFA.fs" />
+		<Compile Include="Fslex\FslexDFA2.fs" />
 		<Compile Include="Fslex\FslexCompiler.fs" />
 		<Compile Include="Fslex\FslexDFAModule.fs" />
 		<Compile Include="Fslex\FslexDFAFile.fs" />

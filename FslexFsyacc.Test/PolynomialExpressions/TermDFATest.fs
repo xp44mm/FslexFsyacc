@@ -25,7 +25,7 @@ type TermDFATest(output:ITestOutputHelper) =
         let tokens = 
             text
             |> FslexTokenUtils.tokenize
-            |> FslexDFA.analyze
+            |> FslexDFA2.analyze
             |> Seq.concat
             |> List.ofSeq
         show tokens
@@ -35,7 +35,7 @@ type TermDFATest(output:ITestOutputHelper) =
         let name = "TermDFA"
         let moduleName = $"PolynomialExpressions.{name}"
 
-        let dfafile = fslex.toFslexDFA()
+        let dfafile = fslex.toFslexDFA2()
         let result = dfafile.generate(moduleName)
         let outputDir = Path.Combine(__SOURCE_DIRECTORY__, $"{name}.fs")
 
@@ -44,14 +44,12 @@ type TermDFATest(output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``2 - valid DFA``() =
-        let y = fslex.toFslexDFA()
+        let y = fslex.toFslexDFA2()
 
-        Should.equal y.nextStates       TermDFA.nextStates
-        Should.equal y.lexemesFromFinal TermDFA.lexemesFromFinal
-        Should.equal y.universalFinals  TermDFA.universalFinals
-        Should.equal y.indicesFromFinal TermDFA.indicesFromFinal
-        Should.equal y.header           TermDFA.header
-        Should.equal y.semantics        TermDFA.semantics
+        Should.equal y.nextStates   TermDFA.nextStates
+        Should.equal y.finalLexemes TermDFA.finalLexemes
+        Should.equal y.header       TermDFA.header
+        Should.equal y.semantics    TermDFA.semantics
 
     [<Fact>]
     member _.``3 - tokenize``() =

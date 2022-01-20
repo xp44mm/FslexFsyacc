@@ -67,7 +67,7 @@ type NFAtoDFATest(output:ITestOutputHelper) =
             10u, 10u
             ]
 
-        let dfa = DFA.fromNFA(ntran, nfinalLexemes)
+        let dfa = DFA2.fromNFA(ntran, nfinalLexemes)
 
         //fig 3-36
         let dtran = set [
@@ -81,15 +81,12 @@ type NFAtoDFATest(output:ITestOutputHelper) =
             (3u,'b',0u)
             ]
 
-        let finalLexemes = [
+        let finalLexemes = [|
             set [3u], Set.empty
-            ]
+            |]
 
         Should.equal dfa.nextStates (DFATools.getNextStates dtran)
-        Should.equal dfa.lexemesFromFinal (DFATools.getLexemesFromFinal finalLexemes)
-        Should.equal dfa.universalFinals (DFATools.getUniversalFinals finalLexemes)
-        Should.equal dfa.indicesFromFinal (DFATools.getIndeciesFromFinal finalLexemes)
-
+        Should.equal dfa.finalLexemes finalLexemes
 
 
     [<Fact>]
@@ -107,7 +104,7 @@ type NFAtoDFATest(output:ITestOutputHelper) =
 
         let nfinalLexemes = [4u,4u]
 
-        let dfa = DFA.fromNFA(n3, nfinalLexemes)
+        let dfa = DFA2.fromNFA(n3, nfinalLexemes)
 
         let dtran = set [
             0u,'a',0u;
@@ -115,15 +112,12 @@ type NFAtoDFATest(output:ITestOutputHelper) =
             1u,'b',1u
             ]
 
-        let finalLexemes = [
+        let finalLexemes = [|
             set [1u],Set.empty
-            ]
+            |]
 
         Should.equal dfa.nextStates (DFATools.getNextStates dtran)
-        Should.equal dfa.lexemesFromFinal (DFATools.getLexemesFromFinal finalLexemes)
-        Should.equal dfa.universalFinals (DFATools.getUniversalFinals finalLexemes)
-        Should.equal dfa.indicesFromFinal (DFATools.getIndeciesFromFinal finalLexemes)
-
+        Should.equal dfa.finalLexemes finalLexemes
     [<Fact>]
     member _.``Example 3-28: fig3-52 to fig3-54``() =
         //fig 3-52
@@ -146,7 +140,7 @@ type NFAtoDFATest(output:ITestOutputHelper) =
             8u,8u
             ]
 
-        let dfa = DFA.fromNFA(ntran, finalLexemes)
+        let dfa = DFA2.fromNFA(ntran, finalLexemes)
 
         // fig 3-54
         let dtran =set [
@@ -160,13 +154,11 @@ type NFAtoDFATest(output:ITestOutputHelper) =
             (4u,'b',5u);
             (5u,'b',5u)]
 
-        let finalLexemes = [
+        let finalLexemes = [|
             set [1u]   ,Set.empty
             set [3u]   ,Set.empty
             set [2u;5u],Set.empty
-            ]
+            |]
 
         Should.equal dfa.nextStates (DFATools.getNextStates dtran)
-        Should.equal dfa.lexemesFromFinal (DFATools.getLexemesFromFinal finalLexemes)
-        Should.equal dfa.universalFinals (DFATools.getUniversalFinals finalLexemes)
-        Should.equal dfa.indicesFromFinal (DFATools.getIndeciesFromFinal finalLexemes)
+        Should.equal dfa.finalLexemes finalLexemes
