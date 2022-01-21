@@ -45,11 +45,12 @@
 		<Compile Include="PolynomialExpressions\Tokenizer.fs" />
 		<Compile Include="PolynomialExpressions\TokenizerTest.fs" />
 		<None Include="PolynomialExpressions\term.fslex" />
-		<Compile Include="PolynomialExpressions\TermDFA.fs" />
+		<Compile Include="PolynomialExpressions\TermDFA2.fs" />
 		<Compile Include="PolynomialExpressions\TermDFATest.fs" />
 		<Compile Include="PolynomialExpressions\Parser.fs" />
 		<Compile Include="PolynomialExpressions\ParserTest.fs" />
 		<Compile Include="PolynomialExpressions\AnalyzerTest.fs" />
+		<Compile Include="PolynomialExpressions\TermDFA.fs" />
 
 		<Compile Include="Program.fs" />
 	</ItemGroup>

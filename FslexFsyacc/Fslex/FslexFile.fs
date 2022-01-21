@@ -44,42 +44,6 @@ type FslexFile =
             rules = rules
         }
 
-    //member this.toFslexDFA_old() =
-    //    let this = this.eliminateHoles()
-    //    let patterns = this.rules |> List.map fst
-    //    let dfa = DFA.fromRgx patterns
-    //    let nextStates : (uint32*(string*uint32)[])[] =
-    //        dfa.nextStates
-    //        |> Map.toArray
-    //        |> Array.map(fun(i,mp)->
-    //            let arr = mp |> Map.toArray
-    //            i,arr
-    //        )
-    //    let lexemesFromFinal: (uint32*uint32[])[] =
-    //        dfa.lexemesFromFinal
-    //        |> Map.toArray
-    //        |> Array.map(fun(i,st)->
-    //            let arr = st |> Set.toArray
-    //            i,arr
-    //        )
-    //    let universalFinals : uint32[] =
-    //        dfa.universalFinals |> Set.toArray
-
-    //    let indicesFromFinal: (uint32*int)[] =
-    //        dfa.indicesFromFinal
-    //        |> Map.toArray
-
-    //    let semantics = this.rules |> List.map snd |> List.toArray
-
-    //    {
-    //        nextStates = nextStates 
-    //        lexemesFromFinal = lexemesFromFinal 
-    //        universalFinals=universalFinals
-    //        indicesFromFinal=indicesFromFinal
-    //        header = this.header
-    //        semantics = semantics 
-    //    }
-
     member this.toFslexDFA() =
         let this = this.eliminateHoles()
         let patterns = this.rules |> List.map fst
@@ -102,4 +66,28 @@ type FslexFile =
             finalLexemes = finalLexemes
             header = this.header
             semantics = semantics 
+        }
+
+    member this.toFslexDFAFile() =
+        let this = this.eliminateHoles()
+        let patterns = this.rules |> List.map fst
+        let dfa = DFA.fromRgx patterns
+        let nextStates : (uint32*(string*uint32)[])[] =
+            dfa.nextStates
+            |> Map.toArray
+            |> Array.map(fun(i,mp)->
+                let arr = mp |> Map.toArray
+                i,arr
+            )
+
+        let rules =
+            dfa.finalLexemes
+            |> Array.mapi(fun i (fnls,lxms)->
+                let _,sem = this.rules.[i]
+                Set.toArray fnls,Set.toArray lxms,sem)
+
+        {
+            header = this.header
+            nextStates = nextStates 
+            rules = rules 
         }
