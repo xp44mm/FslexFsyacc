@@ -12,6 +12,6 @@ let fRules:(uint32[]*uint32[]*_)[] = [|
         toTerm lexbuf
 |]
 open FslexFsyacc.Runtime
-let analyzer = Analyzer(nextStates, fRules)
+let analyzer = Analyzer2(nextStates, fRules)
 let analyze (tokens:seq<_>) = 
     analyzer.analyze(tokens,getTag)

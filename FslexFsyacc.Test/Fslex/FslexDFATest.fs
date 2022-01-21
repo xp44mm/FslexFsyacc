@@ -27,12 +27,12 @@ type FslexDFATest(output:ITestOutputHelper) =
         show dfs
         show rls
         
-    [<Fact(Skip="once and for all!")>] // 
+    [<Fact>] // (Skip="once and for all!")
     member _.``1 - generate DFA``() =
-        let name = "FslexDFA"
+        let name = "FslexDFA2"
         let moduleName = $"FslexFsyacc.Fslex.{name}"
 
-        let y = fslex.toFslexDFA()
+        let y = fslex.toFslexDFAFile()
         let result = y.generate(moduleName)
 
         let outputDir = Path.Combine(sourcePath, $"{name}.fs")
