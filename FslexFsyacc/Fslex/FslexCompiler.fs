@@ -7,7 +7,7 @@ let parseToStructuralData (fslex:string) =
     let tokens = 
         fslex
         |> FslexTokenUtils.tokenize
-        |> FslexDFA2.analyze
+        |> FslexDFA.analyze
         |> Seq.concat
     FslexParseTable.parse tokens
 

@@ -9,11 +9,11 @@
 		<Copyright>xp44mm</Copyright>
 		<PackageProjectUrl>https://github.com/xp44mm/FslexFsyacc</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/xp44mm/FslexFsyacc</RepositoryUrl>
-		<PackageTags>lex;yacc;fsharp compiler</PackageTags>
-		<PackageReleaseNotes>lex dfa format changed.</PackageReleaseNotes>
+		<PackageTags>lex;yacc;compiler;parser;analyzer</PackageTags>
+		<PackageReleaseNotes>analyzer parameters changed.</PackageReleaseNotes>
 		<Company>34696643@qq.com</Company>
 		<Authors>xp44m</Authors>
-		<Version>1.2.2</Version>
+		<Version>1.2.3</Version>
 		<IsPublishable>True</IsPublishable>
 		<PackageReadmeFile>readme.md</PackageReadmeFile>
 	</PropertyGroup>
@@ -65,12 +65,10 @@
 		<None Include="Fslex\fslex.fsyacc" />
 		<Compile Include="Fslex\FslexParseTable.fs" />
 		<None Include="Fslex\fslex.fslex" />
-		<Compile Include="Fslex\FslexDFA2.fs" />
+		<Compile Include="Fslex\FslexDFA.fs" />
 		<Compile Include="Fslex\FslexCompiler.fs" />
-		<Compile Include="Fslex\FslexDFAModule.fs" />
 		<Compile Include="Fslex\FslexDFAFile.fs" />
 		<Compile Include="Fslex\FslexFile.fs" />
-		<Compile Include="Fslex\FslexDFA.fs" />
 
 		<Compile Include="Fsyacc\SemanticGenerator.fs" />
 		<Compile Include="Fsyacc\FsyaccToken.fs" />

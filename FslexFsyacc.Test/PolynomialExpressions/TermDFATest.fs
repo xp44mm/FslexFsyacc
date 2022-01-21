@@ -30,9 +30,9 @@ type TermDFATest(output:ITestOutputHelper) =
             |> List.ofSeq
         show tokens
 
-    [<Fact>] // (Skip="once and for all!")
+    [<Fact(Skip="once and for all!")>] // 
     member _.``1 - generate DFA``() =
-        let name = "TermDFA2"
+        let name = "TermDFA"
         let moduleName = $"PolynomialExpressions.{name}"
 
         let dfafile = fslex.toFslexDFAFile()
@@ -46,9 +46,9 @@ type TermDFATest(output:ITestOutputHelper) =
     member _.``2 - valid DFA``() =
         let y = fslex.toFslexDFAFile()
 
-        Should.equal y.nextStates TermDFA2.nextStates
-        Should.equal y.header     TermDFA2.header
-        Should.equal y.rules      TermDFA2.rules
+        Should.equal y.nextStates TermDFA.nextStates
+        Should.equal y.header     TermDFA.header
+        Should.equal y.rules      TermDFA.rules
 
     [<Fact>]
     member _.``3 - tokenize``() =

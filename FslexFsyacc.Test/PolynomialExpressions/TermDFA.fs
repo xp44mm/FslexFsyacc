@@ -1,18 +1,17 @@
 module PolynomialExpressions.TermDFA
-let nextStates = [|0u,[|"+",1u;"-",1u;"ID",3u;"INT",2u|];1u,[|"ID",3u;"INT",2u|];2u,[|"ID",3u|];3u,[|"**",4u|];4u,[|"INT",5u|]|]
-let finalLexemes:(uint32[]*uint32[])[] = [|[|2u|],[||];[|3u;5u|],[||]|]
 let header = "open PolynomialExpressions.Tokenizer\r\ntype token = int*int*Token"
-let semantics = [|"// multiline test\r\ntoConst lexbuf";"toTerm lexbuf"|]
+let nextStates = [|0u,[|"+",1u;"-",1u;"ID",3u;"INT",2u|];1u,[|"ID",3u;"INT",2u|];2u,[|"ID",3u|];3u,[|"**",4u|];4u,[|"INT",5u|]|]
+let rules:(uint32[]*uint32[]*string)[] = [|[|2u|],[||],"// multiline test\r\ntoConst lexbuf";[|3u;5u|],[||],"toTerm lexbuf"|]
 open PolynomialExpressions.Tokenizer
 type token = int*int*Token
-let mappers = [|
-    fun (lexbuf:token list) ->
+let fxRules:(uint32[]*uint32[]*_)[] = [|
+    [|2u|],[||],fun (lexbuf:token list) ->
         // multiline test
         toConst lexbuf
-    fun (lexbuf:token list) ->
+    [|3u;5u|],[||],fun (lexbuf:token list) ->
         toTerm lexbuf
 |]
 open FslexFsyacc.Runtime
-let analyzer = Analyzer(nextStates, finalLexemes, mappers)
+let analyzer = Analyzer(nextStates, fxRules)
 let analyze (tokens:seq<_>) = 
     analyzer.analyze(tokens,getTag)

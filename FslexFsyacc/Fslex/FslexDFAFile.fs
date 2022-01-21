@@ -27,12 +27,12 @@ type FslexDFAFile =
             $"let nextStates = {Literal.stringify this.nextStates}"
             $"let rules:(uint32[]*uint32[]*string)[] = {Literal.stringify this.rules}"
             this.header
-            "let fRules:(uint32[]*uint32[]*_)[] = [|"
+            "let fxRules:(uint32[]*uint32[]*_)[] = [|"
             rules |> Line.indentCodeBlock 4
             "|]"
 
             "open FslexFsyacc.Runtime"
-            "let analyzer = Analyzer2(nextStates, fRules)"
+            "let analyzer = Analyzer(nextStates, fxRules)"
             "let analyze (tokens:seq<_>) = "
             "    analyzer.analyze(tokens,getTag)"
         ]

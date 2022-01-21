@@ -5,6 +5,6 @@ open PolynomialExpressions
 
 let parse (posTokens:seq<int*int*Token>) = 
     posTokens
-    |> TermDFA2.analyze
+    |> TermDFA.analyze
     |> Seq.toList
 

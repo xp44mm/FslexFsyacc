@@ -27,9 +27,9 @@ type FslexDFATest(output:ITestOutputHelper) =
         show dfs
         show rls
         
-    [<Fact>] // (Skip="once and for all!")
+    [<Fact(Skip="once and for all!")>] // 
     member _.``1 - generate DFA``() =
-        let name = "FslexDFA2"
+        let name = "FslexDFA"
         let moduleName = $"FslexFsyacc.Fslex.{name}"
 
         let y = fslex.toFslexDFAFile()
@@ -41,10 +41,9 @@ type FslexDFATest(output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``2 - valid DFA``() =
-        let y = fslex.toFslexDFA()
+        let y = fslex.toFslexDFAFile()
 
-        Should.equal y.nextStates   FslexDFA.nextStates
-        Should.equal y.finalLexemes FslexDFA.finalLexemes
-        Should.equal y.header       FslexDFA.header
-        Should.equal y.semantics    FslexDFA.semantics
+        Should.equal y.nextStates FslexDFA.nextStates
+        Should.equal y.header     FslexDFA.header
+        Should.equal y.rules      FslexDFA.rules
 

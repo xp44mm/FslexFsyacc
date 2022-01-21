@@ -44,29 +44,29 @@ type FslexFile =
             rules = rules
         }
 
-    member this.toFslexDFA() =
-        let this = this.eliminateHoles()
-        let patterns = this.rules |> List.map fst
-        let dfa = DFA.fromRgx patterns
-        let nextStates : (uint32*(string*uint32)[])[] =
-            dfa.nextStates
-            |> Map.toArray
-            |> Array.map(fun(i,mp)->
-                let arr = mp |> Map.toArray
-                i,arr
-            )
-        let finalLexemes =
-            dfa.finalLexemes
-            |> Array.map(fun(fnls,lxms)->Set.toArray fnls,Set.toArray lxms)
+    //member this.toFslexDFA() =
+    //    let this = this.eliminateHoles()
+    //    let patterns = this.rules |> List.map fst
+    //    let dfa = DFA.fromRgx patterns
+    //    let nextStates : (uint32*(string*uint32)[])[] =
+    //        dfa.nextStates
+    //        |> Map.toArray
+    //        |> Array.map(fun(i,mp)->
+    //            let arr = mp |> Map.toArray
+    //            i,arr
+    //        )
+    //    let finalLexemes =
+    //        dfa.finalLexemes
+    //        |> Array.map(fun(fnls,lxms)->Set.toArray fnls,Set.toArray lxms)
 
-        let semantics = this.rules |> List.map snd |> List.toArray
+    //    let semantics = this.rules |> List.map snd |> List.toArray
 
-        {
-            nextStates = nextStates 
-            finalLexemes = finalLexemes
-            header = this.header
-            semantics = semantics 
-        }
+    //    {
+    //        nextStates = nextStates 
+    //        finalLexemes = finalLexemes
+    //        header = this.header
+    //        semantics = semantics 
+    //    }
 
     member this.toFslexDFAFile() =
         let this = this.eliminateHoles()

@@ -3,13 +3,10 @@
 open FSharp.Idioms
 
 /// 解析带数据的对象
-/// final状态是包括向前看的最长状态。
-/// lexeme状态是回退后最终匹配的较短状态。
 type Analyzer<'tok,'u>
     (
         nextStates: (uint32*(string*uint32)[])[], // state -> tag -> state
-        finalLexemes: (uint32[]*uint32[])[],
-        mappers: ('tok list -> 'u)[]
+        rules: (uint32[]*uint32[]*('tok list -> 'u))[]
     ) =
 
     // state -> tag -> state
@@ -18,31 +15,36 @@ type Analyzer<'tok,'u>
         |> Map.ofArray
         |> Map.map(fun _ arr -> Map.ofArray arr)
 
+    /// final状态是包括向前看的最长状态。
+    let finals =
+        rules
+        |> Array.map Triple.first
+
     let universalFinals = 
-        finalLexemes
-        |> Array.collect fst
+        finals
+        |> Array.concat
         |> Set.ofArray
 
+    /// lexeme状态是回退后，实际取词状态。
+    // final -> lexemes
+    let lexemesFromFinal =
+        rules
+        |> Array.filter(fun(_,lxms,_)-> lxms.Length>0) // 不包含沒有lookahead的接受狀態。
+        |> Array.collect(fun(finals,lexemes,_) ->
+            finals
+            |> Array.map(fun e -> e, Set.ofArray lexemes)
+        )
+        |> Map.ofArray
+
     let indicesFromFinal =
-        finalLexemes
-        |> Array.mapi(fun i (fs,_) -> fs |> Array.map(fun f -> f,i))
+        finals
+        |> Array.mapi(fun i fs -> fs |> Array.map(fun f -> f,i))
         |> Array.concat
         |> Map.ofArray
 
-    // final -> lexemes
-    let lexemesFromFinal =
-        finalLexemes
-        |> Array.filter(fun(_,lxms)-> lxms.Length>0) // 不包含沒有lookahead的接受狀態。
-        |> Array.collect(fun(finals,lexemes) ->
-            finals
-            |> Array.map(fun e -> e, lexemes)
-        )
-        |> Map.ofArray
-        |> Map.map(fun _ arr -> Set.ofArray arr)
-
     let finalMappers =
         indicesFromFinal
-        |> Map.map(fun fnl i -> mappers.[i])
+        |> Map.map(fun final i -> Triple.last rules.[i])
     
     let tryNextState state symbol =
         if nextStates.ContainsKey(state) && nextStates.[state].ContainsKey(symbol) then
