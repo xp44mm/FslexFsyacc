@@ -13,7 +13,7 @@ type FslexDFAFile =
     }
 
     member this.generate(moduleName:string) =
-        let rules = 
+        let fxRules = 
             this.rules
             |> Array.map(fun (f,l,g) -> 
                 let fn = LexSemanticGenerator.decorateSemantic g
@@ -28,7 +28,7 @@ type FslexDFAFile =
             $"let rules:(uint32[]*uint32[]*string)[] = {Literal.stringify this.rules}"
             this.header
             "let fxRules:(uint32[]*uint32[]*_)[] = [|"
-            rules |> Line.indentCodeBlock 4
+            fxRules |> Line.indentCodeBlock 4
             "|]"
 
             "open FslexFsyacc.Runtime"

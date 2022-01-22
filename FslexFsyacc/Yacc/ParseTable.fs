@@ -17,27 +17,27 @@ type ParseTable =
         ) =
 
         // 动作无歧义的表
-        let tbl = 
+        let tbl =
             ParsingTable.create(
                 mainProductions,
                 productionNames,
                 precedences
             )
 
-        let encoder = 
+        let encoder =
             {
-                productions = 
+                productions =
                     ParseTableEncoder.getProductions tbl.grammar.productions
                 kernels = tbl.kernels
             }:ParseTableEncoder
 
         {
-            productions = 
-                tbl.grammar.productions 
-                |> Set.toArray            
-            closures = 
+            productions =
+                tbl.grammar.productions
+                |> Set.toArray
+            closures =
                 encoder.encodeClosures tbl.closures
-            actions = 
+            actions =
                 encoder.encodeActions tbl.actions
             encoder = encoder
         }

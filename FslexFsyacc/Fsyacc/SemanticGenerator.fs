@@ -29,7 +29,7 @@ let decorateSemantic (typeAnnotations:Map<string,string>) (prodSymbols:string li
     let funcDef =
         [
             "fun (ss:obj[]) ->"
-            $"{space4 2}// {renderProduction prodSymbols}"
+            //$"{space4 2}// {renderProduction prodSymbols}"
             if semantic = "" then
                 $"{space4 2}null"
             else

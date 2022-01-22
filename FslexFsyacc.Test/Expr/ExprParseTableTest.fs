@@ -82,15 +82,32 @@ type ExprParseTableTest(output:ITestOutputHelper) =
         File.WriteAllText(outputDir,fsharpCode)
         output.WriteLine($"output yacc:{outputDir}")
 
+    [<Fact>] // (Skip="once for all!")
+    member _.``5 - expr generateParseTable2``() =
+        let fsyacc = NormFsyaccFile.fromRaw rawFsyacc
+        let tbl = fsyacc.toFsyaccParseTableFile()
+        //show tbl
+
+        let name = "ExprParseTable2"
+        let moduleName = $"Expr.{name}"
+
+        //解析表数据
+        let fsharpCode = tbl.generate(moduleName)
+
+        let outputDir = Path.Combine(__SOURCE_DIRECTORY__, $"{name}.fs")
+        File.WriteAllText(outputDir,fsharpCode)
+        output.WriteLine($"output yacc:\r\n{outputDir}")
+
+
     [<Fact>]
     member _.``6 - valid ParseTable``() =
-        let t = fsyacc.toFsyaccParseTable()
+        let fsyacc = NormFsyaccFile.fromRaw rawFsyacc
+        let t = fsyacc.toFsyaccParseTableFile()
 
-        Should.equal t.header       ExprParseTable.header
-        Should.equal t.productions  ExprParseTable.productions
-        Should.equal t.actions      ExprParseTable.actions
-        Should.equal t.closures     ExprParseTable.closures
-        Should.equal t.semantics    ExprParseTable.semantics
-        Should.equal t.declarations ExprParseTable.declarations
+        Should.equal t.header       ExprParseTable2.header
+        Should.equal t.rules        ExprParseTable2.rules
+        Should.equal t.actions      ExprParseTable2.actions
+        Should.equal t.closures     ExprParseTable2.closures
+        Should.equal t.declarations ExprParseTable2.declarations
 
 

@@ -62,10 +62,10 @@
 		<Compile Include="Fslex\LexFileNormalization.fs" />
 		<Compile Include="Fslex\FslexToken.fs" />
 		<Compile Include="Fslex\FslexTokenUtils.fs" />
-		<None Include="Fslex\fslex.fsyacc" />
-		<Compile Include="Fslex\FslexParseTable.fs" />
 		<None Include="Fslex\fslex.fslex" />
 		<Compile Include="Fslex\FslexDFA.fs" />
+		<None Include="Fslex\fslex.fsyacc" />
+		<Compile Include="Fslex\FslexParseTable.fs" />
 		<Compile Include="Fslex\FslexCompiler.fs" />
 		<Compile Include="Fslex\FslexDFAFile.fs" />
 		<Compile Include="Fslex\FslexFile.fs" />
@@ -76,8 +76,10 @@
 		<None Include="Fsyacc\fsyacc.fsyacc" />
 		<Compile Include="Fsyacc\FsyaccParseTable.fs" />
 		<Compile Include="Fsyacc\FsyaccCompiler.fs" />
+		<Compile Include="Fsyacc\FsyaccParseTableFile.fs" />
 		<Compile Include="Fsyacc\FsyaccParseTableModule.fs" />
 		<Compile Include="Fsyacc\FsyaccFile.fs" />
+		<Compile Include="Fsyacc\NormFsyaccFile.fs" />
 		<Compile Include="Fsyacc\AlteredFsyaccFile.fs" />
 		
 		<Compile Include="SourceText.fs" />

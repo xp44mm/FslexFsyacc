@@ -19,6 +19,7 @@
   <ItemGroup>
     <Compile Include="Utils.fs" />
     <Compile Include="Analyzer.fs" />
+    <Compile Include="Parser2.fs" />
     <Compile Include="Parser.fs" />
   </ItemGroup>
 
