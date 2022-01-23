@@ -25,7 +25,6 @@ type SemanticGeneratorTest(output:ITestOutputHelper) =
         let e = 
             """
 fun (ss:obj[]) ->
-        // expr -> expr "+" expr
         let s0 = unbox<float> ss.[0]
         let s2 = unbox<float> ss.[2]
         let result:float =

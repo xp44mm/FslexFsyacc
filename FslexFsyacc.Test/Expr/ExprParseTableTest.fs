@@ -19,7 +19,7 @@ type ExprParseTableTest(output:ITestOutputHelper) =
     let filePath = Path.Combine(__SOURCE_DIRECTORY__, @"expr.fsyacc")
     let text = File.ReadAllText(filePath)
     let rawFsyacc = FsyaccFile.parse text
-    let fsyacc = AlteredFsyaccFile.fromRaw(rawFsyacc)
+    let fsyacc = NormFsyaccFile.fromRaw rawFsyacc
 
     [<Fact>]
     member _.``0 - compiler test``() =
@@ -29,7 +29,9 @@ type ExprParseTableTest(output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``1 - all tokens``() =
-        let grammar = Grammar.from fsyacc.mainProductions
+        let grammar = 
+            fsyacc.getMainProductions() 
+            |> Grammar.from
 
         //show tokens
         let y = set ["(";")";"*";"+";"-";"/";"NUMBER"]
@@ -38,13 +40,15 @@ type ExprParseTableTest(output:ITestOutputHelper) =
     [<Fact>]
     member _.``2 - ambiguous state details``() =
         let states = 
-            AmbiguousCollection.create fsyacc.mainProductions
+            fsyacc.getMainProductions() 
+            |> AmbiguousCollection.create
         show states
 
     [<Fact>]
     member _.``3 - conflicted items``() =
         let collection = 
-            AmbiguousCollection.create fsyacc.mainProductions
+            fsyacc.getMainProductions() 
+            |> AmbiguousCollection.create
 
         // 显示冲突状态的冲突项目
         let conflictedClosures =
@@ -55,7 +59,8 @@ type ExprParseTableTest(output:ITestOutputHelper) =
     [<Fact>]
     member _.``4 - %prec of productions``() =
         let collection = 
-            AmbiguousCollection.create fsyacc.mainProductions
+            fsyacc.getMainProductions() 
+            |> AmbiguousCollection.create
 
         let conflictedClosures =
             collection.filterConflictedClosures() 
@@ -67,31 +72,15 @@ type ExprParseTableTest(output:ITestOutputHelper) =
             ProductionUtils.precedenceOfProductions collection.grammar.terminals productions
         show pprods
 
-    [<Fact(Skip="once for all!")>] // 
-    member _.``5 - expr generateParseTable``() =
-        let tbl = fsyacc.toFsyaccParseTable()
-        //show tbl
-
-        let name = "ExprParseTable"
-        let moduleName = $"Expr.{name}"
-
-        //解析表数据
-        let fsharpCode = tbl.generate(moduleName)
-
-        let outputDir = Path.Combine(__SOURCE_DIRECTORY__, $"{name}.fs")
-        File.WriteAllText(outputDir,fsharpCode)
-        output.WriteLine($"output yacc:{outputDir}")
-
     [<Fact>] // (Skip="once for all!")
     member _.``5 - expr generateParseTable2``() =
-        let fsyacc = NormFsyaccFile.fromRaw rawFsyacc
-        let tbl = fsyacc.toFsyaccParseTableFile()
-        //show tbl
 
         let name = "ExprParseTable2"
         let moduleName = $"Expr.{name}"
 
         //解析表数据
+        let tbl = fsyacc.toFsyaccParseTableFile()
+        //show tbl
         let fsharpCode = tbl.generate(moduleName)
 
         let outputDir = Path.Combine(__SOURCE_DIRECTORY__, $"{name}.fs")
@@ -101,7 +90,6 @@ type ExprParseTableTest(output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``6 - valid ParseTable``() =
-        let fsyacc = NormFsyaccFile.fromRaw rawFsyacc
         let t = fsyacc.toFsyaccParseTableFile()
 
         Should.equal t.header       ExprParseTable2.header

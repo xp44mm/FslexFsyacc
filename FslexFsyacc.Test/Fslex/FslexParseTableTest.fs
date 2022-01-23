@@ -24,7 +24,7 @@ type FslexParseTableTest(output:ITestOutputHelper) =
     let filePath = Path.Combine(sourcePath, @"fslex.fsyacc")
     let text = File.ReadAllText(filePath)
     let rawFsyacc = FsyaccFile.parse text
-    let fsyacc = AlteredFsyaccFile.fromRaw rawFsyacc
+    let fsyacc = NormFsyaccFile.fromRaw rawFsyacc
 
     [<Fact>]
     member _.``0 - compiler test``() =
@@ -34,7 +34,8 @@ type FslexParseTableTest(output:ITestOutputHelper) =
     [<Fact>]
     member _.``1 - 显示冲突状态的冲突项目``() =
         let collection =
-            AmbiguousCollection.create fsyacc.mainProductions
+            fsyacc.getMainProductions()
+            |> AmbiguousCollection.create
         let conflicts =
             collection.filterConflictedClosures()
         //show conflicts
@@ -77,7 +78,8 @@ type FslexParseTableTest(output:ITestOutputHelper) =
     [<Fact>]
     member _.``2 - 汇总冲突的产生式``() =
         let collection =
-            AmbiguousCollection.create fsyacc.mainProductions
+            fsyacc.getMainProductions()
+            |> AmbiguousCollection.create
         let conflicts =
             collection.filterConflictedClosures()
 
@@ -100,7 +102,9 @@ type FslexParseTableTest(output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``3 - print the template of type annotaitions``() =
-        let grammar = Grammar.from fsyacc.mainProductions
+        let grammar = 
+            fsyacc.getMainProductions() 
+            |> Grammar.from
 
         let symbols =
             grammar.symbols
@@ -115,17 +119,21 @@ type FslexParseTableTest(output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``4 - list all tokens``() =
-        let grammar = Grammar.from fsyacc.mainProductions
+        let grammar = 
+            fsyacc.getMainProductions() 
+            |> Grammar.from
+
         let y = set ["%%";"&";"(";")";"*";"+";"/";"=";"?";"CAP";"HEADER";"HOLE";"ID";"QUOTE";"SEMANTIC";"[";"]";"|"]
 
         let tokens = grammar.symbols - grammar.nonterminals
         show tokens
 
-    [<Fact(Skip="once for all!")>] //
+    [<Fact(Skip="once for all!")>] // 
     member _.``5 - generate ParseTable``() =
-        let name = "FslexParseTable"
+        let name = "FslexParseTable2"
         let moduleName = $"FslexFsyacc.Fslex.{name}"
-        let parseTbl = fsyacc.toFsyaccParseTable()
+        let fsyacc = NormFsyaccFile.fromRaw rawFsyacc
+        let parseTbl = fsyacc.toFsyaccParseTableFile()
         let fsharpCode = parseTbl.generate(moduleName)
         let outputDir = Path.Combine(sourcePath, $"{name}.fs")
         File.WriteAllText(outputDir,fsharpCode)
@@ -133,18 +141,20 @@ type FslexParseTableTest(output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``7 - valid ParseTable``() =
-        let t = fsyacc.toFsyaccParseTable()
+        let t = fsyacc.toFsyaccParseTableFile()
 
-        Should.equal t.header       FslexParseTable.header
-        Should.equal t.productions  FslexParseTable.productions
-        Should.equal t.actions      FslexParseTable.actions
-        Should.equal t.closures     FslexParseTable.closures
-        Should.equal t.semantics    FslexParseTable.semantics
-        Should.equal t.declarations FslexParseTable.declarations
+        Should.equal t.header       FslexParseTable2.header
+        Should.equal t.rules  FslexParseTable2.rules
+        Should.equal t.actions      FslexParseTable2.actions
+        Should.equal t.closures     FslexParseTable2.closures
+        Should.equal t.declarations FslexParseTable2.declarations
 
     [<Fact>]
     member _.``8 - regex first or last token test``() =
-        let grammar = Grammar.from fsyacc.mainProductions
+        let grammar = 
+            fsyacc.getMainProductions() 
+            |> Grammar.from
+
         let lastsOfExpr = grammar.lasts.["expr"]
         let firstsOfExpr = grammar.firsts.["expr"]
 

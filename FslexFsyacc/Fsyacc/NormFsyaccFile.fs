@@ -56,10 +56,13 @@ type NormFsyaccFile =
             declarations = fsyacc.declarations
         }
 
+    member this.getMainProductions() =
+        this.rules |> Array.map fst |> Array.toList
+            
     member this.toFsyaccParseTableFile() = 
         let parseTable = 
             ParseTable.create(
-                this.rules |> Array.map fst |> Array.toList,
+                this.getMainProductions(),
                 this.productionNames,
                 this.precedences)
         { 

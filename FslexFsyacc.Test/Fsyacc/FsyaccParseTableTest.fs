@@ -21,7 +21,7 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
     let filePath = Path.Combine(sourcePath, @"fsyacc.fsyacc")
     let text = File.ReadAllText(filePath)
     let rawFsyacc = FsyaccFile.parse text
-    let fsyacc = AlteredFsyaccFile.fromRaw rawFsyacc
+    let fsyacc = NormFsyaccFile.fromRaw rawFsyacc
 
     [<Fact>]
     member _.``0 - compiler test``() =
@@ -31,7 +31,8 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
     [<Fact>]
     member _.``1 - 显示冲突状态的冲突项目``() =
         let collection = 
-            AmbiguousCollection.create fsyacc.mainProductions
+            fsyacc.getMainProductions()
+            |> AmbiguousCollection.create
         let conflictedClosures =
             collection.filterConflictedClosures() 
         //show conflictedClosures
@@ -39,7 +40,9 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``2 - print the template of type annotaitions``() =
-        let grammar = Grammar.from fsyacc.mainProductions
+        let grammar = 
+            fsyacc.getMainProductions()
+            |>          Grammar.from 
 
         let symbols = 
             grammar.symbols 
@@ -54,33 +57,33 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``3 - list all tokens``() =
-        let grammar = Grammar.from fsyacc.mainProductions
+        let grammar = 
+            fsyacc.getMainProductions()
+            |> Grammar.from
 
         let tokens = grammar.symbols - grammar.nonterminals
         show tokens
 
-    [<Fact(Skip="once for all!")>] // 
+    [<Fact>] // (Skip="once for all!")
     member _.``4 - generate ParseTable``() =
-        let name = "FsyaccParseTable"
+        let name = "FsyaccParseTable2"
         let moduleName = $"FslexFsyacc.Fsyacc.{name}"
 
         //解析表数据
-        let parseTbl = fsyacc.toFsyaccParseTable()
+        let parseTbl = fsyacc.toFsyaccParseTableFile()
         let fsharpCode = parseTbl.generate(moduleName)
 
         let outputDir = Path.Combine(sourcePath, $"{name}.fs")
         File.WriteAllText(outputDir,fsharpCode)
         output.WriteLine("output yacc:"+outputDir)
 
-
     [<Fact>]
     member _.``5 - valid ParseTable``() =
-        let t = fsyacc.toFsyaccParseTable()
+        let t = fsyacc.toFsyaccParseTableFile()
 
-        Should.equal t.header       FsyaccParseTable.header
-        Should.equal t.productions  FsyaccParseTable.productions
-        Should.equal t.actions      FsyaccParseTable.actions
-        Should.equal t.closures     FsyaccParseTable.closures
-        Should.equal t.semantics    FsyaccParseTable.semantics
-        Should.equal t.declarations FsyaccParseTable.declarations
+        Should.equal t.header       FsyaccParseTable2.header
+        Should.equal t.rules        FsyaccParseTable2.rules
+        Should.equal t.actions      FsyaccParseTable2.actions
+        Should.equal t.closures     FsyaccParseTable2.closures
+        Should.equal t.declarations FsyaccParseTable2.declarations
 
