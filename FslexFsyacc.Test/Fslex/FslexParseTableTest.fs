@@ -130,7 +130,7 @@ type FslexParseTableTest(output:ITestOutputHelper) =
 
     [<Fact(Skip="once for all!")>] // 
     member _.``5 - generate ParseTable``() =
-        let name = "FslexParseTable2"
+        let name = "FslexParseTable"
         let moduleName = $"FslexFsyacc.Fslex.{name}"
         let fsyacc = NormFsyaccFile.fromRaw rawFsyacc
         let parseTbl = fsyacc.toFsyaccParseTableFile()
@@ -143,11 +143,11 @@ type FslexParseTableTest(output:ITestOutputHelper) =
     member _.``7 - valid ParseTable``() =
         let t = fsyacc.toFsyaccParseTableFile()
 
-        Should.equal t.header       FslexParseTable2.header
-        Should.equal t.rules  FslexParseTable2.rules
-        Should.equal t.actions      FslexParseTable2.actions
-        Should.equal t.closures     FslexParseTable2.closures
-        Should.equal t.declarations FslexParseTable2.declarations
+        Should.equal t.header       FslexParseTable.header
+        Should.equal t.rules  FslexParseTable.rules
+        Should.equal t.actions      FslexParseTable.actions
+        Should.equal t.closures     FslexParseTable.closures
+        Should.equal t.declarations FslexParseTable.declarations
 
     [<Fact>]
     member _.``8 - regex first or last token test``() =

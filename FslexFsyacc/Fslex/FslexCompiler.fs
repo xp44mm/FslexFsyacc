@@ -9,7 +9,7 @@ let parseToStructuralData (fslex:string) =
         |> FslexTokenUtils.tokenize
         |> FslexDFA.analyze
         |> Seq.concat
-    FslexParseTable2.parse tokens
+    FslexParseTable.parse tokens
 
 ///获取被使用的正则定义名称
 let getUsedNames

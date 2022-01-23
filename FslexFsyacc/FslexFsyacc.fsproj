@@ -10,10 +10,10 @@
 		<PackageProjectUrl>https://github.com/xp44mm/FslexFsyacc</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/xp44mm/FslexFsyacc</RepositoryUrl>
 		<PackageTags>lex;yacc;compiler;parser;analyzer</PackageTags>
-		<PackageReleaseNotes>analyzer parameters changed.</PackageReleaseNotes>
+		<PackageReleaseNotes>data-driver use rules</PackageReleaseNotes>
 		<Company>34696643@qq.com</Company>
 		<Authors>xp44m</Authors>
-		<Version>1.2.3</Version>
+		<Version>1.2.4</Version>
 		<IsPublishable>True</IsPublishable>
 		<PackageReadmeFile>readme.md</PackageReadmeFile>
 	</PropertyGroup>
@@ -32,7 +32,6 @@
 		<Compile Include="Lex\PartitionDFA.fs" />
 		<Compile Include="Lex\DFATools.fs" />
 		<Compile Include="Lex\DFA.fs" />
-		<Compile Include="Yacc\ProductionUtils.fs" />
 
 		<Compile Include="Yacc\NullableFactory.fs" />
 		<Compile Include="Yacc\FirstFactory.fs" />
@@ -46,11 +45,10 @@
 		<Compile Include="Yacc\ClosureFactory.fs" />
 		<Compile Include="Yacc\ClosureOperators.fs" />
 		<Compile Include="Yacc\CollectionFactory.fs" />
-		<Compile Include="Yacc\ItemCoreUtils.fs" />
 		<Compile Include="Yacc\LALRCollection.fs" />
+		<Compile Include="Yacc\ProductionUtils.fs" />
 		<Compile Include="Yacc\AmbiguityEliminator.fs" />
 		<Compile Include="Yacc\AmbiguousCollection.fs" />
-		<Compile Include="Yacc\UnambiguousCollection.fs" />
 		<Compile Include="Yacc\Action.fs" />
 		<Compile Include="Yacc\ParsingTable.fs" />
 		<Compile Include="Yacc\ParseTableEncoder.fs" />
@@ -74,7 +72,7 @@
 		<Compile Include="Fsyacc\FsyaccToken.fs" />
 		<Compile Include="Fsyacc\FsyaccTokenUtils.fs" />
 		<None Include="Fsyacc\fsyacc.fsyacc" />
-		<Compile Include="Fsyacc\FsyaccParseTable2.fs" />
+		<Compile Include="Fsyacc\FsyaccParseTable.fs" />
 		<Compile Include="Fsyacc\FsyaccCompiler.fs" />
 		<Compile Include="Fsyacc\FsyaccParseTableFile.fs" />
 		<Compile Include="Fsyacc\FsyaccFile.fs" />

@@ -65,7 +65,6 @@ type AmbiguousCollection =
                 terminals = x.grammar.terminals
                 names = names
                 precedences = precedences
-        
             } : AmbiguityEliminator
 
         let unambiguousClosures =

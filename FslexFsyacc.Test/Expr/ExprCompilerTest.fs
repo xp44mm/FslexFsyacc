@@ -15,7 +15,7 @@ type ExprCompilerTest(output:ITestOutputHelper) =
     let compile (inp:string) =
         inp
         |> ExprToken.tokenize
-        |> ExprParseTable2.parse
+        |> ExprParseTable.parse
 
     [<Fact>]
     member _.``0 - basis test``() =

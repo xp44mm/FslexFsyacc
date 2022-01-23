@@ -64,9 +64,9 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
         let tokens = grammar.symbols - grammar.nonterminals
         show tokens
 
-    [<Fact>] // (Skip="once for all!")
+    [<Fact(Skip="once for all!")>] // 
     member _.``4 - generate ParseTable``() =
-        let name = "FsyaccParseTable2"
+        let name = "FsyaccParseTable"
         let moduleName = $"FslexFsyacc.Fsyacc.{name}"
 
         //解析表数据
@@ -81,9 +81,9 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
     member _.``5 - valid ParseTable``() =
         let t = fsyacc.toFsyaccParseTableFile()
 
-        Should.equal t.header       FsyaccParseTable2.header
-        Should.equal t.rules        FsyaccParseTable2.rules
-        Should.equal t.actions      FsyaccParseTable2.actions
-        Should.equal t.closures     FsyaccParseTable2.closures
-        Should.equal t.declarations FsyaccParseTable2.declarations
+        Should.equal t.header       FsyaccParseTable.header
+        Should.equal t.rules        FsyaccParseTable.rules
+        Should.equal t.actions      FsyaccParseTable.actions
+        Should.equal t.closures     FsyaccParseTable.closures
+        Should.equal t.declarations FsyaccParseTable.declarations
 

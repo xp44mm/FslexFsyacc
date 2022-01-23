@@ -43,7 +43,7 @@ type FsyaccParseTableFile =
                 fxRules |> Line.indentCodeBlock 4
                 "|]"
                 "open FslexFsyacc.Runtime"
-                "let parser = Parser2(fxRules, actions, closures)"
+                "let parser = Parser(fxRules, actions, closures)"
                 "let parse (tokens:seq<_>) ="
                 "    parser.parse(tokens, getTag, getLexeme)"
                 $"    |> unbox<{types.[startSymbol]}>"

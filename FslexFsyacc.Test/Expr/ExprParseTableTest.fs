@@ -72,10 +72,9 @@ type ExprParseTableTest(output:ITestOutputHelper) =
             ProductionUtils.precedenceOfProductions collection.grammar.terminals productions
         show pprods
 
-    [<Fact>] // (Skip="once for all!")
-    member _.``5 - expr generateParseTable2``() =
-
-        let name = "ExprParseTable2"
+    [<Fact(Skip="once for all!")>] // 
+    member _.``5 - expr generateParseTable``() =
+        let name = "ExprParseTable"
         let moduleName = $"Expr.{name}"
 
         //解析表数据
@@ -92,10 +91,10 @@ type ExprParseTableTest(output:ITestOutputHelper) =
     member _.``6 - valid ParseTable``() =
         let t = fsyacc.toFsyaccParseTableFile()
 
-        Should.equal t.header       ExprParseTable2.header
-        Should.equal t.rules        ExprParseTable2.rules
-        Should.equal t.actions      ExprParseTable2.actions
-        Should.equal t.closures     ExprParseTable2.closures
-        Should.equal t.declarations ExprParseTable2.declarations
+        Should.equal t.header       ExprParseTable.header
+        Should.equal t.rules        ExprParseTable.rules
+        Should.equal t.actions      ExprParseTable.actions
+        Should.equal t.closures     ExprParseTable.closures
+        Should.equal t.declarations ExprParseTable.declarations
 
 

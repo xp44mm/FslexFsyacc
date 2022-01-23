@@ -72,7 +72,6 @@ type ParsingTable =
                 |> Map.ofSeq
             )
 
-
         //简化数据的表达为数组
         {
             grammar = uc.grammar
@@ -80,7 +79,3 @@ type ParsingTable =
             actions = actions
             closures = closures
         }
-
-
-
-

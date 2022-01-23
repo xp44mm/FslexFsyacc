@@ -3,4 +3,4 @@
 let compile (inp:string) =
     inp
     |> FsyaccTokenUtils.tokenize
-    |> FsyaccParseTable2.parse
+    |> FsyaccParseTable.parse

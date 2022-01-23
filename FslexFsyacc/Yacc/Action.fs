@@ -4,7 +4,6 @@
 type Action = 
     | Shift of kernel: Set<ItemCore>
     | Reduce of production: string list
-    | DeadState // 多余的，删除
 
     static member from(closure:Map<string,ItemCore>) =
         let rItems,gItems =

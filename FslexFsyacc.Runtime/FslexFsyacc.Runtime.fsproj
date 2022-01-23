@@ -8,18 +8,18 @@
     <PackageProjectUrl>https://github.com/xp44mm/FslexFsyacc</PackageProjectUrl>
     <RepositoryUrl>https://github.com/xp44mm/FslexFsyacc</RepositoryUrl>
     <PackageTags>lex;yacc;compiler;parser;analyzer</PackageTags>
-    <PackageReleaseNotes>analyzer parameters changed.</PackageReleaseNotes>
+    <PackageReleaseNotes>data-driver use rules</PackageReleaseNotes>
     <Authors>xp44m</Authors>
     <Company>34696643@qq.com</Company>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <Version>1.2.3</Version>
+    <Version>1.2.4</Version>
     <PackageReadmeFile>readme.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Include="Utils.fs" />
     <Compile Include="Analyzer.fs" />
-    <Compile Include="Parser2.fs" />
+    <Compile Include="Parser.fs" />
   </ItemGroup>
 
   <ItemGroup>

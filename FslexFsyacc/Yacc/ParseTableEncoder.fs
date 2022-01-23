@@ -19,7 +19,6 @@ type ParseTableEncoder =
         match action with
         | Shift j -> this.kernels.[j]
         | Reduce p -> this.productions.[p]
-        | DeadState -> failwith ""
 
     member this.encodeProduction(production:string list) =
             this.productions.[production]
