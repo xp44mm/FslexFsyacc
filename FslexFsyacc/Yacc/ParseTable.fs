@@ -4,7 +4,7 @@ open FSharp.Idioms
 
 type ParseTable =
     {
-        productions:string list[]
+        //productions:string list[]
         actions:(string*int)[][]
         closures:(int*int*string[])[][]
         encoder:ParseTableEncoder
@@ -32,9 +32,9 @@ type ParseTable =
             }:ParseTableEncoder
 
         {
-            productions =
-                tbl.grammar.productions
-                |> Set.toArray
+            //productions =
+            //    tbl.grammar.productions
+            //    |> Set.toArray
             closures =
                 encoder.encodeClosures tbl.closures
             actions =
