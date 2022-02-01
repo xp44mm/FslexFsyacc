@@ -90,12 +90,15 @@ type Analyzer<'tok,'u>
         ///division是相邻token,or division的容器。
         let getDivision () =
             let revStates = forward 0u []
+            if revStates.IsEmpty then
+                failwith "FslexFsyacc analyzer:`forward` cannot take any tokens."
+
             let finalState,stateCount =
                 try
                     retractFinalAndLexemeSate(revStates)
                 with _ ->
                     let buffer = iterator.dequeue(revStates.Length-1)
-                    failwithf "FslexFsyacc analyzer:%A" buffer
+                    failwithf "FslexFsyacc analyzer:retract was not able to find an accepted status in %A" (buffer)
 
             let lexeme = iterator.dequeue(stateCount-1)
             let mapper = finalMappers.[finalState]

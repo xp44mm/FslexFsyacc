@@ -3,14 +3,17 @@
 Runtime for Fslex/Fsyacc analyzer/parser generation tools. It includes several types to support `FslexFsyacc`:
 
 ```F#
-Analyzer(nextStates, lexemesFromFinal, universalFinals, finalMappers)
+type Analyzer<'tok,'u>
+    (
+        nextStates: (uint32*(string*uint32)[])[], // state -> tag -> state
+        rules: (uint32[]*uint32[]*('tok list -> 'u))[]
+    ) =
 
 type Parser
     (
-        productions: (string list)[],
-        closures   : (int*int*string[])[][],
-        actions    : (string*int)[][],
-        mappers    : (obj[]->obj)[]
-    )
+        rules: (string list*(obj[]->obj))[],
+        actions: (string*int)[][],        
+        closures: (int*int*string[])[][]
+    ) =
 
 ```
