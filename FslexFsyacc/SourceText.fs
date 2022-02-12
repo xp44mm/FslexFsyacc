@@ -19,11 +19,6 @@ let tryMultiLineComment =
     Regex @"^/\*[\s\S]*?\*/"
     |> tryRegexMatch
 
-let tryFsMultiLineComment =
-    Regex @"^\(\*[\s\S]*?\*\)"
-    |> tryRegexMatch
-
-
 //An identifier must start with $, _, or any character in the Unicode categories
 //“Uppercase letter (Lu)”, “Lowercase letter (Ll)”, “Titlecase letter (Lt)”, “Modifier letter (Lm)”, “Other letter (Lo)”, or
 //“Letter number (Nl)”.
@@ -37,8 +32,6 @@ let tryIdentifierName =
     Regex @"^[$_\p{L}\p{Nl}][$_\p{L}\p{Mn}\p{Mc}\p{Nl}\p{Nd}\p{Pc}\u200C\u200D]*"
     |> tryRegexMatch
 
-let ReservedWords = set ["await"; "break"; "case"; "catch"; "class"; "const"; "continue"; "debugger"; "default"; "delete"; "do"; "else"; "enum"; "export"; "extends"; "false"; "finally"; "for"; "function"; "if"; "import"; "in"; "instanceof"; "new"; "null"; "return"; "super"; "switch"; "this"; "throw"; "true"; "try"; "typeof"; "var"; "void"; "while"; "with"; "yield";]
-
 let tryOptionalChainingPunctuator =
     Regex @"^\?\.(?!\d)"
     |> tryRegexMatch
@@ -46,13 +39,6 @@ let tryOptionalChainingPunctuator =
 let tryDivPunctuator = Regex @"^/=?" |> tryRegexMatch
 
 let tryRightBracePunctuator = tryFirstChar '}'
-
-let Punctuators =
-    set ["~"; "}"; "||="; "||"; "|="; "|"; "{"; "^="; "^"; "]"; "["; "??="; "??";
-    "?"; ">>>="; ">>>"; ">>="; ">>"; ">="; ">"; "=>"; "==="; "=="; "="; "<=";
-    "<<="; "<<"; "<"; ";"; ":"; "/="; "/"; "..."; "."; "-="; "--"; "-"; ",";
-    "+="; "++"; "+"; "*="; "**="; "**"; "*"; ")"; "("; "&="; "&&="; "&&"; "&";
-    "%="; "%"; "!=="; "!="; "!"]
 
 let illegalNumberSep (input: string) = Regex.IsMatch(input, "(^_|_$|\D_|_\D)")
 

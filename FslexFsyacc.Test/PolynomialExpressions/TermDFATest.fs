@@ -21,17 +21,31 @@ type TermDFATest(output:ITestOutputHelper) =
     let fslex = FslexFile.parse text
 
     [<Fact>]
-    member _.``0 - compiler test``() =
-        let tokens = 
-            text
-            |> FslexTokenUtils.tokenize
-            |> FslexDFA.analyze
-            |> Seq.concat
-            |> List.ofSeq
-        show tokens
+    member _.``0 = compiler test``() =
+        let hdr,dfs,rls = FslexCompiler.parseToStructuralData text
+        show hdr
+        show dfs
+        show rls
+        
+    [<Fact>]
+    member _.``1 = verify``() =
+        let y = fslex.verify()
+
+        Assert.True(y.undeclared.IsEmpty)
+        Assert.True(y.unused.IsEmpty)
+
+    [<Fact>]
+    member _.``2 = universal characters``() =
+        let res = fslex.getRegularExpressions()
+
+        let y = 
+            res
+            |> Array.collect(fun re -> re.getCharacters())
+            |> Set.ofArray
+        show y
 
     [<Fact(Skip="once and for all!")>] // 
-    member _.``1 - generate DFA``() =
+    member _.``3 = generate DFA``() =
         let name = "TermDFA"
         let moduleName = $"PolynomialExpressions.{name}"
 
@@ -43,25 +57,11 @@ type TermDFATest(output:ITestOutputHelper) =
         output.WriteLine("output lex:" + outputDir)
 
     [<Fact>]
-    member _.``2 - valid DFA``() =
+    member _.``4 = valid DFA``() =
         let y = fslex.toFslexDFAFile()
 
         Should.equal y.nextStates TermDFA.nextStates
         Should.equal y.header     TermDFA.header
         Should.equal y.rules      TermDFA.rules
 
-    [<Fact>]
-    member _.``3 - tokenize``() =
-        let y = 
-            text
-            |> FslexTokenUtils.tokenize 
-            |> Seq.filter(fun (pos,len,token)->
-                match token with
-                | HEADER _ 
-                | SEMANTIC _
-                    -> true
-                | _ -> false
-            )
-            |> Seq.toList
-        show y
 

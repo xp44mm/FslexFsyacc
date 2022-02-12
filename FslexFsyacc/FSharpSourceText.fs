@@ -44,6 +44,7 @@ let tryWord =
     Regex @"^\w+"
     |> tryRegexMatch
 
+// 不终止循环的消费者
 let tries = 
     [
         tryWS
@@ -58,9 +59,17 @@ let tries =
         tryWord
         Regex @"^\S" |> tryRegexMatch
     ]
-    |> List.map(fun f -> f >> Option.map(fun(x,rest)-> 0,x,rest))
+    |> List.map(fun f -> 
+        f 
+        >> Option.map(fun(x,rest)-> 
+            // 0代表不终止循环标记，%}出现的次数
+            0,x,rest)
+        )
 
-let tryPercentRBrace = tryPrefix "%}" >> Option.map(fun(x,rest)-> 1,x,rest)
+let tryPercentRBrace = 
+    tryPrefix "%}" 
+    // 1代表终止循环标记，%}出现的次数
+    >> Option.map(fun(x,rest)-> 1,x,rest)
 let tryHeaderTokens = tryPercentRBrace :: tries
 
 let getHeaderLength (inp:string) =

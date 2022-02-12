@@ -21,14 +21,31 @@ type FslexDFATest(output:ITestOutputHelper) =
     let fslex = FslexFile.parse text
 
     [<Fact>]
-    member _.``0 - compiler test``() =
+    member _.``0 = compiler test``() =
         let hdr,dfs,rls = FslexCompiler.parseToStructuralData text
         show hdr
         show dfs
         show rls
         
+    [<Fact>]
+    member _.``1 = verify``() =
+        let y = fslex.verify()
+
+        Assert.True(y.undeclared.IsEmpty)
+        Assert.True(y.unused.IsEmpty)
+
+    [<Fact>]
+    member _.``2 = universal characters``() =
+        let res = fslex.getRegularExpressions()
+
+        let y = 
+            res
+            |> Array.collect(fun re -> re.getCharacters())
+            |> Set.ofArray
+        show y
+
     [<Fact(Skip="once and for all!")>] // 
-    member _.``1 - generate DFA``() =
+    member _.``3 = generate DFA``() =
         let name = "FslexDFA"
         let moduleName = $"FslexFsyacc.Fslex.{name}"
 
@@ -40,7 +57,7 @@ type FslexDFATest(output:ITestOutputHelper) =
         output.WriteLine("output lex:" + outputDir)
 
     [<Fact>]
-    member _.``2 - valid DFA``() =
+    member _.``4 = valid DFA``() =
         let y = fslex.toFslexDFAFile()
 
         Should.equal y.nextStates FslexDFA.nextStates

@@ -53,7 +53,7 @@ type DFA<'tag when 'tag: comparison> =
                 if x.IsEmpty then
                     pair
                 else
-                    failwith "DFA.fromNFA: finals和lexemes应该没有交集，请检查lex向前看语法！"
+                    failwithf "DFA.fromNFA:\r\nfinals=%A;\r\nlexemes=%A;" fnls lxms
             )
 
         {

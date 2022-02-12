@@ -37,8 +37,3 @@ type FslexToken =
     /// %%
     | PERCENT
 
-    ///// line feed
-    //| LF
-    //| BOF
-    //| EOF
-
