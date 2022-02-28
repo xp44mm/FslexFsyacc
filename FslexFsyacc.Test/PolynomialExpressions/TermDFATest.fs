@@ -53,7 +53,7 @@ type TermDFATest(output:ITestOutputHelper) =
         let result = dfafile.generate(moduleName)
         let outputDir = Path.Combine(__SOURCE_DIRECTORY__, $"{name}.fs")
 
-        File.WriteAllText(outputDir, result)
+        File.WriteAllText(outputDir, result,System.Text.Encoding.UTF8)
         output.WriteLine("output lex:" + outputDir)
 
     [<Fact>]

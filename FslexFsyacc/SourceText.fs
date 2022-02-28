@@ -79,6 +79,3 @@ let tryRegularExpressionLiteral =
     Regex @"^/(\\\\|\\/|[^/])+/[gimsuy]*"
     |> tryRegexMatch
 
-let trySemanticAction = Regex @"^\{[^}]*\}" |> tryRegexMatch
-
-let tryHeader = Regex @"^%\{[\S\s]*?%\}" |> tryRegexMatch

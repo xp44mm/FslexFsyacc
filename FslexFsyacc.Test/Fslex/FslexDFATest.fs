@@ -53,7 +53,7 @@ type FslexDFATest(output:ITestOutputHelper) =
         let result = y.generate(moduleName)
 
         let outputDir = Path.Combine(sourcePath, $"{name}.fs")
-        File.WriteAllText(outputDir, result)
+        File.WriteAllText(outputDir, result,System.Text.Encoding.UTF8)
         output.WriteLine("output lex:" + outputDir)
 
     [<Fact>]
