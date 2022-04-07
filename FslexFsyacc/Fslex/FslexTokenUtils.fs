@@ -36,7 +36,7 @@ let getLexeme (pos,len,token) =
 
 let tryHole =
     Regex @"^\<\w+\>"
-    |> tryRegexMatch
+    |> tryMatch
 
 let tokenize inp =
     let rec loop (lpos:int,linp:string)(pos:int,inp:string) =
@@ -68,57 +68,57 @@ let tokenize inp =
                 yield pos,len,QUOTE(Quotation.unquote x)
                 yield! loop (lpos,linp) (pos+len,rest)
 
-            | Prefix "%%+" (x, rest) ->
+            | On(tryMatch(Regex @"^%%+")) (x, rest) ->
                 let len = x.Length
                 yield pos,len,PERCENT
                 yield! loop (lpos,linp) (pos+len,rest)
 
-            | PrefixChar '=' rest ->
+            | On(tryFirst '=') rest ->
                 let len = 1
                 yield pos,len,EQUALS
                 yield! loop (lpos,linp) (pos+len,rest)
 
-            | PrefixChar '(' rest ->
+            | On(tryFirst '(') rest ->
                 let len = 1
                 yield pos,len,LPAREN
                 yield! loop (lpos,linp) (pos+len,rest)
 
-            | PrefixChar ')' rest ->
+            | On(tryFirst ')') rest ->
                 let len = 1
                 yield pos,len,RPAREN
                 yield! loop (lpos,linp) (pos+len,rest)
 
-            | PrefixChar '[' rest ->
+            | On(tryFirst '[') rest ->
                 let len = 1
                 yield pos,len,LBRACK
                 yield! loop (lpos,linp) (pos+len,rest)
 
-            | PrefixChar ']' rest ->
+            | On(tryFirst ']') rest ->
                 let len = 1
                 yield pos,len,RBRACK
                 yield! loop (lpos,linp) (pos+len,rest)
 
-            | PrefixChar '+' rest ->
+            | On(tryFirst '+') rest ->
                 let len = 1
                 yield pos,len,PLUS
                 yield! loop (lpos,linp) (pos+len,rest)
 
-            | PrefixChar '*' rest ->
+            | On(tryFirst '*') rest ->
                 let len = 1
                 yield pos,len,STAR
                 yield! loop (lpos,linp) (pos+len,rest)
 
-            | PrefixChar '/' rest ->
+            | On(tryFirst '/') rest ->
                 let len = 1
                 yield pos,len,SLASH
                 yield! loop (lpos,linp) (pos+len,rest)
 
-            | PrefixChar '|' rest ->
+            | On(tryFirst '|') rest ->
                 let len = 1
                 yield pos,len,BAR
                 yield! loop (lpos,linp) (pos+len,rest)
 
-            | PrefixChar '?' rest ->
+            | On(tryFirst '?') rest ->
                 let len = 1
                 yield pos,len,QMARK
                 yield! loop (lpos,linp) (pos+len,rest)

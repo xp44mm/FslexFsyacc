@@ -25,7 +25,9 @@ let getLexeme(pos,len,token) =
     | NUMBER n -> box n
     | _   -> null
 
+open FSharp.Idioms.ActivePatterns
 open FSharp.Idioms.StringOps
+open System.Text.RegularExpressions
 
 let tokenize(inp:string) =
     let rec loop pos (inp:string) =
@@ -33,48 +35,48 @@ let tokenize(inp:string) =
             match inp with
             | "" -> ()
 
-            | Prefix @"\s+" (x, rest) ->
+            | On(tryMatch(Regex @"^\s+")) (x, rest) ->
                 let len = x.Length
                 let pos = pos + len
                 yield! loop pos rest
 
-            | Prefix @"\d+(\.\d+)?" (x, rest) ->
+            | On(tryMatch(Regex @"^\d+(\.\d+)?")) (x, rest) ->
                 let len = x.Length
                 yield pos,len,NUMBER <| System.Double.Parse(x)
                 let pos = pos + len
                 yield! loop pos rest
 
-            | PrefixChar '(' rest ->
+            | On(tryFirst '(') rest ->
                 let len = 1
                 yield pos,len, LPAREN
                 let pos = pos + len
                 yield! loop pos rest
 
-            | PrefixChar ')' rest ->
+            | On(tryFirst ')') rest ->
                 let len = 1
                 yield pos,len, RPAREN
                 let pos = pos + len
                 yield! loop pos rest
 
-            | PrefixChar '+' rest ->
+            | On(tryFirst '+') rest ->
                 let len = 1
                 yield pos, len, PLUS
                 let pos = pos + len
                 yield! loop pos rest
 
-            | PrefixChar '-' rest ->
+            | On(tryFirst '-') rest ->
                 let len = 1
                 yield pos, len, MINUS
                 let pos = pos + len
                 yield! loop pos rest
 
-            | PrefixChar '*' rest ->
+            | On(tryFirst '*') rest ->
                 let len = 1
                 yield pos, len, STAR
                 let pos = pos + len
                 yield! loop pos rest
 
-            | PrefixChar '/' rest ->
+            | On(tryFirst '/') rest ->
                 let len = 1
                 yield pos, len, DIV
                 let pos = pos + len

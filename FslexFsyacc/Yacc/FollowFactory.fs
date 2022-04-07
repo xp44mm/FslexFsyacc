@@ -3,7 +3,12 @@ module FslexFsyacc.Yacc.FollowFactory
 
 open FSharp.Idioms
 
-let make (nonterminals:Set<string>) (nullables:Set<string>)(firsts:Map<string,Set<string>>) (productions:Set<string list>) =
+let make 
+    (nonterminals:Set<string>) 
+    (nullables:Set<string>)
+    (firsts:Map<string,Set<string>>)
+    (productions:Set<string list>) =
+
     let startSymbol = productions.MinimumElement.[1]
 
     let isNonterminal symbol = nonterminals.Contains symbol

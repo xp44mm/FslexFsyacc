@@ -29,6 +29,7 @@ let getLexeme(pos,len,token) =
 
 open FSharp.Idioms
 open FslexFsyacc.FSharpSourceText
+open System.Text.RegularExpressions
 
 let tokenize inp =
     let rec loop (lpos:int,linp:string)(pos:int,inp:string) =
@@ -57,24 +58,24 @@ let tokenize inp =
                 yield pos,len,QUOTE(Quotation.unquote x)
                 yield! loop (lpos,linp) (pos+len,rest)
 
-            | Prefix "%%+" (x, rest) ->
+            | On(tryMatch(Regex @"^%%+")) (x, rest) ->
                 let len = x.Length
                 yield pos,len,PERCENT
                 yield! loop (lpos,linp) (pos+len,rest)
 
-            | On (tryFirstChar ':') rest ->
+            | On (tryFirst ':') rest ->
                 yield pos, 1, COLON
                 yield! loop (lpos,linp) (pos+1,rest)
 
-            | On (tryFirstChar '|') rest ->
+            | On (tryFirst '|') rest ->
                 yield pos,1,BAR
                 yield! loop (lpos,linp) (pos+1,rest)
 
-            | On (tryFirstChar ';') rest ->
+            | On (tryFirst ';') rest ->
                 yield pos,1,SEMICOLON
                 yield! loop (lpos,linp) (pos+1,rest)
 
-            | Prefix @"%[a-z]+" (x, rest) ->
+            | On(tryMatch(Regex @"^%[a-z]+")) (x, rest) ->
                 let tok =
                     match x with
                     | "%left" -> LEFT

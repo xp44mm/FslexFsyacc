@@ -9,3 +9,4 @@ let nullables       = ConcurrentDictionary<Set<string list>, Set<string>>(HashId
 let firsts          = ConcurrentDictionary<Set<string list>, Map<string,Set<string>>>(HashIdentity.Structural)
 let lasts           = ConcurrentDictionary<Set<string list>, Map<string,Set<string>>>(HashIdentity.Structural)
 let follows         = ConcurrentDictionary<Set<string list>, Map<string,Set<string>>>(HashIdentity.Structural)
+let precedes        = ConcurrentDictionary<Set<string list>, Map<string,Set<string>>>(HashIdentity.Structural)

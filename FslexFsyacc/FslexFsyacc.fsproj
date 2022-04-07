@@ -10,10 +10,10 @@
 		<PackageProjectUrl>https://github.com/xp44mm/FslexFsyacc</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/xp44mm/FslexFsyacc</RepositoryUrl>
 		<PackageTags>lex;yacc;compiler;parser;analyzer</PackageTags>
-		<PackageReleaseNotes>lex universal characters</PackageReleaseNotes>
+		<PackageReleaseNotes>grammar.precedes</PackageReleaseNotes>
 		<Company>34696643@qq.com</Company>
 		<Authors>xp44m</Authors>
-		<Version>1.2.6</Version>
+		<Version>1.2.7</Version>
 		<IsPublishable>True</IsPublishable>
 		<PackageReadmeFile>readme.md</PackageReadmeFile>
 	</PropertyGroup>
@@ -37,6 +37,7 @@
 		<Compile Include="Yacc\FirstFactory.fs" />
 		<Compile Include="Yacc\LastFactory.fs" />
 		<Compile Include="Yacc\FollowFactory.fs" />
+		<Compile Include="Yacc\PrecedeFactory.fs" />
 		<Compile Include="Yacc\GrammarMemoiz.fs" />
 		<Compile Include="Yacc\Grammar.fs" />
 		<Compile Include="Yacc\ItemCore.fs" />
@@ -88,8 +89,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="FSharp.Idioms" Version="1.1.21" />
-		<PackageReference Include="FSharp.Literals" Version="2.2.8" />
+		<PackageReference Include="FSharp.Idioms" Version="1.2.1" />
+		<PackageReference Include="FSharp.Literals" Version="2.2.9" />
 	</ItemGroup>
 
 	<ItemGroup>

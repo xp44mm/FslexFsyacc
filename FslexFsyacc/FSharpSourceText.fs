@@ -6,43 +6,43 @@ open System.Text.RegularExpressions
 
 let tryWS =
     Regex @"^\s+"
-    |> tryRegexMatch
+    |> tryMatch
 
 let trySingleLineComment =
     Regex @"^//.*"
-    |> tryRegexMatch
+    |> tryMatch
 
 let tryMultiLineComment =
     Regex @"^\(\*(?!\s*\))[\s\S]*?\*\)"
-    |> tryRegexMatch
+    |> tryMatch
 
 let tryDoubleTick =
     Regex @"^``[ \S]+?``"
-    |> tryRegexMatch
+    |> tryMatch
 
 let tryTypeParameter =
     Regex @"^'\w+(?!')"
-    |> tryRegexMatch
+    |> tryMatch
 
 let tryChar =
     Regex @"^'(\\.|[^\\'])+'" // 转义斜杠后面紧跟着的一个字符作为整体看待。
-    |> tryRegexMatch
+    |> tryMatch
 
 let trySingleQuoteString =
     Regex @"^""(\\.|[^\\""])*"""
-    |> tryRegexMatch
+    |> tryMatch
 
 let tryVerbatimString =
     Regex @"^@""(""""|[^""])*"""
-    |> tryRegexMatch
+    |> tryMatch
 
 let tryTripleQuoteString =
     Regex @"^""""""(?!"")[\s\S]*?(?<!"")""""""(?!"")"
-    |> tryRegexMatch
+    |> tryMatch
 
 let tryWord =
     Regex @"^\w+"
-    |> tryRegexMatch
+    |> tryMatch
 
 // 不终止循环的消费者
 let tries = 
@@ -57,7 +57,7 @@ let tries =
         tryVerbatimString
         tryTripleQuoteString
         tryWord
-        Regex @"^\S" |> tryRegexMatch
+        Regex @"^\S" |> tryMatch
     ]
     |> List.map(fun f -> 
         f 
@@ -67,9 +67,9 @@ let tries =
         )
 
 let tryPercentRBrace = 
-    tryPrefix "%}" 
+    tryStart "%}" 
     // 1代表终止循环标记，%}出现的次数
-    >> Option.map(fun(x,rest)-> 1,x,rest)
+    >> Option.map(fun rest -> 1,"%}",rest)
 let tryHeaderTokens = tryPercentRBrace :: tries
 
 let getHeaderLength (inp:string) =
@@ -87,8 +87,8 @@ let getHeaderLength (inp:string) =
             len
     loop 0 inp
 
-let tryLBrace = tryFirstChar '{' >> Option.map(fun rest -> -1,"{",rest)
-let tryRBrace = tryFirstChar '}' >> Option.map(fun rest -> 1,"}",rest)
+let tryLBrace = tryFirst '{' >> Option.map(fun rest -> -1,"{",rest)
+let tryRBrace = tryFirst '}' >> Option.map(fun rest -> 1,"}",rest)
 let trySemanticTokens = tryLBrace :: tryRBrace :: tries
 
 let getSemanticLength(inp:string) =
@@ -110,7 +110,7 @@ let getSemanticLength(inp:string) =
 let tryHeader(inp:string) =
     let start = "%{"
     inp 
-    |> tryStartWith(start)
+    |> tryStart(start)
     |> Option.map(fun rest ->
         let len = getHeaderLength rest
         let hdr = start + rest.[0..len-1]
@@ -120,7 +120,7 @@ let tryHeader(inp:string) =
 let trySemantic(inp:string) =
     let start = "{"
     inp 
-    |> tryStartWith(start)
+    |> tryStart(start)
     |> Option.map(fun rest ->
         let len = getSemanticLength rest
         let hdr = start + rest.[0..len-1]
@@ -132,7 +132,7 @@ let rec getColumnAndRest (start:int, inp:string) (pos:int) =
     match inp with
     | "" -> 
         failwithf "length:%d < pos:%d" start pos
-    | On (tryPrefix @"[^\n]*\n") (x, rest) ->
+    | On(tryMatch (Regex @"^[^\n]*\n")) (x, rest) ->
         let nextStart = start + x.Length
         if pos < nextStart then
             let col = pos - start

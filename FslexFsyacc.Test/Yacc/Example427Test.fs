@@ -21,14 +21,14 @@ type Example427Test(output:ITestOutputHelper) =
 
     ///表达式语法(4.28)
     let mainProductions = [
-        [ E; T; E' ]
-        [ E'; "+"; T; E' ]
+        [ E   ; T   ; E' ]
+        [ E'  ; "+" ; T   ; E' ]
         [ E' ]
-        [ T; F; T' ]
-        [ T'; "*"; F; T' ]
+        [ T   ; F   ; T' ]
+        [ T'  ; "*" ; F   ; T' ]
         [ T' ]
-        [ F; "("; E; ")" ]
-        [ F; id ]
+        [ F   ; "(" ; E   ; ")" ]
+        [ F   ; id ]
         ]
     let grammar = Grammar.from mainProductions
 
@@ -109,6 +109,19 @@ type Example427Test(output:ITestOutputHelper) =
             "T'",set ["";")";"+"]]
 
         Should.equal y grammar.follows
+
+    [<Fact>]
+    member _.``precedes``() =
+        show grammar.precedes
+        ////空字符串代表BOF
+        let y = Map[
+            "E",set["";"("];
+            "E'",set[")";"id"];
+            "F",set["";"(";"*";"+"];
+            "T",set["";"(";"+"];
+            "T'",set[")";"id"]]
+
+        Should.equal y grammar.precedes
 
     [<Fact>]
     member _.``closures``() =

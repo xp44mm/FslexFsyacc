@@ -7,7 +7,10 @@ open System.Collections.Concurrent
 ///参数排列按照依赖顺序排列
 
  /// first set 不包括空，非終結符號是否可為空，使用nullable判斷。
-let make (nullables:Set<string>) (mainProductions:#seq<string list>) =
+let make 
+    (nullables:Set<string>) 
+    (mainProductions:#seq<string list>) =
+
     let leftmost = NullableFactory.leftmost nullables
     
     //列表中包括的是(superset, subset)对
