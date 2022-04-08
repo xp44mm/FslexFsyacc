@@ -101,14 +101,19 @@ type Example427Test(output:ITestOutputHelper) =
         //show grammar.follows
 
         //空字符串代表书中的$
-        let y = Map.ofList [
+        let z = Map [
+            "(",set ["(";"id"];
+            ")",set ["";")";"*";"+"];
+            "*",set ["(";"id"];
+            "+",set ["(";"id"];
             "E",set ["";")"];
             "E'",set ["";")"];
             "F",set ["";")";"*";"+"];
             "T",set ["";")";"+"];
-            "T'",set ["";")";"+"]]
-
-        Should.equal y grammar.follows
+            "T'",set ["";")";"+"];
+            "id",set ["";")";"*";"+"]
+            ]
+        Should.equal z grammar.follows
 
     [<Fact>]
     member _.``precedes``() =
@@ -120,7 +125,18 @@ type Example427Test(output:ITestOutputHelper) =
             "F",set["";"(";"*";"+"];
             "T",set["";"(";"+"];
             "T'",set[")";"id"]]
-
+        let y = Map [
+            "(",set ["";"(";"*";"+"];
+            ")",set [")";"id"];
+            "*",set [")";"id"];
+            "+",set [")";"id"];
+            "E",set ["";"("];
+            "E'",set [")";"id"];
+            "F",set ["";"(";"*";"+"];
+            "T",set ["";"(";"+"];
+            "T'",set [")";"id"];
+            "id",set ["";"(";"*";"+"]
+            ]
         Should.equal y grammar.precedes
 
     [<Fact>]

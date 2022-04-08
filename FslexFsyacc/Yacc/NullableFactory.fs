@@ -43,9 +43,12 @@ let nullable (nullables:Set<string>) =
     loop
 
 /// 每个nullables只生成一个缓存
-let leftmostLookupMemoiz = ConcurrentDictionary<Set<string>, ConcurrentDictionary<string list, Set<string>>>(HashIdentity.Structural)
+let leftmostLookupMemoiz = ConcurrentDictionary<
+                                Set<string>, 
+                                ConcurrentDictionary<string list, Set<string>>
+                                >(HashIdentity.Structural)
        
-/// 一个符号串可能的最左符号
+/// 一个符号串可能的最左符号（包括终结符，非终结符）
 let leftmost (nullables:Set<string>) =
     let lookup = 
         leftmostLookupMemoiz.GetOrAdd(
@@ -67,6 +70,7 @@ let leftmost (nullables:Set<string>) =
         )
     loop
 
+/// 一个符号串可能的最右符号
 let rightmost (nullables:Set<string>) =
     let leftmost = leftmost nullables
     fun (alpha:string list) ->
