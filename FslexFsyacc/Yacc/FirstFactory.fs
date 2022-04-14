@@ -13,13 +13,14 @@ let make
 
     let leftmost = NullableFactory.leftmost nullables
     
-    //列表中包括的是(superset, subset)对
+    // super/sub set relation pairs
+    // 如果有产生式 A -> B ...， 那么 first(A) 包含 first(B)
     let pairs =
         mainProductions
         |> Seq.map(fun p ->
             leftmost p.Tail
-            |> Set.map(fun y -> p.Head, y) // 如果有产生式 A -> B ...， 那么，first A 包含 first B
-            |> Set.filter(fun (l,r)->l<>r)
+            |> Set.map(fun y -> p.Head, y)
+            |> Set.filter(fun(superset,subset)-> superset <> subset)
         )
         |> Set.unionMany
 

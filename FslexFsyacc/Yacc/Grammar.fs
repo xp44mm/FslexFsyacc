@@ -68,11 +68,11 @@ type Grammar =
     member this.follows =
         GrammarMemoiz.follows.GetOrAdd(
             this.productions, 
-            Func<_,_>(FollowFactory.make this.nonterminals this.nullables this.firsts)
+            Func<_,_>(FollowFactory.make this.nullables this.firsts)
             )
 
     member this.precedes =
         GrammarMemoiz.precedes.GetOrAdd(
             this.productions, 
-            Func<_,_>(PrecedeFactory.make this.nonterminals this.nullables this.lasts)
+            Func<_,_>(PrecedeFactory.make this.nullables this.lasts)
             )
