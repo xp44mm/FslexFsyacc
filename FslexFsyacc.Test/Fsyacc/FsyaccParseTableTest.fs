@@ -66,6 +66,7 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
 
     [<Fact(Skip="once for all!")>] // 
     member _.``4 - generate ParseTable``() =
+        // ** input **
         let name = "FsyaccParseTable"
         let moduleName = $"FslexFsyacc.Fsyacc.{name}"
 

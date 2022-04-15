@@ -3,18 +3,26 @@ open FslexFsyacc.Fsyacc
 open FslexFsyacc.Fsyacc.FsyaccTokenUtils
 %}
 
-file       : HEADER rules                                    {s0, List.rev s1,[],[]}
-           | HEADER rules "%%" precedences                   {s0, List.rev s1,List.rev s3,[]}
-           | HEADER rules "%%"                  declarations {s0, List.rev s1,[],List.rev s3}
-           | HEADER rules "%%" precedences "%%" declarations {s0, List.rev s1,List.rev s3,List.rev s5}
+file: 
+    | HEADER rules                                    tailPercent {s0, List.rev s1,[],[]}
+    | HEADER rules "%%" precedences                   tailPercent {s0, List.rev s1,List.rev s3,[]}
+    | HEADER rules "%%"                  declarations tailPercent {s0, List.rev s1,[],List.rev s3}
+    | HEADER rules "%%" precedences "%%" declarations tailPercent {s0, List.rev s1,List.rev s3,List.rev s5}
 
-rules:             rule  {[s0]}
-           | rules rule  {s1::s0}
+tailPercent:
+    | (*empty*) {}
+    | "%%"      {}
 
-rule       : ID derive bodies  {s0,List.rev s2}
+rules:             
+    |       rule {[s0]}
+    | rules rule {s1::s0}
 
-derive : ":" {}
-       | ":" "|" {}
+rule: 
+    | ID ":" headBar bodies {s0,List.rev s3}
+
+headBar:
+    | (*empty*) {}
+    | "|"       {}
 
 precedences:             precedence    {[s0]}
            | precedences precedence    {s1::s0}
