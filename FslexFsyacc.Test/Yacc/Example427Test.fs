@@ -102,41 +102,23 @@ type Example427Test(output:ITestOutputHelper) =
 
         //空字符串代表书中的$
         let z = Map [
-            "(",set ["(";"id"];
-            ")",set ["";")";"*";"+"];
-            "*",set ["(";"id"];
-            "+",set ["(";"id"];
-            "E",set ["";")"];
-            "E'",set ["";")"];
-            "F",set ["";")";"*";"+"];
-            "T",set ["";")";"+"];
-            "T'",set ["";")";"+"];
-            "id",set ["";")";"*";"+"]
-            ]
+            "(",set ["(";"id"];")",set ["";")";"*";"+"];
+            "*",set ["(";"id"];"+",set ["(";"id"];
+            "E",set ["";")"];"E'",set ["";")"];
+            "F",set ["";")";"*";"+"];"T",set ["";")";"+"];
+            "T'",set ["";")";"+"];"id",set ["";")";"*";"+"]]
         Should.equal z grammar.follows
 
     [<Fact>]
     member _.``precedes``() =
         show grammar.precedes
         ////空字符串代表BOF
-        let y = Map[
-            "E",set["";"("];
-            "E'",set[")";"id"];
-            "F",set["";"(";"*";"+"];
-            "T",set["";"(";"+"];
-            "T'",set[")";"id"]]
         let y = Map [
-            "(",set ["";"(";"*";"+"];
-            ")",set [")";"id"];
-            "*",set [")";"id"];
-            "+",set [")";"id"];
-            "E",set ["";"("];
-            "E'",set [")";"id"];
-            "F",set ["";"(";"*";"+"];
-            "T",set ["";"(";"+"];
-            "T'",set [")";"id"];
-            "id",set ["";"(";"*";"+"]
-            ]
+            "(",set ["";"(";"*";"+"];")",set [")";"id"];
+            "*",set [")";"id"];"+",set [")";"id"];
+            "E",set ["";"("];"E'",set [")";"id"];
+            "F",set ["";"(";"*";"+"];"T",set ["";"(";"+"];
+            "T'",set [")";"id"];"id",set ["";"(";"*";"+"]]
         Should.equal y grammar.precedes
 
     [<Fact>]

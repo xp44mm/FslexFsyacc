@@ -17,21 +17,20 @@ let make
     let rightmostSymbol = NullableFactory.rightmost nullables
     // 一个串的第一个终结符号集合
     let firstTerminal = FirstFactory.first nullables firsts
-
-    // 产生式体长度为1或0的，没有用，丢弃。
+        
     let productions = 
         productions
         |> Set.remove productions.MinimumElement // 移除增广产生式
-        |> Set.filter(function
-            | [_]|[_;_] -> false
-            | _ -> true
+        |> Set.filter(fun p -> // 移除空产生式
+            let body = p.Tail
+            not body.IsEmpty
         )
 
     // 展开产生式体
     let spreadBodies =
         productions
-        |> Set.map(fun p -> p.Tail)
-        //|> Set.filter(fun body -> body.Length>1)
+        |> Set.map(fun p -> p.Tail) // body
+        |> Set.filter(fun body -> body.Length>1)
         |> Set.map(fun body -> 
             // 展开:(1,2,3)->[(1,2,3); (2,3); (3)]
             [0 .. body.Length-2]
