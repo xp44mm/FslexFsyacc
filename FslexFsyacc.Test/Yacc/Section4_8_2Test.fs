@@ -33,8 +33,6 @@ type Section4_8_2Test(output:ITestOutputHelper) =
         // 提取冲突的产生式
         let productions =
             AmbiguousCollection.gatherProductions conflictedClosures
-
-
         show productions
 
         //产生式的优先级操作符: production -> symbol
@@ -45,11 +43,3 @@ type Section4_8_2Test(output:ITestOutputHelper) =
 
         show productionSymbols
 
-        ////
-        //let eliminator = 
-        //    {
-        //        terminals = x.grammar.terminals
-        //        names = names
-        //        precedences = precedences
-        
-        //    } : AmbiguityEliminator

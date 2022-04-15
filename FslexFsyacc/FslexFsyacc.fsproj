@@ -10,10 +10,10 @@
 		<PackageProjectUrl>https://github.com/xp44mm/FslexFsyacc</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/xp44mm/FslexFsyacc</RepositoryUrl>
 		<PackageTags>lex;yacc;compiler;parser;analyzer</PackageTags>
-		<PackageReleaseNotes>grammar.precedes,follows extend to terminal key</PackageReleaseNotes>
+		<PackageReleaseNotes>headBar, tailPercent</PackageReleaseNotes>
 		<Company>34696643@qq.com</Company>
 		<Authors>xp44m</Authors>
-		<Version>1.2.8</Version>
+		<Version>1.2.9</Version>
 		<IsPublishable>True</IsPublishable>
 		<PackageReadmeFile>readme.md</PackageReadmeFile>
 	</PropertyGroup>
@@ -78,8 +78,6 @@
 		<Compile Include="Fsyacc\FsyaccParseTableFile.fs" />
 		<Compile Include="Fsyacc\FsyaccFile.fs" />
 		<Compile Include="Fsyacc\NormFsyaccFile.fs" />
-		
-		<Compile Include="SourceText.fs" />
 		
 		<None Include="..\readme.md">
 		  <Pack>True</Pack>
