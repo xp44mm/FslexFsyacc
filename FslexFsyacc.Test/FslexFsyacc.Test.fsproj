@@ -35,6 +35,7 @@
 
 		<Compile Include="Fsyacc\SemanticGeneratorTest.fs" />
 		<Compile Include="Fsyacc\FsyaccParseTableTest.fs" />
+		<Compile Include="Fsyacc\FsyaccFileStartTest.fs" />
 		<Compile Include="Expr\ExprToken.fs" />
 		<None Include="Expr\expr.fsyacc" />
 		<Compile Include="Expr\ExprParseTable.fs" />

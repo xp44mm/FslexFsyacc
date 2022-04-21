@@ -4,12 +4,13 @@ open Xunit
 open Xunit.Abstractions
 
 open System.IO
+open System.Text.RegularExpressions
 
 open FSharp.xUnit
 open FSharp.Literals
+
 open FslexFsyacc.Fsyacc
 open FslexFsyacc.Yacc
-open System.Text.RegularExpressions
 
 type FsyaccParseTableTest(output:ITestOutputHelper) =
     let show res =
@@ -27,6 +28,11 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
     member _.``0 - compiler test``() =
         let result = FsyaccCompiler.compile text
         show result
+
+    [<Fact>]
+    member _.``02 - extract FsyaccFile test``() =
+        let fsyacc = rawFsyacc.extract("rules",Set.empty).render()
+        output.WriteLine(fsyacc)
 
     [<Fact>]
     member _.``1 - 显示冲突状态的冲突项目``() =

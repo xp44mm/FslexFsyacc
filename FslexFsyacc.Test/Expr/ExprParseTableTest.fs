@@ -22,10 +22,20 @@ type ExprParseTableTest(output:ITestOutputHelper) =
     let fsyacc = NormFsyaccFile.fromRaw rawFsyacc
 
     [<Fact>]
-    member _.``0 - compiler test``() =
+    member _.``00 - compiler test``() =
         show rawFsyacc.rules
         show rawFsyacc.precedences
         show rawFsyacc.declarations
+
+    [<Fact>]
+    member _.``01 - render FsyaccFile test``() =
+        let fsyacc = rawFsyacc.render()
+        output.WriteLine(fsyacc)
+
+    [<Fact>]
+    member _.``02 - extract FsyaccFile test``() =
+        let fsyacc = rawFsyacc.extract("expr",Set.empty)
+        output.WriteLine(Literal.stringify fsyacc)
 
     [<Fact>]
     member _.``1 - all tokens``() =
