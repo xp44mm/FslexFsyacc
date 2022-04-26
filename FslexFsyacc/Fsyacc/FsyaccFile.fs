@@ -7,6 +7,7 @@ type FsyaccFile =
         precedences:(string*string list)list
         declarations:(string*string)list
     }
+
     member this.render() =
         FsyaccFileRender.renderFsyacc
             this.header
@@ -41,6 +42,21 @@ type FsyaccFile =
                 precedences = precedences
                 declarations = declarations
         }
+
+    member this.nameRules(productionNames:Map<string list,string>) =
+        productionNames
+        |> FsyaccFileName.productionToHeadBody
+        |> FsyaccFileName.nameRules this.rules
+
+    member this.refineRules(
+        oldProd:string list,
+        newProd:string list) =
+
+        this.rules
+        |> FsyaccFileRefine.refineRules
+            oldProd
+            newProd
+
     static member parse(sourceText:string) =
         let header,rules,precedences,declarations = 
             FsyaccCompiler.compile sourceText

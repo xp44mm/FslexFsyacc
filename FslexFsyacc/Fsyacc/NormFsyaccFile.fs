@@ -51,7 +51,6 @@ type NormFsyaccFile =
             rules = rules |> Seq.map Triple.ends |> Seq.toArray
             productionNames = productionNames
             precedences = precedences
-
             header = fsyacc.header
             declarations = fsyacc.declarations
         }
@@ -71,4 +70,4 @@ type NormFsyaccFile =
             closures = parseTable.closures
             header = this.header
             declarations = Array.ofList this.declarations
-        }: FsyaccParseTableFile
+        } //: FsyaccParseTableFile

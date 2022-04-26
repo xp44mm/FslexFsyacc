@@ -10,10 +10,10 @@
 		<PackageProjectUrl>https://github.com/xp44mm/FslexFsyacc</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/xp44mm/FslexFsyacc</RepositoryUrl>
 		<PackageTags>lex;yacc;compiler;parser;analyzer</PackageTags>
-		<PackageReleaseNotes>FsyaccFile.extract(startSymbol,terminals)</PackageReleaseNotes>
+		<PackageReleaseNotes>FsyaccFile.refineRules()</PackageReleaseNotes>
 		<Company>34696643@qq.com</Company>
 		<Authors>xp44m</Authors>
-		<Version>1.2.11</Version>
+		<Version>1.2.14</Version>
 		<IsPublishable>True</IsPublishable>
 		<PackageReadmeFile>readme.md</PackageReadmeFile>
 	</PropertyGroup>
@@ -78,6 +78,8 @@
 		<Compile Include="Fsyacc\FsyaccParseTableFile.fs" />
 		<Compile Include="Fsyacc\FsyaccFileRender.fs" />
 		<Compile Include="Fsyacc\FsyaccFileStart.fs" />
+		<Compile Include="Fsyacc\FsyaccFileName.fs" />
+		<Compile Include="Fsyacc\FsyaccFileRefine.fs" />
 		<Compile Include="Fsyacc\FsyaccFile.fs" />
 		<Compile Include="Fsyacc\NormFsyaccFile.fs" />
 		
@@ -89,7 +91,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="FSharp.Idioms" Version="1.2.2" />
+		<PackageReference Include="FSharp.Idioms" Version="1.2.4" />
 		<PackageReference Include="FSharp.Literals" Version="2.2.9" />
 	</ItemGroup>
 
