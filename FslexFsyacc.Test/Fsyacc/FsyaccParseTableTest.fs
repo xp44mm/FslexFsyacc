@@ -31,7 +31,7 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``02 - extract FsyaccFile test``() =
-        let fsyacc = rawFsyacc.extract("rules",Set.empty).render()
+        let fsyacc = rawFsyacc.start("rules",Set.empty).render()
         output.WriteLine(fsyacc)
 
     [<Fact>]

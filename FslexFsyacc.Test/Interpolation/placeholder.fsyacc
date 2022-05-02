@@ -1,0 +1,24 @@
+﻿%{
+open Interpolation.PlaceholderUtils
+%}
+
+Placeholder :
+    | expr "}" { s0 }
+
+expr : 
+     | expr "+" expr { BinaryExpression (s0 ,"+", s2) }
+     | expr "-" expr { BinaryExpression (s0 ,"-", s2) }
+     | expr "*" expr { BinaryExpression (s0 ,"*", s2) }
+     | expr "/" expr { BinaryExpression (s0 ,"/", s2) }
+     | "(" expr ")"  { s1 }
+     | "-" expr %prec UMINUS { PrefixExpression("-", s1) }
+     | NUMBER                { Number (float s0) }
+
+%%
+%left "+" "-"
+%left "*" "/"
+%right UMINUS
+%%
+NUMBER : "string"
+expr   : "Expression"
+Placeholder : "Expression"

@@ -1,6 +1,6 @@
 ﻿module FslexFsyacc.Fsyacc.SemanticGenerator
 
-open FslexFsyacc.Runtime.Utils
+open FslexFsyacc.Runtime.RenderUtils
 open System
 open FSharp.Literals
 open FSharp.Idioms.StringOps
@@ -16,7 +16,9 @@ let decorateSemantic (typeAnnotations:Map<string,string>) (prodSymbols:string li
     let mainLines =
         [
             for (i,sym) in bodySymbols do
-                $"let s{i} = unbox<{typeAnnotations.[sym]}> ss.[{i}]"
+                if typeAnnotations.ContainsKey sym then
+                    $"let s{i} = unbox<{typeAnnotations.[sym]}> ss.[{i}]"
+                else failwith $"type annot `{sym}` is required."
             if typeAnnotations.ContainsKey prodSymbols.Head && typeAnnotations.[prodSymbols.Head] <> "unit" then
                 $"let result:{typeAnnotations.[prodSymbols.Head]} ="
                 semantic |> Line.indentCodeBlock (4)

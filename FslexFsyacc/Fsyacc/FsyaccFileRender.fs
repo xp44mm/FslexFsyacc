@@ -1,6 +1,6 @@
 ﻿module FslexFsyacc.Fsyacc.FsyaccFileRender
 
-open FslexFsyacc.Runtime.Utils
+open FslexFsyacc.Runtime.RenderUtils
 
 open System.Text.RegularExpressions
 

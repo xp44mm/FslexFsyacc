@@ -3,10 +3,12 @@
 open Xunit
 open Xunit.Abstractions
 
-open System.IO
-
 open FSharp.xUnit
 open FSharp.Literals
+
+open System.IO
+open System.Text
+
 open FslexFsyacc.Fsyacc
 open FslexFsyacc.Yacc
 
@@ -34,7 +36,7 @@ type ExprParseTableTest(output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``02 - extract FsyaccFile test``() =
-        let fsyacc = rawFsyacc.extract("expr",Set.empty)
+        let fsyacc = rawFsyacc.start("expr",Set.empty)
         output.WriteLine(Literal.stringify fsyacc)
 
     [<Fact>]
@@ -82,7 +84,7 @@ type ExprParseTableTest(output:ITestOutputHelper) =
             ProductionUtils.precedenceOfProductions collection.grammar.terminals productions
         show pprods
 
-    [<Fact(Skip="once for all!")>] // 
+    [<Fact>] // (Skip="once for all!")
     member _.``5 - expr generateParseTable``() =
         let name = "ExprParseTable"
         let moduleName = $"Expr.{name}"
@@ -90,10 +92,10 @@ type ExprParseTableTest(output:ITestOutputHelper) =
         //解析表数据
         let tbl = fsyacc.toFsyaccParseTableFile()
         //show tbl
-        let fsharpCode = tbl.generate(moduleName)
+        let fsharpCode = tbl.generateX(moduleName)
 
         let outputDir = Path.Combine(__SOURCE_DIRECTORY__, $"{name}.fs")
-        File.WriteAllText(outputDir,fsharpCode,System.Text.Encoding.UTF8)
+        File.WriteAllText(outputDir,fsharpCode,Encoding.UTF8)
         output.WriteLine($"output yacc:\r\n{outputDir}")
 
 

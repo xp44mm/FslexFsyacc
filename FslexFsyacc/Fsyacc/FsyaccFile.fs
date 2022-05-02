@@ -15,7 +15,7 @@ type FsyaccFile =
             this.precedences
             this.declarations
 
-    member this.extract(startSymbol:string, terminals:Set<string>) =
+    member this.start(startSymbol:string, terminals:Set<string>) =
         let o = 
             this.rules
             |> List.filter(fun (lhs,_) -> 

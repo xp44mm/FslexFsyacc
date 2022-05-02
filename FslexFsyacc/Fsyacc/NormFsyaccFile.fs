@@ -70,4 +70,4 @@ type NormFsyaccFile =
             closures = parseTable.closures
             header = this.header
             declarations = Array.ofList this.declarations
-        } //: FsyaccParseTableFile
+        }
