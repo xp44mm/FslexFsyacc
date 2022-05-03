@@ -14,3 +14,4 @@ type Token =
     | NumericLiteral of string
     | SingleStringLiteral of string
     | DoubleStringLiteral of string
+    | ExpressionToken of Expression

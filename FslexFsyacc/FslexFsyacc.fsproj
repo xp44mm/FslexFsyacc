@@ -13,7 +13,7 @@
 		<PackageReleaseNotes>FsyaccFile.refineRules()</PackageReleaseNotes>
 		<Company>34696643@qq.com</Company>
 		<Authors>xp44m</Authors>
-		<Version>1.2.14</Version>
+		<Version>1.2.15</Version>
 		<IsPublishable>True</IsPublishable>
 		<PackageReadmeFile>readme.md</PackageReadmeFile>
 	</PropertyGroup>

@@ -13,7 +13,6 @@ let tokenize (index:int) (inp:string) =
         seq {
             match x with
             | "" -> ()
-
             | On (tryWhiteSpace) (raw,rest) ->
                 yield { 
                     index = i
@@ -21,7 +20,6 @@ let tokenize (index:int) (inp:string) =
                     value = WhiteSpace raw
                     }
                 yield! loop (i+raw.Length) rest
-
             | On (tryLineTerminatorSequence) (raw,rest) ->
                 yield { 
                     index = i
@@ -29,7 +27,6 @@ let tokenize (index:int) (inp:string) =
                     value = LineTerminatorSequence raw
                     }
                 yield! loop (i+raw.Length) rest
-
             | On (trySingleLineComment) (raw,rest) ->
                 yield { 
                     index = i
@@ -37,7 +34,6 @@ let tokenize (index:int) (inp:string) =
                     value = SingleLineComment raw
                     }
                 yield! loop (i+raw.Length) rest
-
             | On (tryMultiLineComment) (raw,rest) ->
                 yield { 
                     index = i
@@ -45,7 +41,6 @@ let tokenize (index:int) (inp:string) =
                     value = MultiLineComment raw
                     }
                 yield! loop (i+raw.Length) rest
-
             | On (tryIdentifierName) (raw,rest) ->
                 yield { 
                     index = i
@@ -53,7 +48,6 @@ let tokenize (index:int) (inp:string) =
                     value = IdentifierName raw
                     }
                 yield! loop (i+raw.Length) rest
-
             | On (tryLongestPrefix Punctuators) (raw,rest) ->
                 yield { 
                     index = i
@@ -61,7 +55,6 @@ let tokenize (index:int) (inp:string) =
                     value = Punctuator raw
                     }
                 yield! loop (i+raw.Length) rest
-
             | On (tryNumericLiteral) (raw,rest) ->
                 yield { 
                     index = i
@@ -69,7 +62,6 @@ let tokenize (index:int) (inp:string) =
                     value = NumericLiteral raw
                     }
                 yield! loop (i+raw.Length) rest
-
             | On (trySingleStringLiteral) (raw,rest) ->
                 yield { 
                     index = i
@@ -77,7 +69,6 @@ let tokenize (index:int) (inp:string) =
                     value = SingleStringLiteral raw
                     }
                 yield! loop (i+raw.Length) rest
-
             | On (tryDoubleStringLiteral) (raw,rest) ->
                 yield { 
                     index = i
@@ -89,4 +80,4 @@ let tokenize (index:int) (inp:string) =
             | _ -> failwith $"tokenize:{x}"
                 
         }
-    loop 0 inp
+    loop index inp

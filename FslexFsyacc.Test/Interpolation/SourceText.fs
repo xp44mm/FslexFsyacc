@@ -136,5 +136,11 @@ let tryTemplateCharacters =
     Regex @"^(\\[\s\S]|[^\\`$]|[$](?![{]))*"
     |> tryMatch
 
+//let tryTemplateHead = ()
+//let tryTemplateMiddle = ()
+//let tryTemplateTail = ()
 
+//let tryNoSubstitutionTemplate = 
+//    Regex @"^`(\\.|.)*`"
+//    |> tryMatch
 

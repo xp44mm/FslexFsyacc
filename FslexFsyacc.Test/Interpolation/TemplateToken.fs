@@ -15,20 +15,25 @@ type TemplateToken =
             seq {
                 match x with
                 | "" -> failwith inp
+
                 | On (tryFirst '\\') y ->
                     match y with
                     | "" -> failwith inp
                     | _ -> 
                         yield TemplateChars x.[0..1]
                         yield! loop y.[1..]
+
                 | On (tryFirst '`') y ->
                     yield Backtick
                     yield Rest y
+
                 | On (tryStart "${") y ->
                     yield Dollar_Brace
                     yield Rest y
+
                 | _ ->
                     yield TemplateChars x.[0..0]
                     yield! loop x.[1..]
+
             }
         loop inp
