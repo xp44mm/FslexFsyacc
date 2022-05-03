@@ -69,14 +69,7 @@ type IfElseParseTableTest(output:ITestOutputHelper) =
 
         Should.equal y pprods
 
-    [<Fact>] //(Skip="once and for all!")
-    member _.``5 - generate parsing table``() =
-        let name = "IfElseParseTable" // **input**
-        let moduleName = $"FslexFsyacc.{name}"
-
+    [<Fact>]
+    member _.``5 - verify parsing table``() =
         let parseTbl = fsyacc.toFsyaccParseTableFile()
-        let fsharpCode = parseTbl.generate(moduleName)
-        let outputDir = Path.Combine(__SOURCE_DIRECTORY__, $"{name}.fs")
-
-        File.WriteAllText(outputDir,fsharpCode,Encoding.UTF8)
-        output.WriteLine("output path:"+outputDir)
+        show parseTbl

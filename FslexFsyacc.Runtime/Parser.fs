@@ -3,7 +3,9 @@
 open FSharp.Idioms
 open FSharp.Literals
 open FslexFsyacc.Runtime.ParseTableUtils
+open System
 
+[<Obsolete("XParser<>")>]
 type Parser
     (
         rules: (string list*(obj[]->obj))[],

@@ -1,6 +1,7 @@
 ﻿%{
 open FslexFsyacc.Fsyacc
 open FslexFsyacc.Fsyacc.FsyaccTokenUtils
+type token = int*int*FsyaccToken
 %}
 
 file: 

@@ -70,7 +70,7 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
         let tokens = grammar.symbols - grammar.nonterminals
         show tokens
 
-    [<Fact(Skip="once for all!")>] // 
+    [<Fact>] // (Skip="once for all!")
     member _.``4 - generate ParseTable``() =
         // ** input **
         let name = "FsyaccParseTable"
@@ -78,7 +78,7 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
 
         //解析表数据
         let parseTbl = fsyacc.toFsyaccParseTableFile()
-        let fsharpCode = parseTbl.generate(moduleName)
+        let fsharpCode = parseTbl.generateX(moduleName)
 
         let outputDir = Path.Combine(sourcePath, $"{name}.fs")
         File.WriteAllText(outputDir,fsharpCode,System.Text.Encoding.UTF8)

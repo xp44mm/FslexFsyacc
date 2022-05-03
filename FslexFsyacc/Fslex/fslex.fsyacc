@@ -1,6 +1,8 @@
 ﻿%{
 open FslexFsyacc.Lex
 open FslexFsyacc.Fslex.FslexTokenUtils
+type token = int*int*FslexToken
+
 %}
 
 file       : HEADER definitions "%%" rules {s0,List.rev s1,List.rev s3}

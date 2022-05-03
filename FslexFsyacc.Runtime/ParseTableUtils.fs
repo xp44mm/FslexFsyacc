@@ -1,4 +1,5 @@
-﻿module FslexFsyacc.Runtime.ParseTableUtils
+﻿[<System.Obsolete("ParserTable()")>]
+module FslexFsyacc.Runtime.ParseTableUtils
 
 open FSharp.Idioms
 open FSharp.Literals

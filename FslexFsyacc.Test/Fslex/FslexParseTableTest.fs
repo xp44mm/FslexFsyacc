@@ -134,7 +134,7 @@ type FslexParseTableTest(output:ITestOutputHelper) =
         let moduleName = $"FslexFsyacc.Fslex.{name}"
         let fsyacc = NormFsyaccFile.fromRaw rawFsyacc
         let parseTbl = fsyacc.toFsyaccParseTableFile()
-        let fsharpCode = parseTbl.generate(moduleName)
+        let fsharpCode = parseTbl.generateX(moduleName)
         let outputDir = Path.Combine(sourcePath, $"{name}.fs")
         File.WriteAllText(outputDir,fsharpCode,System.Text.Encoding.UTF8)
         output.WriteLine("output yacc:"+outputDir)

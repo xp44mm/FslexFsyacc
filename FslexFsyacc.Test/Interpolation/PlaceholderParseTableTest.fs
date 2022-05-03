@@ -74,7 +74,7 @@ type PlaceholderParseTableTest(output:ITestOutputHelper) =
         //优先级应该据此结果给出，不能少，也不应该多。
         Should.equal y pprods
 
-    [<Fact>] // (Skip="once for all!")
+    [<Fact(Skip="once for all!")>] // 
     member _.``03 - generate ParseTable``() =
         let name = "PlaceholderParseTable"
         let moduleName = $"Interpolation.{name}"
@@ -82,7 +82,7 @@ type PlaceholderParseTableTest(output:ITestOutputHelper) =
         //解析表数据
         let tbl = fsyacc.toFsyaccParseTableFile()
         //show tbl
-        let fsharpCode = tbl.generate(moduleName)
+        let fsharpCode = tbl.generateX(moduleName)
 
         let outputDir = Path.Combine(__SOURCE_DIRECTORY__, $"{name}.fs")
         File.WriteAllText(outputDir,fsharpCode,Encoding.UTF8)

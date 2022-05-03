@@ -1,5 +1,8 @@
 ﻿%{
 open Interpolation.PlaceholderUtils
+open FslexFsyacc.Runtime
+type token = Position<Token>
+
 %}
 
 Placeholder :
