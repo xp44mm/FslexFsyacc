@@ -6,10 +6,10 @@ open FSharp.Literals
 type ParserTable<'tok> = 
     {
         rules: Map<int,string list*(obj[]->obj)>
-        actions:Map<int,Map<string,int>>
-        closures:(string list*int*string[])[][]
-        getTag:'tok -> string
-        getLexeme:'tok->obj
+        actions: Map<int,Map<string,int>>
+        closures: (string list*int*string[])[][]
+        getTag: 'tok -> string
+        getLexeme: 'tok->obj
 
     }
 

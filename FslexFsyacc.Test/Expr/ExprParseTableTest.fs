@@ -84,7 +84,7 @@ type ExprParseTableTest(output:ITestOutputHelper) =
             ProductionUtils.precedenceOfProductions collection.grammar.terminals productions
         show pprods
 
-    [<Fact>] // (Skip="once for all!")
+    [<Fact(Skip="once for all!")>] // 
     member _.``5 - expr generateParseTable``() =
         let name = "ExprParseTable"
         let moduleName = $"Expr.{name}"

@@ -15,6 +15,7 @@ type FsyaccParseTableFile =
     }
 
     /// 输入模块带名字空间的全名
+    [<Obsolete("generateX")>]
     member this.generate(moduleName:string) =
         let types = Map.ofArray this.declarations // symbol -> type of symbol
         
@@ -119,7 +120,7 @@ type FsyaccParseTableFile =
                 "|]"
                 "open FslexFsyacc.Runtime"
                 "let parser = XParser<token>(fxRules,actions,closures,getTag,getLexeme)"
-                "let parse (tokens:seq<_>) ="
+                "let parse(tokens:seq<token>) ="
                 "    tokens"
                 "    |> parser.parse"
                 $"    |> unbox<{types.[startSymbol]}>"

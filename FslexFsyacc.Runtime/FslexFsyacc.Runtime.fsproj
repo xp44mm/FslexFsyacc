@@ -20,12 +20,11 @@
     <Compile Include="Position.fs" />
     <Compile Include="Utils.fs" />
     <Compile Include="Analyzer.fs" />
-    <Compile Include="ParseTableUtils.fs" />
     <Compile Include="ParserTableAction.fs" />
     <Compile Include="ParserTable.fs" />
     <Compile Include="XParser.fs" />
+    <Compile Include="ParseTableUtils.fs" />
     <Compile Include="Parser.fs" />
-    <Compile Include="HeadParser.fs" />
   </ItemGroup>
 
   <ItemGroup>
