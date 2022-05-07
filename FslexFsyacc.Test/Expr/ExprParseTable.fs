@@ -49,7 +49,7 @@ let fxRules:(string list*(obj[]->obj))[] = [|
 |]
 open FslexFsyacc.Runtime
 let parser = XParser<token>(fxRules,actions,closures,getTag,getLexeme)
-let parse (tokens:seq<_>) =
+let parse(tokens:seq<token>) =
     tokens
     |> parser.parse
     |> unbox<float>

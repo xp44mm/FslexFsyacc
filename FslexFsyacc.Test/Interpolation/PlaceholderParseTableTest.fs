@@ -74,7 +74,7 @@ type PlaceholderParseTableTest(output:ITestOutputHelper) =
         //优先级应该据此结果给出，不能少，也不应该多。
         Should.equal y pprods
 
-    [<Fact(Skip="once for all!")>] // 
+    [<Fact>] // (Skip="once for all!")
     member _.``03 - generate ParseTable``() =
         let name = "PlaceholderParseTable"
         let moduleName = $"Interpolation.{name}"

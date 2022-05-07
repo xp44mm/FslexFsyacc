@@ -1,8 +1,9 @@
 ﻿namespace FslexFsyacc.Runtime
 
 type ParserTableAction =
+    | Shift of states:(int*obj) list
+    | Reduce of states:(int*obj) list
+    | Dead of int * string
     | Accept
-    | Dead
-    | Shift of states:int list*trees:obj list
-    | Reduce of states:int list*trees:obj list
 
+    

@@ -15,6 +15,7 @@ type FSharpSourceTextTest(output:ITestOutputHelper) =
     member _.``tryWord``() =
         let x = "xyz"
         let y = FSharpSourceText.tryWord x
+
         Should.equal y <| Some(x,"")
 
     [<Fact>]

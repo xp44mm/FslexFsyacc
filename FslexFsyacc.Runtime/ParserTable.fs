@@ -2,22 +2,19 @@
 
 open FSharp.Idioms
 open FSharp.Literals
+open System.Collections.Generic
 
-type ParserTable<'tok> = 
+type ParserTable = 
     {
         rules: Map<int,string list*(obj[]->obj)>
         actions: Map<int,Map<string,int>>
         closures: (string list*int*string[])[][]
-        getTag: 'tok -> string
-        getLexeme: 'tok->obj
-
     }
 
     static member create(
         rules: (string list*(obj[]->obj))[],
         actions: (string*int)[][],        
-        closures: (int*int*string[])[][],
-        getTag, getLexeme
+        closures: (int*int*string[])[][]
         ) =
         /// action -> rule(prod,mapper)
         let startSymbol = 
@@ -55,60 +52,217 @@ type ParserTable<'tok> =
             rules = rules
             actions=actions
             closures=closures
-            getTag = getTag
-            getLexeme = getLexeme
+            //getTag = getTag
+            //getLexeme = getLexeme
         }
 
-    member this.execute(
-        states: int list, 
-        trees: obj list, 
-        maybeToken:'tok option
+    member this.next<'tok>(
+        getTag: 'tok -> string,   
+        getLexeme: 'tok->obj, 
+        states: (int*obj) list, 
+        token:'tok
         ) =
+
         let rules = this.rules
         let actions = this.actions
-        let closures = this.closures
-        let getTag = this.getTag
-        let getLexeme = this.getLexeme
 
-        let sm = states.Head
-
-        let ai =
-            maybeToken
-            |> Option.map getTag
-            |> Option.defaultValue ""
-
+        let sm,_ = states.Head
+        let ai = getTag token
         //System.Console.WriteLine($"states:{states},la:'{ai}'")
 
         if actions.ContainsKey sm && actions.[sm].ContainsKey ai then
             match actions.[sm].[ai] with
             | state when state > 0 ->
-                let pushedStates = state::states
-                let tree = getLexeme(maybeToken.Value)
-                let pushedTrees = tree::trees
-                Shift(pushedStates, pushedTrees)
+                let tree = getLexeme token
+                let pushedStates = (state,tree)::states
+                //let pushedTrees = tree::trees
+                Shift pushedStates
             | ruleindex when ruleindex < 0 ->
                 //产生式符号列表。比如产生式 e-> e + e 的符号列表为 [e,e,+,e]
                 let symbols,mapper = rules.[ruleindex] 
                 let leftside = symbols.[0]
                 // 产生式右侧的长度
                 let len = symbols.Length-1 
-                let children, popedTrees = List.advance len trees
+                let children, popedStates = List.advance len states
+
+                let tree = 
+                    children
+                    |> List.map snd
+                    |> List.toArray
+                    |> mapper
 
                 let pushedStates =
                     //弹出状态，产生式体
-                    let popedStates = List.skip len states
-                    let smr = popedStates.Head // = s_{m-r}
+                    //let popedStates = List.skip len states
+                    let smr,_ = popedStates.Head // = s_{m-r}
                     //压入状态，产生式的头
                     let newstate = actions.[smr].[leftside] // GOTO
-                    newstate :: popedStates
 
-                let result = mapper(Array.ofList children)
-                let pushedTrees = result::popedTrees
+                    (newstate,tree) :: popedStates
 
-                Reduce(pushedStates, pushedTrees)
-            | 0 | _ -> Accept
+                Reduce pushedStates
+                //this.nextAction(pushedStates, pushedTrees,token)
+
+            | 0 -> Accept
+            | _ -> failwith "never" 
         else
-            Dead
+            Dead(sm,ai)
+
+    member this.complete(states: (int*obj) list) =
+        let rules = this.rules
+        let actions = this.actions
+
+        let sm,_ = states.Head
+        let ai = ""
+        //System.Console.WriteLine($"states:{states},la:'{ai}'")
+
+        if actions.ContainsKey sm && actions.[sm].ContainsKey ai then
+            match actions.[sm].[ai] with
+            | state when state > 0 ->
+                failwith $"no more shift."
+            | ruleindex when ruleindex < 0 ->
+                //产生式符号列表。比如产生式 e-> e + e 的符号列表为 [e,e,+,e]
+                let symbols,mapper = rules.[ruleindex] 
+                let leftside = symbols.[0]
+                // 产生式右侧的长度
+                let len = symbols.Length-1 
+                let children, popedStates = List.advance len states
+
+                let tree = 
+                    children
+                    |> List.map snd
+                    |> List.toArray
+                    |> mapper
+
+                let pushedStates =
+                    //弹出状态，产生式体
+                    //let popedStates = List.skip len states
+                    let smr,_ = popedStates.Head // = s_{m-r}
+                    //压入状态，产生式的头
+                    let newstate = actions.[smr].[leftside] // GOTO
+
+                    (newstate,tree) :: popedStates
+
+                Reduce pushedStates
+
+            | 0 -> Accept
+            | _ -> failwith "never" 
+        else
+            Dead(sm,ai)
 
 
 
+    //member this.next(
+    //    states: Stack<int>,
+    //    trees: Stack<obj>,
+    //    token:'tok
+    //    ) =
+
+    //    let rules = this.rules
+    //    let actions = this.actions
+    //    let closures = this.closures
+    //    let getTag = this.getTag
+    //    let getLexeme = this.getLexeme
+
+    //    let sm = states.Peek()
+    //    let ai = getTag token
+
+    //    //System.Console.WriteLine($"states:{states},la:'{ai}'")
+
+    //    if actions.ContainsKey sm && actions.[sm].ContainsKey ai then
+    //        match actions.[sm].[ai] with
+    //        | state when state > 0 ->
+    //            //let pushedStates = state::states
+    //            states.Push(state)
+    //            let tree = getLexeme token
+    //            //let pushedTrees = tree::trees
+    //            trees.Push(tree)
+    //            Shift([],[])
+    //        | ruleindex when ruleindex < 0 ->
+    //            //产生式符号列表。比如产生式 e-> e + e 的符号列表为 [e,e,+,e]
+    //            let symbols,mapper = rules.[ruleindex] 
+    //            let leftside = symbols.[0]
+    //            // 产生式右侧的长度
+    //            let len = symbols.Length-1
+
+    //            // 从栈顶弹出产生式体
+    //            let rec getChildren (ls:obj list) i =
+    //                if i = 0 then
+    //                    ls
+    //                else
+    //                    let s = trees.Pop()
+    //                    states.Pop() |> ignore
+    //                    getChildren (s::ls) (i-1)
+                    
+    //            let children = getChildren [] len
+
+    //            //弹出状态，产生式体
+    //            //let popedStates = List.skip len states
+
+    //            let smr = states.Peek() // = s_{m-r}
+    //            let newstate = actions.[smr].[leftside] // GOTO
+
+    //            //压入状态，产生式的头
+    //            states.Push(newstate)
+
+    //            let result = mapper(Array.ofList children)
+    //            trees.Push(result)
+
+    //            //Reduce(pushedStates, pushedTrees)
+    //            this.next(states,trees,token)
+    //        | 0 | _ -> Accept
+    //    else
+    //        Dead(sm,ai)
+
+    //member this.complete(states: Stack<int>,trees: Stack<obj>) =
+
+    //    let rules = this.rules
+    //    let actions = this.actions
+    //    let closures = this.closures
+    //    let getTag = this.getTag
+    //    let getLexeme = this.getLexeme
+
+    //    let sm = states.Peek()
+    //    let ai = ""
+
+    //    //System.Console.WriteLine($"states:{states},la:'{ai}'")
+
+    //    if actions.ContainsKey sm && actions.[sm].ContainsKey ai then
+    //        match actions.[sm].[ai] with
+    //        | state when state > 0 ->
+    //            failwith $"{state}"
+    //        | ruleindex when ruleindex < 0 ->
+    //            //产生式符号列表。比如产生式 e-> e + e 的符号列表为 [e,e,+,e]
+    //            let symbols,mapper = rules.[ruleindex] 
+    //            let leftside = symbols.[0]
+    //            // 产生式右侧的长度
+    //            let len = symbols.Length-1
+
+    //            // 从栈顶弹出产生式体
+    //            let rec getChildren (ls:obj list) i =
+    //                if i = 0 then
+    //                    ls
+    //                else
+    //                    let s = trees.Pop()
+    //                    states.Pop() |> ignore
+    //                    getChildren (s::ls) (i-1)
+                    
+    //            let children = getChildren [] len
+
+    //            //弹出状态，产生式体
+    //            //let popedStates = List.skip len states
+
+    //            let smr = states.Peek() // = s_{m-r}
+    //            let newstate = actions.[smr].[leftside] // GOTO
+
+    //            //压入状态，产生式的头
+    //            states.Push(newstate)
+
+    //            let result = mapper(Array.ofList children)
+    //            trees.Push(result)
+
+    //            //Reduce(pushedStates, pushedTrees)
+    //            this.complete(states,trees)
+    //        | 0 | _ -> Accept
+    //    else
+    //        Dead(sm,ai)

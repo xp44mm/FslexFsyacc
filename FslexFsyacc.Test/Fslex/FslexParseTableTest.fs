@@ -128,7 +128,7 @@ type FslexParseTableTest(output:ITestOutputHelper) =
         let tokens = grammar.symbols - grammar.nonterminals
         show tokens
 
-    [<Fact(Skip="once for all!")>] // 
+    [<Fact>] // (Skip="once for all!")
     member _.``5 - generate ParseTable``() =
         let name = "FslexParseTable"
         let moduleName = $"FslexFsyacc.Fslex.{name}"
