@@ -11,15 +11,11 @@ type XParser<'tok> (
         getLexeme:'tok->obj
     ) =
 
-    let tbl = 
-        ParserTable.create(
-            rules,
-            actions,
-            closures
-        )
+    let tbl =
+        ParserTable.create(rules, actions, closures)
 
     member this.parse(tokens:seq<'tok>) =
-        let iterator = 
+        let iterator =
             tokens.GetEnumerator()
             |> Iterator
 
@@ -29,18 +25,21 @@ type XParser<'tok> (
             =
             let action() =
                 match maybeToken with
-                | None -> tbl.complete(states)
-                | Some token -> tbl.next(getTag,getLexeme,states,token)
+                | Some token ->
+                    this.next(states,token)
+                | None ->
+                    this.complete(states)
 
             match action() with
-            | Accept -> states
-            | Shift states ->
-                iterator.tryNext()
-                |> loop states 
             | Reduce states ->
                 loop states maybeToken
+            | Shift states ->
+                iterator.tryNext()
+                |> loop states
+            | Accept ->
+                states
             | Dead(sm,ai) ->
-                let closure = 
+                let closure =
                     tbl.closures.[sm]
                     |> RenderUtils.renderClosure
                 let tok =
@@ -53,4 +52,16 @@ type XParser<'tok> (
         |> loop [0,null]
         |> List.head
         |> snd
+
+    member this.next(states,token:'tok) =
+        match tbl.next(getTag, getLexeme,states,token) with
+        | Reduce states -> 
+            this.next(states,token)
+        | Accept -> failwith $"next never meet Accept."
+        | act -> act
+
+    member this.complete(states) =
+        match tbl.complete(states) with
+        | Shift _ -> failwith "EOF never meet shift."
+        | act -> act
 

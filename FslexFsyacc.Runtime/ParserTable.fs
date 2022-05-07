@@ -4,7 +4,7 @@ open FSharp.Idioms
 open FSharp.Literals
 open System.Collections.Generic
 
-type ParserTable = 
+type ParserTable =
     {
         rules: Map<int,string list*(obj[]->obj)>
         actions: Map<int,Map<string,int>>
@@ -13,15 +13,15 @@ type ParserTable =
 
     static member create(
         rules: (string list*(obj[]->obj))[],
-        actions: (string*int)[][],        
+        actions: (string*int)[][],
         closures: (int*int*string[])[][]
         ) =
         /// action -> rule(prod,mapper)
-        let startSymbol = 
+        let startSymbol =
             rules.[0]
             |> fst  // production
             |> List.head
-        
+
         let rules: Map<int,string list*(obj[]->obj)> =
             [|
                 yield ["";startSymbol], (fun _ -> null)
@@ -47,7 +47,7 @@ type ParserTable =
                     prod,dot,las
                 )
             )
-        
+
         {
             rules = rules
             actions=actions
@@ -57,9 +57,9 @@ type ParserTable =
         }
 
     member this.next<'tok>(
-        getTag: 'tok -> string,   
-        getLexeme: 'tok->obj, 
-        states: (int*obj) list, 
+        getTag: 'tok -> string,
+        getLexeme: 'tok->obj,
+        states: (int*obj) list,
         token:'tok
         ) =
 
@@ -69,42 +69,14 @@ type ParserTable =
         let sm,_ = states.Head
         let ai = getTag token
         //System.Console.WriteLine($"states:{states},la:'{ai}'")
-
         if actions.ContainsKey sm && actions.[sm].ContainsKey ai then
             match actions.[sm].[ai] with
-            | state when state > 0 ->
-                let tree = getLexeme token
-                let pushedStates = (state,tree)::states
-                //let pushedTrees = tree::trees
-                Shift pushedStates
+            | stateIndex when stateIndex > 0 ->
+                ParserTableAction.shift(getLexeme,states,token,stateIndex) 
             | ruleindex when ruleindex < 0 ->
-                //产生式符号列表。比如产生式 e-> e + e 的符号列表为 [e,e,+,e]
-                let symbols,mapper = rules.[ruleindex] 
-                let leftside = symbols.[0]
-                // 产生式右侧的长度
-                let len = symbols.Length-1 
-                let children, popedStates = List.advance len states
-
-                let tree = 
-                    children
-                    |> List.map snd
-                    |> List.toArray
-                    |> mapper
-
-                let pushedStates =
-                    //弹出状态，产生式体
-                    //let popedStates = List.skip len states
-                    let smr,_ = popedStates.Head // = s_{m-r}
-                    //压入状态，产生式的头
-                    let newstate = actions.[smr].[leftside] // GOTO
-
-                    (newstate,tree) :: popedStates
-
-                Reduce pushedStates
-                //this.nextAction(pushedStates, pushedTrees,token)
-
+                ParserTableAction.reduce(rules,actions,states,ruleindex)
             | 0 -> Accept
-            | _ -> failwith "never" 
+            | _ -> failwith "never"
         else
             Dead(sm,ai)
 
@@ -121,32 +93,9 @@ type ParserTable =
             | state when state > 0 ->
                 failwith $"no more shift."
             | ruleindex when ruleindex < 0 ->
-                //产生式符号列表。比如产生式 e-> e + e 的符号列表为 [e,e,+,e]
-                let symbols,mapper = rules.[ruleindex] 
-                let leftside = symbols.[0]
-                // 产生式右侧的长度
-                let len = symbols.Length-1 
-                let children, popedStates = List.advance len states
-
-                let tree = 
-                    children
-                    |> List.map snd
-                    |> List.toArray
-                    |> mapper
-
-                let pushedStates =
-                    //弹出状态，产生式体
-                    //let popedStates = List.skip len states
-                    let smr,_ = popedStates.Head // = s_{m-r}
-                    //压入状态，产生式的头
-                    let newstate = actions.[smr].[leftside] // GOTO
-
-                    (newstate,tree) :: popedStates
-
-                Reduce pushedStates
-
+                ParserTableAction.reduce(rules,actions,states,ruleindex)
             | 0 -> Accept
-            | _ -> failwith "never" 
+            | _ -> failwith "never"
         else
             Dead(sm,ai)
 
@@ -180,7 +129,7 @@ type ParserTable =
     //            Shift([],[])
     //        | ruleindex when ruleindex < 0 ->
     //            //产生式符号列表。比如产生式 e-> e + e 的符号列表为 [e,e,+,e]
-    //            let symbols,mapper = rules.[ruleindex] 
+    //            let symbols,mapper = rules.[ruleindex]
     //            let leftside = symbols.[0]
     //            // 产生式右侧的长度
     //            let len = symbols.Length-1
@@ -193,7 +142,7 @@ type ParserTable =
     //                    let s = trees.Pop()
     //                    states.Pop() |> ignore
     //                    getChildren (s::ls) (i-1)
-                    
+
     //            let children = getChildren [] len
 
     //            //弹出状态，产生式体
@@ -233,7 +182,7 @@ type ParserTable =
     //            failwith $"{state}"
     //        | ruleindex when ruleindex < 0 ->
     //            //产生式符号列表。比如产生式 e-> e + e 的符号列表为 [e,e,+,e]
-    //            let symbols,mapper = rules.[ruleindex] 
+    //            let symbols,mapper = rules.[ruleindex]
     //            let leftside = symbols.[0]
     //            // 产生式右侧的长度
     //            let len = symbols.Length-1
@@ -246,7 +195,7 @@ type ParserTable =
     //                    let s = trees.Pop()
     //                    states.Pop() |> ignore
     //                    getChildren (s::ls) (i-1)
-                    
+
     //            let children = getChildren [] len
 
     //            //弹出状态，产生式体

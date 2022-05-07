@@ -23,7 +23,6 @@
     <Compile Include="ParserTableAction.fs" />
     <Compile Include="ParserTable.fs" />
     <Compile Include="XParser.fs" />
-    <Compile Include="ReactiveParser.fs" />
     <Compile Include="ParseTableUtils.fs" />
     <Compile Include="Parser.fs" />
   </ItemGroup>
