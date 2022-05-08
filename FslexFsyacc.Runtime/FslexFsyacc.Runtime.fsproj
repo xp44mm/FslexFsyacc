@@ -22,7 +22,7 @@
     <Compile Include="Analyzer.fs" />
     <Compile Include="ParserTableAction.fs" />
     <Compile Include="ParserTable.fs" />
-    <Compile Include="XParser.fs" />
+    <Compile Include="Parser.fs" />
   </ItemGroup>
 
   <ItemGroup>

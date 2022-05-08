@@ -13,7 +13,9 @@ type Parser
     (
         rules: (string list*(obj[]->obj))[],
         actions: (string*int)[][],        
-        closures: (int*int*string[])[][]
+        closures: (int*int*string[])[][],
+        getTag:'tok -> string,
+        getLexeme:'tok->obj
     ) =
 
 ```
