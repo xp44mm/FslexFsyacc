@@ -3,7 +3,7 @@
 open FSharp.Idioms
 open FSharp.Literals
 
-type XParser<'tok> (
+type Parser<'tok> (
         rules: (string list*(obj[]->obj))[],
         actions: (string*int)[][],
         closures: (int*int*string[])[][],

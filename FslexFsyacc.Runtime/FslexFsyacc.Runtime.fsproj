@@ -8,11 +8,11 @@
     <PackageProjectUrl>https://github.com/xp44mm/FslexFsyacc</PackageProjectUrl>
     <RepositoryUrl>https://github.com/xp44mm/FslexFsyacc</RepositoryUrl>
     <PackageTags>lex;yacc;compiler;parser;analyzer</PackageTags>
-    <PackageReleaseNotes>update dependency</PackageReleaseNotes>
+    <PackageReleaseNotes>update parser</PackageReleaseNotes>
     <Authors>xp44m</Authors>
     <Company>34696643@qq.com</Company>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <Version>1.2.8</Version>
+    <Version>1.2.9</Version>
     <PackageReadmeFile>readme.md</PackageReadmeFile>
   </PropertyGroup>
 
@@ -23,8 +23,6 @@
     <Compile Include="ParserTableAction.fs" />
     <Compile Include="ParserTable.fs" />
     <Compile Include="XParser.fs" />
-    <Compile Include="ParseTableUtils.fs" />
-    <Compile Include="Parser.fs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -78,7 +78,7 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
 
         //解析表数据
         let parseTbl = fsyacc.toFsyaccParseTableFile()
-        let fsharpCode = parseTbl.generateX(moduleName)
+        let fsharpCode = parseTbl.generate(moduleName)
 
         let outputDir = Path.Combine(sourcePath, $"{name}.fs")
         File.WriteAllText(outputDir,fsharpCode,System.Text.Encoding.UTF8)

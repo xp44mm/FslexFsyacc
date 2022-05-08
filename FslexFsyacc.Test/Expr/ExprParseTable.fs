@@ -48,7 +48,7 @@ let fxRules:(string list*(obj[]->obj))[] = [|
             box result
 |]
 open FslexFsyacc.Runtime
-let parser = XParser<token>(fxRules,actions,closures,getTag,getLexeme)
+let parser = Parser<token>(fxRules,actions,closures,getTag,getLexeme)
 let parse(tokens:seq<token>) =
     tokens
     |> parser.parse

@@ -92,7 +92,7 @@ type ExprParseTableTest(output:ITestOutputHelper) =
         //解析表数据
         let tbl = fsyacc.toFsyaccParseTableFile()
         //show tbl
-        let fsharpCode = tbl.generateX(moduleName)
+        let fsharpCode = tbl.generate(moduleName)
 
         let outputDir = Path.Combine(__SOURCE_DIRECTORY__, $"{name}.fs")
         File.WriteAllText(outputDir,fsharpCode,Encoding.UTF8)
