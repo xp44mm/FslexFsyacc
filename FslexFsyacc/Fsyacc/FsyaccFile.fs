@@ -1,4 +1,5 @@
 ﻿namespace FslexFsyacc.Fsyacc
+open System
 
 type FsyaccFile = 
     {
@@ -42,21 +43,7 @@ type FsyaccFile =
                 precedences = precedences
                 declarations = declarations
         }
-
-    member this.nameRules(productionNames:Map<string list,string>) =
-        productionNames
-        |> FsyaccFileName.productionToHeadBody
-        |> FsyaccFileName.nameRules this.rules
-
-    member this.refineRules(
-        oldProd:string list,
-        newProd:string list) =
-
-        this.rules
-        |> FsyaccFileRefine.refineRules
-            oldProd
-            newProd
-
+    
     static member parse(sourceText:string) =
         let header,rules,precedences,declarations = 
             FsyaccCompiler.compile sourceText
@@ -67,4 +54,21 @@ type FsyaccFile =
             declarations = declarations
 
         }
+            
+    
+    [<Obsolete("FsyaccFileRules")>]
+    member this.nameRules(productionNames:Map<string list,string>) =
+        productionNames
+        |> FsyaccFileName.productionToHeadBody
+        |> FsyaccFileName.nameRules this.rules
+
+    [<Obsolete("FsyaccFileRules")>]
+    member this.refineRules(
+        oldProd:string list,
+        newProd:string list) =
+
+        this.rules
+        |> FsyaccFileRefine.refineRules
+            oldProd
+            newProd
 

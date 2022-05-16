@@ -8,11 +8,11 @@
     <PackageProjectUrl>https://github.com/xp44mm/FslexFsyacc</PackageProjectUrl>
     <RepositoryUrl>https://github.com/xp44mm/FslexFsyacc</RepositoryUrl>
     <PackageTags>lex;yacc;compiler;parser;analyzer</PackageTags>
-    <PackageReleaseNotes>update parser</PackageReleaseNotes>
+    <PackageReleaseNotes>update dep</PackageReleaseNotes>
     <Authors>xp44m</Authors>
     <Company>34696643@qq.com</Company>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <Version>1.2.9</Version>
+    <Version>1.2.10</Version>
     <PackageReadmeFile>readme.md</PackageReadmeFile>
   </PropertyGroup>
 
@@ -33,12 +33,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FSharp.Idioms" Version="1.2.4" />
+    <PackageReference Include="FSharp.Idioms" Version="1.2.6" />
     <PackageReference Include="FSharp.Literals" Version="2.2.9" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="6.0.3" />
+    <PackageReference Update="FSharp.Core" Version="6.0.4" />
   </ItemGroup>
 
 </Project>

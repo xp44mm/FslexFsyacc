@@ -2,6 +2,7 @@
 
 open FSharp.Idioms
 open FslexFsyacc.Yacc
+
 type NormFsyaccFile = 
     {
         rules:(string list*string)[]
@@ -13,15 +14,19 @@ type NormFsyaccFile =
     }
 
     static member fromRaw(fsyacc:FsyaccFile) =
+        //let rules =
+        //    //简写的产生式规范化为完整的产生式
+        //    fsyacc.rules
+        //    |> Seq.collect(fun (head,bodies)->
+        //        bodies
+        //        |> Seq.map(fun (symbols,name,semantic)->
+        //            head::symbols,name,semantic
+        //        )
+        //    )
+
         let rules =
-            //简写的产生式规范化为完整的产生式
             fsyacc.rules
-            |> Seq.collect(fun (head,bodies)->
-                bodies
-                |> Seq.map(fun (symbols,name,semantic)->
-                    head::symbols,name,semantic
-                )
-            )
+            |> FsyaccFileRules.rawToNormRules
 
         // production -> name
         let productionNames =

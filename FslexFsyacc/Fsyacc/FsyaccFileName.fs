@@ -1,4 +1,5 @@
-﻿module FslexFsyacc.Fsyacc.FsyaccFileName
+﻿[<System.Obsolete("FsyaccFileRules")>]
+module FslexFsyacc.Fsyacc.FsyaccFileName
 
 open FSharp.Idioms
 
