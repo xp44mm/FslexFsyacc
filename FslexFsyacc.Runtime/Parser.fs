@@ -14,6 +14,9 @@ type Parser<'tok> (
     let tbl =
         ParserTable.create(rules, actions, closures)
 
+    ///状态的符号
+    member this.getSymbol(state) = tbl.getSymbol(state)
+
     member this.parse(tokens:seq<'tok>) =
         let iterator =
             tokens.GetEnumerator()

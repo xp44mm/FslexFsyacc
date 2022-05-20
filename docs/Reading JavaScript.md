@@ -1,3 +1,40 @@
+In traditional JavaScript compilers, the parser and lexer are intertwined. Rather than run the entire program through the lexer once to get a sequence of tokens, the parser calls out to the lexer from a given grammatical context with a flag to indicate if the lexer should accept a regular expression or a divide operator, and the input character stream is tokenized accordingly. So if the parser is in a context that accepts a regular expression, the characters “/x/” will be lexed into the single token /x/ otherwise it will lex into the individual tokens /, x, and /.
+
+```
+        feedback
+lexer<->parser->AST
+        Token*
+
+```
+
+Our JavaScript macro system, sweet.js, includes a separate reader that converts a sequence of tokens into a sequence of token trees (a little analogous to Symbolic-expressions) without feedback from the parser.
+
+```
+lexer → reader→ expander/parser→
+```
+
+This enables us to finally separate the JavaScript lexer and parser and build a fully hygienic macro system for JavaScript. The reader records sufficient history information in the form of token trees in order to correctly decide whether to parse a sequence of tokens `/x/g` as a regular expression or as division operators (as in `4.0/x/g`). Surprisingly, this history information needs to be remembered from arbitrarily far back in the token stream.
+
+While the algorithm for resolving ambiguities we present in this paper is specific to JavaScript, the technique of recording history in the reader with token trees can be applied to other languages with ambiguous grammars.
+
+Once JavaScript source has been correctly read, there are still a number of challenges to building an expressive macro system. The lack of parentheses in particular make writing declarative macro definitions difficult. For example, the if statement in JavaScript allows undelimited then and else branches:
+
+```js
+if ( denom > 0)
+x / denom ;
+else
+throw " divide by zero";
+```
+
+It is necessary to know where the then and else branches end to correctly implement an if macro but this is complicated by the lack of delimiters.
+
+The solution to this problem that we take is by progressively building a partial AST during macro expansion. Macros can then match against and manipulate this partial AST. For example, an `if` macro could indicate that the `then` and `else` branches must be single statements and then manipulate them appropriately.
+
+This approach, called *enforestation*, was pioneered by Honu [29, 30], which we adapt here for JavaScript. 
+
+enforestation parsing step, which converts a flat stream of tokens into an S-expression-like tree, in addition to the initial "read" phase of parsing and interleaved with the "macro-expand" phase.
+
+
 # 2. Reading JavaScript
 
 Parsers give structure to unstructured source code. In parsers without macro systems this is usually accomplished by a lexer (which converts a character stream to a token stream) and a parser (which converts the token stream into an AST according to a context-free grammar). A system with macros must implement a macro expander that sits between the lexer and parser. Some macros systems, such as the C preprocessor, work over just the token stream. However, to implement truly expressive Scheme-like macros that can manipulate groups of unparsed tokens, it is necessary to structure the token stream via a *reader*, which performs delimiter matching and enables macros to manipulate delimiter-grouped tokens.
@@ -220,7 +257,7 @@ The parser for normal tokens is defined in Figure 4, and generates ASTs in the a
 Program :: Token* -> AST
 ```
 
-We use notation whereby the grammar production `Program e ::= SourceElements e` means to match the input sequence with SourceElements e and produce the resulting AST e. 
+We use notation whereby the grammar production `Program e ::= SourceElements e` means to match the input sequence with `SourceElements e` and produce the resulting `AST e`. 
 
 Note that the grammar we present here is a simplified version of the grammar specified in the ECMAScript 5.1 standard and many nonterminal names are shortened versions of nonterminals in the standard. It is mostly straightforward to extend the algorithm presented here to the full sweet.js implementation for ES5 JavaScript. 
 

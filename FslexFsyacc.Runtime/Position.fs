@@ -7,6 +7,13 @@ type Position<'value> =
         value :'value
     }
 
+    static member from(index,length,value)=
+        {
+            index  = index
+            length = length
+            value  = value
+        }
+
     member this.nextIndex = 
         this.index + this.length
 
