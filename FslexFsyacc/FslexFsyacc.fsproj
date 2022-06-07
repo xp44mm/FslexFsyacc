@@ -13,7 +13,7 @@
 		<PackageReleaseNotes>runtime</PackageReleaseNotes>
 		<Company>34696643@qq.com</Company>
 		<Authors>xp44m</Authors>
-		<Version>1.2.18</Version>
+		<Version>1.2.24</Version>
 		<IsPublishable>True</IsPublishable>
 		<PackageReadmeFile>readme.md</PackageReadmeFile>
 	</PropertyGroup>
@@ -93,7 +93,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="FSharp.Idioms" Version="1.2.6" />
+		<PackageReference Include="FSharp.Idioms" Version="1.2.8" />
 		<PackageReference Include="FSharp.Literals" Version="2.2.9" />
 	</ItemGroup>
 

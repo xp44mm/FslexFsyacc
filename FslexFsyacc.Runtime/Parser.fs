@@ -2,6 +2,7 @@
 
 open FSharp.Idioms
 open FSharp.Literals
+open FslexFsyacc.Runtime.ParserTableAction
 
 type Parser<'tok> (
         rules: (string list*(obj[]->obj))[],
@@ -14,34 +15,95 @@ type Parser<'tok> (
     let tbl =
         ParserTable.create(rules, actions, closures)
 
+    member this.getParserTable() = tbl
+
     ///状态的符号
     member this.getSymbol(state) = tbl.getSymbol(state)
+
+    ///将token压入状态栈中。
+    member this.shift(states,token:'tok) =
+        let ai = getTag token
+        let rec loop states =
+            match tbl.tryNextAction(states,ai) with
+            | None ->
+                failwith $"next state is dead state."
+            | Some i when isRuleOfReduce i ->
+                let states = reduce(tbl.rules,tbl.actions,states,i)
+                loop states
+            | Some i when isStateOfShift i ->
+                let states = shift(getLexeme,states,token,i)
+                states
+            | Some i -> failwith $"unexpected action:{i}."
+        loop states
+
+    ///对状态栈连续执行reduce，直到非reduce动作:shift,accept（不执行）
+    ///如果改变了states返回Some newStates，如果states保持不变，返回None
+    member this.tryReduce(states,token:'tok) =
+        let ai = getTag token
+        let rec loop times states =
+            match tbl.tryNextAction(states,ai) with
+            | None ->
+                failwith $"next state is dead state."
+            | Some i when isRuleOfReduce i ->
+                let pushedStates = reduce(tbl.rules,tbl.actions,states,i)
+                loop (times+1) pushedStates
+            | Some i ->
+                if times > 0 then
+                    Some states
+                else None
+        loop 0 states
+
+    ///对状态栈执行reduce，直到非reduce动作:shift,accept（不执行）
+    ///如果改变了states返回Some newStates，如果states保持不变，返回None
+    member this.tryReduce(states) =
+        let rec loop times states =
+            match tbl.tryNextAction(states,"") with
+            | None ->
+                failwith $"next state is dead state."
+            | Some i when isRuleOfReduce i ->
+                let pushedStates = reduce(tbl.rules,tbl.actions,states,i)
+                loop (times+1) pushedStates
+            | Some 0 ->
+                if times > 0 then
+                    Some states
+                else None
+            | Some i -> failwith $"unexpected action:{i}."
+
+        loop 0 states
+
+    ///返回接受状态
+    member this.isAccept(states) =
+        match tbl.tryNextAction(states,"") with
+        | None ->
+            failwith $"next state is dead state."
+        | Some 0 -> true
+        | Some _ -> false
 
     member this.parse(tokens:seq<'tok>) =
         let iterator =
             tokens.GetEnumerator()
             |> Iterator
 
-        let rec loop
-            (states: (int*obj) list)
-            (maybeToken: 'tok option)
-            =
+        let rec loop(states: (int*obj) list)(maybeToken: 'tok option)=
             let action() =
                 match maybeToken with
                 | Some token ->
-                    this.next(states,token)
+                    tbl.next(getTag,getLexeme,states,token)
                 | None ->
-                    this.complete(states)
+                    tbl.complete(states)
 
             match action() with
-            | Reduce states ->
-                loop states maybeToken
-            | Shift states ->
-                iterator.tryNext()
-                |> loop states
-            | Accept ->
-                states
-            | Dead(sm,ai) ->
+            | Some(i,nextStates) ->
+                if isStateOfShift i then
+                    iterator.tryNext()
+                    |> loop nextStates
+                elif isRuleOfReduce i then
+                    loop nextStates maybeToken
+                elif i = 0 then
+                    nextStates
+                else failwith ""
+            | None ->
+                let sm,_ = states.Head
                 let closure =
                     tbl.closures.[sm]
                     |> RenderUtils.renderClosure
@@ -55,16 +117,3 @@ type Parser<'tok> (
         |> loop [0,null]
         |> List.head
         |> snd
-
-    member this.next(states,token:'tok) =
-        match tbl.next(getTag, getLexeme,states,token) with
-        | Reduce states -> 
-            this.next(states,token)
-        | Accept -> failwith $"next never meet Accept."
-        | act -> act
-
-    member this.complete(states) =
-        match tbl.complete(states) with
-        | Shift _ -> failwith "EOF never meet shift."
-        | act -> act
-

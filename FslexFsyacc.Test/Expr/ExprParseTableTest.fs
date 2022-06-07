@@ -110,3 +110,11 @@ type ExprParseTableTest(output:ITestOutputHelper) =
         Should.equal t.declarations ExprParseTable.declarations
 
 
+    [<Fact>]
+    member _.``7 - closures``() =
+        let tbl = ExprParseTable.parser.getParserTable()
+        let str = tbl.collection()
+        let name = "expr"
+        let outputDir = Path.Combine(__SOURCE_DIRECTORY__, $"{name}.txt")
+        File.WriteAllText(outputDir,str,Encoding.UTF8)
+        output.WriteLine($"output:\r\n{outputDir}")

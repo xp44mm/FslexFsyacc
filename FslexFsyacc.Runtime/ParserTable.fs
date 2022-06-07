@@ -1,6 +1,8 @@
 ﻿namespace FslexFsyacc.Runtime
+open FslexFsyacc.Runtime.ParserTableAction
 
 open FSharp.Idioms
+open FSharp.Idioms.ActivePatterns
 
 type ParserTable =
     {
@@ -68,48 +70,65 @@ type ParserTable =
         |> Seq.map(fun(prod,dot,_)->prod.[dot])
         |> Seq.head
 
+    member this.collection() =
+        this.closures
+        |> Array.mapi(fun i cls ->
+            let symbol =
+                i
+                |> this.getSymbol
+                |> RenderUtils.renderSymbol
+            let ls =
+                RenderUtils.renderClosure cls
+                |> Line.indentCodeBlock 4
+            $"{i}/{symbol} :\r\n{ls}"
+        )
+        |> String.concat "\r\n"
+
+    member this.tryNextAction(
+        states: (int*obj) list,
+        ai:string
+    ) =
+        let actions = this.actions
+        let sm,_ = states.Head
+        if actions.ContainsKey sm && actions.[sm].ContainsKey ai then
+            Some actions.[sm].[ai]
+        else
+            None
+
     member this.next<'tok>(
         getTag: 'tok -> string,
         getLexeme: 'tok->obj,
         states: (int*obj) list,
         token:'tok
         ) =
-
         let rules = this.rules
         let actions = this.actions
 
-        let sm,_ = states.Head
-        let ai = getTag token
-        //System.Console.WriteLine($"states:{states},la:'{ai}'")
-        if actions.ContainsKey sm && actions.[sm].ContainsKey ai then
-            match actions.[sm].[ai] with
-            | stateIndex when stateIndex > 0 ->
-                ParserTableAction.shift(getLexeme,states,token,stateIndex) 
-            | ruleindex when ruleindex < 0 ->
-                ParserTableAction.reduce(rules,actions,states,ruleindex)
-            | 0 -> Accept
-            | _ -> failwith "never"
-        else
-            Dead(sm,ai)
+        this.tryNextAction(states,getTag token)
+        |> Option.map(fun i ->
+            match i with
+            | _ when isStateOfShift i ->
+                let pushedStates = shift(getLexeme,states,token,i)
+                i,pushedStates
+            | _ when isRuleOfReduce i ->
+                let pushedStates = reduce(rules,actions,states,i)
+                i,pushedStates
+            | _ ->
+                i,states
+        )
 
-    member this.complete(states: (int*obj) list) =
+    member this.complete(states:(int*obj) list) =
         let rules = this.rules
         let actions = this.actions
-
-        let sm,_ = states.Head
-        let ai = ""
-        //System.Console.WriteLine($"states:{states},la:'{ai}'")
-
-        if actions.ContainsKey sm && actions.[sm].ContainsKey ai then
-            match actions.[sm].[ai] with
-            | state when state > 0 ->
+        this.tryNextAction(states,"")
+        |> Option.map(fun i ->
+            match i with
+            | _ when isStateOfShift i ->
                 failwith $"no more shift."
-            | ruleindex when ruleindex < 0 ->
-                ParserTableAction.reduce(rules,actions,states,ruleindex)
-            | 0 -> Accept
-            | _ -> failwith "never"
-        else
-            Dead(sm,ai)
-
-
+            | _ when isRuleOfReduce i ->
+                let pushedStates = reduce(rules,actions,states,i)
+                i,pushedStates
+            | _ ->
+                i,states
+        )
 

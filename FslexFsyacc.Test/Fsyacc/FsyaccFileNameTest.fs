@@ -12,35 +12,35 @@ type FsyaccFileNameTest(output:ITestOutputHelper) =
         |> Literal.stringify
         |> output.WriteLine
 
-    [<Fact>]
-    member _.``0 - names test``() =
-        let x = Map.ofList [
-            ["IfStatement";"if";"(";"Expression";")";"Statement"],"if"]
-        let names = FsyaccFileName.productionToHeadBody x
-        let y = Map ["IfStatement",Map [["if";"(";"Expression";")";"Statement"],"if"]]
+    //[<Fact>]
+    //member _.``0 - names test``() =
+    //    let x = Map.ofList [
+    //        ["IfStatement";"if";"(";"Expression";")";"Statement"],"if"]
+    //    let names = FsyaccFileName.productionToHeadBody x
+    //    let y = Map ["IfStatement",Map [["if";"(";"Expression";")";"Statement"],"if"]]
 
-        show names
-        Should.equal y names
+    //    show names
+    //    Should.equal y names
 
-    [<Fact>]
-    member _.``1 - names test``() =
-        let x = 
-            ["IfStatement",[
-                ["if";"(";"Expression";")";"Statement"],"","{}"
-                ["if";"(";"Expression";")";"Statement";"else";"Statement"],"","{}"
-                ] ]
+    //[<Fact>]
+    //member _.``1 - names test``() =
+    //    let x = 
+    //        ["IfStatement",[
+    //            ["if";"(";"Expression";")";"Statement"],"","{}"
+    //            ["if";"(";"Expression";")";"Statement";"else";"Statement"],"","{}"
+    //            ] ]
 
-        let names = Map ["IfStatement",Map [["if";"(";"Expression";")";"Statement"],"if"]]
+    //    let names = Map ["IfStatement",Map [["if";"(";"Expression";")";"Statement"],"if"]]
 
 
-        let rules = FsyaccFileName.nameRules x names
+    //    let rules = FsyaccFileName.nameRules x names
 
-        show rules
-        let y = ["IfStatement",[
-            ["if";"(";"Expression";")";"Statement"],"if","{}";
-            ["if";"(";"Expression";")";"Statement";"else";"Statement"],"","{}"]]
+    //    show rules
+    //    let y = ["IfStatement",[
+    //        ["if";"(";"Expression";")";"Statement"],"if","{}";
+    //        ["if";"(";"Expression";")";"Statement";"else";"Statement"],"","{}"]]
 
-        Should.equal y rules
+    //    Should.equal y rules
 
 
 

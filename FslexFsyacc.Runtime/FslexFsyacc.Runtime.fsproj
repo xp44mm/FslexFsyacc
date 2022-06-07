@@ -8,21 +8,22 @@
     <PackageProjectUrl>https://github.com/xp44mm/FslexFsyacc</PackageProjectUrl>
     <RepositoryUrl>https://github.com/xp44mm/FslexFsyacc</RepositoryUrl>
     <PackageTags>lex;yacc;compiler;parser;analyzer</PackageTags>
-    <PackageReleaseNotes>parser.getSymbol state</PackageReleaseNotes>
+    <PackageReleaseNotes>Analyzer</PackageReleaseNotes>
     <Authors>xp44m</Authors>
     <Company>34696643@qq.com</Company>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <Version>1.2.11</Version>
+    <Version>1.2.17</Version>
     <PackageReadmeFile>readme.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Include="Position.fs" />
-    <Compile Include="Utils.fs" />
+    <Compile Include="RenderUtils.fs" />
     <Compile Include="Analyzer.fs" />
     <Compile Include="ParserTableAction.fs" />
     <Compile Include="ParserTable.fs" />
     <Compile Include="Parser.fs" />
+    <Compile Include="BalancedBracketCounter.fs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -33,7 +34,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FSharp.Idioms" Version="1.2.6" />
+    <PackageReference Include="FSharp.Idioms" Version="1.2.8" />
     <PackageReference Include="FSharp.Literals" Version="2.2.9" />
   </ItemGroup>
 

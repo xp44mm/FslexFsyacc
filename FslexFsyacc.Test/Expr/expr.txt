@@ -1,0 +1,93 @@
+﻿0/"" :
+    "" -> @ expr
+    expr -> @ "(" expr ")"
+    expr -> @ "-" expr
+    expr -> @ NUMBER
+    expr -> @ expr "*" expr
+    expr -> @ expr "+" expr
+    expr -> @ expr "-" expr
+    expr -> @ expr "/" expr
+1/expr :
+    "" -> expr [""]
+    expr -> expr @ "*" expr
+    expr -> expr @ "+" expr
+    expr -> expr @ "-" expr
+    expr -> expr @ "/" expr
+2/"(" :
+    expr -> @ "(" expr ")"
+    expr -> "(" @ expr ")"
+    expr -> @ "-" expr
+    expr -> @ NUMBER
+    expr -> @ expr "*" expr
+    expr -> @ expr "+" expr
+    expr -> @ expr "-" expr
+    expr -> @ expr "/" expr
+3/expr :
+    expr -> "(" expr @ ")"
+    expr -> expr @ "*" expr
+    expr -> expr @ "+" expr
+    expr -> expr @ "-" expr
+    expr -> expr @ "/" expr
+4/")" :
+    expr -> "(" expr ")" ["";")";"*";"+";"-";"/"]
+5/"-" :
+    expr -> @ "(" expr ")"
+    expr -> @ "-" expr
+    expr -> "-" @ expr
+    expr -> @ NUMBER
+    expr -> @ expr "*" expr
+    expr -> @ expr "+" expr
+    expr -> @ expr "-" expr
+    expr -> @ expr "/" expr
+6/expr :
+    expr -> "-" expr ["";")";"*";"+";"-";"/"]
+7/NUMBER :
+    expr -> NUMBER ["";")";"*";"+";"-";"/"]
+8/expr :
+    expr -> expr "*" expr ["";")";"*";"+";"-";"/"]
+9/expr :
+    expr -> expr @ "*" expr
+    expr -> expr "+" expr ["";")";"+";"-"]
+    expr -> expr @ "/" expr
+10/expr :
+    expr -> expr @ "*" expr
+    expr -> expr "-" expr ["";")";"+";"-"]
+    expr -> expr @ "/" expr
+11/expr :
+    expr -> expr "/" expr ["";")";"*";"+";"-";"/"]
+12/"*" :
+    expr -> @ "(" expr ")"
+    expr -> @ "-" expr
+    expr -> @ NUMBER
+    expr -> @ expr "*" expr
+    expr -> expr "*" @ expr
+    expr -> @ expr "+" expr
+    expr -> @ expr "-" expr
+    expr -> @ expr "/" expr
+13/"+" :
+    expr -> @ "(" expr ")"
+    expr -> @ "-" expr
+    expr -> @ NUMBER
+    expr -> @ expr "*" expr
+    expr -> @ expr "+" expr
+    expr -> expr "+" @ expr
+    expr -> @ expr "-" expr
+    expr -> @ expr "/" expr
+14/"-" :
+    expr -> @ "(" expr ")"
+    expr -> @ "-" expr
+    expr -> @ NUMBER
+    expr -> @ expr "*" expr
+    expr -> @ expr "+" expr
+    expr -> @ expr "-" expr
+    expr -> expr "-" @ expr
+    expr -> @ expr "/" expr
+15/"/" :
+    expr -> @ "(" expr ")"
+    expr -> @ "-" expr
+    expr -> @ NUMBER
+    expr -> @ expr "*" expr
+    expr -> @ expr "+" expr
+    expr -> @ expr "-" expr
+    expr -> @ expr "/" expr
+    expr -> expr "/" @ expr

@@ -97,10 +97,10 @@ type Analyzer<'tok,'u>
                 try
                     retractFinalAndLexemeSate(revStates)
                 with _ ->
-                    let buffer = iterator.dequeue(revStates.Length-1)
+                    let buffer = iterator.consume(revStates.Length-1)
                     failwithf "FslexFsyacc analyzer:retract was not able to find an accepted status in %A" (buffer)
 
-            let lexeme = iterator.dequeue(stateCount-1)
+            let lexeme = iterator.consume(stateCount-1)
             let mapper = finalMappers.[finalState]
             let lexbuf = lexeme |> Array.map snd |> Array.toList
             mapper lexbuf

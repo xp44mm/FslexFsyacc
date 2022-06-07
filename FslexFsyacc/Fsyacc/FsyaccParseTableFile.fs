@@ -84,3 +84,4 @@ type FsyaccParseTableFile =
                 $"    |> unbox<{types.[startSymbol]}>"
             ] |> String.concat Environment.NewLine
         result
+
