@@ -3,8 +3,8 @@
 open FslexFsyacc.Runtime.RenderUtils
 open System
 open FSharp.Literals
-open FSharp.Idioms.StringOps
 open FSharp.Idioms
+open FSharp.Idioms.StringOps
 
 let decorateSemantic (typeAnnotations:Map<string,string>) (prodSymbols:string list) (semantic:string) =
     let bodySymbols =
@@ -18,8 +18,12 @@ let decorateSemantic (typeAnnotations:Map<string,string>) (prodSymbols:string li
             for (i,sym) in bodySymbols do
                 if typeAnnotations.ContainsKey sym then
                     $"let s{i} = unbox<{typeAnnotations.[sym]}> ss.[{i}]"
-                else failwith $"type annot `{sym}` is required."
-            if typeAnnotations.ContainsKey prodSymbols.Head && typeAnnotations.[prodSymbols.Head] <> "unit" then
+                else 
+                    failwith $"type annot `{sym}` is required."
+
+            if typeAnnotations.ContainsKey prodSymbols.Head && 
+                typeAnnotations.[prodSymbols.Head] <> "unit" then
+
                 $"let result:{typeAnnotations.[prodSymbols.Head]} ="
                 semantic |> Line.indentCodeBlock (4)
                 $"box result"
@@ -31,10 +35,11 @@ let decorateSemantic (typeAnnotations:Map<string,string>) (prodSymbols:string li
     let funcDef =
         [
             "fun (ss:obj[]) ->"
-            //$"{space4 2}// {renderProduction prodSymbols}"
             if semantic = "" then
                 $"{space4 2}null"
             else
-                mainLines |> Line.indentCodeBlock (4*2)
+                mainLines 
+                |> Line.indentCodeBlock (4*2)
+
         ] |> String.concat Environment.NewLine
     funcDef

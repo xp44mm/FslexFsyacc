@@ -61,7 +61,8 @@ type FsyaccParseTableFile =
 
         if types.ContainsKey startSymbol then
             ()
-        else failwith $"type annot `{startSymbol}` is required."
+        else 
+            failwith $"type annot `{startSymbol}` is required."
 
         //解析表数据
         let result =
@@ -80,8 +81,15 @@ type FsyaccParseTableFile =
                 "let parser = Parser<token>(fxRules,actions,closures,getTag,getLexeme)"
                 "let parse(tokens:seq<token>) ="
                 "    tokens"
-                "    |> parser.parse"
+                $"    |> parser.parse"
                 $"    |> unbox<{types.[startSymbol]}>"
             ] |> String.concat Environment.NewLine
         result
 
+    member this.generateMappers() =
+        let types = Map.ofArray this.declarations // symbol -> type of symbol
+        this.rules
+        |> Array.map(fun(prod, semantic) ->
+            SemanticGenerator.decorateSemantic types prod semantic
+            )
+        |> String.concat Environment.NewLine
