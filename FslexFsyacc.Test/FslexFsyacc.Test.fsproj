@@ -35,16 +35,17 @@
 
 		<Compile Include="Fsyacc\SemanticGeneratorTest.fs" />
 		<Compile Include="Fsyacc\FsyaccParseTableTest.fs" />
+		<Compile Include="Fsyacc\FsyaccParseTableFileTest.fs" />
 		<Compile Include="Fsyacc\FsyaccFileStartTest.fs" />
 		<Compile Include="Fsyacc\FsyaccFileNameTest.fs" />
 		<Compile Include="Fsyacc\FsyaccFileRefineTest.fs" />
 		<Compile Include="Fsyacc\FsyaccFileRulesTest.fs" />
 		<Compile Include="Expr\ExprToken.fs" />
 		<None Include="Expr\expr.fsyacc" />
-		<Compile Include="Expr\ExprParseTable.fs" />
+		<Compile Include="Expr\ExprParseTable0.fs" />
+		<Compile Include="Expr\ExprParseTable2.fs" />
 		<Compile Include="Expr\ExprParseTableTest.fs" />
 		<Compile Include="Expr\ExprCompilerTest.fs" />
-		<Compile Include="Expr\ReactiveParserTest.fs" />
 		
 		<Compile Include="PolynomialExpressions\Polynomials.fs" />
 		<Compile Include="PolynomialExpressions\Tokenizer.fs" />
@@ -61,7 +62,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="FSharp.xUnit" Version="1.2.2" />
+		<PackageReference Include="FSharp.xUnit" Version="1.2.3" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.2.0" />
 		<PackageReference Include="System.Reactive" Version="5.0.0" />
 		<PackageReference Include="xunit" Version="2.4.1" />
@@ -81,7 +82,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Update="FSharp.Core" Version="6.0.4" />
+	  <PackageReference Update="FSharp.Core" Version="6.0.5" />
 	</ItemGroup>
 
 </Project>

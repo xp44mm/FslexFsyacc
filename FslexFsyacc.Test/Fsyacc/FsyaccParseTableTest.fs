@@ -70,7 +70,7 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
         let tokens = grammar.symbols - grammar.nonterminals
         show tokens
 
-    [<Fact>] // (Skip="once for all!")
+    [<Fact(Skip="once for all!")>] // 
     member _.``4 - generate ParseTable``() =
         // ** input **
         let name = "FsyaccParseTable"

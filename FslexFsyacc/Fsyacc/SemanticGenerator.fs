@@ -1,12 +1,9 @@
 ﻿module FslexFsyacc.Fsyacc.SemanticGenerator
 
-open FslexFsyacc.Runtime.RenderUtils
 open System
-open FSharp.Literals
 open FSharp.Idioms
-open FSharp.Idioms.StringOps
 
-let decorateSemantic (typeAnnotations:Map<string,string>) (prodSymbols:string list) (semantic:string) =
+let semanticBody (typeAnnotations:Map<string,string>) (prodSymbols:string list) (semantic:string) =
     let bodySymbols =
         prodSymbols
         |> List.tail
@@ -32,14 +29,18 @@ let decorateSemantic (typeAnnotations:Map<string,string>) (prodSymbols:string li
                 "null"
         ]|> String.concat Environment.NewLine
 
+    if semantic = "" then
+        "null"
+    else
+        mainLines 
+
+let decorateSemantic (typeAnnotations:Map<string,string>) (prodSymbols:string list) (semantic:string) =
+    let body = semanticBody typeAnnotations prodSymbols semantic
     let funcDef =
         [
             "fun (ss:obj[]) ->"
-            if semantic = "" then
-                $"{space4 2}null"
-            else
-                mainLines 
-                |> Line.indentCodeBlock (4*2)
+            body 
+            |> Line.indentCodeBlock 4
 
         ] |> String.concat Environment.NewLine
     funcDef

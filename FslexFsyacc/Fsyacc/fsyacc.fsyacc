@@ -1,4 +1,5 @@
 ﻿%{
+open FslexFsyacc.Runtime
 open FslexFsyacc.Fsyacc
 open FslexFsyacc.Fsyacc.FsyaccTokenUtils
 type token = int*int*FsyaccToken

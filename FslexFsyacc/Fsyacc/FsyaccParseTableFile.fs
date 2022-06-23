@@ -47,7 +47,7 @@ type FsyaccParseTableFile =
     member this.generate(moduleName:string) =
         let types = Map.ofArray this.declarations // symbol -> type of symbol
         
-        let fxRules =
+        let rules =
             this.rules
             |> Array.map(fun(prod, semantic) ->
                 let mapper = SemanticGenerator.decorateSemantic types prod semantic
@@ -68,17 +68,17 @@ type FsyaccParseTableFile =
         let result =
             [
                 $"module {moduleName}"
-                $"let rules = {Literal.stringify this.rules}"
+                //$"let rules = {Literal.stringify this.rules}"
                 $"let actions = {Literal.stringify this.actions}"
                 $"let closures = {Literal.stringify this.closures}"
-                $"let header = {Literal.stringify this.header}"
-                $"let declarations = {Literal.stringify this.declarations}"
+                //$"let header = {Literal.stringify this.header}"
+                //$"let declarations = {Literal.stringify this.declarations}"
                 this.header
-                $"let fxRules:(string list*(obj[]->obj))[] = [|"
-                fxRules |> Line.indentCodeBlock 4
+                $"let rules:(string list*(obj[]->obj))[] = [|"
+                rules |> Line.indentCodeBlock 4
                 "|]"
-                "open FslexFsyacc.Runtime"
-                "let parser = Parser<token>(fxRules,actions,closures,getTag,getLexeme)"
+                //"open FslexFsyacc.Runtime"
+                "let parser = Parser<token>(rules,actions,closures,getTag,getLexeme)"
                 "let parse(tokens:seq<token>) ="
                 "    tokens"
                 $"    |> parser.parse"

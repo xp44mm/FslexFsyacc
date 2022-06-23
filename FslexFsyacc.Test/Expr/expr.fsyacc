@@ -1,4 +1,5 @@
 ﻿%{
+open FslexFsyacc.Runtime
 open Expr.ExprToken
 type token = int*int*ExprToken
 %}

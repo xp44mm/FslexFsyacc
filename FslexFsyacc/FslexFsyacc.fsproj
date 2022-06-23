@@ -93,7 +93,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="FSharp.Idioms" Version="1.2.8" />
+		<PackageReference Include="FSharp.Idioms" Version="1.2.9" />
 		<PackageReference Include="FSharp.Literals" Version="2.2.9" />
 	</ItemGroup>
 
@@ -102,7 +102,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Update="FSharp.Core" Version="6.0.4" />
+		<PackageReference Update="FSharp.Core" Version="6.0.5" />
 	</ItemGroup>
 
 </Project>

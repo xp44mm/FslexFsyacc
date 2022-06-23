@@ -15,8 +15,6 @@ let getTag(pos,len,token) =
     | RIGHT        -> "%right"
     | NONASSOC     -> "%nonassoc"
     | PREC         -> "%prec"
-    //| BOF          -> "BOF"
-    //| EOF          -> "EOF"
 
 /// 获取token携带的语义信息
 let getLexeme(pos,len,token) =
