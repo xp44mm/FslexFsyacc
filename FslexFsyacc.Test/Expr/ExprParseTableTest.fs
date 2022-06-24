@@ -99,7 +99,7 @@ type ExprParseTableTest(output:ITestOutputHelper) =
 
     [<Fact>] // (Skip="once for all!")
     member _.``501 - expr generateParseTable``() =
-        let name = "ExprParseTable2"
+        let name = "ExprParseTable"
         let moduleName = $"Expr.{name}"
 
         //解析表数据
@@ -116,13 +116,13 @@ type ExprParseTableTest(output:ITestOutputHelper) =
 
         //Should.equal t.header       ExprParseTable2.header
         //Should.equal t.rules        ExprParseTable2.rules
-        Should.equal t.actions      ExprParseTable2.actions
-        Should.equal t.closures     ExprParseTable2.closures
+        Should.equal t.actions      ExprParseTable.actions
+        Should.equal t.closures     ExprParseTable.closures
         //Should.equal t.declarations ExprParseTable2.declarations
 
     [<Fact>]
     member _.``7 - output closures``() =
-        let tbl = ExprParseTable2.parser.getParserTable()
+        let tbl = ExprParseTable.parser.getParserTable()
         let str = tbl.collection()
         let name = "expr"
         let outputDir = Path.Combine(__SOURCE_DIRECTORY__, $"{name}.txt")
