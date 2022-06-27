@@ -6,7 +6,7 @@ open FSharp.Literals
 
 let decorateSemantic (semantic:string) =
     [
-        $"fun (lexbuf:token list) ->"
+        "fun (lexbuf:token list) ->"
         semantic |> Line.indentCodeBlock 4
     ] |> String.concat Environment.NewLine
 

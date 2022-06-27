@@ -1,6 +1,7 @@
 ﻿namespace FslexFsyacc.Fslex
 
 open System.IO
+open System.Text
 
 open Xunit
 open Xunit.Abstractions
@@ -21,21 +22,21 @@ type FslexDFATest(output:ITestOutputHelper) =
     let fslex = FslexFile.parse text
 
     [<Fact>]
-    member _.``0 = compiler test``() =
+    member _.``01 - compiler test``() =
         let hdr,dfs,rls = FslexCompiler.parseToStructuralData text
         show hdr
         show dfs
         show rls
         
     [<Fact>]
-    member _.``1 = verify``() =
+    member _.``02 - verify``() =
         let y = fslex.verify()
 
         Assert.True(y.undeclared.IsEmpty)
         Assert.True(y.unused.IsEmpty)
 
     [<Fact>]
-    member _.``2 = universal characters``() =
+    member _.``03 - universal characters``() =
         let res = fslex.getRegularExpressions()
 
         let y = 
@@ -45,7 +46,7 @@ type FslexDFATest(output:ITestOutputHelper) =
         show y
 
     [<Fact(Skip="once and for all!")>] // 
-    member _.``3 = generate DFA``() =
+    member _.``04 - generate DFA``() =
         let name = "FslexDFA"
         let moduleName = $"FslexFsyacc.Fslex.{name}"
 
@@ -53,14 +54,27 @@ type FslexDFATest(output:ITestOutputHelper) =
         let result = y.generate(moduleName)
 
         let outputDir = Path.Combine(sourcePath, $"{name}.fs")
-        File.WriteAllText(outputDir, result,System.Text.Encoding.UTF8)
+        File.WriteAllText(outputDir, result, Encoding.UTF8)
         output.WriteLine("output lex:" + outputDir)
 
     [<Fact>]
-    member _.``4 = valid DFA``() =
-        let y = fslex.toFslexDFAFile()
+    member _.``10 - valid DFA``() =
+        let src = fslex.toFslexDFAFile()
+        Should.equal src.nextStates FslexDFA.nextStates
 
-        Should.equal y.nextStates FslexDFA.nextStates
-        Should.equal y.header     FslexDFA.header
-        Should.equal y.rules      FslexDFA.rules
+        let headerFslex =
+            FSharp.Compiler.SyntaxTreeX.Parser.getDecls("header.fsx",src.header)
+
+        let semansFslex =
+            let mappers = src.generateMappers()
+            FSharp.Compiler.SyntaxTreeX.SourceCodeParser.semansFromMappers mappers
+
+        let header,semans =
+            let filePath = Path.Combine(sourcePath, "FslexDFA.fs")
+            let text = File.ReadAllText(filePath, Encoding.UTF8)
+            FSharp.Compiler.SyntaxTreeX.SourceCodeParser.getHeaderSemansFromFSharp 1 text
+
+        Should.equal headerFslex header
+        Should.equal semansFslex semans
+
 

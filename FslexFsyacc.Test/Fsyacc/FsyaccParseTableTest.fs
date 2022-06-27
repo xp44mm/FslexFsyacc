@@ -4,6 +4,7 @@ open Xunit
 open Xunit.Abstractions
 
 open System.IO
+open System.Text
 open System.Text.RegularExpressions
 
 open FSharp.xUnit
@@ -25,7 +26,7 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
     let fsyacc = NormFsyaccFile.fromRaw rawFsyacc
 
     [<Fact>]
-    member _.``0 - compiler test``() =
+    member _.``01 - compiler test``() =
         let result = FsyaccCompiler.compile text
         show result
 
@@ -35,7 +36,7 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
         output.WriteLine(fsyacc)
 
     [<Fact>]
-    member _.``1 - 显示冲突状态的冲突项目``() =
+    member _.``03 - 显示冲突状态的冲突项目``() =
         let collection = 
             fsyacc.getMainProductions()
             |> AmbiguousCollection.create
@@ -45,7 +46,7 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
         Should.equal conflictedClosures Map.empty
 
     [<Fact>]
-    member _.``2 - print the template of type annotaitions``() =
+    member _.``04 - print the template of type annotaitions``() =
         let grammar = 
             fsyacc.getMainProductions()
             |>          Grammar.from 
@@ -62,7 +63,7 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
         output.WriteLine(sourceCode)
 
     [<Fact>]
-    member _.``3 - list all tokens``() =
+    member _.``05 - list all tokens``() =
         let grammar = 
             fsyacc.getMainProductions()
             |> Grammar.from
@@ -71,7 +72,7 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
         show tokens
 
     [<Fact(Skip="once for all!")>] // 
-    member _.``4 - generate ParseTable``() =
+    member _.``06 - generate ParseTable``() =
         // ** input **
         let name = "FsyaccParseTable"
         let moduleName = $"FslexFsyacc.Fsyacc.{name}"
@@ -85,12 +86,34 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
         output.WriteLine("output yacc:"+outputDir)
 
     [<Fact>]
-    member _.``5 - valid ParseTable``() =
-        let t = fsyacc.toFsyaccParseTableFile()
+    member _.``10 - valid ParseTable``() =
+        let src = fsyacc.toFsyaccParseTableFile()
 
-        Should.equal t.header       FsyaccParseTable.header
-        Should.equal t.rules        FsyaccParseTable.rules
-        Should.equal t.actions      FsyaccParseTable.actions
-        Should.equal t.closures     FsyaccParseTable.closures
-        Should.equal t.declarations FsyaccParseTable.declarations
+        Should.equal src.actions FsyaccParseTable.actions
+        Should.equal src.closures FsyaccParseTable.closures
+
+        let prodsFsyacc = 
+            Array.map fst src.rules
+
+        let prodsParseTable = 
+            Array.map fst FsyaccParseTable.rules
+
+        Should.equal prodsFsyacc prodsParseTable
+
+        let headerFromFsyacc =
+            FSharp.Compiler.SyntaxTreeX.Parser.getDecls("header.fsx",src.header)
+
+        let semansFsyacc =
+            let mappers = src.generateMappers()
+            FSharp.Compiler.SyntaxTreeX.SourceCodeParser.semansFromMappers mappers
+
+        let header,semans =
+            let filePath = Path.Combine(sourcePath, "FsyaccParseTable.fs")
+
+            File.ReadAllText(filePath, Encoding.UTF8)
+            |> FSharp.Compiler.SyntaxTreeX.SourceCodeParser.getHeaderSemansFromFSharp 2
+
+        Should.equal headerFromFsyacc header
+        Should.equal semansFsyacc semans
+
 

@@ -2,6 +2,7 @@
 
 open System
 open System.IO
+open System.Text
 
 open Xunit
 open Xunit.Abstractions
@@ -44,7 +45,7 @@ type TermDFATest(output:ITestOutputHelper) =
             |> Set.ofArray
         show y
 
-    [<Fact(Skip="once and for all!")>] // 
+    [<Fact>] // (Skip="once and for all!")
     member _.``3 = generate DFA``() =
         let name = "TermDFA"
         let moduleName = $"PolynomialExpressions.{name}"
@@ -57,11 +58,24 @@ type TermDFATest(output:ITestOutputHelper) =
         output.WriteLine("output lex:" + outputDir)
 
     [<Fact>]
-    member _.``4 = valid DFA``() =
-        let y = fslex.toFslexDFAFile()
+    member _.``10 - valid DFA``() =
+        let src = fslex.toFslexDFAFile()
+        Should.equal src.nextStates TermDFA.nextStates
 
-        Should.equal y.nextStates TermDFA.nextStates
-        Should.equal y.header     TermDFA.header
-        Should.equal y.rules      TermDFA.rules
+        let headerFslex =
+            FSharp.Compiler.SyntaxTreeX.Parser.getDecls("header.fsx",src.header)
+
+        let semansFslex =
+            let mappers = src.generateMappers()
+            FSharp.Compiler.SyntaxTreeX.SourceCodeParser.semansFromMappers mappers
+
+        let header,semans =
+            let filePath = Path.Combine(__SOURCE_DIRECTORY__, "TermDFA.fs")
+            let text = File.ReadAllText(filePath, Encoding.UTF8)
+            FSharp.Compiler.SyntaxTreeX.SourceCodeParser.getHeaderSemansFromFSharp 1 text
+
+        Should.equal headerFslex header
+        Should.equal semansFslex semans
+
 
 

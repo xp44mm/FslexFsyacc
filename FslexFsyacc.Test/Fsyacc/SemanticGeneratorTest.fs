@@ -25,10 +25,11 @@ type SemanticGeneratorTest(output:ITestOutputHelper) =
         let e = 
             """
 fun (ss:obj[]) ->
-        let s0 = unbox<float> ss.[0]
-        let s2 = unbox<float> ss.[2]
-        let result:float =
-            s0 + s3
-        box result
+    let s0 = unbox<float> ss.[0]
+    let s2 = unbox<float> ss.[2]
+    let result:float =
+        s0 + s3
+    box result
             """.Trim()
+
         Should.equal e y
