@@ -24,20 +24,21 @@ type ParsingTable =
         let actions =
             uc.closures
             |> Map.map(fun i closure ->
-                let rMp,gMp =
+                let reduceMp,gotoMp =
                     closure
                     |> Map.partition(fun la icores -> icores.MinimumElement.dotmax)
 
+                // la -> Action.reduce
                 let reduces =
-                    rMp
+                    reduceMp
                     |> Map.map(fun la icores ->
                         let item = Seq.exactlyOne icores
                         Reduce item.production
                     )
-
+                // la -> Action.shift
                 let shifts =
                     let gotos = uc.GOTOs.[i]
-                    gMp
+                    gotoMp
                     |> Map.map(fun la icores ->
                         Shift gotos.[la]
                     )
@@ -48,22 +49,26 @@ type ParsingTable =
         let closures =
             uc.closures
             |> Map.map(fun i closure ->
-                let rMp,gMp =
+                let reduceMp,gotoMp =
                     closure
                     |> Map.partition(fun la icores -> icores.MinimumElement.dotmax)
 
                 let reduces =
-                    rMp
+                    reduceMp
                     |> Map.toArray
                     |> Array.map(fun(la, icores) -> Seq.exactlyOne icores, la)
                     |> Array.groupBy fst
-                    |> Array.map(fun(icore,sq)->
-                        let st = sq |> Seq.map snd |> Set.ofSeq
-                        icore, st)
+                    |> Array.map(fun(icore,las)-> // 合并lookaheads
+                        let las =
+                            las
+                            |> Seq.map snd
+                            |> Set.ofSeq
+                        icore, las
+                        )
                     |> Set.ofArray
 
                 let shifts =
-                    gMp
+                    gotoMp
                     |> Map.values
                     |> Set.unionMany
                     |> Set.map(fun icore -> icore, Set.empty)

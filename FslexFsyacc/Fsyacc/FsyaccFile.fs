@@ -56,19 +56,3 @@ type FsyaccFile =
         }
             
     
-    //[<Obsolete("FsyaccFileRules")>]
-    //member this.nameRules(productionNames:Map<string list,string>) =
-    //    productionNames
-    //    |> FsyaccFileName.productionToHeadBody
-    //    |> FsyaccFileName.nameRules this.rules
-
-    //[<Obsolete("FsyaccFileRules")>]
-    //member this.refineRules(
-    //    oldProd:string list,
-    //    newProd:string list) =
-
-    //    this.rules
-    //    |> FsyaccFileRefine.refineRules
-    //        oldProd
-    //        newProd
-

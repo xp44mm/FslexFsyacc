@@ -54,7 +54,6 @@ let renderRule (lhs:string,rhs:(string list*string*string)list) =
     ]
     |> String.concat "\r\n"
 
-
 let renderPrecedence (assoc:string, symbols:string list) =
     let symbols =
         symbols

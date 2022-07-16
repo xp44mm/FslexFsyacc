@@ -97,19 +97,6 @@ type ExprParseTableTest(output:ITestOutputHelper) =
         File.WriteAllText(outputDir,fsharpCode,Encoding.UTF8)
         output.WriteLine($"output yacc:\r\n{outputDir}")
 
-    [<Fact>] // (Skip="once for all!")
-    member _.``08 - expr generateParseTable``() =
-        let name = "ExprParseTable"
-        let moduleName = $"Expr.{name}"
-
-        //解析表数据
-        let tbl = fsyacc.toFsyaccParseTableFile()
-        let fsharpCode = tbl.generate(moduleName)
-
-        let outputDir = Path.Combine(__SOURCE_DIRECTORY__, $"{name}.fs")
-        File.WriteAllText(outputDir,fsharpCode,Encoding.UTF8)
-        output.WriteLine($"output yacc:\r\n{outputDir}")
-
     [<Fact>]
     member _.``09 - output closures``() =
         let tbl = ExprParseTable.parser.getParserTable()

@@ -1,7 +1,5 @@
 ﻿namespace FslexFsyacc.Yacc
 
-open FSharp.Idioms
-
 type ParseTable =
     {
         actions:(string*int)[][]

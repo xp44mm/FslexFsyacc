@@ -10,10 +10,10 @@
 		<PackageProjectUrl>https://github.com/xp44mm/FslexFsyacc</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/xp44mm/FslexFsyacc</RepositoryUrl>
 		<PackageTags>lex;yacc;compiler;parser;analyzer</PackageTags>
-		<PackageReleaseNotes>FslexDFA</PackageReleaseNotes>
+		<PackageReleaseNotes>nullableSymbols</PackageReleaseNotes>
 		<Company>34696643@qq.com</Company>
 		<Authors>xp44m</Authors>
-		<Version>1.2.26</Version>
+		<Version>1.2.27</Version>
 		<IsPublishable>True</IsPublishable>
 		<PackageReadmeFile>readme.md</PackageReadmeFile>
 	</PropertyGroup>
@@ -49,6 +49,7 @@
 		<Compile Include="Yacc\LALRCollection.fs" />
 		<Compile Include="Yacc\ProductionUtils.fs" />
 		<Compile Include="Yacc\AmbiguityEliminator.fs" />
+		<Compile Include="Yacc\SmartAmbiguityEliminator.fs" />
 		<Compile Include="Yacc\AmbiguousCollection.fs" />
 		<Compile Include="Yacc\Action.fs" />
 		<Compile Include="Yacc\ParsingTable.fs" />

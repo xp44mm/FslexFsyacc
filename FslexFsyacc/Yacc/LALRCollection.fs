@@ -4,8 +4,8 @@
 type LALRCollection =
     {
         grammar : Grammar
-        kernels : Map<Set<ItemCore>,int>
-        closures: Map<int,Set<string*ItemCore>>
+        kernels : Map<Set<ItemCore>,int> // kernel -> index
+        closures: Map<int,Set<string*ItemCore>> // index -> lookahead*action
     }
 
     static member create(mainProductions:string list list)  =
@@ -26,7 +26,7 @@ type LALRCollection =
         let closures =
             closures
             |> Set.toArray
-            |> Array.mapi(fun i (k,closure) -> //需要检查状态编号是否是从0开始
+            |> Array.mapi(fun i (kernels,closure) -> //需要检查状态编号是否是从0开始
                 ///展开lookaheads的closure
                 let spreadedClosure =
                     closure
@@ -42,7 +42,7 @@ type LALRCollection =
                                 Set.singleton itemCore.nextSymbol
                         lookaheads
                         |> Set.toArray
-                        |> Array.map(fun lookahead -> lookahead,itemCore)
+                        |> Array.map(fun lookahead -> lookahead, itemCore)
                     )
                     |> Set.ofArray
                 i,spreadedClosure
