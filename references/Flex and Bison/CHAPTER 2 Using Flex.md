@@ -1,6 +1,8 @@
 # CHAPTER 2 Using Flex
 
-In this chapter we’ll take a closer look at flex as a standalone tool, with some examples that exercise most of its C language capabilities. All of flex’s facilities are described in Chapter 5, and the usage of flex scanners in C++ programs is described in Chapter 9.
+In this chapter we’ll take a closer look at flex as a standalone tool, with some examples that exercise most of its C language capabilities.
+
+All of flex’s facilities ~~are described in Chapter 5,~~ and the usage of flex scanners in C++ programs ~~is described in Chapter 9.~~
 
 ## Regular Expressions
 
@@ -66,7 +68,7 @@ Trailing context, which means to match the regular expression preceding the slas
 
 ### Regular Expression Examples
 
-We can combine these characters to make quite complex and useful regular expression patterns. For example, consider the surprisingly difficult job of writing a pattern to match Fortran-style numbers, which consist of an optional sign, a string of digits that may contain a decimal point, optionally an exponent that is the letter E, an optional sign, and a string of digits. A pattern for an optional sign and a string of digits is simple enough:
+We can combine these characters to make quite complex and useful regular expression patterns. For example, consider the surprisingly difficult job of writing a pattern to match Fortran-style numbers, which consist of an optional sign, a string of digits that may contain a decimal point, optionally an exponent that is the letter `E`, an optional sign, and a string of digits. A pattern for an optional sign and a string of digits is simple enough:
 
 `[-+]?[0-9]+`
 
@@ -74,18 +76,18 @@ Note that we put the hyphen as the first thing in `[-+]` so it wouldn’t be tak
 
 Writing the pattern to match a string of digits with an optional decimal point is harder, because the decimal point can come at the beginning or end of the number. Here’s a few near misses:
 
-```
+```c
 [-+]?[0-9.]+            matches too much, like 1.2.3.4
-[-+]?[0-9]+\.?[0-9]+    matches too little, misses .12 or 12. 
-[-+]?[0-9]*\.?[0-9]+    doesn't match 12. 
-[-+]?[0-9]+\.?[0-9]*    doesn't match .12 
+[-+]?[0-9]+\.?[0-9]+    matches too little, misses .12 or 12.
+[-+]?[0-9]*\.?[0-9]+    doesn't match 12.
+[-+]?[0-9]+\.?[0-9]*    doesn't match .12
 [-+]?[0-9]*\.?[0-9]*    matches nothing, or a dot with no digits at all
 ```
 
 It turns out that no combination of character classes, `?`, `*`, and `+` will match a number with an optional decimal point. Fortunately, the alternation operator `|` does the trick by allowing the pattern to combine two versions, each of which individually isn’t quite sufficient:
 
-```
-[-+]?([0-9]*\.?[0-9]+|[0-9]+\.)      
+```c
+[-+]?([0-9]*\.?[0-9]+|[0-9]+\.)
 [-+]?([0-9]*\.?[0-9]+|[0-9]+\.[0-9]*) This is overkill but also works
 ```
 
@@ -93,13 +95,13 @@ The second example is internally ambiguous, because there are many strings that 
 
 Now we need to add on the optional exponent, for which the pattern is quite simple:
 
-```
+```c
 E(+|-)?[0-9]+
 ```
 
 (We did the two sign characters as an alternation here rather than a character class; it’s purely a matter of taste.) Now we glue the two together to get a Fortran number pattern:
 
-```
+```c
 [-+]?([0-9]*\.?[0-9]+|[0-9]+\.)(E(+|-)?[0-9]+)?
 ```
 
@@ -157,14 +159,14 @@ main(argc, argv)
 int argc;
 char **argv;
 {
-  if(argc > 1) {
-    if(!(yyin = fopen(argv[1], "r"))) {
-      perror(argv[1]);
-      return (1);
+    if(argc > 1) {
+        if(!(yyin = fopen(argv[1], "r"))) {
+            perror(argv[1]);
+            return (1);
+        }
     }
-  }
-  yylex();
-  printf("%8d%8d%8d\n", lines, words, chars);
+    yylex();
+    printf("%8d%8d%8d\n", lines, words, chars);
 }
 ```
 
@@ -197,30 +199,29 @@ main(argc, argv)
 int argc;
 char **argv;
 {
-  int i;
-  if(argc < 2) { /* just read stdin */
-    yylex();
-    printf("%8d%8d%8d\n", lines, words, chars);
-    return 0;
-  }
-  for(i = 1; i < argc; i++) {
-    FILE *f = fopen(argv[i], "r");
-
-    if(!f) {
-      perror(argv[i]);
-      return (1);
+    int i;
+    if(argc < 2) { /* just read stdin */
+        yylex();
+        printf("%8d%8d%8d\n", lines, words, chars);
+        return 0;
     }
-    yyrestart(f);
-    yylex();
-    fclose(f);
-    printf("%8d%8d%8d %s\n", lines, words, chars, argv[i]);
-    totchars += chars; chars = 0;
-    totwords += words; words = 0;
-    totlines += lines; lines = 0;
-  }
-  if(argc > 1) /* print total if more than one file */
-    printf("%8d%8d%8d total\n", totlines, totwords, totchars);
-  return 0;
+    for(i = 1; i < argc; i++) {
+        FILE *f = fopen(argv[i], "r");
+        if(!f) {
+            perror(argv[i]);
+            return (1);
+        }
+        yyrestart(f);
+        yylex();
+        fclose(f);
+        printf("%8d%8d%8d %s\n", lines, words, chars, argv[i]);
+        totchars += chars; chars = 0;
+        totwords += words; words = 0;
+        totlines += lines; lines = 0;
+    }
+    if(argc > 1) /* print total if more than one file */
+        printf("%8d%8d%8d total\n", totlines, totwords, totchars);
+    return 0;
 }
 ```
 
@@ -234,7 +235,7 @@ Basically, a flex scanner reads from an input source and optionally writes to an
 
 In programs that include scanners, the performance of the scanner frequently determines the performance of the entire program. Early versions of lex read from `yyin` one character at a time. Since then, flex has developed a flexible (perhaps overly so) three-level input system that allows programmers to customize it at each level to handle any imaginable input structure.
 
-In most cases, a flex scanner reads its input using stdio from a file or the standard input, which can be the user console. There’s a subtle but important difference between reading from a file and reading from the console—readahead. If the scanner is reading from a file, it should read big chunks to be as fast as possible. But if it’s reading from the console, the user is probably typing one line at a time and will expect the scanner to process each line as soon as it’s typed. In this case, speed doesn’t matter, since a very slow scanner is still a lot faster than a fast typist, so it reads one character at a time. Fortunately, a flex scanner checks to see whether its input is from the terminal and generally does the right thing automatically.[^ †]
+In most cases, a flex scanner reads its input using `stdio` from a file or the standard input, which can be the user console. There’s a subtle but important difference between reading from a file and reading from the console—readahead. If the scanner is reading from a file, it should read big chunks to be as fast as possible. But if it’s reading from the console, the user is probably typing one line at a time and will expect the scanner to process each line as soon as it’s typed. In this case, speed doesn’t matter, since a very slow scanner is still a lot faster than a fast typist, so it reads one character at a time. Fortunately, a flex scanner checks to see whether its input is from the terminal and generally does the right thing automatically.[^ †]
 
 [^ †]: There’s a separate issue for interactive scanners related to whether the scanning process itself needs to peek ahead at the character after the one being processed, but we’ll save that for later in this chapter. Fortunately, flex generally does the right thing in that case, too.
 
@@ -243,17 +244,20 @@ To handle its input, a flex scanner uses a structure known as a `YY_BUFFER_STATE
 The default input behavior of a flex scanner is approximately this:
 
 ```c
-    YY_BUFFER_STATE bp;
-    extern FILE* yyin;
-    // ... whatever the program does before the first call to the scanner
-    if(!yyin) yyin = stdin; // default input is stdin
-    bp = yy_create_buffer(yyin,YY_BUF_SIZE );
-        // YY_BUF_SIZE defined by flex, typically 16K
-    yy_switch_to_buffer(bp); // tell it to use the buffer we just made
-    yylex(); // or yyparse() or whatever calls the scanner
+YY_BUFFER_STATE bp;
+extern FILE* yyin;
+// ... whatever the program does before the first call to the scanner
+if(!yyin) yyin = stdin; // default input is stdin
+bp = yy_create_buffer(yyin,YY_BUF_SIZE );
+
+// YY_BUF_SIZE defined by flex, typically 16K
+yy_switch_to_buffer(bp); // tell it to use the buffer we just made
+yylex(); // or yyparse() or whatever calls the scanner
 ```
 
-If `yyin` isn’t already set, set it to `stdin`. Then use `yy_create_buffer` to create a new buffer reading from `yyin`, use `yy_switch_to_buffer` to tell the scanner to read from it, then scan. When reading from several files in sequence, after opening each file, call `yyrestart(fp)` to switch the scanner input to the `stdio` file `fp`. For the common case where a new file is assigned to `yyin`, `YY_NEW_FILE` is equivalent to `yyrestart(yyin)`.[^ ‡]
+If `yyin` isn’t already set, set it to `stdin`. Then use `yy_create_buffer` to create a new buffer reading from `yyin`, use `yy_switch_to_buffer` to tell the scanner to read from it, then scan.
+
+When reading from several files in sequence, after opening each file, call `yyrestart(fp)` to switch the scanner input to the `stdio` file `fp`. For the common case where a new file is assigned to `yyin`, `YY_NEW_FILE` is equivalent to `yyrestart(yyin)`.[^ ‡]
 
 [^ ‡]: If the previous `yyin` was read all the way to `EOF`, `YY_NEW_FILE` isn’t strictly necessary, but it’s good to use anyway for defensive programming. This is particularly the case if a scanner or parse error might return from the scanner or parser without reading the whole file.
 
@@ -288,7 +292,7 @@ Scanner output management is much simpler than input management and is completel
 #define ECHO fwrite( yytext, yyleng, 1, yyout )
 ```
 
-This is of some use in flex programs that do something with part of the input and leave the rest untouched, as in the English to American translator in Example 1-2, but in general it is more likely to be a source of bugs than to be useful. Flex lets you say `%option` nodefault at the top of the scanner to tell it not to add a default rule and rather to report an error if the input rules don’t cover all possible input. I recommend that scanners always use nodefault and include their own default rule if one is needed.
+This is of some use in flex programs that do something with part of the input and leave the rest untouched, as in the English to American translator in Example 1-2, but in general it is more likely to be a source of bugs than to be useful. Flex lets you say `%option nodefault` at the top of the scanner to tell it not to add a default rule and rather to report an error if the input rules don’t cover all possible input. I recommend that scanners always use `nodefault` and include their own default rule if one is needed.
 
 ## Start States and Nested Input Files
 
@@ -317,11 +321,11 @@ Example 2-3. Skeleton for include files
   int popfile(void);
 %}
 %%
-// match #include statement up through the quote or < 
+// match #include statement up through the quote or <
 ^"#"[ \t]*include[ \t]*\[\"<]  { BEGIN IFILE; }
 
 // handle filename up to the closing quote, >, or end of line
-<IFILE>[^ \t\n\">]+        { 
+<IFILE>[^ \t\n\">]+        {
                              { int c;
                                while((c = input()) && c != '\n') ;
                              }
@@ -332,11 +336,11 @@ Example 2-3. Skeleton for include files
                            }
 // handle bad input in IFILE state
 <IFILE>.|\n                { fprintf(stderr, "%4d bad include line\n", yylineno);
-                                     yyterminate();
+                            yyterminate();
                            }
 // pop the file stack at end of file, terminate if it's the outermost file
 <<EOF>>                    { if(!popfile()) yyterminate(); }
-/* print the line number at the beginning of each line 
+/* print the line number at the beginning of each line
    and bump the line number each time a \n is read */
 ^.                         { fprintf(yyout, "%4d %s", yylineno, yytext); }
 ^\n                        { fprintf(yyout, "%4d %s", yylineno++, yytext); }
@@ -349,11 +353,12 @@ main(int argc, char **argv)
     fprintf(stderr, "need filename\n");
     return 1;
   }
-  if(newfile(argv[1]))
+  if(newfile(argv[1])) // filename = argv[1]
     yylex();
 }
+
 int
-  newfile(char *fn)
+newfile(char *fn)
 {
   FILE *f = fopen(fn, "r");
   struct bufstack *bs = malloc(sizeof(struct bufstack));
@@ -365,7 +370,6 @@ int
   bs->prev = curbs;
   /* set up current entry */
   bs->bs = yy_create_buffer(f, YY_BUF_SIZE);
-
   bs->f = f;
   bs->filename = fn;
   yy_switch_to_buffer(bs->bs);
@@ -374,17 +378,16 @@ int
   curfilename = fn;
   return 1;
 }
+
 int
-  popfile(void)
+popfile(void)
 {
   struct bufstack *bs = curbs;
   struct bufstack *prevbs;
   if(!bs) return 0;
-    
   /* get rid of current entry */
   fclose(bs->f);
   yy_delete_buffer(bs->bs);
-    
   /* switch back to previous */
   prevbs = bs->prev;
   free(bs);
@@ -393,27 +396,27 @@ int
   curbs = prevbs;
   yylineno = curbs->lineno;
   curfilename = curbs->filename;
-  return 1; 
+  return 1;
 }
 ```
 
-The first part of the program defines the start state and also has the C code to declare the `bufstack` structure that will hold an entry in the list of saved input files. 
+The first part of the program defines the start state and also has the C code to declare the `bufstack` structure that will hold an entry in the list of saved input files.
 
 In the patterns, the first pattern matches a `#include` statement up through the double quote that precedes the filename. The pattern permits optional whitespace in the usual places. It switches to `IFILE` state to read the next input filename. In `IFILE` state, the second pattern matches a filename, characters up to a closing quote, whitespace, or end-of-line. The filename is passed to `newfile` to stack the current input file and set up the next level of input, but first there’s the matter of dealing with whatever remains of the `#include` line. One possibility would be to use another start state and patterns that absorb the rest of the line, but that would be tricky, since the action switches to the included file, so the start state and pattern would have to be used after the end of the included file. Instead, this is one of the few places where `input()` makes a scanner simpler. A short loop reads until it finds the `\n` at the end of the line or `EOF`. Then, when scanning returns to this file after the end of the included one, it resumes at the beginning of the next line.
 
-Since an exclusive start state in effect defines its own mini-scanner, that scanner has to be prepared for any possible input. The next pattern deals with the case of an ill-formed `#include` line that doesn’t have a filename after the double quote. It simply prints an error message and uses the macro `yyterminate()`, which immediately returns from the scanner.[^§] 
+Since an exclusive start state in effect defines its own mini-scanner, that scanner has to be prepared for any possible input. The next pattern deals with the case of an ill-formed `#include` line that doesn’t have a filename after the double quote. It simply prints an error message and uses the macro `yyterminate()`, which immediately returns from the scanner.[^§]
 
 [^ §]:It returns the value `YY_NULL`, defined as `0`, which a bison parser interprets as the end of input.
 
-This definition of `#include` is fairly casual and makes no effort to verify that the punctuation around the filename matches or that there isn’t extra junk after the filename. It’s not hard to write code to check those issues and diagnose errors, and a more polished version of this program should do so.[^ ‖]
-
-[^ ‖]:  Or to put it another way, the error diagnostics are left as an exercise for the reader.
+This definition of `#include` is fairly casual and makes no effort to verify that the punctuation around the filename matches or that there isn’t extra junk after the filename. It’s not hard to write code to check those issues and diagnose errors, and a more polished version of this program should do so.(error diagnostics)
 
 Next is the special pattern `<<EOF>>`, which matches at the end of each input file. We call `popfile()`, defined later, to return to the previous input file. If it returns `0`, meaning that was the last file, we terminate. Otherwise, the scanner will resume reading the previous file when it resumes scanning.
 
 The last four patterns do the actual work of printing out each line with a preceding line number. Flex provides a variable called `yylineno` that is intended to track line numbers, so we might as well use it. The pattern `^`. matches any character at the beginning of a line, so the action prints the current line number and the character. Since a dot doesn’t match a newline, `^\n` matches a newline at the beginning of a line, that is, an empty line, so the code prints out the line number and the new line and increments the line number. A newline or other character not at the beginning of the line is just printed out with `ECHO`, incrementing the line number for a new line.
 
-The routine `newfile(fn)` prepares to read from the file named `fn`, saving any previous input file. It does so by keeping a linked list of `bufstack` structures, each of which has a link to the previous `bufstack` along with the saved `yylineno` and filename. It opens the file; creates and switches to a flex buffer; and saves the previous open file, filename, and buffer. (In this program nothing uses the filename after the file is open, but we’ll reuse this code later in this chapter in a program that does.)
+The routine `newfile(fn)` prepares to read from the file named `fn`, saving any previous input file. It does so by keeping a linked list of `bufstack` structures, each of which has a link to the previous `bufstack` along with the saved `yylineno` and filename. It opens the file; creates and switches to a flex buffer; and saves the previous open file, filename, and buffer. 
+
+> (In this program nothing uses the `filename` after the file is open, but we’ll reuse this code later in this chapter in a program that does.)
 
 The routine `popfile` undoes what `newfile` did. It closes the open file, deletes the current flex buffer, and then restores the buffer, filename, and line number from the prior stack entry. Note that it doesn’t call `yyrestart()` when it restores the prior buffer; if it did, it would lose any input that had already been read into the buffer.
 
@@ -446,7 +449,7 @@ Example 2-4. Concordance generator
   };
   /* simple symtab of fixed size */
   #define NHASH 9997
-  struct symbol symtab[NHASH];
+  struct symbol symtab[NHASH]; // symtab = symbol table
   struct symbol *lookup(char*);
   void addref(int, char*, char*,int);
   char *curfilename;            /* name of current input file */
@@ -454,16 +457,16 @@ Example 2-4. Concordance generator
 %%
 ```
 
-The `%option` line has two options we haven’t seen before, both of which are quite useful. The `%yylineno` option tells flex to define an integer variable called `yylineno` and to maintain the current line number in it. What that means is that every time the scanner reads a newline character, it increments `yylineno`, and if the scanner backs up over a newline (using some features we’ll get to later), it decrements it. It’s still up to you to initialize `yylineno` to `1` at the beginning of each file and to save and restore it if you’re handling include files. Even with those limitations, it’s still easier than doing line numbers by hand. (In this example, there’s only a single pattern that matches `\n`, which wouldn’t be hard to get right, but it’s quite common to have several patterns that match, causing hard-to-track bugs when some but not all of them update the line number.) 
+The `%option` line has two options we haven’t seen before, both of which are quite useful. The `%option yylineno` option tells flex to define an integer variable called `yylineno` and to maintain the current line number in it. What that means is that every time the scanner reads a newline character, it increments `yylineno`, and if the scanner backs up over a newline (using some features we’ll get to later), it decrements it. It’s still up to you to initialize `yylineno` to `1` at the beginning of each file and to save and restore it if you’re handling include files. Even with those limitations, it’s still easier than doing line numbers by hand. (In this example, there’s only a single pattern that matches `\n`, which wouldn’t be hard to get right, but it’s quite common to have several patterns that match, causing hard-to-track bugs when some but not all of them update the line number.)
 
-The other new option is case-insensitive, which tells flex to build a scanner that treats upper- and lower-case the same. What this means is that a pattern like `abc` will match `abc`, `Abc`, `ABc`, `AbC`, and so forth. It does not have any effect on your input; in particular, the matched string in `yytext` is not case folded or otherwise modified.
+The other new option is `case-insensitive`, which tells flex to build a scanner that treats upper- and lowercase the same. What this means is that a pattern like `abc` will match `abc`, `Abc`, `ABc`, `AbC`, and so forth. It does not have any effect on your input; in particular, the matched string in `yytext` is not case folded or otherwise modified.
 
 The symbol table is just an array of symbol structures, each of which contains a pointer to the name (i.e., the word in the concordance) and a list of references. The references are a linked list of line numbers and pointers to the filename. We also define `curfilename`, a static pointer to the name of the current file, for use when adding references.
 
 ```c
 %%
- /* rules for concordance generator */
- /* skip common words */
+/* rules for concordance generator */
+/* skip common words */
 a |
 an |
 and |
@@ -492,9 +495,11 @@ Concordances usually don’t index common short words, so the first set of patte
 
 The next rule is the meat of the scanner and matches a reasonable approximation of an English word. It matches a string of letters, `[a-z]+`, optionally followed by an apostrophe and either `s` or `t`, to match words such as `owner’s` and `can’t`. Each matched word is passed to `addref()`, described in a moment, along with the current filename and line number.
 
-The final pattern is a catchall to match whatever the previous patterns didn’t. 
+The final pattern is a catchall to match whatever the previous patterns didn’t.
 
 Note that this scanner is extremely ambiguous, but flex’s rules for resolving ambiguity make it do what we want. It prefers longer matches to shorter ones, so the word `toad` will be matched by the main word pattern, not `to`. If two patterns make an exact match, it prefers the earlier one in the program, which is why we put the ignore rules first and the catchall last.
+
+
 
 ```c
 /* concordance main routine */
@@ -564,7 +569,7 @@ lookup(char* sym)
 }
 ```
 
-Note that whenever lookup makes a new entry, it calls `strdup` to make a copy of the string to put into the symbol table entry. Flex and bison programs often have hard-to-track string storage management bugs, because it is easy to forget that the string in `yytext` will be there only until the next token is scanned.
+Note that whenever `lookup` makes a new entry, it calls `strdup` to make a copy of the string to put into the symbol table entry. Flex and bison programs often have hard-to-track string storage management bugs, because it is easy to forget that the string in `yytext` will be there only until the next token is scanned.
 
 This simple hash function and lookup routine works pretty well. I ran a group of text files through an instrumented version of the concordance program, with 4,429 different words and a total of 70,775 lookups. The average lookup took 1.32 probes, not far from the ideal minimum of 1.0.
 
@@ -594,7 +599,7 @@ Next is `addref`, the routine called from inside the scanner to add a reference 
 /* print the references
  * sort the table alphabetically
  * then flip each entry's reflist to get it into forward order
- * and print it out 
+ * and print it out
  */
 /* aux function for sorting */
 static int
@@ -641,14 +646,13 @@ printrefs()
 }
 ```
 
-
 The final routines sort and print the symbol table. The symbol table is created in an order that depends on the hash function, which is not one that is useful to human readers, so we sort the symbol table alphabetically using the standard `qsort` function.
 
 Since the symbol table probably won’t be full, the sort function puts unused symbol entries after used ones, so the sorted entries will end up at the front of the table.
 
-Then `printrefs` runs down the table and prints out the references to each word. The references are in a linked list, but since each reference was pushed onto the front of the list, it is in reverse order. So, we make a pass over the list to flip the links and put it in forward order, and we then print it out.# 
+Then `printrefs` runs down the table and prints out the references to each word. The references are in a linked list, but since each reference was pushed onto the front of the list, it is in reverse order. So, we make a pass over the list to flip the links and put it in forward order, and we then print it out.
 
-[^ #]: This trick of building the list in the wrong order and then reversing it is a handy one that we’ll see again when building parse trees. It turns out to be quite efficient, since the reversal step takes just one pass over the list and requires no extra space in each individual entry.
+> This trick of building the list in the wrong order and then reversing it is a handy one that we’ll see again when building parse trees. It turns out to be quite efficient, since the reversal step takes just one pass over the list and requires no extra space in each individual entry.
 
 To make the concordance somewhat more readable, we print the filename only if it’s different from the one in the previous entry.
 
@@ -676,9 +680,11 @@ ILEN    ([Uu](L|l|LL|ll)?|(L|l|LL|ll)[Uu]?)
 ```
 
 
-The options here are the same as for the concordance, except that there’s no case folding, since C treats upper- and lower-case text differently. The two exclusive start states are `COMMENT`, used to skip text inside C comments, and `IFILE`, used in `#include`.
+The options here are the same as for the concordance, except that there’s no case folding, since C treats upper- and lowercase text differently. The two exclusive start states are `COMMENT`, used to skip text inside C comments, and `IFILE`, used in `#include`.
 
 Next come three named patterns, for use later in the rule section. There’s a style of flex programming that names every tiny sub-pattern, for example, `DIGIT` for `[0-9]`. I don’t find that useful, but I do find it useful to name patterns that are both fairly complex and used inside other larger patterns. The first pattern matches a universal character name, which is a cumbersome way of putting non-ASCII characters into strings and identifiers. A `UCN` is `\u` followed by four hex digits or else `\U` followed by eight hex digits. The second pattern is for the exponent of a floating-point number, the letter E in upper- or lowercase, an optional sign, and a string of digits. The third pattern matches the length and type suffix on an integer constant, which is an optional `U` for unsigned or an optional `L` or `LL` for length, in either order, each in either upper- or lowercase. Each pattern is enclosed in parentheses to avoid an old lex/flex incompatibility: When flex interpolates a named pattern, it acts as though the pattern was enclosed in parens, but lex didn’t, leading to some very obscure bugs.
+
+
 
 ```c
 /* the symbol table */
@@ -699,7 +705,7 @@ Next come three named patterns, for use later in the rule section. There’s a s
   struct symbol *lookup(char*);
   void addref(int, char*, char*, int);
   char *curfilename;            /* name of current input file */
-  /* include file stack */  
+  /* include file stack */
   struct bufstack {
     struct bufstack *prev;      /* previous entry */
     YY_BUFFER_STATE bs;         /* saved buffer */
@@ -713,7 +719,9 @@ Next come three named patterns, for use later in the rule section. There’s a s
 %}
 ```
 
-The rest of the front section should look familiar. The symbol table is the same as the one in the previous example. The file stack is the same as in Example 2-3. Last is a new variable, defining, which is set when a mention of a name is likely to be a definition rather than a reference.
+The rest of the front section should look familiar. The symbol table is the same as the one in the previous example. The file stack is the same as in Example 2-3. Last is a new variable, `defining`, which is set when a mention of a name is likely to be a definition rather than a reference.
+
+
 
 Next comes the rules section, which is much longer than any rules section we’ve seen before; this one is more typical of practical flex programs. Many of the token-matching rules are long and complicated but were actually quite easy to write by transliterating the BNF descriptions in the C standard. Although flex can’t handle general BNF (you need bison for that), the tokens were deliberately designed to be matched by regular expressions, so the transliterations all work.
 
@@ -729,8 +737,9 @@ Next comes the rules section, which is much longer than any rules section we’v
 "//".*\n
 ```
 
-
 An exclusive start state makes it easy to match C comments. The first rule starts the `COMMENT` state when it sees `/*`, and the second rule switches back to the normal `INITIAL` state on `*/`. The third rule matches everything in between. Although the complexity of patterns doesn’t affect the speed of a flex scanner, it is definitely faster to match one big pattern than several little ones. So, this rule could have just been `.|\n`, but the `([^*]|\n)+` can match a long string of text at once. Note that it has to exclude `*` so that the second rule can match `*/`. The `<COMMENT><<EOF>>` rule catches and reports unterminated comments. Next is a bonus rule that matches C++-style comments, a common extension to C compilers.
+
+
 
 ```c
 /* declaration keywords */
@@ -775,8 +784,9 @@ switch
 while
 ```
 
+Next are patterns to match all of the C keywords. The keywords that introduce a definition or declaration set the `defining` flag; the other keywords are just ignored. Another way to handle keywords is to put them into the symbol table with a flag saying they’re keywords, treat them as ordinary symbols in the scanner, and recognize them via the symbol table lookup. This is basically a space versus time trade-off. Putting them into the scanner makes the scanner bigger but recognizes the keywords without an extra lookup. On modern computers the size of the scanner tables is rarely an issue, so it is easier to put them in the scanner; even with all the keywords, the tables in this program are less than 18K bytes.
 
-Next are patterns to match all of the C keywords. The keywords that introduce a definition or declaration set the defining flag; the other keywords are just ignored. Another way to handle keywords is to put them into the symbol table with a flag saying they’re keywords, treat them as ordinary symbols in the scanner, and recognize them via the symbol table lookup. This is basically a space versus time trade-off. Putting them into the scanner makes the scanner bigger but recognizes the keywords without an extra lookup. On modern computers the size of the scanner tables is rarely an issue, so it is easier to put them in the scanner; even with all the keywords, the tables in this program are less than 18K bytes.
+
 
 ```c
 /* constants */
@@ -785,20 +795,22 @@ Next are patterns to match all of the C keywords. The keywords that introduce a 
 0[0-7]*{ILEN}?
 [1-9][0-9]*{ILEN}?
 0[Xx][0-9a-fA-F]+{ILEN}?
-    
+
  /* decimal float */
 ([0-9]*\.[0-9]+|[0-9]+\.){EXP}?[flFL]?
 [0-9]+{EXP}[flFL]?
-    
+
  /* hex float */
 0[Xx]([0-9a-fA-F]*\.[0-9a-fA-F]+|[0-9a-fA-F]+\.?)[Pp][-+]?[0-9]+[flFL]?
 ```
 
-Next come the patterns for numbers. The syntax for C numbers is surprisingly complicated, but the named ILEN and EXP subpatterns make the rules manageable. There’s one pattern for each form of integer, octal, decimal, and hex, each with an optional unsigned and/or integer prefix. (This could have been done as one larger pattern, but it seems easier to read this way, and of course it’s the same speed.)
+Next come the patterns for numbers. The syntax for C numbers is surprisingly complicated, but the named `ILEN` and `EXP` subpatterns make the rules manageable. There’s one pattern for each form of integer, octal, decimal, and hex, each with an optional unsigned and/or integer prefix. (This could have been done as one larger pattern, but it seems easier to read this way, and of course it’s the same speed.)
 
 Decimal floating-point numbers are very similar to the Fortran example earlier in the chapter. The first pattern matches a number that includes a decimal point and has an optional exponent. The second matches a number that doesn’t have a decimal point, in which case the exponent is mandatory to make it floating point. (Without the exponent, it’d just be an integer.)
 
 Finally comes the hex form of a floating-point number, with a binary exponent separated by `P` rather than `E`, so it can’t use the `EXP` pattern.
+
+
 
 ```c
  /* char const */
@@ -807,7 +819,9 @@ Finally comes the hex form of a floating-point number, with a binary exponent se
 L?\"([^"\\]|\\['"?\\abfnrtv]|\\[0-7]{1,3}|\\[Xx][0-9a-fA-F]+|{UCN})*\"
 ```
 
-Next come very messy patterns for character and string literals. A character literal is a single quote followed by one or more of an ordinary character other than a quote or a backslash, a single character backslash escape such as `\n`, an octal escape with up to three octal digits, a hex escape with an arbitrary number of hex digits, or a UCN, all followed by a close quote. A string literal is the same syntax, except that it’s enclosed in double quotes, has an optional prefix L to indicate a wide string, and doesn’t have to contain any characters. (Note the `+` at the end of the character constant and the `*` at the end of the string.)
+Next come very messy patterns for character and string literals. A character literal is a single quote followed by one or more of an ordinary character other than a quote or a backslash, a single character backslash escape such as `\n`, an octal escape with up to three octal digits, a hex escape with an arbitrary number of hex digits, or a UCN, all followed by a close quote. A string literal is the same syntax, except that it’s enclosed in double quotes, has an optional prefix `L` to indicate a wide string, and doesn’t have to contain any characters. (Note the `+` at the end of the character constant and the `*` at the end of the string.)
+
+
 
 ```c
  /* punctuators */
@@ -823,19 +837,23 @@ Next come very messy patterns for character and string literals. A character lit
 
 C calls all of the operators and punctuation punctuators. For our purposes, we separately treat three that usually indicate the end of the names in a variable or function definition, and we ignore the rest.
 
+
+
 ```c
- /* identifier */
+/* identifier */
 ([_a-zA-Z]|{UCN})([_a-zA-Z0-9]|{UCN})* {
                          addref(yylineno, curfilename, yytext, defining); }
- /* whitespace */
+/* whitespace */
 [ \t\n]+
- /* continued line */
+/* continued line */
 \\$
 ```
 
 The C syntax of an identifier is a letter, underscore, or UCN, optionally followed by more letters, underscores, UCNs, and digits. When we see an identifier, we add a reference to it to the symbol table.
 
 Two more patterns match and ignore whitespace and a backslash at the end of the line.
+
+
 
 ```c
 /* some preprocessor stuff */
@@ -846,68 +864,77 @@ Two more patterns match and ignore whitespace and a backslash at the end of the 
 "#"" "*line.*\n
 /* recognize an include */
 ^"#"[ \t]*include[ \t]*[\"<] { BEGIN IFILE; }
-<IFILE>[^>\"]+  { 
-                       { int c;
-             while((c = input()) && c != '\n') ;
-               }
-               newfile(strdup(yytext));
-               BEGIN INITIAL;
-                }
-<IFILE>.|\n     { fprintf(stderr, "%s:%d bad include line\n",
-              curfilename, yylineno);
+<IFILE>[^>\"]+ {
+                  { int c;
+                    while((c = input()) && c != '\n') ;
+                  }
+                  newfile(strdup(yytext));
                   BEGIN INITIAL;
-                }
-<<EOF>>         { if(!popfile()) yyterminate(); }
+               }
+<IFILE>.|\n    { fprintf(stderr, "%s:%d bad include line\n",
+                         curfilename, yylineno);
+                 BEGIN INITIAL;
+               }
+<<EOF>>        { if(!popfile()) yyterminate(); }
 ```
 
-There’s no totally satisfactory solution to handling preprocessor commands in a cross-referencer. One possibility would be to run the source program through the preprocessor first, but that would mean the cross-reference wouldn’t see any of the symbols handled by the preprocessor, just the code it expanded to. We take a very simple approach here and just ignore all preprocessor commands other than `#include`. (A reasonable alternative would be to read whatever follows `#define` and `#if` and add that to the cross-reference.) The code to handle include files is nearly the same as the example earlier in this chapter, slightly modified to handle C’s include syntax. One pattern matches `#include` up to the quote or `<` that precedes the filename, and then it switches to `IFILE` state. The next pattern collects the file name, skips the rest of the line, and switches to the new file. It’s a little sloppy and doesn’t try to ensure that the punctuation before and after the filename matches. The next two patterns complain if there’s no filename and return to the previous file at the end of each included one.
+There’s no totally satisfactory solution to handling preprocessor commands in a cross-referencer. One possibility would be to run the source program through the preprocessor first, but that would mean the cross-reference wouldn’t see any of the symbols handled by the preprocessor, just the code it expanded to. We take a very simple approach here and just ignore all preprocessor commands other than `#include`. 
+
+> (A reasonable alternative would be to read whatever follows `#define` and `#if` and add that to the cross-reference.) 
+
+The code to handle include files is nearly the same as the example earlier in this chapter, slightly modified to handle C’s include syntax. One pattern matches `#include` up to the quote or `<` that precedes the filename, and then it switches to `IFILE` state. The next pattern collects the filename, skips the rest of the line, and switches to the new file. It’s a little sloppy and doesn’t try to ensure that the punctuation before and after the filename matches. The next two patterns complain if there’s no filename and return to the previous file at the end of each included one.
+
+
 
 ```c
- /* invalid character */
+/* invalid character */
 .               { printf("%s:%d: Mystery character '%s'\n",
-             curfilename, yylineno, yytext);
+                         curfilename, yylineno, yytext);
                 }
 %%
 ```
 
-
 The final pattern is a simple `.` to catch anything that none of the previous patterns did. Since the patterns cover every token that can appear in a valid C program, this pattern shouldn’t ever match.
+
+
 
 The contents of the code section are very similar to code we’ve already seen. The first two routines, `symhash` and `lookup`, are identical to the versions in the previous example and aren’t shown again here. The version of `addref` is the same as in the earlier include example. This version of `printrefs` is slightly different. It has a line to print a `*` for each reference that’s flagged as being a definition.
 
 ```c
 void
-printrefs()
+    printrefs()
 {
-  struct symbol *sp;
-  qsort(symtab, NHASH, sizeof(struct symbol), symcompare); /* sort the symbol table */
-  for(sp = symtab; sp->name && sp < symtab+NHASH; sp++) {
-    char *prevfn = NULL;    /* last printed filename, to skip dups */
-    /* reverse the list of references */
-    struct ref *rp = sp->reflist;
-    struct ref *rpp = 0;    /* previous ref */
-    struct ref *rpn;    /* next ref */
-    do {
-      rpn = rp->next;
-      rp->next = rpp;
-      rpp = rp;
-      rp = rpn;
-    } while(rp);
-    /* now print the word and its references */
-    printf("%10s", sp->name);
-    for(rp = rpp; rp; rp = rp->next) {
-      if(rp->filename == prevfn) {
-    printf(" %d", rp->lineno);
-      } else {
-    printf(" %s:%d", rp->filename, rp->lineno);
-    prevfn = rp->filename;
-      }
-      if(rp->flags & 01) printf("*");
+    struct symbol *sp;
+    qsort(symtab, NHASH, sizeof(struct symbol), symcompare); /* sort the symbol table */
+    for(sp = symtab; sp->name && sp < symtab+NHASH; sp++) {
+        char *prevfn = NULL;    /* last printed filename, to skip dups */
+        /* reverse the list of references */
+        struct ref *rp = sp->reflist;
+        struct ref *rpp = 0;    /* previous ref */
+        struct ref *rpn;    /* next ref */
+        do {
+            rpn = rp->next;
+            rp->next = rpp;
+            rpp = rp;
+            rp = rpn;
+        } while(rp);
+        /* now print the word and its references */
+        printf("%10s", sp->name);
+        for(rp = rpp; rp; rp = rp->next) {
+            if(rp->filename == prevfn) {
+                printf(" %d", rp->lineno);
+            } else {
+                printf(" %s:%d", rp->filename, rp->lineno);
+                prevfn = rp->filename;
+            }
+            if(rp->flags & 01) printf("*");
+        }
+        printf("\n");
     }
-    printf("\n");
-  }
 }
 ```
+
+
 
 The versions of `newfile` and `popfile` are the same as the ones earlier in this chapter, so they aren’t repeated here. In this program, if `newfile` can’t open a file, it just prints an error message, returning `1` if it opened the file and `0` if it didn’t, and the include code in the rules section just goes on to the next line. This wouldn’t be a good idea in a regular compiler. For a cross-referencer, it has the reasonable effect of processing include files in the same directory that are specific to the current program, while skipping library files in other directories.
 
@@ -915,21 +942,21 @@ Finally, the main program just calls `newfile` and, if it succeeds, `yylex` for 
 
 ```c
 int
-main(argc, argv)
-int argc;
-char **argv;
+    main(argc, argv)
+    int argc;
+    char **argv;
 {
-  int i;
-  if(argc < 2) {
-    fprintf(stderr, "need filename\n");
-    return 1;
-  }
-  for(i = 1; i < argc; i++) {
-    if(newfile(argv[i]))
-      yylex();
-  }
-  printrefs();
-  return 0;
+    int i;
+    if(argc < 2) {
+        fprintf(stderr, "need filename\n");
+        return 1;
+    }
+    for(i = 1; i < argc; i++) {
+        if(newfile(argv[i]))
+            yylex();
+    }
+    printrefs();
+    return 0;
 }
 ```
 
@@ -941,5 +968,5 @@ This concludes our first realistically large flex program. It has a fairly compl
 
 2. The concordance program treats upper- and lowercase text separately. Modify it to handle them together. You can do this without making extra copies of the words. In `symhash()`, use `tolower` to hash lowercase versions of the characters, and use `strcasecmp()` to compare words.
 
-3. The symbol table routine in the concordance and cross-referencer programs uses a fixed-size symbol table and dies if it fills up. Modify the routine so it doesn’t do that. The two standard techniques to allow variable-sized hash tables are chaining and rehashing. Chaining turns the hash table into a table of pointers to a list of symbol entries. Lookups run down the chain to find the symbol, and if it’s not found, allocate a new entry with `malloc()` and add it to the chain. Rehashing creates an initial fixed-size symbol table, again using `malloc()`. When the symbol table fills up, create a new larger symbol table and copy all the entries into it, using the hash function to decide where each entry goes in the new table. Both techniques work, but one would make it a lot messier to produce the cross-reference. Which one? Why?
+3. The symbol table routine in the concordance and cross-referencer programs uses a fixed-size symbol table and dies if it fills up. Modify the routine so it doesn’t do that. The two standard techniques to allow variable-sized hash tables are chaining and rehashing. **Chaining** turns the hash table into a table of pointers to a list of symbol entries. Lookups run down the chain to find the symbol, and if it’s not found, allocate a new entry with `malloc()` and add it to the chain. **Rehashing** creates an initial fixed-size symbol table, again using `malloc()`. When the symbol table fills up, create a new larger symbol table and copy all the entries into it, using the hash function to decide where each entry goes in the new table. Both techniques work, but one would make it a lot messier to produce the cross-reference. Which one? Why?
 

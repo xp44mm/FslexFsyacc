@@ -1,6 +1,8 @@
 # CHAPTER 3 Using Bison
 
-The previous chapter concentrated on flex alone. In this chapter we turn our attention to bison, although we use flex to generate our lexical analyzers. Where flex recognizes regular expressions, bison recognizes entire grammars. Flex divides the input stream into pieces (tokens), and then bison takes these pieces and groups them together logically. In this chapter we’ll finish the desk calculator we started in Chapter 1, starting with simple arithmetic and then adding built-in functions, user variables, and finally user-defined functions.
+The previous chapter concentrated on flex alone. In this chapter we turn our attention to bison, although we use flex to generate our lexical analyzers. Where flex recognizes regular expressions, bison recognizes entire grammars. Flex divides the input stream into pieces (tokens), and then bison takes these pieces and groups them together logically.
+
+In this chapter we’ll finish the desk calculator we started in Chapter 1, starting with simple arithmetic and then adding built-in functions, user variables, and finally user-defined functions.
 
 ## How a Bison Parser Matches Its Input
 
@@ -20,12 +22,12 @@ The usual way to represent a parsed sentence is as a tree. For example, if we pa
 
 Figure 3-1. Expression parse tree
 
-In this example, `12 + 13` is an expression, and `fred = expression` is a statement. A bison parser doesn’t automatically create this tree as a data structure, although as we will see, it is not hard to do so yourself. Every grammar includes a start symbol, the one that has to be at the root of the parse tree. In this grammar, statement is the start symbol. Rules can refer directly or indirectly to themselves; this important ability makes it possible to parse arbitrarily long input sequences. Let’s extend our grammar to handle longer arithmetic expressions:
+In this example, `12 + 13` is an `expression`, and `fred = expression` is a `statement`. A bison parser doesn’t automatically create this tree as a data structure, although as we will see, it is not hard to do so yourself. Every grammar includes a **start symbol**, the one that has to be at the root of the parse tree. In this grammar, `statement` is the start symbol. Rules can refer directly or indirectly to themselves; this important ability makes it possible to parse arbitrarily long input sequences. Let’s extend our grammar to handle longer arithmetic expressions:
 
-```
+```c
 expression: NUMBER
-          | expression + NUMBER
-          | expression − NUMBER
+          | expression '+' NUMBER
+          | expression '-' NUMBER
 ```
 
 Now we can parse a sequence like `fred = 14 + 23 − 11 + 7` by applying the expression rules repeatedly, as in Figure 3-2. Bison can parse recursive rules very efficiently, so we will see recursive rules in nearly every grammar we use.
@@ -34,11 +36,11 @@ Now we can parse a sequence like `fred = 14 + 23 − 11 + 7` by applying the exp
 
 A bison parser works by looking for rules that might match the tokens seen so far.
 
-When bison processes a parser, it creates a set of states, each of which reflects a possible position in one or more partially parsed rules. As the parser reads tokens, each time it reads a token that doesn’t complete a rule, it pushes the token on an internal stack and switches to a new state reflecting the token it just read. This action is called a shift.
+When bison processes a parser, it creates a set of states, each of which reflects a possible position in one or more partially parsed rules. As the parser reads tokens, each time it reads a token that doesn’t complete a rule, it pushes the token on an internal stack and switches to a new state reflecting the token it just read. This action is called a **shift**.
 
-When it has found all the symbols that constitute the right-hand side of a rule, it pops the right-hand side symbols off the stack, pushes the left-hand side symbol onto the stack, and switches to a new state reflecting the new symbol on the stack. This action is called a reduction, since it usually reduces the number of items on the stack.[^ *]
+When it has found all the symbols that constitute the right-hand side of a rule, it pops the right-hand side symbols off the stack, pushes the left-hand side symbol onto the stack, and switches to a new state reflecting the new symbol on the stack. This action is called a **reduction**, since it usually reduces the number of items on the stack.
 
-[^ *]: It is possible to have rules with empty right-hand sides, in which case a reduction ends up with one more item than it started with, but we call them reductions anyway.
+> It is possible to have rules with empty right-hand sides, in which case a reduction ends up with one more item than it started with, but we call them reductions anyway.
 
 Whenever bison reduces a rule, it executes user code associated with the rule. This is how you actually do something with the material that the parser parses. Let’s look how it parses the input `fred = 12 + 13` using the simple rules in Figure 3-1. The parser starts by shifting tokens on to the internal stack one at a time:
 
@@ -53,7 +55,7 @@ fred = 12 + 13
 At this point it can reduce the rule expression: `NUMBER + NUMBER`, so it pops the 12, the plus, and the 13 from the stack and replaces them with expression:
 
 ```c
-    fred = expression
+fred = expression
 ```
 
 Now it reduces the rule statement: `NAME = expression`, so it pops `fred`, `=`, and `expression` and replaces them with `statement`. We’ve reached the end of the input and the stack has been reduced to the start symbol, so the input was valid according to the grammar.
@@ -62,11 +64,11 @@ Now it reduces the rule statement: `NAME = expression`, so it pops `fred`, `=`, 
 
 Bison parsers can use either of two parsing methods, known as LALR(1) (Look Ahead Left to Right with a one-token lookahead) and GLR (Generalized Left to Right). Most parsers use LALR(1), which is less powerful but considerably faster and easier to use than GLR. In this chapter we’ll describe LALR parsing and save GLR for Chapter 9.
 
-Although LALR parsing is quite powerful, you can write grammars that it cannot handle. It cannot deal with ambiguous grammars, ones in which the same input can match more than one parse tree. It also cannot deal with grammars that need more than one token of lookahead to tell whether it has matched a rule. (But bison has a wonderful hack to deal with the most common kind of ambiguous grammars, which we’ll come to in a few pages.) 
+Although LALR parsing is quite powerful, you can write grammars that it cannot handle. It cannot deal with ambiguous grammars, ones in which the same input can match more than one parse tree. It also cannot deal with grammars that need more than one token of lookahead to tell whether it has matched a rule. (But bison has a wonderful hack to deal with the most common kind of ambiguous grammars~~, which we’ll come to in a few pages~~.)
 
 Consider this extremely contrived example:
 
-```
+```c
 phrase:  cart_animal AND CART
        | work_animal AND PLOW
 cart_animal: HORSE | GOAT
@@ -82,31 +84,29 @@ phrase: cart_animal CART
 
 bison would have no trouble, since it can look one token ahead to see whether an input of `HORSE` is followed by `CART`, in which case the horse is a `cart_animal`, or by `PLOW`, in which case it is a `work_animal`. In practice, the rules about what bison can handle are not as complex and confusing as they may seem here. One reason is that bison knows exactly what grammars it can parse and what it cannot. If you give it one that it cannot handle, it will tell you, so there is no problem of overcomplex parsers silently failing.
 
-Another reason is that the grammars that bison can handle correspond pretty well to ones that people really write. As often as not, a grammatical construct that confuses bison will confuse people as well, so if you have some latitude in your language design, you should consider changing the language to make it more understandable both to bison and to its users. For more information on shift/reduce parsing, see Chapter 7.
+Another reason is that the grammars that bison can handle correspond pretty well to ones that people really write. As often as not, a grammatical construct that confuses bison will confuse people as well, so if you have some latitude in your language design, you should consider changing the language to make it more understandable both to bison and to its users. ~~For more information on shift/reduce parsing, see Chapter 7.~~
 
-For a discussion of what bison has to do to turn your specification into a working C program, a good reference is Dick Grune’s Parsing Techniques: A Practical Guide.
-
-> ~~He offers a download of an old but quite adequate edition at http://www.cs.vu.nl/~dick/PTAPG.html.~~
+~~For a discussion of what bison has to do to turn your specification into a working C program, a good reference is Dick Grune’s Parsing Techniques: A Practical Guide. He offers a download of an old but quite adequate edition at http://www.cs.vu.nl/~dick/PTAPG.html.~~
 
 ## A Bison Parser
 
-A bison specification has the same three-part structure as a flex specification. 
+A bison specification has the same three-part structure as a flex specification.
 
-> (Flex copied its structure from the earlier lex, which copied its structure from yacc, the predecessor of bison.) 
+> (Flex copied its structure from the earlier lex, which copied its structure from yacc, the predecessor of bison.)
 
 The first section, the definition section, handles control information for the parser and generally sets up the execution environment in which the parser will operate. The second section contains the rules for the parser, and the third section is C code copied verbatim into the generated C program.
 
 Bison creates the C program by plugging pieces into a standard skeleton file. The rules are compiled into arrays that represent the state machine that matches the input tokens.
 
-The actions have the `$N` and `@N` values translated into C and then are put into a switch statement within `yyparse()` that runs the appropriate action each time there’s a reduction. Some bits of the skeleton have multiple versions from which bison chooses depending on what options are in use; for example, if the parser uses the locations feature, it includes code to handle location data.
+The actions have the `$N` and `@N` values translated into C and then are put into a `switch` statement within `yyparse()` that runs the appropriate action each time there’s a reduction. Some bits of the skeleton have multiple versions from which bison chooses depending on what options are in use; for example, if the parser uses the `locations` feature, it includes code to handle location data.
 
-In this chapter we take the simple calculator example from Chapter 1 and extend it significantly. First, we rewrite it to take advantage of some handy bison shortcuts and change it to produce a reusable data structure rather than computing the values on the fly. Later, we’ll add more complex syntax for loops and functions and show how to implement them in a simple interpreter.[^ †]
+In this chapter we take the simple calculator example from Chapter 1 and extend it significantly. First, we rewrite it to take advantage of some handy bison shortcuts and change it to produce a reusable data structure rather than computing the values on the fly. Later, we’ll add more complex syntax for loops and functions and show how to implement them in a simple interpreter.
 
-[^ †]: Then we’ll stop; the world has plenty of script interpreter programs already. For practical purposes, you’ll be much better off adding a few extensions to an existing well-debugged scripting language such as Python, Perl, or Lua rather than writing yet another one.
+>Then we’ll stop; the world has plenty of script interpreter programs already. For practical purposes, you’ll be much better off adding a few extensions to an existing well-debugged scripting language such as Python, Perl, or Lua rather than writing yet another one.
 
 ## Abstract Syntax Trees
 
-One of the most powerful data structures used in compilers is an abstract syntax tree (AST). In Chapter 1 we saw a parse tree, a tree that has a node for every rule used to parse the input string. In most real grammars, there are rules that exist to manage grouping but that add no meaning to the program. In the calculator example, the rules `exp: term` and `term: factor` exist only to tell the parser the relative precedence of the operators. An AST is basically a parse tree that omits the nodes for the uninteresting rules.
+One of the most powerful data structures used in compilers is an **abstract syntax tree (AST)**. In Chapter 1 we saw a parse tree, a tree that has a node for every rule used to parse the input string. In most real grammars, there are rules that exist to manage grouping but that add no meaning to the program. In the calculator example, the rules `exp: term` and `term: factor` exist only to tell the parser the relative precedence of the operators. An AST is basically a parse tree that omits the nodes for the uninteresting rules.
 
 Once a parser creates an AST, it’s straightforward to write recursive routines that “walk” the tree. We’ll see several tree walkers in this example.
 
@@ -114,7 +114,7 @@ Once a parser creates an AST, it’s straightforward to write recursive routines
 
 This example is big enough to be worth dividing into several source files, so we’ll put most of the C code into a separate file, which means we also need a C header file to declare the routines and data structures used in the various files (Example 3-1).
 
-Example 3-1. Calculator that builds an AST: header fb3-1.h
+Example 3-1. Calculator that builds an AST: header `fb3-1.h`
 
 ```c
 /*
@@ -144,7 +144,7 @@ void treefree(struct ast *);
 
 The variable `yylineno` and routine `yyerror` are familiar from the flex example. Our `yyerror` is slightly enhanced to take multiple arguments in the style of `printf`.
 
-The AST consists of nodes, each of which has a node type. Different nodes have different fields, but for now we have just two kinds, one that has pointers to up to two subnodes and one that contains a number. Two routines, `newast` and `newnum`, create AST nodes; eval walks an AST and returns the value of the expression it represents; and treefree walks an AST and deletes all of its nodes.
+The AST consists of nodes, each of which has a node type. Different nodes have different fields, but for now we have just two kinds, one that has pointers to up to two subnodes and one that contains a number. Two routines, `newast` and `newnum`, create AST nodes; `eval` walks an AST and returns the value of the expression it represents; and `treefree` walks an AST and deletes all of its nodes.
 
 Example 3-2. Bison parser for AST calculator
 
@@ -165,20 +165,20 @@ Example 3-2. Bison parser for AST calculator
 %type <a> exp factor term
 ```
 
-Example 3-2 shows the bison parser for the AST calculator. The first section of the parser uses the `%union` construct to declare types to be used in the values of symbols in the parser. In a bison parser, every symbol, both tokens and nonterminals, can have a value associated with it. By default, the values are all integers, but useful programs generally need more sophisticated values. The `%union` construct, as its name suggests, is used to create a C language union declaration for symbol values. In this case, the union has two members: `a`, which is a pointer to an AST, and `d`, which is a double precision number.
+Example 3-2 shows the bison parser for the AST calculator. The first section of the parser uses the `%union` construct to declare types to be used in the values of symbols in the parser. In a bison parser, every symbol, both tokens and nonterminals, can have a value associated with it. ~~By default, the values are all integers,~~ but useful programs generally need more sophisticated values. The `%union` construct, as its name suggests, is used to create a C language `union` declaration for symbol values. In this case, the union has two members: `a`, which is a pointer to an AST, and `d`, which is a double precision number.
 
 Once the union is defined, we need to tell bison what symbols have what types of values by putting the appropriate name from the union in angle brackets (`<>`). The token `NUMBER`, which represents numbers in the input, has the value `<d>` to hold the value of the number. The new declaration `%type` assigns the value `<a>` to `exp`, `factor`, and `term`, which we’ll use as we build up our AST.
 
 You don’t have to declare a type for a token or declare a nonterminal at all if you don’t use the symbol’s value. If there is a `%union` in the declarations, bison will give you an error if you attempt to use the value of a symbol that doesn’t have an assigned type.
 
-Keep in mind that any rule without explicit action code gets the default action `$$ =$1;`, and bison will complain if the LHS symbol has a type and the RHS symbol doesn’t have the same type.
+Keep in mind that any rule without explicit action code gets the default action `$$ = $1;`, and bison will complain if the LHS symbol has a type and the RHS symbol doesn’t have the same type.
 
 ```c
 %%
 calclist: /* nothing */
 | calclist exp EOL {
-     printf("= %4.4g\n", eval($2));   evaluate and print the AST
-     treefree($2);                    free up the AST
+     printf("= %4.4g\n", eval($2)); // evaluate and print the AST
+     treefree($2); // free up the AST
      printf("> ");
  }
  | calclist EOL { printf("> "); } /* blank line or a comment */
@@ -201,7 +201,7 @@ term: NUMBER { $$ = newnum($1); }
 
 ### Literal Character Tokens
 
-The rules section has two significant changes from the version in Chapter 1. One is that the rules now use literal tokens for the operators. Rather than giving every token a name, it’s also possible to use a single quoted character as a token, with the ASCII value of the token being the token number. (Bison starts the numbers for named tokens at 258, so there’s no problem of collisions.) By convention, literal character tokens are used to represent input tokens consisting of the same character; for example, the token `'+'` represents the input token `+`, so in practice they are used only for punctuation and operators. There’s no need to declare literal character tokens unless you need to declare the type of their values.
+The rules section has two significant changes from the version in Chapter 1. One is that the rules now use literal tokens for the operators. Rather than giving every token a name, it’s also possible to use a single quoted character as a token, with the ASCII value of the token being the token number. ~~(Bison starts the numbers for named tokens at 258, so there’s no problem of collisions.)~~ By convention, **literal character tokens** are used to represent input tokens consisting of the same character; for example, the token `'+'` represents the input token `+`, so in practice they are used only for punctuation and operators. There’s no need to declare literal character tokens unless you need to declare the type of their values.
 
 The other change to the parser is that it creates an AST for each expression rather than evaluating it on the fly. In this version of the calculator, we create an AST for each expression and then evaluate the AST, print the result, and free the AST. We call `newast()` to create each node in the AST. Each node has an operator type, which is generally the same as the token name. Notice that unary minus creates a node of type `M` to distinguish it from binary subtraction.
 
@@ -228,15 +228,15 @@ EXP     ([Ee][-+]?[0-9]+)
 [0-9]+"."[0-9]*{EXP}? |
 "."?[0-9]+{EXP}? { yylval.d = atof(yytext); return NUMBER; }
 \n      { return EOL; }
-"//".*  
+"//".*
 [ \t]   { /* ignore whitespace */ }
 .       { yyerror("Mystery character %c\n", *yytext); }
 %%
 ```
 
-The lexer, shown in Example 3-3, is a little simpler than the version in Chapter 1. We use a common idiom for the single-character operators, handling them all with the same rule that returns `yytext[0]`, the character itself, as the token. We do still have names for `NUMBER` and `EOL`. We also handle floating-point numbers, using a version of the pattern from Chapter 2, and change the internal representation of numbers to double.
+The lexer, shown in Example 3-3, is a little simpler than the version in Chapter 1. We use a common idiom for the single-character operators, handling them all with the same rule that returns `yytext[0]`, the character itself, as the token. We do still have names for `NUMBER` and `EOL`. We also handle floating-point numbers, using a version of the pattern from Chapter 2, and change the internal representation of numbers to `double`.
 
-Since yylval is now a union, the double value has to be assigned to yylval.d. (Flex does not automate the management of token values as bison does.)
+Since `yylval` is now a union, the double value has to be assigned to `yylval.d`. (Flex does not automate the management of token values as bison does.)
 
 Example 3-4. C routines for AST calculator
 
@@ -249,7 +249,7 @@ struct ast *
 newast(int nodetype, struct ast *l, struct ast *r)
 {
   struct ast *a = malloc(sizeof(struct ast));
-  
+
   if(!a) {
     yyerror("out of space");
     exit(0);
@@ -274,17 +274,17 @@ newnum(double d)
 }
 ```
 
-Finally, there is a file of routines called from the parser, shown in Example 3-4.[^ ‡]
+Finally, there is a file of routines called from the parser, shown in Example 3-4.
 
-[^ ‡]: These could have gone in the third section of the parser, but it’s easier to debug your program if you don’t put a lot of extra code in the parser file.
+> These could have gone in the third section of the parser, but it’s easier to debug your program if you don’t put a lot of extra code in the parser file.
 
-First come the two routines to create AST nodes, by mallocing a node and filling it in. All AST nodes have a nodetype as the first field, so a tree walk can tell what kind of nodes it’s walking through.
+First come the two routines to create AST nodes, by mallocing a node and filling it in. All AST nodes have a `nodetype` as the first field, so a tree walk can tell what kind of nodes it’s walking through.
 
 ```c
 double
 eval(struct ast *a)
 {
-  double v;  calculated value of this subtree
+  double v; // calculated value of this subtree
   switch(a->nodetype) {
   case 'K': v = ((struct numval *)a)->number; break;
   case '+': v = eval(a->l) + eval(a->r); break;
@@ -301,17 +301,17 @@ void
 treefree(struct ast *a)
 {
   switch(a->nodetype) {
-    /* two subtrees */
+  /* two subtrees */
   case '+':
   case '-':
   case '*':
   case '/':
     treefree(a->r);
-    /* one subtree */
+  /* one subtree */
   case '|':
   case 'M':
     treefree(a->l);
- /* no subtree */
+  /* no subtree */
   case 'K':
     free(a);
     break;
@@ -320,7 +320,9 @@ treefree(struct ast *a)
 }
 ```
 
-Next we have the two tree-walking routines. They each make what’s known as a depth-first traversal of the tree, recursively visiting the subtrees of each node and then the node itself. The eval routine returns the value of the tree or subtree from each call, and the `treefree` doesn’t have to return anything.
+Next we have the two tree-walking routines. They each make what’s known as a depth-first traversal of the tree, recursively visiting the subtrees of each node and then the node itself. The `eval` routine returns the value of the tree or subtree from each call, and the `treefree` doesn’t have to return anything.
+
+
 
 ```c
 void
@@ -335,7 +337,7 @@ yyerror(char *s, ...)
 int
 main()
 {
-  printf("> "); 
+  printf("> ");
   return yyparse();
 }
 ```
@@ -349,7 +351,7 @@ This program now has three source files and a header file, so of course we use m
 ```c
 fb3-1:  fb3-1.l fb3-1.y fb3-1.h
         bison -d fb3-1.y
-        flex -ofb3-1.lex.c fb3-1.l
+        flex -o fb3-1.lex.c fb3-1.l
         cc -o $@ fb3-1.tab.c fb3-1.lex.c fb3-1funcs.c
 ```
 
@@ -357,19 +359,21 @@ Notice the `-o` flag to flex. Bison automatically names its generated C file to 
 
 ## Shift/Reduce Conflicts and Operator Precedence
 
-The expression parser uses three different symbols, `exp`, `factor`, and `term`, to set the precedence and associativity of operators. Although this parser is still reasonably legible, as grammars add more operators with more levels of precedence, they become increasingly hard to read and maintain. Bison provides a clever way to describe the precedence separately from the rules in the grammar, which makes the grammar and parser smaller and easier to maintain. First, we’ll just make all expressions use `exp` symbols:
+The expression parser uses three different symbols, `exp`, `factor`, and `term`, to set the precedence and associativity of operators. Although this parser is still reasonably legible, as grammars add more operators with more levels of precedence, they become increasingly hard to read and maintain. Bison provides a clever way to describe the precedence separately from the rules in the grammar, which makes the grammar and parser smaller and easier to maintain. 
+
+First, we’ll just make all expressions use `exp` symbols:
 
 ```c
 %type <a> exp
 %%
  ...
-exp: exp '+' exp { $$ = newast('+', $1,$3); }
-   | exp '-' exp { $$ = newast('-', $1,$3);}
-   | exp '*' exp { $$ = newast('*', $1,$3); }
-   | exp '/' exp { $$ = newast('/', $1,$3); }
-   | '|' exp     { $$ = newast('|', $2, NULL); }
+exp: exp '+' exp { $$ = newast('+',$1,$3); }
+   | exp '-' exp { $$ = newast('-',$1,$3); }
+   | exp '*' exp { $$ = newast('*',$1,$3); }
+   | exp '/' exp { $$ = newast('/',$1,$3); }
+   | '|' exp     { $$ = newast('|',$2,NULL); }
    | '(' exp ')' { $$ = $2; }
-   | '-' exp     { $$ = newast('M', $2, NULL); }
+   | '-' exp     { $$ = newast('M',$2,NULL); }
    | NUMBER      { $$ = newnum($1); }
  ;
 %%
@@ -383,37 +387,39 @@ If you compile this grammar as it stands, bison will tell you that there are 24 
 
 ```c
      2         shift NUMBER
-     E         reduce E 
-→ 
+     E         reduce E
+→
 NUMBER
      E +       shift +
      E + 3     shift NUMBER
-     E + E     reduce E 
-→ 
+     E + E     reduce E
+→
 NUMBER
 ```
 
 At this point, the parser looks at the `*` and could either reduce `2+3` using:
 
 ```c
-    exp:       exp '+' exp
+exp:       exp '+' exp
 ```
 
 to an expression or shift the `*`, expecting to be able to reduce:
 
 ```c
-    exp:       exp '*' exp
+exp:       exp '*' exp
 ```
 
 later on.
 
 The problem is that we haven’t told bison about the precedence and associativity of the operators. Precedence controls which operators execute first in an expression.
 
-Mathematical and programming tradition (dating back past the first Fortran compiler in 1956) says that multiplication and division take precedence over addition and subtraction, so a+b*c means a+(b*c), and d/e-f means (d/e)-f. In any expression grammar, operators are grouped into levels of precedence from lowest to highest. The total number of levels depends on the language. The C language is notorious for having too many precedence levels, a total of 15 levels.
+Mathematical and programming tradition (dating back past the first Fortran compiler in 1956) says that multiplication and division take precedence over addition and subtraction, so `a+b*c` means `a+(b*c)`, and `d/e-f` means `(d/e)-f`. In any expression grammar, operators are grouped into levels of precedence from lowest to highest. The total number of levels depends on the language. The C language is notorious for having too many precedence levels, a total of 15 levels.
 
-Associativity controls the grouping of operators at the same precedence level. Operators may group to the left, for example, a-b-c in C means (a-b)-c, or to the right, for example, a=b=c in C means a=(b=c). In some cases, operators do not group at all; for example, in Fortran A.LE.B.LE.C is invalid.
+Associativity controls the grouping of operators at the same precedence level. Operators may group to the left, for example, `a-b-c` in C means `(a-b)-c`, or to the right, for example, `a=b=c` in C means `a=(b=c)`. In some cases, operators do not group at all; for example, in Fortran `A.LE.B.LE.C` is invalid.
 
 There are two ways to specify precedence and associativity in a grammar, implicitly and explicitly. So far, we’ve specified them implicitly, by using separate nonterminal symbols for each precedence level. This is a perfectly reasonable way to write a grammar, and if bison didn’t have explicit precedence rules, it would be the only way.
+
+
 
 But bison also lets you specify precedence explicitly. We can add these lines to the definition section to tell it how to resolve the conflicts:
 
@@ -425,27 +431,27 @@ But bison also lets you specify precedence explicitly. We can add these lines to
 %%
  ...
 exp: exp '+' exp { $$ = newast('+', $1,$3); }
-   | exp '-' exp { $$ = newast('-', $1,$3);}
- | exp '*' exp { $$ = newast('*', $1,$3); }
+   | exp '-' exp { $$ = newast('-', $1,$3); }
+   | exp '*' exp { $$ = newast('*', $1,$3); }
    | exp '/' exp { $$ = newast('/', $1,$3); }
-   | '|' exp     { $$ = newast('|', $2, NULL); }
+   | '|' exp     { $$ = newast('|', $2,NULL); }
    | '(' exp ')' { $$ = $2; }
-   | '-' exp %prec UMINUS{ $$ = newast('M', NULL, $2); }
+   | '-' exp %prec UMINUS { $$ = newast('M', NULL, $2); }
    | NUMBER      { $$ = newnum($1); }
  ;
 ```
 
-Each of these declarations defines a level of precedence, with the order of the %left, %right, and %nonassoc declarations defining the order of precedence from lowest to highest. They tell bison that + and - are left associative and at the lowest precedence level; * and / are left associative and at a higher precedence level; and | and UMINUS, a pseudotoken standing for unary minus, have no associativity and are at the highest precedence. (We don’t have any right-associative operators here, but if we did, they’d use %right.) Bison assigns each rule the precedence of the rightmost token on the right-hand side; if that token has no precedence assigned, the rule has no precedence of its own. When bison encounters a shift/reduce conflict, it consults the table of precedence, and if all the rules involved in the conflict have a precedence assigned, it uses precedence to resolve the conflict.
+Each of these declarations defines a level of precedence, with the order of the `%left`, `%right`, and `%nonassoc` declarations defining the order of precedence from lowest to highest. They tell bison that `+` and `-` are left associative and at the lowest precedence level; `*` and `/` are left associative and at a higher precedence level; and `|` and UMINUS, a pseudo-token standing for unary minus, have no associativity and are at the highest precedence. (We don’t have any right-associative operators here, but if we did, they’d use `%right`.) Bison assigns each rule the precedence of the rightmost token on the right-hand side; if that token has no precedence assigned, the rule has no precedence of its own. When bison encounters a shift/reduce conflict, it consults the table of precedence, and if all the rules involved in the conflict have a precedence assigned, it uses precedence to resolve the conflict.
 
-In our grammar, all of the conflicts occur in the rules of the form exp OP exp, so setting precedence for the four operators allows it to resolve all of the conflicts. This parser using precedence is slightly smaller and faster than the one with the extra rules for implicit precedence, since it has fewer rules to reduce.
+In our grammar, all of the conflicts occur in the rules of the form `exp OP exp`, so setting precedence for the four operators allows it to resolve all of the conflicts. This parser using precedence is slightly smaller and faster than the one with the extra rules for implicit precedence, since it has fewer rules to reduce.
 
-The rule for negation includes %prec UMINUS. The only operator in this rule is -, which has low precedence, but we want unary minus to have higher precedence than multi-plication rather than lower. The %prec tells bison to use the precedence of UMINUS for this rule.
+The rule for negation includes `%prec UMINUS`. The only operator in this rule is `-`, which has low precedence, but we want unary minus to have higher precedence than multiplication rather than lower. The `%prec` tells bison to use the precedence of UMINUS for this rule.
 
 ### When Not to Use Precedence Rules
 
 You can use precedence rules to fix any shift/reduce conflict that occurs in the grammar. This is usually a terrible idea. In expression grammars, the cause of the conflicts is easy to understand, and the effect of the precedence rules is clear. In other situations, precedence rules fix shift/reduce problems, but it can be extremely difficult to understand just what effect they have on the grammar.
 
-Use precedence in only two situations: in expression grammars and to resolve the “dangling else” conflict in grammars for if/then/else language constructs. (See the section “IF/THEN/ELSE” on page 185 for examples of the latter.) Otherwise, if you can, you should fix the grammar to remove the conflict. Remember that conflicts mean that bison can’t create a parser for a grammar, probably because it’s ambiguous. This means there are multiple possible parses for the same input and the parser that bison created chose one of them. Except in the two previous cases, this usually points to a problem in your language definition. In some cases, if a grammar is ambiguous to bison, it’s almost certainly ambiguous to humans, too. See Chapter 8 for more information on finding and repairing conflicts, as well as the advanced bison features that let you use ambiguous grammars if you really want to do so.
+Use precedence in only two situations: in expression grammars and to resolve the “dangling else” conflict in grammars for if/then/else language constructs. (See the section “IF/THEN/ELSE” ~~on page 185~~ for examples of the latter.) Otherwise, if you can, you should fix the grammar to remove the conflict. Remember that conflicts mean that bison can’t create a parser for a grammar, probably because it’s ambiguous. This means there are multiple possible parses for the same input and the parser that bison created chose one of them. Except in the two previous cases, this usually points to a problem in your language definition. In some cases, if a grammar is ambiguous to bison, it’s almost certainly ambiguous to humans, too. See Chapter 8 for more information on finding and repairing conflicts, as well as the advanced bison features that let you use ambiguous grammars if you really want to do so.
 
 ## An Advanced Calculator
 
@@ -462,7 +468,7 @@ Defined avg
 
 As before, we start with the declarations, shown in Example 3-5.
 
-Example 3-5. Advanced calculator header fb3-2.h
+Example 3-5. Advanced calculator header `fb3-2.h`
 
 ```c
 /*
@@ -491,7 +497,9 @@ struct symlist *newsymlist(struct symbol *sym, struct symlist *next);
 void symlistfree(struct symlist *sl);
 ```
 
-The symbol table is adapted from the one used in the previous chapter. In the calculator, each symbol can potentially be both a variable and a user-defined function. The value field holds the symbol’s value as a variable, the func field points to the AST for the user code for the function, and syms points to a linked list of the dummy arguments, which are themselves symbols. (In the previous example, avg is the function, and a and b are the dummy arguments.) The C functions newsymlist and symlistfree create and free them.
+The symbol table is adapted from the one used in the previous chapter. In the calculator, each `symbol` can potentially be both a variable and a user-defined function. The `value` field holds the symbol’s value as a variable, the `func` field points to the AST for the user code for the function, and `syms` points to a linked list of the dummy arguments, which are themselves symbols. (In the previous example, `avg` is the function, and `a` and `b` are the dummy arguments.) The C functions `newsymlist` and `symlistfree` create and free them.
+
+
 
 ```c
 /* node types
@@ -506,7 +514,7 @@ The symbol table is adapted from the one used in the previous chapter. In the ca
  *  S list of symbols
  *  F built in function call
  *  C user function call
- */ 
+ */
 enum bifs {                     /* built-in functions */
   B_sqrt = 1,
   B_exp,
@@ -531,7 +539,6 @@ struct ufncall {                /* user function */
   struct symbol *s;
 };
 struct flow {
-
   int nodetype;                 /* type I or W */
   struct ast *cond;             /* condition */
   struct ast *tl;               /* then branch or do list */
@@ -570,7 +577,11 @@ extern int yylineno; /* from lexer */
 void yyerror(char *s, ...);
 ```
 
-This version has considerably more kinds of nodes in the AST. As before, each kind of node starts with a nodetype that the tree-walking code can use to tell what kind of node it is.§ The basic ast node is also used for comparisons, with each kind of comparison (less, less-equal, equal, etc.) being a different type, and for lists of expressions.
+This version has considerably more kinds of nodes in the AST. As before, each kind of node starts with a `nodetype` that the tree-walking code can use to tell what kind of node it is.
+
+> This is a classic C trick that doesn’t work in C++. If you write your parser in C++, as we describe in Chapter 9, you’ll have to use an explicit union of structures within the AST structure to get a similar result.
+
+The basic `ast` node is also used for comparisons, with each kind of comparison (less, less-equal, equal, etc.) being a different type, and for lists of expressions.
 
 Built-in functions have a fncall node with the AST of the argument (the built-ins each take one argument) and an enum that says which built-in function it is. There are three standard functions, sqrt, exp, and log, as well as print, a function that prints its argument and returns the argument as its value. Calls to user functions have a ufncall node with a pointer to the function, which is an entry in the symbol table, and an AST, which is a list of the arguments.
 
@@ -758,8 +769,8 @@ EXP     ([Ee][-+]?[0-9]+)
 [a-zA-Z][a-zA-Z0-9]*  { yylval.s = lookup(yytext); return NAME; }
 [0-9]+"."[0-9]*{EXP}? |
 "."?[0-9]+{EXP}? { yylval.d = atof(yytext); return NUMBER; }
-"//".*  
-[ \t]  /* ignore whitespace */ 
+"//".*
+[ \t]  /* ignore whitespace */
 \\\n { printf("c> "); } /* ignore line continuation */
 \n   { return EOL; }
 .       { yyerror("Mystery character %c\n", *yytext); }
@@ -839,7 +850,7 @@ struct ast *
 newast(int nodetype, struct ast *l, struct ast *r)
 {
   struct ast *a = malloc(sizeof(struct ast));
-  
+
   if(!a) {
     yyerror("out of space");
     exit(0);
@@ -853,7 +864,7 @@ struct ast *
 newnum(double d)
 {
   struct numval *a = malloc(sizeof(struct numval));
-  
+
   if(!a) {
     yyerror("out of space");
     exit(0);
@@ -866,7 +877,7 @@ struct ast *
 newcmp(int cmptype, struct ast *l, struct ast *r)
 {
   struct ast *a = malloc(sizeof(struct ast));
-  
+
   if(!a) {
     yyerror("out of space");
     exit(0);
@@ -880,7 +891,7 @@ struct ast *
 newfunc(int functype, struct ast *l)
 {
   struct fncall *a = malloc(sizeof(struct fncall));
-  
+
   if(!a) {
     yyerror("out of space");
     exit(0);
@@ -894,7 +905,7 @@ struct ast *
 newcall(struct symbol *s, struct ast *l)
 {
   struct ufncall *a = malloc(sizeof(struct ufncall));
-  
+
   if(!a) {
     yyerror("out of space");
     exit(0);
@@ -908,7 +919,7 @@ struct ast *
 newref(struct symbol *s)
 {
   struct symref *a = malloc(sizeof(struct symref));
-  
+
   if(!a) {
     yyerror("out of space");
     exit(0);
@@ -934,7 +945,7 @@ struct ast *
 newflow(int nodetype, struct ast *cond, struct ast *tl, struct ast *el)
 {
   struct flow *a = malloc(sizeof(struct flow));
-  
+
   if(!a) {
     yyerror("out of space");
     exit(0);
@@ -975,15 +986,15 @@ treefree(struct ast *a)
     if( ((struct flow *)a)->el) treefree( ((struct flow *)a)->el);
     break;
   default: printf("internal error: free bad node %c\n", a->nodetype);
-  }       
-  
+  }
+
   free(a); /* always free the node itself */
 }
 struct symlist *
 newsymlist(struct symbol *sym, struct symlist *next)
 {
   struct symlist *sl = malloc(sizeof(struct symlist));
-  
+
   if(!sl) {
     yyerror("out of space");
     exit(0);
@@ -1043,7 +1054,7 @@ eval(struct ast *a)
   /* control flow */
   /* null expressions allowed in the grammar, so check for them */
   /* if/then/else */
-  case 'I': 
+  case 'I':
     if( eval( ((struct flow *)a)->cond) != 0) { check the condition
       if( ((struct flow *)a)->tl) {             the true branch
         v = eval( ((struct flow *)a)->tl);
@@ -1059,13 +1070,13 @@ eval(struct ast *a)
   /* while/do */
  case 'W':
     v = 0.0;            /* a default value */
-    
+
     if( ((struct flow *)a)->tl) {
       while( eval(((struct flow *)a)->cond) != 0) evaluate the condition
         v = eval(((struct flow *)a)->tl);         evaluate the target statements
     }
     break;                      /* value of last statement is value of while/do */
-                      
+
   /* list of statements */
   case 'L': eval(a->l); v = eval(a->r); break;
   case 'F': v = callbuiltin((struct fncall *)a); break;
@@ -1166,7 +1177,7 @@ calluser(struct ufncall *f)
   if(!oldval || !newval) {
     yyerror("Out of space in %s", fn->name); return 0.0;
   }
-  
+
   /* evaluate the arguments */
   for(i = 0; i < nargs; i++) {
     if(!args) {
@@ -1182,7 +1193,7 @@ calluser(struct ufncall *f)
       args = NULL;
     }
   }
-                     
+
   /* save old values of dummies, assign new ones */
   sl = fn->syms;
   for(i = 0; i < nargs; i++) {

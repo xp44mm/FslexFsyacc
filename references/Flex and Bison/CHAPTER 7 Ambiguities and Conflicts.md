@@ -31,7 +31,7 @@ x:    A B @ C D;
 y:    A B @ E F;
 ```
 
-> (For the rest of the examples in this chapter, all capital letters are tokens, so we will leave out the `%token` and the `%%`.) 
+> (For the rest of the examples in this chapter, all capital letters are tokens, so we will leave out the `%token` and the `%%`.)
 
 There are two ways for pointers to disappear. One happens when a subsequent token doesn’t match a partially matched rule. If the next token that the parser reads is `C`, the second pointer will disappear, and the first pointer advances:
 
@@ -270,7 +270,7 @@ That is, after the first `A` in `threeAs`, the parser could have accepted `6i+1`
 
 ## Contents of name.output
 
-Now that we have defined states, we can look at the conflicts described in `name.output`. The format of the file has varied among versions of bison, but it always includes a listing of all the rules in the grammar and all the parser states. It usually has a summary of conflicts and other errors at the beginning, including rules that are never used, typically because of conflicts. For each state, it lists the rules and positions that correspond to the state, the shifts and reductions the parser will do when it reads various tokens in that state, and what state it will switch to after a reduction produces a nonterminal in that state. We’ll show some ambiguous grammars and the `name.output` reports that identify the ambiguities. 
+Now that we have defined states, we can look at the conflicts described in `name.output`. The format of the file has varied among versions of bison, but it always includes a listing of all the rules in the grammar and all the parser states. It usually has a summary of conflicts and other errors at the beginning, including rules that are never used, typically because of conflicts. For each state, it lists the rules and positions that correspond to the state, the shifts and reductions the parser will do when it reads various tokens in that state, and what state it will switch to after a reduction produces a nonterminal in that state. We’ll show some ambiguous grammars and the `name.output` reports that identify the ambiguities.
 
 > The files that bison produces show the cursor as a dot, but we’ll show it as an ~~up arrow~~ (`@`) to make it easier to read and to be consistent with the examples so far.
 
@@ -293,14 +293,14 @@ state 3
     Y  shift, and go to state 6
 ```
 
-In this state, the parser has already reduced an `a`. If it sees a `Y`, it shifts the `Y` and moves to state 6. Anything else would be an error. 
+In this state, the parser has already reduced an `a`. If it sees a `Y`, it shifts the `Y` and moves to state 6. Anything else would be an error.
 
 The ambiguity produces a reduce/reduce conflict in state 1:
 
 ```
     3 a: X @
     4 b: X @
-    
+
     Y         reduce using rule 3 (a)
     Y         [reduce using rule 4 (b)]
     $default  reduce using rule 3 (a)
@@ -706,10 +706,10 @@ If you’re writing a parser for a language you’re inventing, conflicts in the
 
 ### IF/THEN/ELSE (Shift/Reduce)
 
-We saw this conflict earlier in this chapter. Here we describe what to do with the shift/reduce conflict once you’ve tracked it down. It turns out that the default way that bison resolves this particular conflict is usually what you want it to do anyway. How do you know it’s doing what you want it to do? Your choices are to 
-(1) be good enough at reading bison descriptions, 
-(2) be masochistic enough to decode the `name.output` listing, or 
-(3) test the generated code to death. 
+We saw this conflict earlier in this chapter. Here we describe what to do with the shift/reduce conflict once you’ve tracked it down. It turns out that the default way that bison resolves this particular conflict is usually what you want it to do anyway. How do you know it’s doing what you want it to do? Your choices are to
+(1) be good enough at reading bison descriptions,
+(2) be masochistic enough to decode the `name.output` listing, or
+(3) test the generated code to death.
 
 Once you’ve verified that you’re getting what you want, you ought to make bison quit complaining. Conflict warnings may confuse or annoy anyone trying to maintain your code, and if there are other conflicts in the grammar that indicate genuine errors, it’s hard to tell the real problems from the false alarms.
 

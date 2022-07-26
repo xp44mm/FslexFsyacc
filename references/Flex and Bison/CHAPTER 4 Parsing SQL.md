@@ -8,7 +8,7 @@ We’ll develop a SQL parser that produces a compact tokenized version of SQL st
 
 This parser is based on the version of SQL used in the popular MySQL open source database. MySQL actually uses a bison parser to parse its SQL input, although for a variety of reasons this parser isn’t based on mySQL’s parser but rather is based on the description of the language in the manual.
 
-MySQL’s parser is much longer and more complex, since this pedagogical example leaves out many of the less heavily used parts. MySQL’s parser is written in an odd way that uses bison to generate a C parser that’s compiled by the C++ compiler, with a handwritten C++ lexer. 
+MySQL’s parser is much longer and more complex, since this pedagogical example leaves out many of the less heavily used parts. MySQL’s parser is written in an odd way that uses bison to generate a C parser that’s compiled by the C++ compiler, with a handwritten C++ lexer.
 
 > There’s also the detail that its license doesn’t allow excerpting in a book like this one. But if you’re interested, it’s the file `sql/sql_yacc.yy`, which is part of the source code at http://dev.mysql.com/downloads/mysql/5.1.html.
 
@@ -41,13 +41,13 @@ The syntax is completely free-format, and there are often several different synt
 Table 4-1. Two relational tables
 
 ```
-Foods         Courses    
+Foods         Courses
 name type flavor     course flavor sequence
 peach fruit sweet     salad savory 1
 tomato fruit savory     main savory 2
 lemon fruit sour     dessert sweet 3
-lard fat bland          
-cheddar fat savory          
+lard fat bland
+cheddar fat savory
 ```
 
 SQL implements what’s known as a tuple calculus, where tuple is relational-ese for a record, which is an ordered list of fields or expressions. To use a database, you tell the database what tuples you want it to extract from your data. It’s up to the database to figure out how to get it from the tables it has. (That’s the calculus part.) The specification of a set of desired data is a query. For example, using the two tables in Table 4-1, to get a list of fruits, you would say the following:
@@ -141,7 +141,7 @@ Classic RPN has a fixed number of operands for each operator, but we’re going 
 
 ```sql
 select a,b,c from d;
- 
+
 rpn: NAME a
 rpn: NAME b
 rpn: NAME c
@@ -187,7 +187,7 @@ ADD     { return ADD; }
 ALL     { return ALL; }
 ALTER   { return ALTER; }
 ANALYZE { return ANALYZE; }
-  /* Hack for BETWEEN ... AND ... 
+  /* Hack for BETWEEN ... AND ...
    * return special AND token if BETWEEN seen
    */
 <BTWMODE>AND    { BEGIN INITIAL; return AND; }
@@ -413,7 +413,7 @@ The keyword `BETWEEN` switches into start state `BTWMODE`, in which the word `AN
 
 ```sql
      IF(a && b, ...)   normally these mean the same thing
-     IF(a AND b, ...) 
+     IF(a AND b, ...)
      ... WHERE a BETWEEN c AND d, ... except here
 ```
 
@@ -427,7 +427,7 @@ Numbers come in a variety of forms:
 
 ```js
    /* numbers */
--?[0-9]+                { yylval.intval = atoi(yytext); return INTNUM; } 
+-?[0-9]+                { yylval.intval = atoi(yytext); return INTNUM; }
 -?[0-9]+"."[0-9]* |
 -?"."[0-9]+     |
 -?[0-9]+E[-+]?[0-9]+    |
@@ -444,7 +444,7 @@ FALSE   { yylval.intval = 0; return BOOL; }
 '(\\.|[^'\n])*$      { yyerror("Unterminated string %s", yytext); }
 \"(\\.|[^"\n])*$    { yyerror("Unterminated string %s", yytext); }
    /* hex strings */
-X'[0-9A-F]+' |  
+X'[0-9A-F]+' |
 0X[0-9A-F]+  { yylval.strval = strdup(yytext); return STRING; }
    /* bit strings */
 0B[01]+      |
@@ -453,7 +453,7 @@ B'[01]+'     { yylval.strval = strdup(yytext); return STRING; }
 
 SQL numbers are similar to the numbers we’ve seen in previous chapters. The rules to scan them turn them into C integers or doubles and store them in the token values. Boolean values are true, false, and unknown, so they’re recognized as reserved words and returned as variations on a BOOL token.
 
-SQL strings are enclosed in single quotes, using a pair of quotes to represent a single quote in the string. MySQL extends this to add double-quoted strings, and `\x` escapes within strings. The first two string patterns match valid, quoted strings that don’t extend past a newline and return the string as the token value, remembering to make a copy since the value in `yytext` doesn’t stay around.[^ ‡] 
+SQL strings are enclosed in single quotes, using a pair of quotes to represent a single quote in the string. MySQL extends this to add double-quoted strings, and `\x` escapes within strings. The first two string patterns match valid, quoted strings that don’t extend past a newline and return the string as the token value, remembering to make a copy since the value in `yytext` doesn’t stay around.[^ ‡]
 
 [^ ‡]: MySQL actually accepts multiline strings, but we’re keeping this example simple.
 
@@ -529,7 +529,7 @@ We also have some patterns to catch unclosed quoted user variable names. They en
 ### Comments and Miscellany
 
 ```c
-        /* comments */   
+        /* comments */
 #.*             ;
 "--"[ \t].*     ;
 "/*"            { oldstate = YY_START; BEGIN COMMENT; }
@@ -653,7 +653,7 @@ Before we define the syntax for specific statements, we’ll define the syntax o
 
 ```c
    /**** expressions ****/
-   
+
 expr: NAME         { emit("NAME %s", $1); free($1); }
    | NAME '.' NAME { emit("FIELDNAME %s.%s", $1, $3); free($1); free($3); }
    | USERVAR       { emit("USERVAR %s", $1); free($1); }
@@ -700,7 +700,7 @@ expr: expr BETWEEN expr AND expr %prec BETWEEN { emit("BETWEEN"); }
    ;
 ```
 
-Unary and binary expressions are straightforward and just emit the code for the appropriate operator. Comparisons also emit a subcode to tell what kind of comparison to do. 
+Unary and binary expressions are straightforward and just emit the code for the appropriate operator. Comparisons also emit a subcode to tell what kind of comparison to do.
 
 > (The subcodes are bit-encoded, where 1 means less than, 2 means greater than, and 4 means equal.)
 
@@ -743,7 +743,7 @@ expr: NAME '(' opt_val_list ')' {  emit("CALL %d %s", $3, $1); free($1); }
    ;
   /* functions with special syntax */
 expr: FCOUNT '(' '*' ')' { emit("COUNTALL") }
-   | FCOUNT '(' expr ')' { emit(" CALL 1 COUNT"); } 
+   | FCOUNT '(' expr ')' { emit(" CALL 1 COUNT"); }
 expr: FSUBSTRING '(' val_list ')'               {  emit("CALL %d SUBSTR", $3); }
    | FSUBSTRING '(' expr FROM expr ')'          {  emit("CALL 2 SUBSTR"); }
    | FSUBSTRING '(' expr FROM expr FOR expr ')' {  emit("CALL 3 SUBSTR"); }
@@ -788,7 +788,7 @@ expr: CASE expr case_list END           { emit("CASEVAL %d 0", $3); }
    |  CASE case_list ELSE expr END      { emit("CASE %d 1", $2); }
    ;
 case_list: WHEN expr THEN expr     { $$ = 1; }
-         | case_list WHEN expr THEN expr { $$ = $1+1; } 
+         | case_list WHEN expr THEN expr { $$ = $1+1; }
    ;
 expr: expr LIKE expr { emit("LIKE"); }
    | expr NOT LIKE expr { emit("LIKE"); emit("NOT"); }
@@ -828,9 +828,9 @@ The first rule says that a `select_stmt` is a kind of statement, and it emits an
 Each qualifier has its own rules.
 
 ```c
-opt_where: /* nil */ 
+opt_where: /* nil */
    | WHERE expr { emit("WHERE"); };
-opt_groupby: /* nil */ 
+opt_groupby: /* nil */
    | GROUP BY groupby_list opt_with_rollup
                              { emit("GROUPBYLIST %d %d", $3, $4); }
 ;
@@ -846,15 +846,15 @@ opt_asc_desc: /* nil */ { $$ = 0; }
 opt_with_rollup: /* nil */  { $$ = 0; }
    | WITH ROLLUP  { $$ = 1; }
    ;
-opt_having: /* nil */ 
+opt_having: /* nil */
    | HAVING expr { emit("HAVING"); };
-opt_orderby: /* nil */ 
+opt_orderby: /* nil */
    | ORDER BY groupby_list { emit("ORDERBY %d", $3); }
    ;
 opt_limit: /* nil */ | LIMIT expr { emit("LIMIT 1"); }
   | LIMIT expr ',' expr             { emit("LIMIT 2"); }
-  ; 
-opt_into_list: /* nil */ 
+  ;
+opt_into_list: /* nil */
    | INTO column_list { emit("INTO %d", $2); }
    ;
 column_list: NAME { emit("COLUMN %s", $1); free($1); $$ = 1; }
@@ -874,22 +874,22 @@ Now we handle the initial options and the main list of expressions in a `SELECT`
 
 ```c
 select_opts:                          { $$ = 0; }
-| select_opts ALL                 
+| select_opts ALL
    { if($1 & 01) yyerror("duplicate ALL option"); $$ = $1 | 01; }
-| select_opts DISTINCT            
+| select_opts DISTINCT
    { if($1 & 02) yyerror("duplicate DISTINCT option"); $$ = $1 | 02; }
-| select_opts DISTINCTROW         
+| select_opts DISTINCTROW
    { if($1 & 04) yyerror("duplicate DISTINCTROW option"); $$ = $1 | 04; }
-| select_opts HIGH_PRIORITY       
+| select_opts HIGH_PRIORITY
    { if($1 & 010) yyerror("duplicate HIGH_PRIORITY option"); $$ = $1 | 010; }
-| select_opts STRAIGHT_JOIN       
+| select_opts STRAIGHT_JOIN
    { if($1 & 020) yyerror("duplicate STRAIGHT_JOIN option"); $$ = $1 | 020; }
-| select_opts SQL_SMALL_RESULT    
+| select_opts SQL_SMALL_RESULT
    { if($1 & 040) yyerror("duplicate SQL_SMALL_RESULT option"); $$ = $1 | 040; }
-| select_opts SQL_BIG_RESULT      
+| select_opts SQL_BIG_RESULT
    { if($1 & 0100) yyerror("duplicate SQL_BIG_RESULT option"); $$ = $1 | 0100; }
-| select_opts SQL_CALC_FOUND_ROWS 
-   { if($1 & 0200) yyerror("duplicate SQL_CALC_FOUND_ROWS option"); $$ = 
+| select_opts SQL_CALC_FOUND_ROWS
+   { if($1 & 0200) yyerror("duplicate SQL_CALC_FOUND_ROWS option"); $$ =
    $1 | 0200; }
     ;
 select_expr_list: select_expr { $$ = 1; }
@@ -925,7 +925,7 @@ table_factor:
   | table_subquery opt_as NAME { emit("SUBQUERYAS %s", $3); free($3); }
   | '(' table_references ')' { emit("TABLEREFERENCES %d", $2); }
   ;
-opt_as: AS 
+opt_as: AS
   | /* nil */
   ;
 join_table:
@@ -1096,7 +1096,7 @@ insert_stmt: INSERT insert_opts opt_into NAME
      { emit("INSERTASGN %d %d %s", $2, $6, $4); free($4) }
    ;
 insert_asgn_list:
-     NAME COMPARISON expr 
+     NAME COMPARISON expr
        { if ($2 != 4) { yyerror("bad insert assignment to %s", $1); YYERROR; }
        emit("ASSIGN %s", $1); free($1); $$ = 1; }
    | NAME COMPARISON DEFAULT
@@ -1116,7 +1116,7 @@ The second form uses an assignment syntax similar to the one for `ON DUPLICATE`.
 (In this version of the parser there’s no error recovery, but see Chapter 8.) This form uses same optional `ON DUPLICATE` syntax at the end of the statement, so we use the same rule.
 
 ```sql
-   INSERT into a(b,c) SELECT x,y FROM z where x < 12 
+   INSERT into a(b,c) SELECT x,y FROM z where x < 12
 ```
 
 ```c
@@ -1171,17 +1171,17 @@ update_opts: /* nil */ { $$ = 0; }
    | insert_opts IGNORE { $$ = $1 | 010 ; }
    ;
 update_asgn_list:
-     NAME COMPARISON expr 
+     NAME COMPARISON expr
      { if ($2 != 4) { yyerror("bad update assignment to %s", $1); YYERROR; }
      emit("ASSIGN %s", $1); free($1); $$ = 1; }
-   | NAME '.' NAME COMPARISON expr 
+   | NAME '.' NAME COMPARISON expr
        { if ($4 != 4) { yyerror("bad update assignment to %s", $1); YYERROR; }
      emit("ASSIGN %s.%s", $1, $3); free($1); free($3); $$ = 1; }
    | update_asgn_list ',' NAME COMPARISON expr
        { if ($4 != 4) { yyerror("bad update assignment to %s", $3); YYERROR; }
      emit("ASSIGN %s.%s", $3); free($3); $$ = $1 + 1; }
    | update_asgn_list ',' NAME '.' NAME COMPARISON expr
-       { if ($6 != 4) { yyerror("bad update  assignment to %s.$s", $3, $5); 
+       { if ($6 != 4) { yyerror("bad update  assignment to %s.$s", $3, $5);
           YYERROR; }
          emit("ASSIGN %s.%s", $3, $5); free($3); free($5); $$ = 1; }
    ;
@@ -1199,14 +1199,14 @@ Now we’ll handle two of the many data definition statements that create and mo
    /** create database **/
 stmt: create_database_stmt { emit("STMT"); }
    ;
-create_database_stmt: 
-     CREATE DATABASE opt_if_not_exists NAME 
+create_database_stmt:
+     CREATE DATABASE opt_if_not_exists NAME
        { emit("CREATEDATABASE %d %s", $3, $4); free($4); }
-   | CREATE SCHEMA opt_if_not_exists NAME 
+   | CREATE SCHEMA opt_if_not_exists NAME
        { emit("CREATEDATABASE %d %s", $3, $4); free($4); }
    ;
 opt_if_not_exists:  /* nil */ { $$ = 0; }
-   | IF EXISTS           
+   | IF EXISTS
        { if(!$2) { yyerror("IF EXISTS doesn't exist"); YYERROR; }
                         $$ = $2; /* NOT EXISTS hack */ }
    ;
@@ -1274,22 +1274,22 @@ create_definition: { emit("STARTCOL"); } NAME data_type column_atts
 column_atts: /* nil */ { $$ = 0; }
     | column_atts NOT NULLX             { emit("ATTR NOTNULL"); $$ = $1 + 1; }
     | column_atts NULLX
-    | column_atts DEFAULT STRING        
+    | column_atts DEFAULT STRING
         { emit("ATTR DEFAULT STRING %s", $3); free($3); $$ = $1 + 1; }
-    | column_atts DEFAULT INTNUM        
+    | column_atts DEFAULT INTNUM
         { emit("ATTR DEFAULT NUMBER %d", $3); $$ = $1 + 1; }
-    | column_atts DEFAULT APPROXNUM     
+    | column_atts DEFAULT APPROXNUM
         { emit("ATTR DEFAULT FLOAT %g", $3); $$ = $1 + 1; }
-    | column_atts DEFAULT BOOL          
+    | column_atts DEFAULT BOOL
         { emit("ATTR DEFAULT BOOL %d", $3); $$ = $1 + 1; }
-    | column_atts AUTO_INCREMENT        
+    | column_atts AUTO_INCREMENT
         { emit("ATTR AUTOINC"); $$ = $1 + 1; }
-    | column_atts UNIQUE '(' column_list ')' 
+    | column_atts UNIQUE '(' column_list ')'
         { emit("ATTR UNIQUEKEY %d", $4); $$ = $1 + 1; }
     | column_atts UNIQUE KEY { emit("ATTR UNIQUEKEY"); $$ = $1 + 1; }
     | column_atts PRIMARY KEY { emit("ATTR PRIKEY"); $$ = $1 + 1; }
     | column_atts KEY { emit("ATTR PRIKEY"); $$ = $1 + 1; }
-    | column_atts COMMENT STRING 
+    | column_atts COMMENT STRING
         { emit("ATTR COMMENT %s", $3); free($3); $$ = $1 + 1; }
     ;
 ```
