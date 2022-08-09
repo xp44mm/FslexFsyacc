@@ -11,7 +11,6 @@ A flex program consists of three parts: the definition section, the rules sectio
 ```
 ...definition section ...
 %%
-
 ... rules section ...
 %%
 ... user subroutines ...
@@ -21,15 +20,15 @@ The parts are separated by lines consisting of two percent signs. The first two 
 
 ### Definition Section
 
-The definition section can include options, the literal block, definitions, start conditions, and translations. (There is a section on each in this reference.) Lines that start with whitespace are copied verbatim to the C file. Typically this is used to include comments enclosed in `/*` and `*/`, preceded by whitespace.
+The definition section can include options, the literal block, definitions, start conditions, and translations. ~~(There is a section on each in this reference.)~~ Lines that start with whitespace are copied verbatim to the C file. Typically this is used to include comments enclosed in `/*` and `*/`, preceded by whitespace.
 
 ### Rules Section
 
 The rules section contains pattern lines and C code. Lines that start with whitespace, or material enclosed in `%{` and `%}`, are C code that is copied verbatim to `yylex()`. C code at the beginning of the rules section will be at the beginning of `yylex()` and can include declarations of variables used in the scanner, and code to run each time `yylex()` is called. C code lines are copied verbatim to the generated C file. Lines at the beginning of the rules section are placed near the beginning of the generated `yylex()` function and should be declarations of variables used by code associated with the patterns and initialization code for the scanner. C code lines anywhere else should contain only comments, since it’s unpredictable where in the scanner they’ll be. (This is how you put comments in the rules section outside of actions.)
 
-A line that starts with anything else is a pattern line. Pattern lines contain a pattern followed by some whitespace and C code to execute when the input matches the pattern. If the C code is more than one statement or spans multiple lines, it must be enclosed in braces (`{}` or `%{%}`).
+A line that starts with anything else is a **pattern line**. Pattern lines contain a pattern followed by some whitespace and C code to execute when the input matches the pattern. If the C code is more than one statement or spans multiple lines, it must be enclosed in braces (`{}` or `%{%}`).
 
-When a flex scanner runs, it matches the input against the patterns in the rules section. Every time it finds a match (the matched input is called a token), it executes the C code associated with that pattern. If a pattern is followed by a single vertical bar, instead of C code, the pattern uses the same C code as the next pattern in the file. When an input character matches no pattern, the lexer acts as though it matched a pattern whose code is ECHO;, which writes a copy of the token to the output.
+When a flex scanner runs, it matches the input against the patterns in the rules section. Every time it finds a match (the matched input is called a **token**), it executes the C code associated with that pattern. If a pattern is followed by a single vertical bar, instead of C code, the pattern uses the same C code as the next pattern in the file. When an input character matches no pattern, the lexer acts as though it matched a pattern whose code is `ECHO;`, which writes a copy of the token to the output.
 
 ### User Subroutines
 
@@ -41,17 +40,19 @@ In a large program, it is often more convenient to put the supporting code in a 
 
 The BEGIN macro switches among start states. You invoke it, usually in the action code for a pattern, as follows:
 
-```
+```c
 BEGIN statename;
 ```
 
-The scanner starts in state `0` (zero), also known as INITIAL. All other states must be named in `%s` or `%x` lines in the definition section. (See “Start States” on page 136.)
+The scanner starts in state `0` (zero), also known as `INITIAL`. All other states must be named in `%s` or `%x` lines in the definition section. ~~(See “Start States” on page 136.)~~
 
 Notice that even though BEGIN is a macro, the macro itself doesn’t take any arguments, and the state name need not be enclosed in parentheses, although it is good style to do so.
 
 ## C++ Scanners
 
-Although flex has an option to create a C++ scanner, the manual says it’s experimental, and the code is buggy and doesn’t work very well. All is not lost for C++ programmers, though. If you generate a C lexer, it will compile with a C++ compiler, and you can tell a C++ bison parser to call a C lexer.
+Although flex has an option to create a C++ scanner, the manual says it’s experimental, and the code is buggy and doesn’t work very well. All is not lost for C++ programmers, though. 
+
+If you generate a C lexer, it will compile with a C++ compiler, and you can tell a C++ bison parser to call a C lexer.
 
 ## Context Sensitivity
 
@@ -63,7 +64,7 @@ There are three ways to handle left context: the special beginning-of-line patte
 
 The character `^` at the beginning of a pattern tells lex to match the pattern only at the beginning of the line. The `^` doesn’t match any characters; it just specifies the context. Start states can be used to require that one token precede another:
 
-```
+```c
 %s MYSTATE
 %%
 first { BEGIN MYSTATE; }
@@ -71,25 +72,25 @@ first { BEGIN MYSTATE; }
 <MYSTATE>second  { BEGIN 0; }
 ```
 
-In this lexer, the second token is recognized only after the first token. There may be intervening tokens between the first and second.
+In this lexer, the `second` token is recognized only after the `first` token. There may be intervening tokens between the `first` and `second`.
 
 In some cases you can fake left context sensitivity by setting flags to pass context information from one token’s routine to another:
 
 ```c
- %{
-  int flag = 0;
- %}
- %%
- a     { flag = 1; }
- b     { flag = 2; }
- zzz   {
-         switch(flag) {
-          case 1:     a_zzz_token(); break;
-          case 2:     b_zzz_token(); break;
-          default: plain_zzz_token(); break;
-         }
-         flag = 0;
-        }
+%{
+    int flag = 0;
+%}
+%%
+a     { flag = 1; }
+b     { flag = 2; }
+zzz   {
+    switch(flag) {
+        case 1:  a_zzz_token(); break;
+        case 2:  b_zzz_token(); break;
+        default: u_zzz_token(); break;
+    }
+    flag = 0;
+}
 ```
 
 ### Right Context
@@ -110,13 +111,13 @@ The previous has nearly the same effect as `abc/de` does because the call to `yy
 
 ## Definitions (Substitutions)
 
-Definitions (or substitutions) allow you to give a name to all or part of a regular expression and refer to it by name in the rules section. This can be useful to break up complex expressions and to document what your expressions are supposed to be doing. A definition takes this form:
+**Definitions** (or **substitutions**) allow you to give a name to all or part of a regular expression and refer to it by name in the rules section. This can be useful to break up complex expressions and to document what your expressions are supposed to be doing. A definition takes this form:
 
-```
+```c
 NAME expression
 ```
 
-The name can contain letters, digits, hyphens, and underscores, and it must not start with a digit.
+The NAME can contain letters, digits, hyphens, and underscores, and it must not start with a digit.
 
 In the rules section, patterns may include references to substitutions with the name in braces, for example, `{NAME}`. The expression corresponding to the name is substituted into the pattern as though it were enclosed in parentheses. For example:
 
@@ -131,13 +132,13 @@ DIG       [0-9]
 
 ## ECHO
 
-In the C code associated with a pattern, the macro ECHO writes the token to the current output file `yyout`. It is equivalent to the following:
+In the C code associated with a pattern, the macro `ECHO` writes the token to the current output file `yyout`. It is equivalent to the following:
 
-```
+```c
 fprintf(yyout, "%s", yytext);
 ```
 
-The default action in flex for input text that doesn’t match any pattern is to write the text to the output, equivalent to ECHO. In flex, `%option nodefault` or the command-line flag `-s` or `--nodefault` makes the default action abort, which is useful in the common case that the scanner is supposed to include patterns to handle all possible input.
+The default action in flex for input text that doesn’t match any pattern is to write the text to the output, equivalent to `ECHO`. In flex, `%option nodefault` or the command-line flag `-s` or `--nodefault` makes the default action abort, which is useful in the common case that the scanner is supposed to include patterns to handle all possible input.
 
 ## Input Management
 
@@ -145,9 +146,7 @@ Flex offers a variety of ways to manage the source of the text to be scanned. At
 
 ### Stdio File Chaining
 
-You can tell the lexer to read from any stdio file by calling `yyrestart(file)`. Also, when a lexer built with `%option yywrap` reaches the end of the input file, it calls `yywrap()`, which can switch to a different input file.
-
-> See the sections “`yyrestart()`” and “`yywrap()`” on page 139 for more details.
+You can tell the lexer to read from any stdio file by calling `yyrestart(file)`. Also, when a lexer built with `%option yywrap` reaches the end of the input file, it calls `yywrap()`, which can switch to a different input file. See the sections “`yyrestart()`” and “`yywrap()`” ~~on page 139 for more details~~.
 
 ### Input Buffers
 
@@ -157,8 +156,8 @@ Flex scanners read input from an input buffer. An input buffer can be associated
 YY_BUFFER_STATE bp;
 FILE *f;
 f = fopen(..., "r");
-bp = yy_create_buffer(f,YY_BUF_SIZE ); //new buffer reading from f
-yy_switch_to_buffer(bp); //use the buffer we just made
+bp = yy_create_buffer(f, YY_BUF_SIZE); // new buffer reading from f
+yy_switch_to_buffer(bp); // use the buffer we just made
 ...
 yy_flush_buffer(bp); //discard buffer contents
 ...
@@ -176,8 +175,10 @@ Normally flex reads from a file, but sometimes you want it to read from some oth
 ```c
 //scan a copy of bytes
 bp = yy_scan_bytes(char *bytes, len);
+
 //scan a copy of null-terminated string
 bp = yy_scan_string("string");
+
 //scan (size-2) bytes in place
 bp = yy_scan_buffer (char *base, yy_size_t size);
 ```
@@ -191,13 +192,14 @@ Once a string buffer is created, use `yy_switch_to_buffer` to tell the scanner t
 Many input languages have features to allow input files to include other files, such as `#include` in C. Flex provides a pair of functions to manage a stack of input buffers:
 
 ```c
-//switch to bp, stack old buf
+// switch to bp, stack old buf
 void yypush_buffer_state(bp);
-//delete current buffer, return to previous
+
+// delete current buffer, return to previous
 void yypop_buffer_state();
 ```
 
-In practice, these functions are inadequate for any but the simplest input nesting, since they don’t maintain any auxiliary information such as the line number or name of the current file. Maintaining your own stack of input files is not hard. See Example 2-3 for sample code.
+In practice, these functions are inadequate for any but the simplest input nesting, since they don’t maintain any auxiliary information such as the line number or name of the current file. Maintaining your own stack of input files is not hard. ~~See Example 2-3 for sample code.~~
 
 Also helpful to maintain an input stack is the special token pattern `<<EOF>>`, which matches at the end of a file after the call to `yywrap()`.
 
@@ -208,25 +210,32 @@ The `input()` function conceptually provides characters to the lexer. When the l
 The most likely place to call `input()` is in an action routine to do something special with the text that follows a particular token. For example, here is a way to handle C comments:
 
 ```c
-"/*" {   int c1 = 0, c2 = input ();
-         for(;;) {
-               if(c2 == EOF)
-                     break;
-               if(c1 == '*' && c2 == '/')
-                     break;
-               c1 = c2;
-               c2 = input();
-         }
-     }
+"/*" {   
+    int c1 = 0, c2 = input ();
+    for(;;) {
+        if(c2 == EOF)
+            break;
+        if(c1 == '*' && c2 == '/')
+            break;
+        c1 = c2;
+        c2 = input();
+    }
+  }
 ```
 
-The calls to `input()` process the characters until either end-of-file or the characters `*/` occur. This approach is an alternative to exclusive start states (see “Start States” on page 136) to handle C-style comments. It is the best way to handle very long quoted strings and other tokens that might be too long for flex to buffer itself in its typical 16K input buffer.
+The calls to `input()` process the characters until either end-of-file or the characters `*/` occur. This approach is an alternative to exclusive start states ~~(see “Start States” on page 136)~~ to handle C-style comments. It is the best way to handle very long quoted strings and other tokens that might be too long for flex to buffer itself in its typical 16K input buffer.
 
 If you use a C++ compiler, input is called `yyinput` instead to avoid name collisions with C++ libraries.
 
 ### YY_INPUT
 
-Flex scanners read input into a buffer using the macro `YY_INPUT(buf,result, max_size)`. Whenever the scanner needs more input and the buffer is empty, it invokes `YY_INPUT`, where `buf` and `maxsize` are the buffer and its size, respectively, and result is where to put the actual amount read or zero at `EOF`. (Since this is a macro, it’s `result`, not `*result`.) When the buffer is first set up, it calls `isatty()` to see whether the input source is the console and, if so, reads one character at a time rather than large chunks.
+Flex scanners read input into a buffer using the macro 
+
+```c
+YY_INPUT(buf,result, max_size)
+```
+
+. Whenever the scanner needs more input and the buffer is empty, it invokes `YY_INPUT`, where `buf` and `maxsize` are the buffer and its size, respectively, and `result` is where to put the actual amount read or zero at `EOF`. (Since this is a macro, it’s `result`, not `*result`.) When the buffer is first set up, it calls `isatty()` to see whether the input source is the console and, if so, reads one character at a time rather than large chunks.
 
 The main situation where redefining `YY_INPUT` is useful is when reading from an input source that is neither a string nor a stdio file.
 
@@ -246,19 +255,19 @@ int yywrap() { return 1; }
 
 ## Interactive and Batch Scanners
 
-A flex scanner sometimes needs to look ahead one character in the input to see whether the current token is done. (Think of a number that is a string of digits.) It turns out that the scanner runs a little faster if it always looks ahead even when it doesn’t need to, but that would cause very unpleasant results when a scanner is reading directly from the console. For example, if the current token is a newline, `\n`, and it reads ahead, the scanner will wait until you type another new line before going ahead.
+A flex scanner sometimes needs to look ahead one character in the input to see whether the current token is done. (Think of a number that is a string of digits.) It turns out that the scanner runs a little faster if it always looks ahead even when it doesn’t need to, but that would cause very unpleasant results when a scanner is reading directly from the console. For example, if the current token is a newline, `\n`, and it reads ahead, the scanner will wait until you type another newline before going ahead.
 
 To minimize the unpleasantness, the scanner can run either in batch mode, where it always looks ahead, or in interactive mode, where it looks ahead only when it needs to do so (which is slightly slower). If you use the standard input routines, the scanner will check to see whether the input source is a terminal using `isatty()` and, if so, switch to interactive mode. You can use `%option batch` or `%option interactive` to force it always to use one or the other mode. Forcing batch mode can make sense if you know that your scanner will never need to be interactive, for example, if you read the input yourself or if it always reads from a file.
 
 ## Line Numbers and yylineno
 
-If you keep track of the line number in the input file, you can report it in error messages. If you set `%option yylineno`, flex defines `yylineno` to contain the current line number and automatically updates it each time it reads a `\n` character. The lexer does not initialize `yylineno`, so you need to set it to 1 each time you start reading a file. Lexers that handle nested include files have to save and restore the line number associated with each file if they want to track line numbers per file.
+If you keep track of the line number in the input file, you can report it in error messages. If you set `%option yylineno`, flex defines `yylineno` to contain the current line number and automatically updates it each time it reads a `\n` character. The lexer does not initialize `yylineno`, so you need to set it to `1` each time you start reading a file. Lexers that handle nested include files have to save and restore the line number associated with each file if they want to track line numbers per file.
 
 ## Literal Block
 
-A literal block in the definition section is C code bracketed by the lines `%{` and `%}`.
+A **literal block** in the definition section is C code bracketed by the lines `%{` and `%}`.
 
-```
+```c
 %{
 ... C code and declarations...
 %}
@@ -268,9 +277,7 @@ The contents of each literal block are copied verbatim to the generated C source
 
 If a literal block starts with `%top{` rather than `%{`, it’s copied near the front of the generated program, typically for `#include` files or `#define` lines to set `YY_BUF_SIZE`.
 
-A literal block at the beginning of the rules section is copied near the beginning of `yylex()` after the declarations of local variables, so it can contain more declarations and setup code. A literal block elsewhere in the rules section is copied to an unspecified place in `yylex`, so it should contain only comments.
-
-See also “`YY_USER_ACTION`” on page 139.
+A literal block at the beginning of the rules section is copied near the beginning of `yylex()` after the declarations of local variables, so it can contain more declarations and setup code. A literal block elsewhere in the rules section is copied to an unspecified place in `yylex`, so it should contain only comments. See also “`YY_USER_ACTION`” ~~on page 139~~.
 
 ## Multiple Lexers in One Program
 
@@ -286,20 +293,20 @@ You can combine two lexers into one by using start states. All of the patterns f
 %s INITA INITB INITC
 %%
 %{
-     extern first_tok, first_lex;
-     if(first_lex) {
-           BEGIN first_lex;
-           first_lex = 0;
-     }
-     if(first_tok) {
-           int holdtok = first_tok;
-           first_tok = 0;
-           return holdtok;
-     }
+    extern first_tok, first_lex;
+    if(first_lex) {
+        BEGIN first_lex;
+        first_lex = 0;
+    }
+    if(first_tok) {
+        int holdtok = first_tok;
+        first_tok = 0;
+        return holdtok;
+    }
 %}
 ```
 
-In this case, before you call the lexer, you set `first_lex` to the initial state for the lexer. You will usually use a combined lexer in conjunction with a combined yacc parser, so you’ll also usually have code to force an initial token to tell the parser which grammar to use. See “Variant and Multiple Grammars” on page 163.
+In this case, before you call the lexer, you set `first_lex` to the initial state for the lexer. You will usually use a combined lexer in conjunction with a combined yacc parser, so you’ll also usually have code to force an initial token to tell the parser which grammar to use. See “Variant and Multiple Grammars” ~~on page 163~~.
 
 The advantages of this approach are that the object code is somewhat smaller, since there is only one copy of the lexer code, and the different rule sets can share rules. The disadvantages are that you have to be careful to use the correct start states everywhere, you cannot have both lexers active at once (i.e., you can’t call `yylex()` recursively unless you use the reentrant lexer option), and it is difficult to use different input sources for the different lexers.
 
@@ -310,17 +317,17 @@ The other approach is to include two complete lexers in your program. The trick 
 Flex provides a command-line switch and program option to change the prefix used on the names in the scanner generated by lex. For example, these options tell flex to use the prefix “`foo`” rather than “`yy`” and to put the generated scanner in `foolex.c`.
 
 ```bash
-  %option prefix="foo"
-  %option outfile="foolex.c"
+%option prefix="foo"
+%option outfile="foolex.c"
 ```
 
 You can also set options on the command line:
 
 ```bash
-  $ flex --outfile=foolex.c --prefix=foo foo.l
+$ flex --outfile=foolex.c --prefix=foo foo.l
 ```
 
-Either way, the generated scanner has entry point `foolex()`, reads from stdio file fooin, and so forth. Somewhat confusingly, flex will generate a set of `#define` macros at the front of the lexer that redefine the standard “`yy`” names to the chosen prefix. This lets you write your lexer using the standard names, but the externally visible names will all use the chosen prefix.
+Either way, the generated scanner has entry point `foolex()`, reads from stdio file `fooin`, and so forth. Somewhat confusingly, flex will generate a set of `#define` macros at the front of the lexer that redefine the standard “`yy`” names to the chosen prefix. This lets you write your lexer using the standard names, but the externally visible names will all use the chosen prefix.
 
 ```c
 #define yy_create_buffer foo_create_buffer
@@ -347,7 +354,7 @@ Either way, the generated scanner has entry point `foolex()`, reads from stdio f
 
 Flex offers several hundred options when building a scanner. Most can be written as
 
-```bash
+```c
 %option name
 ```
 
@@ -368,18 +375,18 @@ Flex generates portable C code, and you can usually move the code to any C compi
 You may want to adjust the size of some buffers. Flex uses two input buffers, each by default 16K, which may be too big for some microcomputer implementations. You can define the macro `YY_BUF_SIZE` in the definition section:
 
 ```c
- %{
- #define YY_BUF_SIZE 4096
- %}
+%{
+#define YY_BUF_SIZE 4096
+%}
 ```
 
 If your lexer uses `REJECT`, it will also allocate a backup state buffer four times as large as `YY_BUF_SIZE` (eight times on 64-bit machines). Don’t use `REJECT` if space is an issue.
 
 #### Character sets
 
-The knottiest portability problem involves character sets. The C code generated by every flex implementation uses character codes as indexes into tables in the lexer. If both the original and target machines use the same character code, such as ASCII, the ported lexer will work. You may have to deal with different line end conventions: Unix systems end a line with a plain `\n`, while Microsoft Windows and other systems use `\r\n`. You often can have lexers ignore `\r` and treat `\n` as the line end in either case.
+The knottiest portability problem involves **character sets**. The C code generated by every flex implementation uses character codes as indexes into tables in the lexer. If both the original and target machines use the same character code, such as ASCII, the ported lexer will work. You may have to deal with different **line end** conventions: Unix systems end a line with a plain `\n`, while Microsoft Windows and other systems use `\r\n`. You often can have lexers ignore `\r` and treat `\n` as the line end in either case.
 
-When the original and target machines use different character sets, for example, ASCII and EBCDIC, the lexer won’t work at all, since all of the character codes used as indexes will be wrong. Sophisticated users have sometimes been able to post-process the tables to rebuild them for other character sets, but in general the only reasonable approach is to find a version of flex that runs on the target machine or else to redefine the lexer’s input routine to translate the input characters into the original character set. See “Input from Strings” on page 124 for how to change the input routine.
+When the original and target machines use different character sets, for example, ASCII and EBCDIC, the lexer won’t work at all, since all of the character codes used as indexes will be wrong. Sophisticated users have sometimes been able to post-process the tables to rebuild them for other character sets, but in general the only reasonable approach is to find a version of flex that runs on the target machine or else to redefine the lexer’s input routine to translate the input characters into the original character set. See “Input from Strings” ~~on page 124~~ for how to change the input routine.
 
 ## Reentrant Scanners
 
@@ -388,14 +395,20 @@ The normal code for a flex scanner places its state information in static variab
 ```c
 yyscan_t scanner;
 if(yylex_init(&scanner)) { printf("no scanning today\n"); abort(); }
-while((yylex(scanner))
-   ... do something ...;
+while(yylex(scanner))
+   /*... do something ...*/;
 yylex_destroy(scanner);
 ```
 
 In a reentrant scanner, all of the state information about the scan in progress is kept in a `yyscan_t` variable, which is actually a pointer to the structure with all the state. You create the scanner with `yylex_init()`, passing the address of the `yyscan_t` as an argument, and it returns `0` on success or `1` if it can’t allocate the structure. Then you pass the `yyscan_t` to every call to `yylex()` and finally delete it with `yylex_destroy`. Each call to `yylex_init` creates a separate scanner, and several scanners can be active at once, passing the appropriate structure to each call to `yylex()`.
 
-In a reentrant scanner, some variables commonly used in `yylex` are redefined as macros, so you can use them the same as in an ordinary scanner. These variables are `yyin`, `yyout`, `yyextra`, `yyleng`, `yytext`, `yylineno`, `yycolumn`, and `yy_flex_debug`. The macros `BEGIN`, `YY_START`, `YYSTATE`, `yymore()`, `unput()`, and `yyless()` are also modified, so you can use them the same as in an ordinary scanner. All of the routines that create and manipulate input buffers take an additional `yyscan_t` argument, for example, `yyrestart(file, scanner)`. The other routines that take a `yyscan_t` argument are `yy_switch_to_buffer`, `yy_create_buffer`, `yy_delete_buffer`, `yy_flush_buffer`, `yypush_buffer_state`, `yypop_buffer_state`, `yy_scan_buffer`, `yy_scan_string`, and `yy_scan_bytes`.
+In a reentrant scanner, some variables commonly used in `yylex` are redefined as macros, so you can use them the same as in an ordinary scanner. These variables are `yyin`, `yyout`, `yyextra`, `yyleng`, `yytext`, `yylineno`, `yycolumn`, and `yy_flex_debug`. The macros `BEGIN`, `YY_START`, `YYSTATE`, `yymore()`, `unput()`, and `yyless()` are also modified, so you can use them the same as in an ordinary scanner. All of the routines that create and manipulate input buffers take an additional `yyscan_t` argument, for example, 
+
+```c
+yyrestart(file, scanner)
+```
+
+. The other routines that take a `yyscan_t` argument are `yy_switch_to_buffer`, `yy_create_buffer`, `yy_delete_buffer`, `yy_flush_buffer`, `yypush_buffer_state`, `yypop_buffer_state`, `yy_scan_buffer`, `yy_scan_string`, and `yy_scan_bytes`.
 
 ### Extra Data for Reentrant Scanners
 
@@ -404,12 +417,12 @@ When using a reentrant scanner, you’ll often have some other per-scanner data,
 ```c
 yyscan_t scanner;
 symbol *symp;
-symp = symtabinit(); //make per-scanner symbol table
+symp = symtabinit(); // make per-scanner symbol table
 if(yylex_init_extra(symp, &scanner)) { printf("no scanning today\n"); abort(); }
-while((yylex(scanner))
-   ... do something ...;
+while(yylex(scanner))
+   /*... do something ...*/;
 yylex_destroy(scanner);
-... inside yylex ...
+/*... inside yylex ...*/
 [a-z]+  { symlookup(yyextra, yylval); }
 ```
 
@@ -418,19 +431,24 @@ yylex_destroy(scanner);
 In a normal scanner, code outside `yylex()` can refer directly to `yyin`, `yyout`, and other global variables, but in a reentrant scanner, they’re part of the per-scanner data structure. Flex provides access routines to get and set the major variables.
 
 ```c
-YY_EXTRA_TYPE yyget_extra (yyscan_t yyscanner ); yyextra
-void yyset_extra (YY_EXTRA_TYPE user_defined ,yyscan_t yyscanner );
-FILE *yyget_in (yyscan_t yyscanner ); yyin
-void yyset_in  (FILE * in_str ,yyscan_t yyscanner );
-FILE *yyget_out (yyscan_t yyscanner ); yyout
-void yyset_out  (FILE * out_str ,yyscan_t yyscanner );
-int yyget_lineno (yyscan_t yyscanner );
-void yyset_lineno (int line_number ,yyscan_t yyscanner );
-int yyget_leng(yyscan_t yyscanner); yyleng, read only
-char *yyget_text(yyscan_t yyscanner); yytext
+YY_EXTRA_TYPE yyget_extra(yyscan_t yyscanner ); //yyextra
+void yyset_extra(YY_EXTRA_TYPE user_defined, yyscan_t yyscanner );
+
+FILE *yyget_in(yyscan_t yyscanner ); //yyin
+void yyset_in(FILE *in_str,yyscan_t yyscanner );
+
+FILE *yyget_out(yyscan_t yyscanner ); //yyout
+void yyset_out(FILE *out_str,yyscan_t yyscanner );
+
+int yyget_lineno(yyscan_t yyscanner );
+void yyset_lineno(int line_number, yyscan_t yyscanner );
+
+int yyget_leng(yyscan_t yyscanner); //yyleng, read only
+
+char *yyget_text(yyscan_t yyscanner); //yytext
 ```
 
-These functions are all available in nonreentrant scanners, without the `yyscanner` argument, although there’s little need for them since they are entirely equivalent to reading or setting the appropriate variable.
+These functions are all available in non-reentrant scanners, without the `yyscanner` argument, although there’s little need for them since they are entirely equivalent to reading or setting the appropriate variable.
 
 ### Reentrant Scanners, Nested Files, and Multiple Scanners
 
@@ -442,17 +460,17 @@ Reentrant scanners, nested files, and multiple scanners all address sort of the 
 
 - Multiple scanners allow you to apply different sets of patterns to different input sources.
 
-You can combine all three of these as needed. For example, you can call `yy_switch_to_buffer` in a reentrant scanner to change the input source for a particular instance. You can say `%option reentrant prefix="foo"` to create a scanner that can be invoked multiple times (call `foolex_init` to get started) and can be linked into the same program with other reentrant or nonreentrant scanners.
+You can combine all three of these as needed. For example, you can call `yy_switch_to_buffer` in a reentrant scanner to change the input source for a particular instance. You can say `%option reentrant prefix="foo"` to create a scanner that can be invoked multiple times (call `foolex_init` to get started) and can be linked into the same program with other reentrant or non-reentrant scanners.
 
 ### Using Reentrant Scanners with Bison
 
-Bison has its own option to create a reentrant parser, known as pure-parser, which can, with some effort, be used along with a reentrant scanner. A pure parser normally gets tokens by calling `yylex`, with a pointer to the place to put the token value, but without the `yyscan_t` value that flex needs. (Flex and bison developers don’t always talk to each other.) Flex provides `%option reentrant bison-bridge`, which changes the declaration of `yylex` to be
+Bison has its own option to create a reentrant parser, known as **pure-parser**, which can, with some effort, be used along with a reentrant scanner. A pure parser normally gets tokens by calling `yylex`, with a pointer to the place to put the token value, but without the `yyscan_t` value that flex needs. ~~(Flex and bison developers don’t always talk to each other.)~~ Flex provides `%option reentrant bison-bridge`, which changes the declaration of `yylex` to be
 
 ```c
 int yylex (YYSTYPE * yylval_param,yyscan_t yyscanner);
 ```
 
-and also sets `yylval` automatically from the argument. One important difference from normal scanners is that `yylval` is now a pointer to a union rather than a union, so a reference that was `yylval.member` is now `yylval->member`. See “Pure Scanners and Parsers” on page 209 for an example of a pure bison parser calling a reentrant scanner.
+and also sets `yylval` automatically from the argument. One important difference from normal scanners is that `yylval` is now a pointer to a union rather than a union, so a reference that was `yylval.member` is now `yylval->member`. See “Pure Scanners and Parsers” ~~on page 209~~ for an example of a pure bison parser calling a reentrant scanner.
 
 ## Regular Expression Syntax
 
@@ -462,63 +480,63 @@ Flex patterns are an extended version of the regular expressions used by editors
 
 The metacharacters in a flex expression include the following:
 
-.
+`.`
 
 Matches any single character except the newline character `\n`.
 
-[]
+`[]`
 
 Match any one of the characters within the brackets. A range of characters is indicated with the `-` (dash), for example, `[0-9]` for any of the 10 digits. If the first character after the open bracket is a dash or close bracket, it is not interpreted as a metacharacter. If the first character is a circumflex `^`, it changes the meaning to match any character except those within the brackets. (Such a character class will match a newline unless you explicitly exclude it.) Other metacharacters have no special meaning within square brackets except that C escape sequences starting with `\` are recognized. POSIX added more special square bracket patterns for internationalization. See the last few items in this list for details.
 
-[a-z]{-}[jv] [a-f]{+}[0-9]
+`[a-z]{-}[jv] [a-f]{+}[0-9]`
 
 Set difference or union of character classes. The pattern matches characters that are in the first class, with the characters in the second class omitted (for `{-}`) or added (for `{+}`).
 
-*
+`*`
 
 Matches zero or more of the preceding expression. For example, the pattern a.*z matches any string that starts with a and ends with z, such as az, abz or alcatraz.
 
-+
+`+`
 
-Matches one or more occurrence of the preceding regular expression. For example, x+ matches x, xxx, or xxxxxx, but not an empty string, and `(ab)+` matches ab, abab, ababab, and so forth.
+Matches one or more occurrence of the preceding regular expression. For example, `x+` matches x, xxx, or xxxxxx, but not an empty string, and `(ab)+` matches ab, abab, ababab, and so forth.
 
-?
+`?`
 
 Matches zero or one occurrence of the preceding regular expression. For example, `-?[0-9]+` indicates a number with an optional leading unary minus.
 
-{}
+`{}`
 
 Mean different things depending on what is inside. A single number `{n}` means n repetitions of the preceding pattern; for example, `[A-Z]{3}` matches any three uppercase letters. If the braces contain two numbers separated by a comma, `{n,m}`, they are the minimum and maximum numbers of repetitions of the preceding pattern. For example, `A{1,3}` matches one to three occurrences of the letter A. If the second number is missing, it is taken to be infinite, so `{1,}` means the same as `+`, and `{0,}` is the same as `*`. If the braces contain a name, it refers to the substitution by that name.
 
-\
+`\`
 
 If the following character is a lowercase letter, then it is a C escape sequence such as `\t` for tab. Some implementations also allow octal and hex characters in the form `\123` and `\x3f`. Otherwise, `\` quotes the following character, so `\*` matches an asterisk.
 
-()
+`()`
 
 Group a series of regular expressions together. Each of `*`, `+`, and `[]` affects only the expression immediately to its left, and `|` normally affects everything to its left and right. Parentheses can change this; for example, `(ab|cd)?ef` matches abef, cdef, or just ef.
 
-|
+`|`
 
 Matches either the preceding regular expression or the subsequent regular expression. For example, twelve|12 matches either twelve or 12.
 
-"..."
+`"..."`
 
 Match everything within the quotation marks literally. Metacharacters other than `\` lose their meaning. For example, "`/*`" matches the two characters `/*`.
 
-/
+`/`
 
 Matches the preceding regular expression but only if followed by the following regular expression. For example, 0/1 matches “0” in the string “01” but does not match anything in the strings “0” or “02”. Only one slash is permitted per pattern, and a pattern cannot contain both a slash and a trailing `$`.
 
-^
+`^`
 
 As the first character of a regular expression, it matches the beginning of a line; it is also used for negation within square brackets. Otherwise, it’s not special.
 
-$
+`$`
 
 As the last character of a regular expression, it matches the end of a line—otherwise not special. This has the same meaning as `/\n` at the end of an expression.
 
-<>
+`<>`
 
 A name or list of names in angle brackets at the beginning of a pattern makes that pattern apply only in the given start states.
 
@@ -526,15 +544,15 @@ A name or list of names in angle brackets at the beginning of a pattern makes th
 
 The special pattern `<<EOF>>` matches the end of file.
 
-(?# comment )
+`(?# comment )`
 
 Perl-style expression comments.
 
-(?a:pattern) or (?a-x:pattern)
+`(?a:pattern) or (?a-x:pattern)`
 
 Perl-style pattern modifiers. Interpret the pattern using modifier a, but without modifier x. The modifiers are i for case insensitive, s to match as though everything is a single line (in particular, make the . match a `\n` character), and x to ignore whitespace and C-style comments. The pattern can extend over more than one line.
 
-```
+```c
 (?i:xyz) [Xx][Yy][Zz]
 (?i:x(?-i:y)z) [Xx]y[Zz]
 (?s:a.b) a(.|\n)b
@@ -544,15 +562,15 @@ Perl-style pattern modifiers. Interpret the pattern using modifier a, but withou
 Flex also allows a limited set of POSIX character classes inside character class expressions:
 
 ```
-[:alnum:]  [:alpha:]  [:blank:]  [:cntrl:]  [:digit:]  [:graph:]  [:lower:]
-[:print:] [:punct:] [:space:] [:upper:] [:xdigit:]
+[:alnum:][:alpha:][:blank:][:cntrl:][:digit:][:graph:][:lower:]
+[:print:][:punct:][:space:][:upper:][:xdigit:]
 ```
 
-A character class expression stands for any character of a named type handled by the ctype macros, with the types being alnum, alpha, blank, cntrl, digit, graph, lower, print, punct, space, upper, and xdigit. The class name is enclosed in square brackets and colons and must itself be inside a character class. For example, `[[:digit:]]` would be equivalent to `[0123456789]`, and `[x[:xdigit:]]`, equivalent to `[x0123456789AaBbCcDdEeFf]`.
+A character class expression stands for any character of a named type handled by the `ctype` macros, with the types being alnum, alpha, blank, cntrl, digit, graph, lower, print, punct, space, upper, and xdigit. The class name is enclosed in square brackets and colons and must itself be inside a character class. For example, `[[:digit:]]` would be equivalent to `[0123456789]`, and `[x[:xdigit:]]`, equivalent to `[x0123456789AaBbCcDdEeFf]`.
 
 ## REJECT
 
-Usually lex separates the input into nonoverlapping tokens. But sometimes you want all occurrences of a token even if it overlaps with other tokens. The special action REJECT lets you do this. If an action executes REJECT, flex conceptually puts back the text matched by the pattern and finds the next best match for it. The example finds all occurrences of the words `pink`, `pin`, and `ink` in a file, even when they overlap:
+Usually lex separates the input into non-overlapping tokens. But sometimes you want all occurrences of a token even if it overlaps with other tokens. The special action `REJECT` lets you do this. If an action executes `REJECT`, flex conceptually puts back the text matched by the pattern and finds the next best match for it. The example finds all occurrences of the words `pink`, `pin`, and `ink` in a file, even when they overlap:
 
 ```c
 ...
@@ -564,9 +582,9 @@ pin     { npin++; REJECT; }
 \n     ;    /* discard other characters */
 ```
 
-If the input contains the word `pink`, all three patterns will match. Without the REJECT statements, only `pink` would match.
+If the input contains the word `pink`, all three patterns will match. Without the `REJECT` statements, only `pink` would match.
 
-Scanners that use REJECT are much larger and slower than those that don’t, since they need considerable extra information to allow backtracking and relexing.
+Scanners that use `REJECT` are much larger and slower than those that don’t, since they need considerable extra information to allow backtracking and relexing.
 
 ## Returning Values from yylex()
 
@@ -576,39 +594,39 @@ This means that you cannot restart a lexer just by calling `yylex()`. You have t
 
 ## Start States
 
-You can declare start states, also called start conditions or start rules, in the definition section. Start states are used to limit the scope of certain rules or to change the way the lexer treats part of the file. Start states come in two versions, inclusive declared with `%s` and exclusive declared with `%x`. For example, suppose we want to scan the following C preprocessor directive:
+You can declare **start states**, also called start conditions or start rules, in the definition section. Start states are used to limit the scope of certain rules or to change the way the lexer treats part of the file. Start states come in two versions, inclusive declared with `%s` and exclusive declared with `%x`. For example, suppose we want to scan the following C preprocessor directive:
 
 ```c
 #include <somefile.h>
 ```
 
-Normally, the angle brackets and the filename would be scanned as the five tokens `<`, `somefile`, `.`, `h`, and `>`, but after `#include`, they are a single filename token. You can use a start state to apply a set of rules only at certain times. Be warned that those rules that do not have start states can apply in any inclusive state! The `BEGIN` statement (see “`BEGIN`” on page 120) in an action sets the current start state. For example:
+Normally, the angle brackets and the filename would be scanned as the five tokens `<`, `somefile`, `.`, `h`, and `>`, but after `#include`, they are a single filename token. You can use a start state to apply a set of rules only at certain times. Be warned that those rules that do not have start states can apply in any inclusive state! The `BEGIN` statement ~~(see “`BEGIN`” on page 120)~~ in an action sets the current start state. For example:
 
 ```c
 %s INCLMODE
 %%
 ^"#include" { BEGIN INCLMODE; }
-<INCLMODE>"<" [^>\n]+">" { ... do something with the name ...  }
+<INCLMODE>"<"[^>\n]+">" { /*... do something with the name ...*/  }
 <INCLMODE>\n      { BEGIN INITIAL;  /* return to normal */ }
 ```
 
 You declare a start state with a `%s` or `%x` line. For example:
 
-```
+```c
 %s PREPROC
 ```
 
-The previous code creates the inclusive start state PREPROC. In the rules section, then, a rule that has `<PREPROC>` prepended to it will apply only in state PREPROC. The standard state in which lex starts is state zero, also known as INITIAL. The current start state can be found in `YY_START` (also called `YYSTATE` for compatibility with older versions of lex), which is useful when you have a state that wants to switch back to whatever the previous state was, for example:
+The previous code creates the **inclusive start state** `PREPROC`. In the rules section, then, a rule that has `<PREPROC>` prepended to it will apply only in state `PREPROC`. The standard state in which lex starts is state zero, also known as `INITIAL`. The current start state can be found in `YY_START` (also called `YYSTATE` for compatibility with older versions of lex), which is useful when you have a state that wants to switch back to whatever the previous state was, for example:
 
 ```c
 %s A B C X
- int savevar;
+int savevar;
 %%
 <A,B,C>start { save = YY_START; BEGIN X; }
-<X>end       { BEGIN save;
+<X>end       { BEGIN save; }
 ```
 
-Flex also has exclusive start states declared with `%x`. The difference between regular and exclusive start states is that a rule with no start state is not matched when an exclusive state is active. In practice, exclusive states are a lot more useful than regular states, and you will probably want to use them.
+Flex also has **exclusive start states** declared with `%x`. The difference between regular and exclusive start states is that a rule with no start state is not matched when an exclusive state is active. In practice, exclusive states are a lot more useful than regular states, and you will probably want to use them.
 
 Exclusive start states make it easy to do things like recognize C language comments:
 
@@ -621,17 +639,17 @@ Exclusive start states make it easy to do things like recognize C language comme
 <COMMENT>"*/"    { BEGIN INITIAL;  /* return to regular mode */ }
 ```
 
-This wouldn’t work using regular start states since all of the regular token patterns would still be active in COMMENT state.
+This wouldn’t work using regular start states since all of the regular token patterns would still be active in `COMMENT` state.
 
 ## unput()
 
-The macro `unput(c)` returns the character c to the input stream. Unlike the analogous stdio routine `unputc()`, you can call `unput()` several times in a row to put several char-acters back in the input. The limit of data “pushed back” by `unput()` varies, but it is always at least as great as the longest token the lexer recognizes.
+The macro `unput(c)` returns the character `c` to the input stream. Unlike the analogous stdio routine `unputc()`, you can call `unput()` several times in a row to put several characters back in the input. The limit of data “pushed back” by `unput()` varies, but it is always at least as great as the longest token the lexer recognizes.
 
 For example, when expanding macros such as C’s `#define`, you need to insert the text of the macro in place of the macro call. One way to do this is to call `unput()` to push back the text, for example:
 
 ```c
-... in lexer action code...
-char *p = macro_contents () ;
+/*...in lexer action code...*/
+char *p = macro_contents();
 char *q = p + strlen(p);
 while(q > p)
     unput(*--q);    /* push back right-to-left */
@@ -647,31 +665,31 @@ Whenever a scanner matches a token, the text of the token is stored in the null-
 
 ## yyless()
 
-You can call `yyless(n)` from the code associated with a rule to “push back” all but the first n characters of the token. This can be useful when the rule to determine the boundary between tokens is inconvenient to express as a regular expression. For example, consider a pattern to match quoted strings, but where a quotation mark within a string can be escaped with a backslash:
+You can call `yyless(n)` from the code associated with a rule to “push back” all but the first `n` characters of the token. This can be useful when the rule to determine the boundary between tokens is inconvenient to express as a regular expression. For example, consider a pattern to match quoted strings, but where a quotation mark within a string can be escaped with a backslash:
 
-```c
-\" [^"]*\"    { /* is the char before close quote a \ ? */
-                    if(yytext[yyleng-2]   ==  '\\') {
-                         yyless(yyleng-1); /* return last quote */
-
-                         yymore();         /* append next string */
-                       } else {
-                       ...  /* process string */
-                       }
-                 }
+```js
+/\" [^"]*\"/    { 
+    /* is the char before close quote a \ ? */
+    if(yytext[yyleng-2]   ==  '\\') {
+        yyless(yyleng-1); /* return last quote */
+        yymore();         /* append next string */
+    } else {
+        /* process string */
+    }
+}
 ```
 
-If the quoted string ends with a backslash before the closing quotation mark, it uses `yyless()` to push back the closing quote, and it uses `yymore()` to tell lex to append the next token to this one (see “`yymore()`” on page 139). The next token will be the rest of the quoted string starting with the pushed back quote, so the entire string will end up in `yytext`.
+If the quoted string ends with a backslash before the closing quotation mark, it uses `yyless()` to push back the closing quote, and it uses `yymore()` to tell lex to append the next token to this one ~~(see “`yymore()`” on page 139)~~. The next token will be the rest of the quoted string starting with the pushed back quote, so the entire string will end up in `yytext`.
 
 A call to `yyless()` has the same effect as calling `unput()` with the characters to be pushed back, but `yyless()` is often much faster because it can take advantage of the fact that the characters pushed back are the same ones just fetched from the input.
 
 Another use of `yyless()` is to reprocess a token using rules for a different start state:
 
-```
+```c
 sometoken { BEGIN OTHER_STATE; yyless(0); }
 ```
 
-BEGIN tells lex to use another start state, and the call to `yyless()` pushes back all of the token’s characters so they can be reread using the new start state. If the new start state doesn’t enable different patterns that take precedence over the current one, `yyless(0)` will cause an infinite loop in the scanner because the same token is repeatedly recognized and pushed back. (This is similar to the function of REJECT but is considerably faster.) Unlike REJECT, it will loop and match the same pattern unless you use BEGIN to change what patterns are active.
+BEGIN tells lex to use another start state, and the call to `yyless()` pushes back all of the token’s characters so they can be reread using the new start state. If the new start state doesn’t enable different patterns that take precedence over the current one, `yyless(0)` will cause an infinite loop in the scanner because the same token is repeatedly recognized and pushed back. (This is similar to the function of `REJECT` but is considerably faster.) Unlike `REJECT`, it will loop and match the same pattern unless you use `BEGIN` to change what patterns are active.
 
 ## yylex() and YY_DECL
 
@@ -702,20 +720,20 @@ You can call `yymore()` from the code associated with a rule to tell lex to appe
 ```c
 %%
 hyper yymore ();
-text   printf("Token is %s\n", yytext);
+text  printf("Token is %s\n", yytext);
 ```
 
 If the input string is hypertext, the output will be “Token is hypertext.”
 
-Using `yymore()` is most often useful where it is inconvenient or impractical to define token boundaries with regular expressions. See “`yyless()`” on page 137 for an example.
+Using `yymore()` is most often useful where it is inconvenient or impractical to define token boundaries with regular expressions. See “`yyless()`” ~~on page 137~~ for an example.
 
 #### yyrestart()
 
-You can call `yyrestart(f)` to make your scanner read from open stdio file f. See “Stdio File Chaining” on page 123.
+You can call `yyrestart(f)` to make your scanner read from open stdio file `f`. See “Stdio File Chaining” ~~on page 123~~.
 
 #### yy_scan_string and yy_scan_buffer
 
-These functions prepare to take the scanner’s input from a string or buffer in memory. See “Input from Strings” on page 124.
+These functions prepare to take the scanner’s input from a string or buffer in memory. See “Input from Strings” ~~on page 124~~.
 
 ## YY_USER_ACTION
 
@@ -723,9 +741,9 @@ This macro is expanded just before the code for each scanner action, after `yyte
 
 ### yywrap()
 
-When a lexer encounters an end of file, it optionally calls the routine `yywrap()` to find out what to do next. If `yywrap()` returns `0`, the scanner continues scanning, while if it returns 1, the scanner returns a zero token to report the end-of-file. If your lexer doesn’t use `yywrap()` to switch files, the option `%option noyywrap` removes the calls to `yywrap()`. The special token `<<EOF>>` is usually a better way to handle end-of-file situations.
+When a lexer encounters an end of file, it optionally calls the routine `yywrap()` to find out what to do next. If `yywrap()` returns `0`, the scanner continues scanning, while if it returns `1`, the scanner returns a zero token to report the end-of-file. If your lexer doesn’t use `yywrap()` to switch files, the option `%option noyywrap` removes the calls to `yywrap()`. The special token `<<EOF>>` is usually a better way to handle end-of-file situations.
 
-The standard version of `yywrap()` in the flex library always returns 1, but if you use `yywrap()`, you should replace it with one of your own. If `yywrap()` returns `0` to indicate that there is more input, it needs first to adjust `yyin` to point to a new file, probably using `fopen()`.
+The standard version of `yywrap()` in the flex library always returns `1`, but if you use `yywrap()`, you should replace it with one of your own. If `yywrap()` returns `0` to indicate that there is more input, it needs first to adjust `yyin` to point to a new file, probably using `fopen()`.
 
 
 

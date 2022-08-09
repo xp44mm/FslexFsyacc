@@ -583,26 +583,30 @@ This version has considerably more kinds of nodes in the AST. As before, each ki
 
 The basic `ast` node is also used for comparisons, with each kind of comparison (less, less-equal, equal, etc.) being a different type, and for lists of expressions.
 
-Built-in functions have a fncall node with the AST of the argument (the built-ins each take one argument) and an enum that says which built-in function it is. There are three standard functions, sqrt, exp, and log, as well as print, a function that prints its argument and returns the argument as its value. Calls to user functions have a ufncall node with a pointer to the function, which is an entry in the symbol table, and an AST, which is a list of the arguments.
+Built-in functions have a `fncall` node with the AST of the argument (the built-ins each take one argument) and an enum that says which built-in function it is. There are three standard functions, `sqrt`, `exp`, and `log`, as well as `print`, a function that prints its argument and returns the argument as its value. Calls to user functions have a `ufncall` node with a pointer to the function, which is an entry in the symbol table, and an AST, which is a list of the arguments.
 
 Flow control expressions if/then/else and while/do use a flow node with the control expression, the then branch or do list, and the optional else branch.
 
-Constants are numval as before; references to symbols are symref with a pointer to the symbol in the symbol table; and assignments are symasgn with a pointer to the symbol to be assigned and the AST of the value to assign to it.
+Constants are `numval` as before; references to symbols are `symref` with a pointer to the symbol in the symbol table; and assignments are `symasgn` with a pointer to the symbol to be assigned and the AST of the value to assign to it.
 
-Every AST has a value. The value of an if/then/else is the value of the branch taken; the value of while/do is the last value of the do list; and the value of a list of expressions is the last expression.‖ Finally, we have C procedures to create each kind of AST node and a procedure to create a user-defined function.
+Every AST has a value. The value of an if/then/else is the value of the branch taken; the value of while/do is the last value of the do list; and the value of a list of expressions is the last expression.
+
+> This design is vaguely based on the ancient BLISS system programming language. It would be perfectly possible to design an AST that treated expressions and statements separately, but the implementation is a little simpler this way.
+
+Finally, we have C procedures to create each kind of AST node and a procedure to create a user-defined function.
 
 ### Advanced Calculator Parser
 
 Example 3-6 shows the parser for the advanced AST calculator.
 
-Example 3-6. Advanced calculator parser fb3-2.y
+Example 3-6. Advanced calculator parser `fb3-2.y`
 
 ```c
 /* calculator with AST */
 %{
-#  include <stdio.h>
-#  include <stdlib.h>
-#  include "fb3-2.h"
+# include <stdio.h>
+# include <stdlib.h>
+# include "fb3-2.h"
 %}
 %union {
   struct ast *a;
@@ -616,7 +620,6 @@ Example 3-6. Advanced calculator parser fb3-2.y
 %token <s> NAME
 %token <fn> FUNC
 %token EOL
-
 %token IF THEN ELSE WHILE DO LET
 %nonassoc <fn> CMP
 %right '='
@@ -629,47 +632,49 @@ Example 3-6. Advanced calculator parser fb3-2.y
 %%
 ```
 
-The %union here defines many kinds of symbol values, which is typical in realistic bison parsers. As well as a pointer to an AST and a numeric value, a value can be a pointer to the symbol table for a user symbol, a list of symbols, or a subtype of a comparison or function token. (We use the word symbol somewhat confusingly here, both for names used in the bison grammar and for names that the user types into the compiled program. We’ll say user symbol for the latter when the context isn’t otherwise clear.)
+The `%union` here defines many kinds of symbol values, which is typical in realistic bison parsers. As well as a pointer to an AST and a numeric value, a value can be a pointer to the symbol table for a user symbol, a list of symbols, or a subtype of a comparison or function token. 
 
-There’s a new token FUNC for the built-in functions, with the value indicating which function, and six reserved words, IF through LET. The token CMP is any of the six com-parison operators, with the value indicating which operator. (This trick of using one token for several syntactically similar operators helps keep down the size of the grammar.)
+> (We use the word symbol somewhat confusingly here, both for names used in the bison grammar and for names that the user types into the compiled program. We’ll say user symbol for the latter when the context isn’t otherwise clear.)
 
-The list of precedence declarations starts with the new CMP and = operators.
+There’s a new token `FUNC` for the built-in functions, with the value indicating which function, and six reserved words, `IF` through `LET`. The token `CMP` is any of the six comparison operators, with the value indicating which operator. (This trick of using one token for several syntactically similar operators helps keep down the size of the grammar.)
 
-A %start declaration identifies the top-level rule, so we don’t have to put it at the beginning of the parser.
+The list of precedence declarations starts with the new `CMP` and `=` operators.
 
-Calculator Statement Syntax
+A `%start` declaration identifies the top-level rule, so we don’t have to put it at the beginning of the parser.
 
-```
+### Calculator Statement Syntax
+
+```c
 stmt: IF exp THEN list           { $$ = newflow('I', $2, $4, NULL); }
-   | IF exp THEN list ELSE list  { $$ = newflow('I', $2, $4, $6); }
-   | WHILE exp DO list           { $$ = newflow('W', $2, $4, NULL); }
-   | exp
-;
+    | IF exp THEN list ELSE list { $$ = newflow('I', $2, $4, $6); }
+    | WHILE exp DO list          { $$ = newflow('W', $2, $4, NULL); }
+    | exp
+    ;
 list: /* nothing */ { $$ = NULL; }
-   | stmt ';' list { if ($3 == NULL)
+    | stmt ';' list { if ($3 == NULL)
                         $$ = $1;
                       else
                         $$ = newast('L', $1, $3);
                     }
-   ;
+;
 ```
 
-Our grammar distinguishes between statements (stmt) and expressions (exp). A statement is either a flow of control (if/then/else or while/do) or an expression. The if and while statements take lists of statements, with each statement in the list being followed by a semicolon. Each rule that matches a statement calls a routine to build an appropriate AST node.
+Our grammar distinguishes between statements (`stmt`) and expressions (`exp`). A statement is either a flow of control (if/then/else or while/do) or an expression. The `if` and `while` statements take lists of statements, with each statement in the list being followed by a semicolon. Each rule that matches a statement calls a **routine** to build an appropriate AST node.
 
-The design of the syntax here is largely arbitrary, and one of the nice things about using bison to build a parser is that it’s easy to experiment with variations. The interplay among bits of the syntax can be quite subtle; if, for example, the definition of list had put semicolons between rather than after each statement, the grammar would be ambiguous unless the grammar also added closing FI and ENDDO tokens to indicate the end of if/then and while/do statements.
+The design of the syntax here is largely arbitrary, and one of the nice things about using bison to build a parser is that it’s easy to experiment with variations. The interplay among bits of the syntax can be quite subtle; if, for example, the definition of list had put semicolons between rather than after each statement, the grammar would be ambiguous unless the grammar also added closing `FI` and `ENDDO` tokens to indicate the end of if/then and while/do statements.
 
-The definition of list is right recursive, that is, stmt ; list rather than list stmt ;.
+The definition of list is right recursive, that is, `stmt ; list` rather than `list stmt ;`.
 
-It doesn’t make any difference to the language recognized, but it makes it easier to build the list of statements linked from head to tail rather than from tail to head. Each time the stmt ; list rule is reduced, it creates a link that adds the statement to the head of the list so far. If the rule were list stmt ;, the statement would need to go at the tail of the list, which would require either a more complex circularly linked list or else reversing the list at the end (as we did with the list of references in Chapter 1).
+It doesn’t make any difference to the language recognized, but it makes it easier to build the list of statements linked from head to tail rather than from tail to head. Each time the `stmt ; list` rule is reduced, it creates a link that adds the statement to the head of the list so far. If the rule were `list stmt ;`, the statement would need to go at the tail of the list, which would require either a more complex circularly linked list or else reversing the list at the end (as we did with the list of references in Chapter 1).
 
-One disadvantage of right recursion rather than left is that right recursion puts up all of the yet-to-be-reduced statements on the parser stack and then reduces them all at the end of the list, while left recursion builds the list a statement at a time as the input is parsed. In a situation like this, where the list is unlikely to be more than a few items long, it doesn’t matter, but in a language where the list might be a list of thousands of items, it’s worth making the list with a left recursive rule and then reversing it to prevent parser stack overflow. Some programmers also find left recursion to be easier to debug, since it tends to produce output after each statement rather than all at once at the end.
+One disadvantage of right recursion rather than left is that right recursion puts up all of the yet-to-be-reduced statements on the parser stack and then reduces them all at the end of the list, while **left recursion** builds the list a statement at a time as the input is parsed. In a situation like this, where the list is unlikely to be more than a few items long, it doesn’t matter, but in a language where the list might be a list of thousands of items, it’s worth making the list with a left recursive rule and then reversing it to prevent parser stack overflow. Some programmers also find left recursion to be easier to debug, since it tends to produce output after each statement rather than all at once at the end.
 
 ### Calculator Expression Syntax
 
-```
+```c
 exp: exp CMP exp          { $$ = newcmp($2, $1, $3); }
    | exp '+' exp          { $$ = newast('+', $1,$3); }
-   | exp '-' exp          { $$ = newast('-', $1,$3);}
+   | exp '-' exp          { $$ = newast('-', $1,$3); }
    | exp '*' exp          { $$ = newast('*', $1,$3); }
    | exp '/' exp          { $$ = newast('/', $1,$3); }
    | '|' exp              { $$ = newast('|', $2, NULL); }
@@ -682,47 +687,49 @@ exp: exp CMP exp          { $$ = newcmp($2, $1, $3); }
    | NAME '(' explist ')' { $$ = newcall($1, $3); }
 ;
 explist: exp
- | exp ',' explist  { $$ = newast('L', $1, $3); }
+       | exp ',' explist  { $$ = newast('L', $1, $3); }
 ;
-symlist: NAME       { $$ = newsymlist($1, NULL); }
- | NAME ',' symlist { $$ = newsymlist($1, $3); }
+symlist: NAME             { $$ = newsymlist($1, NULL); }
+       | NAME ',' symlist { $$ = newsymlist($1, $3); }
 ;
 ```
 
-The expression syntax is a modestly expanded version of the expression syntax in the previous example. A new rule for CMP handles the six comparison operators, using the value of the CMP to tell which operator it was, and a rule for assignments creates an assignment node.
+The expression syntax is a modestly expanded version of the expression syntax in the previous example. A new rule for `CMP` handles the six comparison operators, using the value of the `CMP` to tell which operator it was, and a rule for assignments creates an assignment node.
 
-There are separate rules for built-in functions identified by a reserved name (FUNC) and user functions identified by a user symbol (NAME).
+There are separate rules for built-in functions identified by a reserved name (`FUNC`) and user functions identified by a user symbol (`NAME`).
 
-A rule for explist, a list of expressions, builds an AST of the expressions used for the actual arguments to a function call. A separate rule for symlist, a list of symbols, builds a linked list of symbols for the dummy arguments in a function definition. Both are right recursive to make it easier to build the list in the desired order.
+A rule for `explist`, a list of expressions, builds an AST of the expressions used for the actual arguments to a function call. A separate rule for `symlist`, a list of symbols, builds a linked list of symbols for the dummy arguments in a function definition. Both are right recursive to make it easier to build the list in the desired order.
 
 ### Top-Level Calculator Grammar
 
 ```c
 calclist: /* nothing */
-  | calclist stmt EOL {
-     printf("= %4.4g\n> ", eval($2));
-     treefree($2);
-    }
-  | calclist LET NAME '(' symlist ')' '=' list EOL {
-                       dodef($3, $5, $8);
-                       printf("Defined %s\n> ", $3->name); }
-  | calclist error EOL { yyerrok; printf("> "); }
- ;
+        | calclist stmt EOL {
+                            printf("= %4.4g\n> ", eval($2));
+                            treefree($2);
+                          }
+        | calclist LET NAME '(' symlist ')' '=' list EOL {
+                            dodef($3, $5, $8);
+                            printf("Defined %s\n> ", $3->name); }
+        | calclist error EOL { yyerrok; printf("> "); }
+;
 ```
 
 The last bit of grammar is the top level, which recognizes a list of statements and function declarations. As before, the top level evaluates the AST for a statement, prints the result, and then frees the AST. A function definition is just saved for future use.
 
 ### Basic Parser Error Recovery
 
-The last rule in the parser provides a small amount of error recovery. Because of the way that bison parsers work, it’s rarely worth the effort to try to correct errors, but it’s at least possible to recover to a state where the parser can continue. The special pseudo-token error indicates an error recovery point. When a bison parser encounters an error, it starts discarding symbols from the parser stack until it reaches a point where an error token would be valid; then it discards input tokens until it finds one it can shift in its current state, and then continues parsing from there. If the parse fails again, it discards more stack symbols and input tokens until either it can resume parsing or the stack is empty and the parse fails. To avoid a cascade of misleading error messages, the parser normally suppresses any parse error messages after the first one until it has successfully shifted three tokens in a row. The macro yyerrok in an action tells the parser that recovery is done, so subsequent error messages will be produced.
+The last rule in the parser provides a small amount of **error recovery**. Because of the way that bison parsers work, it’s rarely worth the effort to try to correct errors, but it’s at least possible to recover to a state where the parser can continue. 
+
+The special pseudo-token `error` indicates an error recovery point. When a bison parser encounters an error, it starts discarding symbols from the parser stack until it reaches a point where an `error` token would be valid; then it discards input tokens until it finds one it can shift in its current state, and then continues parsing from there. If the parse fails again, it discards more stack symbols and input tokens until either it can resume parsing or the stack is empty and the parse fails. To avoid a cascade of misleading error messages, the parser normally suppresses any parse error messages after the first one until it has successfully shifted three tokens in a row. The macro `yyerrok` in an action tells the parser that recovery is done, so subsequent error messages will be produced.
 
 Although it’s possible in principle to add lots of error rules to try to do lots of error recovery, in practice it’s rare to have more than one or two error rules. The error token is almost always used to resynchronize at a punctuation character in a top-level recursive rule as we do here.
 
 If the symbols discarded in error recovery from the stack have values that point to allocated storage, the error recovery process will leak storage, since the discarded values are never freed. In this example, we don’t worry about it, but bison does provide a feature to tell the parser to call your code to free discarded values, described in Chapter 6.
 
-The Advanced Calculator Lexer
+### The Advanced Calculator Lexer
 
-Example 3-7. Advanced calculator lexer fb3-2.l
+Example 3-7. Advanced calculator lexer `fb3-2.l`
 
 ```c
 /* recognize tokens for the calculator */
@@ -777,7 +784,7 @@ EXP     ([Ee][-+]?[0-9]+)
 %%
 ```
 
-The lexer, shown in Example 3-7, adds a few new rules to the previous example. There are a few new single-character operators. The six comparison operators all return a CMP token with a lexical value to distinguish them.
+The lexer, shown in Example 3-7, adds a few new rules to the previous example. There are a few new single-character operators. The six comparison operators all return a `CMP` token with a lexical value to distinguish them.
 
 The six keywords and four built-in functions are recognized by literal patterns. Note that they have to precede the general pattern to match a name so that they’re matched in preference to the general pattern. The name pattern looks up the name in the symbol table and returns a pointer to the symbol.
 
@@ -785,305 +792,306 @@ As before, a newline (EOL) marks the end of an input string. Since a function or
 
 ### Reserved Words
 
-In this grammar, the words if, then, else, while, do, let, sqrt, exp, log, and print are reserved and can’t be used as user symbols. Whether you want to allow users to use the same name for two things in the same program is debatable. On the one hand, it can make programs harder to understand, but on the other hand, users are otherwise forced to invent names that do not conflict with the reserved names.
+In this grammar, the words `if`, `then`, `else`, `while`, `do`, `let`, `sqrt`, `exp`, `log`, and `print` are reserved and can’t be used as user symbols. Whether you want to allow users to use the same name for two things in the same program is debatable. On the one hand, it can make programs harder to understand, but on the other hand, users are otherwise forced to invent names that do not conflict with the reserved names.
 
 Either can be taken to extremes. COBOL has more than 300 reserved words, so nobody can remember them all, and programmers resort to strange conventions like starting every variable name with a digit to be sure it doesn’t conflict with a reserved word. On the other hand, PL/I has no reserved words at all, so you can write the following:
 
-  IF IF = THEN THEN ELSE = THEN; ELSE ELSE = IF;
+```fortran
+IF IF = THEN THEN ELSE = THEN; ELSE ELSE = IF;
+```
 
 Bison parsers are a lot easier to write if you reserve the keywords; otherwise, you need to carefully design your language so at each point where the lexer is reading a token, either a name or a keyword is valid, but not both, and you have to provide extensive feedback to the lexer so it knows which to do. Having written lexers for Fortran, which has no reserved words and (in its classic versions) ignores all whitespace, I strongly encourage you to reserve your keywords.
 
 ### Building and Interpreting ASTs
 
-Finally, we have the file of helper code, shown in Example 3-8. Some of this file is the same as the previous example; the main and yyerror are unchanged and aren’t repeated here.
+Finally, we have the file of helper code, shown in Example 3-8. Some of this file is the same as the previous example; the `main` and `yyerror` are unchanged and aren’t repeated here.
 
 The key code builds and evaluates the ASTs. First, we have the symbol table management, which should be familiar from the examples in Chapter 2.
 
-Example 3-8. Advanced calculator helper functions fb3-2func.c
+Example 3-8. Advanced calculator helper functions `fb3-2func.c`
 
 ```c
 /*
  * helper functions for fb3-2
  */
-#  include <stdio.h>
-#  include <stdlib.h>
-#  include <stdarg.h>
-#  include <string.h>
-#  include <math.h>
-#  include "fb3-2.h"
+# include <stdio.h>
+# include <stdlib.h>
+# include <stdarg.h>
+# include <string.h>
+# include <math.h>
+# include "fb3-2.h"
 /* symbol table */
 /* hash a symbol */
 static unsigned
-symhash(char *sym)
+    symhash(char *sym)
 {
-  unsigned int hash = 0;
-  unsigned c;
-  while(c = *sym++) hash = hash*9 ^ c;
-  return hash;
+    unsigned int hash = 0;
+    unsigned c;
+    while(c = *sym++) hash = hash*9 ^ c;
+    return hash;
 }
 struct symbol *
-lookup(char* sym)
+    lookup(char* sym)
 {
-  struct symbol *sp = &symtab[symhash(sym)%NHASH];
-  int scount = NHASH;           /* how many have we looked at */
-  while(--scount >= 0) {
-    if(sp->name && !strcmp(sp->name, sym)) { return sp; }
-    if(!sp->name) {             /* new entry */
-      sp->name = strdup(sym);
-
- sp->value = 0;
-      sp->func = NULL;
-      sp->syms = NULL;
-      return sp;
+    struct symbol *sp = &symtab[symhash(sym)%NHASH];
+    int scount = NHASH;           /* how many have we looked at */
+    while(--scount >= 0) {
+        if(sp->name && !strcmp(sp->name, sym)) { return sp; }
+        if(!sp->name) {             /* new entry */
+            sp->name = strdup(sym);
+            sp->value = 0;
+            sp->func = NULL;
+            sp->syms = NULL;
+            return sp;
+        }
+        if(++sp >= symtab+NHASH) sp = symtab; /* try the next entry */
     }
-    if(++sp >= symtab+NHASH) sp = symtab; /* try the next entry */
-  }
-  yyerror("symbol table overflow\n");
-  abort(); /* tried them all, table is full */
+    yyerror("symbol table overflow\n");
+    abort(); /* tried them all, table is full */
 }
 ```
 
-Next come the procedures to build the AST nodes and symlists. They all allocate a node and then fill in the fields appropriately for the node type. An extended version of treefree recursively walks an AST and frees all of the nodes in the tree.
+Next come the procedures to build the AST nodes and symlists. They all allocate a node and then fill in the fields appropriately for the node type. An extended version of `treefree` recursively walks an AST and frees all of the nodes in the tree.
 
 ```c
 struct ast *
-newast(int nodetype, struct ast *l, struct ast *r)
+    newast(int nodetype, struct ast *l, struct ast *r)
 {
-  struct ast *a = malloc(sizeof(struct ast));
+    struct ast *a = malloc(sizeof(struct ast));
 
-  if(!a) {
-    yyerror("out of space");
-    exit(0);
-  }
-  a->nodetype = nodetype;
-  a->l = l;
-  a->r = r;
-  return a;
+    if(!a) {
+        yyerror("out of space");
+        exit(0);
+    }
+    a->nodetype = nodetype;
+    a->l = l;
+    a->r = r;
+    return a;
 }
 struct ast *
-newnum(double d)
+    newnum(double d)
 {
-  struct numval *a = malloc(sizeof(struct numval));
+    struct numval *a = malloc(sizeof(struct numval));
 
-  if(!a) {
-    yyerror("out of space");
-    exit(0);
-  }
-  a->nodetype = 'K';
-  a->number = d;
-  return (struct ast *)a;
+    if(!a) {
+        yyerror("out of space");
+        exit(0);
+    }
+    a->nodetype = 'K';
+    a->number = d;
+    return (struct ast *)a;
 }
 struct ast *
-newcmp(int cmptype, struct ast *l, struct ast *r)
+    newcmp(int cmptype, struct ast *l, struct ast *r)
 {
-  struct ast *a = malloc(sizeof(struct ast));
+    struct ast *a = malloc(sizeof(struct ast));
 
-  if(!a) {
-    yyerror("out of space");
-    exit(0);
-  }
- a->nodetype = '0' + cmptype;
-  a->l = l;
-  a->r = r;
-  return a;
+    if(!a) {
+        yyerror("out of space");
+        exit(0);
+    }
+    a->nodetype = '0' + cmptype;
+    a->l = l;
+    a->r = r;
+    return a;
 }
 struct ast *
-newfunc(int functype, struct ast *l)
+    newfunc(int functype, struct ast *l)
 {
-  struct fncall *a = malloc(sizeof(struct fncall));
+    struct fncall *a = malloc(sizeof(struct fncall));
 
-  if(!a) {
-    yyerror("out of space");
-    exit(0);
-  }
-  a->nodetype = 'F';
-  a->l = l;
-  a->functype = functype;
-  return (struct ast *)a;
+    if(!a) {
+        yyerror("out of space");
+        exit(0);
+    }
+    a->nodetype = 'F';
+    a->l = l;
+    a->functype = functype;
+    return (struct ast *)a;
 }
 struct ast *
-newcall(struct symbol *s, struct ast *l)
+    newcall(struct symbol *s, struct ast *l)
 {
-  struct ufncall *a = malloc(sizeof(struct ufncall));
+    struct ufncall *a = malloc(sizeof(struct ufncall));
 
-  if(!a) {
-    yyerror("out of space");
-    exit(0);
-  }
-  a->nodetype = 'C';
-  a->l = l;
-  a->s = s;
-  return (struct ast *)a;
+    if(!a) {
+        yyerror("out of space");
+        exit(0);
+    }
+    a->nodetype = 'C';
+    a->l = l;
+    a->s = s;
+    return (struct ast *)a;
 }
 struct ast *
-newref(struct symbol *s)
+    newref(struct symbol *s)
 {
-  struct symref *a = malloc(sizeof(struct symref));
+    struct symref *a = malloc(sizeof(struct symref));
 
-  if(!a) {
-    yyerror("out of space");
-    exit(0);
-  }
-  a->nodetype = 'N';
-  a->s = s;
-  return (struct ast *)a;
+    if(!a) {
+        yyerror("out of space");
+        exit(0);
+    }
+    a->nodetype = 'N';
+    a->s = s;
+    return (struct ast *)a;
 }
 struct ast *
-newasgn(struct symbol *s, struct ast *v)
+    newasgn(struct symbol *s, struct ast *v)
 {
-  struct symasgn *a = malloc(sizeof(struct symasgn));
- if(!a) {
-    yyerror("out of space");
-    exit(0);
-  }
-  a->nodetype = '=';
-  a->s = s;
-  a->v = v;
-  return (struct ast *)a;
+    struct symasgn *a = malloc(sizeof(struct symasgn));
+    if(!a) {
+        yyerror("out of space");
+        exit(0);
+    }
+    a->nodetype = '=';
+    a->s = s;
+    a->v = v;
+    return (struct ast *)a;
 }
 struct ast *
-newflow(int nodetype, struct ast *cond, struct ast *tl, struct ast *el)
+    newflow(int nodetype, struct ast *cond, struct ast *tl, struct ast *el)
 {
-  struct flow *a = malloc(sizeof(struct flow));
+    struct flow *a = malloc(sizeof(struct flow));
 
-  if(!a) {
-    yyerror("out of space");
-    exit(0);
-  }
-  a->nodetype = nodetype;
-  a->cond = cond;
-  a->tl = tl;
-  a->el = el;
-  return (struct ast *)a;
+    if(!a) {
+        yyerror("out of space");
+        exit(0);
+    }
+    a->nodetype = nodetype;
+    a->cond = cond;
+    a->tl = tl;
+    a->el = el;
+    return (struct ast *)a;
 }
 /* free a tree of ASTs */
 void
-treefree(struct ast *a)
+    treefree(struct ast *a)
 {
-  switch(a->nodetype) {
-    /* two subtrees */
-  case '+':
-  case '-':
-  case '*':
-  case '/':
-  case '1':  case '2':  case '3':  case '4':  case '5':  case '6':
-  case 'L':
-    treefree(a->r);
-    /* one subtree */
-  case '|':
-  case 'M': case 'C': case 'F':
-    treefree(a->l);
-    /* no subtree */
-  case 'K': case 'N':
-    break;
-  case '=':
-    free( ((struct symasgn *)a)->v);
-    break;
-    /* up to three subtrees */
- case 'I': case 'W':
-    free( ((struct flow *)a)->cond);
-    if( ((struct flow *)a)->tl) treefree( ((struct flow *)a)->tl);
-    if( ((struct flow *)a)->el) treefree( ((struct flow *)a)->el);
-    break;
-  default: printf("internal error: free bad node %c\n", a->nodetype);
-  }
-
-  free(a); /* always free the node itself */
+    switch(a->nodetype) {
+        /* two subtrees */
+        case '+':
+        case '-':
+        case '*':
+        case '/':
+        case '1':  case '2':  case '3':  case '4':  case '5':  case '6':
+        case 'L':
+            treefree(a->r);
+        /* one subtree */
+        case '|':
+        case 'M': case 'C': case 'F':
+            treefree(a->l);
+        /* no subtree */
+        case 'K': case 'N':
+            break;
+        case '=':
+            free( ((struct symasgn *)a)->v);
+            break;
+        /* up to three subtrees */
+        case 'I': case 'W':
+            free(((struct flow *)a)->cond);
+            if(((struct flow *)a)->tl) treefree(((struct flow *)a)->tl);
+            if(((struct flow *)a)->el) treefree(((struct flow *)a)->el);
+            break;
+        default: printf("internal error: free bad node %c\n", a->nodetype);
+    }
+    free(a); /* always free the node itself */
 }
 struct symlist *
-newsymlist(struct symbol *sym, struct symlist *next)
+    newsymlist(struct symbol *sym, struct symlist *next)
 {
-  struct symlist *sl = malloc(sizeof(struct symlist));
+    struct symlist *sl = malloc(sizeof(struct symlist));
 
-  if(!sl) {
-    yyerror("out of space");
-    exit(0);
-  }
-  sl->sym = sym;
-  sl->next = next;
-  return sl;
+    if(!sl) {
+        yyerror("out of space");
+        exit(0);
+    }
+    sl->sym = sym;
+    sl->next = next;
+    return sl;
 }
 /* free a list of symbols */
 void
-symlistfree(struct symlist *sl)
+    symlistfree(struct symlist *sl)
 {
-  struct symlist *nsl;
-  while(sl) {
-    nsl = sl->next;
-    free(sl);
-    sl = nsl;
-  }
+    struct symlist *nsl;
+    while(sl) {
+        nsl = sl->next;
+        free(sl);
+        sl = nsl;
+    }
 }
 ```
 
-The heart of the calculator is eval, which evaluates an AST built up in the parser. Following the practice in C, comparisons return 1 or 0 depending on whether the com-parison succeeds, and tests in if/then/else and while/do treat any nonzero as true. For expressions, we do the familiar depth-first tree walk to compute the value. An AST makes it straightforward to implement if/then/else: Evaluate the condition AST to decide which branch to take, and then evaluate the AST for the path to be taken. To evaluate while/do loops, a loop in eval evaluates the condition AST, then the body AST, repeating as long as the condition AST remains true. Any AST that references variables that are changed by an assignment will have a new value each time it’s evaluated.
+
+
+The heart of the calculator is `eval`, which evaluates an AST built up in the parser. Following the practice in C, comparisons return `1` or `0` depending on whether the comparison succeeds, and tests in if/then/else and while/do treat any nonzero as true. For expressions, we do the familiar depth-first tree walk to compute the value. An AST makes it straightforward to implement if/then/else: Evaluate the condition AST to decide which branch to take, and then evaluate the AST for the path to be taken. To evaluate while/do loops, a loop in `eval` evaluates the condition AST, then the body AST, repeating as long as the condition AST remains true. Any AST that references variables that are changed by an assignment will have a new value each time it’s evaluated.
 
 ```c
 static double callbuiltin(struct fncall *);
 static double calluser(struct ufncall *);
 double
-eval(struct ast *a)
+    eval(struct ast *a)
 {
-  double v;
-  if(!a) {
-    yyerror("internal error, null eval");
-    return 0.0;
-  }
-  switch(a->nodetype) {
-    /* constant */
-  case 'K': v = ((struct numval *)a)->number; break;
-    /* name reference */
-  case 'N': v = ((struct symref *)a)->s->value; break;
-    /* assignment */
-  case '=': v = ((struct symasgn *)a)->s->value =
-      eval(((struct symasgn *)a)->v); break;
-    /* expressions */
-  case '+': v = eval(a->l) + eval(a->r); break;
-  case '-': v = eval(a->l) - eval(a->r); break;
-  case '*': v = eval(a->l) * eval(a->r); break;
-  case '/': v = eval(a->l) / eval(a->r); break;
-  case '|': v = fabs(eval(a->l)); break;
-  case 'M': v = -eval(a->l); break;
-    /* comparisons */
-  case '1': v = (eval(a->l) > eval(a->r))? 1 : 0; break;
-  case '2': v = (eval(a->l) < eval(a->r))? 1 : 0; break;
-  case '3': v = (eval(a->l) != eval(a->r))? 1 : 0; break;
-  case '4': v = (eval(a->l) == eval(a->r))? 1 : 0; break;
-  case '5': v = (eval(a->l) >= eval(a->r))? 1 : 0; break;
-  case '6': v = (eval(a->l) <= eval(a->r))? 1 : 0; break;
-  /* control flow */
-  /* null expressions allowed in the grammar, so check for them */
-  /* if/then/else */
-  case 'I':
-    if( eval( ((struct flow *)a)->cond) != 0) { check the condition
-      if( ((struct flow *)a)->tl) {             the true branch
-        v = eval( ((struct flow *)a)->tl);
-      } else
-        v = 0.0;                /* a default value */
-    } else {
-      if( ((struct flow *)a)->el) {             the false branch
-        v = eval(((struct flow *)a)->el);
-      } else
-        v = 0.0;                /* a default value */
+    double v;
+    if(!a) {
+        yyerror("internal error, null eval");
+        return 0.0;
     }
-    break;
-  /* while/do */
- case 'W':
-    v = 0.0;            /* a default value */
+    switch(a->nodetype) {
+            /* constant */
+        case 'K': v = ((struct numval *)a)->number; break;
+            /* name reference */
+        case 'N': v = ((struct symref *)a)->s->value; break;
+            /* assignment */
+        case '=': v = ((struct symasgn *)a)->s->value = eval(((struct symasgn *)a)->v); break;
+            /* expressions */
+        case '+': v = eval(a->l) + eval(a->r); break;
+        case '-': v = eval(a->l) - eval(a->r); break;
+        case '*': v = eval(a->l) * eval(a->r); break;
+        case '/': v = eval(a->l) / eval(a->r); break;
+        case '|': v = fabs(eval(a->l)); break;
+        case 'M': v = -eval(a->l); break;
+            /* comparisons */
+        case '1': v = (eval(a->l) > eval(a->r))? 1 : 0; break;
+        case '2': v = (eval(a->l) < eval(a->r))? 1 : 0; break;
+        case '3': v = (eval(a->l) != eval(a->r))? 1 : 0; break;
+        case '4': v = (eval(a->l) == eval(a->r))? 1 : 0; break;
+        case '5': v = (eval(a->l) >= eval(a->r))? 1 : 0; break;
+        case '6': v = (eval(a->l) <= eval(a->r))? 1 : 0; break;
+            /* control flow */
+            /* null expressions allowed in the grammar, so check for them */
+            /* if/then/else */
+        case 'I':
+            if(eval(((struct flow *)a)->cond) != 0) { //check the condition
+                if(((struct flow *)a)->tl) { //the true branch
+                    v = eval(((struct flow *)a)->tl);
+                } else
+                    v = 0.0; /* a default value */
+            } else {
+                if(((struct flow *)a)->el) {          // the false branch
+                    v = eval(((struct flow *)a)->el);
+                } else
+                    v = 0.0; /* a default value */
+            }
+            break;
+            /* while/do */
+        case 'W':
+            v = 0.0; /* a default value */
 
-    if( ((struct flow *)a)->tl) {
-      while( eval(((struct flow *)a)->cond) != 0) evaluate the condition
-        v = eval(((struct flow *)a)->tl);         evaluate the target statements
+            if( ((struct flow *)a)->tl) {
+                while( eval(((struct flow *)a)->cond) != 0) // evaluate the condition
+                    v = eval(((struct flow *)a)->tl); // evaluate the target statements
+            }
+            break; /* value of last statement is value of while/do */
+
+        /* list of statements */
+        case 'L': eval(a->l); v = eval(a->r); break;
+        case 'F': v = callbuiltin((struct fncall *)a); break;
+        case 'C': v = calluser((struct ufncall *)a); break;
+        default: printf("internal error: bad node %c\n", a->nodetype);
     }
-    break;                      /* value of last statement is value of while/do */
-
-  /* list of statements */
-  case 'L': eval(a->l); v = eval(a->r); break;
-  case 'F': v = callbuiltin((struct fncall *)a); break;
-  case 'C': v = calluser((struct ufncall *)a); break;
-  default: printf("internal error: bad node %c\n", a->nodetype);
-  }
-  return v;
+    return v;
 }
 ```
 
@@ -1093,24 +1101,24 @@ The trickiest bits of code in the evaluator handle functions. Built-in functions
 
 ```c
 static double
-callbuiltin(struct fncall *f)
+    callbuiltin(struct fncall *f)
 {
-  enum bifs functype = f->functype;
-  double v = eval(f->l);
- switch(functype) {
- case B_sqrt:
-   return sqrt(v);
- case B_exp:
-   return exp(v);
- case B_log:
-   return log(v);
- case B_print:
-   printf("= %4.4g\n", v);
-   return v;
- default:
-   yyerror("Unknown built-in function %d", functype);
-   return 0.0;
- }
+    enum bifs functype = f->functype;
+    double v = eval(f->l);
+    switch(functype) {
+        case B_sqrt:
+            return sqrt(v);
+        case B_exp:
+            return exp(v);
+        case B_log:
+            return log(v);
+        case B_print:
+            printf("= %4.4g\n", v);
+            return v;
+        default:
+            yyerror("Unknown built-in function %d", functype);
+            return 0.0;
+    }
 }
 ```
 
@@ -1121,12 +1129,12 @@ A function definition consists of the name of the function, a list of dummy argu
 ```c
 /* define a function */
 void
-dodef(struct symbol *name, struct symlist *syms, struct ast *func)
+    dodef(struct symbol *name, struct symlist *syms, struct ast *func)
 {
-  if(name->syms) symlistfree(name->syms);
-  if(name->func) treefree(name->func);
-  name->syms = syms;
-  name->func = func;
+    if(name->syms) symlistfree(name->syms);
+    if(name->func) treefree(name->func);
+    name->syms = syms;
+    name->func = func;
 }
 ```
 
@@ -1137,9 +1145,9 @@ Say you define a function to calculate the maximum of its two arguments:
 > max(4+5,6+7)
 ```
 
-The function has two dummy arguments, x and y. When the function is called, the evaluator does this:
+The function has two dummy arguments, `x` and `y`. When the function is called, the evaluator does this:
 
-1. Evaluate the actual arguments, 4+5 and 6+7 in this case.
+1. Evaluate the actual arguments, `4+5` and `6+7` in this case.
 
 2. Save the current values of the dummy arguments and assign the values of the actual arguments to them.
 
@@ -1153,67 +1161,67 @@ The code to do this counts the arguments, allocates two temporary arrays for the
 
 ```c
 static double
-calluser(struct ufncall *f)
+    calluser(struct ufncall *f)
 {
-  struct symbol *fn = f->s;     /* function name */
-  struct symlist *sl;           /* dummy arguments */
-  struct ast *args = f->l;      /* actual arguments */
-  double *oldval, *newval;      /* saved arg values */
-  double v;
-  int nargs;
-  int i;
-  if(!fn->func) {
-    yyerror("call to undefined function", fn->name);
-    return 0;
-  }
-  /* count the arguments */
-  sl = fn->syms;
-  for(nargs = 0; sl; sl = sl->next)
-    nargs++;
-
- /* prepare to save them */
-  oldval = (double *)malloc(nargs * sizeof(double));
-  newval = (double *)malloc(nargs * sizeof(double));
-  if(!oldval || !newval) {
-    yyerror("Out of space in %s", fn->name); return 0.0;
-  }
-
-  /* evaluate the arguments */
-  for(i = 0; i < nargs; i++) {
-    if(!args) {
-      yyerror("too few args in call to %s", fn->name);
-      free(oldval); free(newval);
-      return 0.0;
+    struct symbol *fn = f->s;     /* function name */
+    struct symlist *sl;           /* dummy arguments */
+    struct ast *args = f->l;      /* actual arguments */
+    double *oldval, *newval;      /* saved arg values */
+    double v;
+    int nargs;
+    int i;
+    if(!fn->func) {
+        yyerror("call to undefined function", fn->name);
+        return 0;
     }
-    if(args->nodetype == 'L') { /* if this is a list node */
-      newval[i] = eval(args->l);
-      args = args->r;
-    } else {                    /* if it's the end of the list */
-      newval[i] = eval(args);
-      args = NULL;
-    }
-  }
+    /* count the arguments */
+    sl = fn->syms;
+    for(nargs = 0; sl; sl = sl->next)
+        nargs++;
 
-  /* save old values of dummies, assign new ones */
-  sl = fn->syms;
-  for(i = 0; i < nargs; i++) {
-    struct symbol *s = sl->sym;
-    oldval[i] = s->value;
-    s->value = newval[i];
-    sl = sl->next;
-  }
-  free(newval);
-  /* evaluate the function */
-  v = eval(fn->func);
-  /* put the real values of the dummies back */
-  sl = fn->syms;
-  for(i = 0; i < nargs; i++) {
-    struct symbol *s = sl->sym;
-    s->value = oldval[i];
-    sl = sl->next;
-  }
-  free(oldval);
-  return v;
+    /* prepare to save them */
+    oldval = (double *)malloc(nargs * sizeof(double));
+    newval = (double *)malloc(nargs * sizeof(double));
+    if(!oldval || !newval) {
+        yyerror("Out of space in %s", fn->name); return 0.0;
+    }
+
+    /* evaluate the arguments */
+    for(i = 0; i < nargs; i++) {
+        if(!args) {
+            yyerror("too few args in call to %s", fn->name);
+            free(oldval); free(newval);
+            return 0.0;
+        }
+        if(args->nodetype == 'L') { /* if this is a list node */
+            newval[i] = eval(args->l);
+            args = args->r;
+        } else {                    /* if it's the end of the list */
+            newval[i] = eval(args);
+            args = NULL;
+        }
+    }
+
+    /* save old values of dummies, assign new ones */
+    sl = fn->syms;
+    for(i = 0; i < nargs; i++) {
+        struct symbol *s = sl->sym;
+        oldval[i] = s->value;
+        s->value = newval[i];
+        sl = sl->next;
+    }
+    free(newval);
+    /* evaluate the function */
+    v = eval(fn->func);
+    /* put the real values of the dummies back */
+    sl = fn->syms;
+    for(i = 0; i < nargs; i++) {
+        struct symbol *s = sl->sym;
+        s->value = oldval[i];
+        sl = sl->next;
+    }
+    free(oldval);
+    return v;
 }
 ```
 

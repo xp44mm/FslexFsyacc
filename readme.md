@@ -84,3 +84,11 @@ Should.equal y [Term(2,"x",2);Term(3,"x",1);Const -5]
 - The result code is data-driven and highly readable.
 
 - Flexiblely compose of tokenize, regular expressions, BNF technology.
+
+1. 可以重复非终结符产生式
+2. 产生式的名称不能重名，不能与现有名称重复。
+3. 无限递归
+4. 规则簇(bunch)
+5. precedence level
+6. 三部分改为两部分。规则，定义
+7. list 代替 array

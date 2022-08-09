@@ -1,12 +1,12 @@
 # CHAPTER 4 Parsing SQL
 
-SQL (which stands for Structured Query Language and is usually pronounced sequel) is the most common language used to handle relational databases.[^ *]
+SQL (which stands for Structured Query Language and is usually pronounced sequel) is the most common language used to handle relational databases.
 
-[^ *]: SQL is the Fortran of databases—nobody likes it much, the language is ugly and ad hoc, every database supports it, and we all use it.
+>SQL is the Fortran of databases—nobody likes it much, the language is ugly and ad hoc, every database supports it, and we all use it.
 
 We’ll develop a SQL parser that produces a compact tokenized version of SQL statements.
 
-This parser is based on the version of SQL used in the popular MySQL open source database. MySQL actually uses a bison parser to parse its SQL input, although for a variety of reasons this parser isn’t based on mySQL’s parser but rather is based on the description of the language in the manual.
+This parser is based on the version of SQL used in the popular MySQL open source database. MySQL actually uses a bison parser to parse its SQL input, although for a variety of reasons this parser isn’t based on MySQL’s parser but rather is based on the description of the language in the manual.
 
 MySQL’s parser is much longer and more complex, since this pedagogical example leaves out many of the less heavily used parts. MySQL’s parser is written in an odd way that uses bison to generate a C parser that’s compiled by the C++ compiler, with a handwritten C++ lexer.
 
@@ -24,33 +24,39 @@ A database is a collection of tables, which are analogous to files. Each table c
 
 ```sql
 CREATE TABLE Foods (
-      name CHAR(8) NOT NULL,
-      type CHAR(5),
-      flavor    CHAR(6),
-      PRIMARY KEY ( name )
+    name CHAR(8) NOT NULL,
+    type CHAR(5),
+    flavor CHAR(6),
+    PRIMARY KEY ( name )
 )
 CREATE TABLE Courses (
-      course      CHAR(8) NOT NULL PRIMARY KEY,
-      flavor      CHAR(6),
-      sequence INTEGER
+    course CHAR(8) NOT NULL PRIMARY KEY,
+    flavor CHAR(6),
+    sequence INTEGER
 )
 ```
 
-The syntax is completely free-format, and there are often several different syntactic ways to write the same thing—notice the two different ways we gave the PRIMARY KEY specifier. (The primary key in a table is a column, or set of columns, that uniquely specifies a row.) Table 4-1 shows the two tables we just created after loading in data.
+The syntax is completely free-format, and there are often several different syntactic ways to write the same thing—notice the two different ways we gave the `PRIMARY KEY` specifier. (The primary key in a table is a column, or set of columns, that uniquely specifies a row.) Table 4-1 shows the two tables we just created after loading in data.
 
 Table 4-1. Two relational tables
 
 ```
-Foods         Courses
-name type flavor     course flavor sequence
-peach fruit sweet     salad savory 1
-tomato fruit savory     main savory 2
-lemon fruit sour     dessert sweet 3
-lard fat bland
-cheddar fat savory
+Foods
+name    type  flavor
+peach   fruit sweet
+tomato  fruit savory
+lemon   fruit sour
+lard    fat   bland
+cheddar fat   savory
+
+Courses
+course  flavor sequence
+salad   savory 1
+main    savory 2
+dessert sweet  3
 ```
 
-SQL implements what’s known as a tuple calculus, where tuple is relational-ese for a record, which is an ordered list of fields or expressions. To use a database, you tell the database what tuples you want it to extract from your data. It’s up to the database to figure out how to get it from the tables it has. (That’s the calculus part.) The specification of a set of desired data is a query. For example, using the two tables in Table 4-1, to get a list of fruits, you would say the following:
+SQL implements what’s known as a **tuple calculus**, where tuple is relational-ese for a record, which is an ordered list of fields or expressions. To use a database, you tell the database what tuples you want it to extract from your data. It’s up to the database to figure out how to get it from the tables it has. (That’s the calculus part.) The specification of a set of desired data is a query. For example, using the two tables in Table 4-1, to get a list of fruits, you would say the following:
 
 ```sql
 SELECT name, flavor
@@ -63,18 +69,18 @@ The response is shown in Table 4-2.
 Table 4-2. SQL response table
 
 ```
-name flavor
-peach sweet
+name   flavor
+peach  sweet
 tomato savory
-lemon sour
+lemon  sour
 ```
 
 You can also ask questions spanning more than one table. To get a list of foods suitable to each course of the meal, you say the following:
 
 ```sql
 SELECT course, name, Foods.flavor, type
-FROM   Courses, Foods
-WHERE  Courses.flavor = Foods.flavor
+FROM Courses, Foods
+WHERE Courses.flavor = Foods.flavor
 ```
 
 The response is shown in Table 4-3.
@@ -82,19 +88,19 @@ The response is shown in Table 4-3.
 Table 4-3. Second SQL response table
 
 ```
-course name flavor type
-salad tomato savory fruit
-salad cheddar savory fat
-main tomato savory fruit
-main cheddar savory fat
-dessert peach sweet fruit
+course  name    flavor type
+salad   tomato  savory fruit
+salad   cheddar savory fat
+main    tomato  savory fruit
+main    cheddar savory fat
+dessert peach   sweet  fruit
 ```
 
 When listing the column names, we can leave out the table name if the column name is unambiguous.
 
 ## Manipulating Relations
 
-SQL has a rich set of table manipulation commands. You can read and write individual rows with SELECT, INSERT, UPDATE, and DELETE commands. The SELECT statement has a very complex syntax that lets you look for values in columns; compare columns to each other; do arithmetic; and compute minimum, maximum, average, and group totals.
+SQL has a rich set of table manipulation commands. You can read and write individual rows with `SELECT`, `INSERT`, `UPDATE`, and `DELETE` commands. The `SELECT` statement has a very complex syntax that lets you look for values in columns; compare columns to each other; do arithmetic; and compute minimum, maximum, average, and group totals.
 
 ## Three Ways to Use SQL
 
@@ -104,9 +110,7 @@ Since the syntax of SQL is so large, we have reproduced the entire grammar in on
 
 ## SQL to RPN
 
-Our tokenized version of SQL will use a version of Reverse Polish Notation (RPN), familiar to users of HP calculators. In 1920, Polish logician Jan Łukasiewicz[^ †] realized that if you put the operators before the operands in logical expressions, you don’t need any parentheses or other punctuation to describe the order of evaluation:
-
-[^ †]: It’s called Polish notation because people don’t know how to pronounce Łukasiewicz. It’s roughly WOO-ka-shay-vits.
+Our tokenized version of SQL will use a version of **Reverse Polish Notation** (RPN), familiar to users of HP calculators. In 1920, Polish logician Jan Łukasiewicz realized that if you put the operators before the operands in logical expressions, you don’t need any parentheses or other punctuation to describe the order of evaluation:
 
 ```
 (a+b)*c          * + a b c
@@ -124,7 +128,7 @@ On a computer, RPN has the practical advantage that it is very easy to interpret
 
 RPN has two other advantages for compiler developers. One is that if you’re using a bottom-up parser like the ones that bison generates, it is amazingly easy to generate RPN. If you emit the action code for each operator or operand in the rule that recognizes it, your code will come out in RPN order. Here’s a sneak preview of part of the SQL parser:
 
-```
+```c
 expr: NAME         { emit("NAME %s", $1); }
    | INTNUM        { emit("NUMBER %d", $1); }
    | expr '+' expr { emit("ADD"); }
@@ -171,7 +175,7 @@ void yyerror(char *s, ...);
 int oldstate;
 %}
 %x COMMENT
-%s BTWMODE
+%s BTWMODE // BETWEEN ... AND ...
 %%
 ```
 
@@ -407,7 +411,7 @@ YEAR_MONTH      { return YEAR_MONTH; }
 ZEROFILL        { return ZEROFILL; }
 ```
 
-All of the reserved words are separate tokens in the parser, because it is the easiest thing to do. Notice that CHARACTER and VARCHARACTER can be abbreviated to CHAR and VAR CHAR, and INDEX and KEY are the same as each other.
+All of the reserved words are separate tokens in the parser, because it is the easiest thing to do. Notice that `CHARACTER` and `VARCHARACTER` can be abbreviated to `CHAR` and `VAR CHAR`, and `INDEX` and `KEY` are the same as each other.
 
 The keyword `BETWEEN` switches into start state `BTWMODE`, in which the word `AND` returns the token `AND` rather than `ANDOP`. The reason is that normally `AND` is treated the same as the `&&` logical-and operator, except in the SQL operator `BETWEEN ... AND`:
 
@@ -417,7 +421,7 @@ The keyword `BETWEEN` switches into start state `BTWMODE`, in which the word `AN
      ... WHERE a BETWEEN c AND d, ... except here
 ```
 
-There’s a variety of ways to deal with problems like this, but lexical special cases are often the easiest.
+There’s a variety of ways to deal with problems like this, but **lexical special cases** are often the easiest.
 
 Also note that the phrases `NOT EXISTS` and `ON DUPLICATE` are recognized as single tokens; this is to avoid shift/reduce conflicts in the parser because of other contexts where `NOT` and `ON` can appear. To remember the difference between `EXISTS` and `NOT EXISTS`, the lexer returns a value along with the token that the parser uses when generating the token code. These two don’t actually turn out to be ambiguous, but parsing them needs more than the single-token lookahead that bison usually uses. We revisit these in Chapter 9 where the alternate GLR parser can handle them directly.
 
@@ -426,38 +430,37 @@ Also note that the phrases `NOT EXISTS` and `ON DUPLICATE` are recognized as sin
 Numbers come in a variety of forms:
 
 ```js
-   /* numbers */
+/* numbers */
 -?[0-9]+                { yylval.intval = atoi(yytext); return INTNUM; }
 -?[0-9]+"."[0-9]* |
--?"."[0-9]+     |
--?[0-9]+E[-+]?[0-9]+    |
+-?"."[0-9]+ |
+-?[0-9]+E[-+]?[0-9]+ |
 -?[0-9]+"."[0-9]*E[-+]?[0-9]+ |
--?"."[0-9]+E[-+]?[0-9]+ { yylval.floatval = atof(yytext) ;
-                                  return APPROXNUM; }
-    /* booleans */
+-?"."[0-9]+E[-+]?[0-9]+ { yylval.floatval = atof(yytext); return APPROXNUM; }
+/* booleans */
 TRUE    { yylval.intval = 1; return BOOL; }
 UNKNOWN { yylval.intval = -1; return BOOL; }
 FALSE   { yylval.intval = 0; return BOOL; }
-   /* strings */
-'(\\.|''|[^'\n])*'   |
+/* strings */
+'(\\.|''|[^'\n])*' |
 \"(\\.|\"\"|[^"\n])*\"  { yylval.strval = strdup(yytext); return STRING; }
-'(\\.|[^'\n])*$      { yyerror("Unterminated string %s", yytext); }
+'(\\.|[^'\n])*$     { yyerror("Unterminated string %s", yytext); }
 \"(\\.|[^"\n])*$    { yyerror("Unterminated string %s", yytext); }
-   /* hex strings */
+/* hex strings */
 X'[0-9A-F]+' |
 0X[0-9A-F]+  { yylval.strval = strdup(yytext); return STRING; }
-   /* bit strings */
+/* bit strings */
 0B[01]+      |
 B'[01]+'     { yylval.strval = strdup(yytext); return STRING; }
 ```
 
 SQL numbers are similar to the numbers we’ve seen in previous chapters. The rules to scan them turn them into C integers or doubles and store them in the token values. Boolean values are true, false, and unknown, so they’re recognized as reserved words and returned as variations on a BOOL token.
 
-SQL strings are enclosed in single quotes, using a pair of quotes to represent a single quote in the string. MySQL extends this to add double-quoted strings, and `\x` escapes within strings. The first two string patterns match valid, quoted strings that don’t extend past a newline and return the string as the token value, remembering to make a copy since the value in `yytext` doesn’t stay around.[^ ‡]
+SQL strings are enclosed in single quotes, using a pair of quotes to represent a single quote in the string. MySQL extends this to add double-quoted strings, and `\x` escapes within strings. The first two string patterns match valid, quoted strings that don’t extend past a newline and return the string as the token value, remembering to make a copy since the value in `yytext` doesn’t stay around.
 
-[^ ‡]: MySQL actually accepts multiline strings, but we’re keeping this example simple.
+> MySQL actually accepts multiline strings, but we’re keeping this example simple.
 
-The next two patterns catch un-terminated strings and print a suitable diagnostic.
+The next two patterns catch unterminated strings and print a suitable diagnostic.
 
 The next four patterns match hex and binary strings, each of which can be written in two ways. A more realistic example would convert them to binary, but for our purposes we just return them as strings.
 
@@ -490,25 +493,25 @@ Next come the punctuation tokens, using the standard trick to match all of the s
 The last pieces to capture are functions and names:
 
 ```c
-        /* functions */
+/* functions */
 SUBSTR(ING)?/"(" { return FSUBSTRING; }
 TRIM/"("         { return FTRIM; }
 DATE_ADD/"("    { return FDATE_ADD; }
 DATE_SUB/"("    { return FDATE_SUB; }
-         /* check trailing context manually */
+/* check trailing context manually */
 COUNT    { int c = input(); unput(c);
            if(c == '(') return FCOUNT;
            yylval.strval = strdup(yytext);
            return NAME; }
-        /* names */
+/* names */
 [A-Za-z][A-Za-z0-9_]*   { yylval.strval = strdup(yytext);
                           return NAME; }
 `[^`/\\.\n]+`           { yylval.strval = strdup(yytext+1);
                           yylval.strval[yyleng-2] = 0;
                           return NAME; }
-`[^`\n]*$               { yyerror("unterminated quoted name %s", yytext); }
+`[^`\n]*$  { yyerror("unterminated quoted name %s", yytext); }
 
-  /* user variables */
+/* user variables */
 @[0-9a-z_.$]+ |
 @\"[^"\n]+\" |
 @`[^`\n]+` |
@@ -529,14 +532,14 @@ We also have some patterns to catch unclosed quoted user variable names. They en
 ### Comments and Miscellany
 
 ```c
-        /* comments */
+/* comments */
 #.*             ;
 "--"[ \t].*     ;
 "/*"            { oldstate = YY_START; BEGIN COMMENT; }
 <COMMENT>"*/"   { BEGIN oldstate; }
 <COMMENT>.|\n   ;
 <COMMENT><<EOF>> { yyerror("unclosed comment"); }
-        /* everything else */
+/* everything else */
 [ \t\n]         /* whitespace */
 .               { yyerror("mystery character '%c'", *yytext); }
 %%
@@ -581,9 +584,9 @@ The `%union` has four members, all of which we met in the lexer: integer and flo
 %token <intval> INTNUM
 %token <intval> BOOL
 %token <floatval> APPROXNUM
-       /* user @abc names */
+/* user @abc names */
 %token <strval> USERVAR
-       /* operators and precedence levels */
+/* operators and precedence levels */
 %right ASSIGN
 %left OR
 %left XOR
@@ -606,11 +609,11 @@ Next come token declarations, matching the tokens used in the lexer. Like C, MyS
 ```c
 %token ADD
 %token ALL
- ...
+...
 %token ESCAPED
 %token <subtok> EXISTS /* NOT EXISTS or EXISTS */
- ...
- /* functions with special syntax */
+...
+/* functions with special syntax */
 %token FSUBSTRING
 %token FTRIM
 %token FDATE_ADD FDATE_SUB
@@ -652,8 +655,7 @@ The top level is just a list of statements with each terminated by a semicolon, 
 Before we define the syntax for specific statements, we’ll define the syntax of MySQL expressions, which are an extended version of the expressions familiar from languages like C and Fortran.
 
 ```c
-   /**** expressions ****/
-
+/**** expressions ****/
 expr: NAME         { emit("NAME %s", $1); free($1); }
    | NAME '.' NAME { emit("FIELDNAME %s.%s", $1, $3); free($1); free($3); }
    | USERVAR       { emit("USERVAR %s", $1); free($1); }
@@ -684,16 +686,16 @@ expr: expr '+' expr { emit("ADD"); }
    | NOT expr { emit("NOT"); }
    | '!' expr { emit("NOT"); }
    | expr COMPARISON expr { emit("CMP %d", $2); }
-      /* recursive selects and comparisons thereto */
+   /* recursive selects and comparisons thereto */
    | expr COMPARISON '(' select_stmt ')' { emit("CMPSELECT %d", $2); }
    | expr COMPARISON ANY '(' select_stmt ')' { emit("CMPANYSELECT %d", $2); }
    | expr COMPARISON SOME '(' select_stmt ')' { emit("CMPANYSELECT %d", $2); }
    | expr COMPARISON ALL '(' select_stmt ')' { emit("CMPALLSELECT %d", $2); }
    ;
-expr:  expr IS NULLX     { emit("ISNULL"); }
-   |   expr IS NOT NULLX { emit("ISNULL"); emit("NOT"); }
-   |   expr IS BOOL      { emit("ISBOOL %d", $3); }
-   |   expr IS NOT BOOL  { emit("ISBOOL %d", $4); emit("NOT"); }
+expr:expr IS NULLX     { emit("ISNULL"); }
+   | expr IS NOT NULLX { emit("ISNULL"); emit("NOT"); }
+   | expr IS BOOL      { emit("ISBOOL %d", $3); }
+   | expr IS NOT BOOL  { emit("ISBOOL %d", $4); emit("NOT"); }
    | USERVAR ASSIGN expr { emit("ASSIGN @%s", $1); free($1); }
    ;
 expr: expr BETWEEN expr AND expr %prec BETWEEN { emit("BETWEEN"); }
@@ -710,6 +712,8 @@ SQL has some postfix operators including `IS NULL`, `IS TRUE`, and `IS FALSE`, a
 
 The syntactically unusual `BETWEEN ... AND` operator tests a value against two limits. It needed a lexical hack, described earlier, because of the ambiguity between the `AND` in this operator and the logical operation `AND`. (Like all hacks, this one isn’t totally satisfactory, but it will do.) Since bison’s precedence rules normally use the precedence of the rightmost token in a rule, we need a `%prec` to tell it to use `BETWEEN`’s precedence.
 
+
+
 ```c
 val_list: expr { $$ = 1; }
    | expr ',' val_list { $$ = 1 + $3; }
@@ -717,9 +721,9 @@ val_list: expr { $$ = 1; }
 opt_val_list: /* nil */ { $$ = 0 }
    | val_list
    ;
-expr: expr IN '(' val_list ')'       { emit("ISIN %d", $4); }
+expr:expr     IN '(' val_list ')'    { emit("ISIN %d", $4); }
    | expr NOT IN '(' val_list ')'    { emit("ISIN %d", $5); emit("NOT"); }
-   | expr IN '(' select_stmt ')'     { emit("CMPANYSELECT 4"); }
+   | expr     IN '(' select_stmt ')' { emit("CMPANYSELECT 4"); }
    | expr NOT IN '(' select_stmt ')' { emit("CMPALLSELECT 3"); }
    | EXISTS '(' select_stmt ')'      { emit("EXISTSSELECT"); if($1)emit("NOT"); }
    ;
@@ -727,7 +731,7 @@ expr: expr IN '(' val_list ')'       { emit("ISIN %d", $4); }
 
 The next set of operators uses variable-length lists of expressions (called lists of values or `val_lists` in the MySQL manual). In Chapter 3 we built trees to manage multiple expressions, but RPN makes the job considerably easier. Since an RPN interpreter evaluates each RPN value onto its internal stack, an operator that takes multiple values needs only to know how many values to pop off the stack. In our RPN code, such operators include an expression count.
 
-This means the bison rules to parse the variable-length lists need only maintain a count of how many expressions they’ve parsed, which we keep as the value of the list’s LHS symbol, in this case `val_list`. A single element list has length 1, and at each stage, a multi-element list has one more element than its `sublist`. There are some constructs where the list of values is optional, so an `opt_val_list` is either empty, with a count value of zero, or a `val_list` with a count value of whatever the `val_list` had. (Remember the default action `$$ = $1` for rules with no explicit action.)
+This means the bison rules to parse the variable-length lists need only maintain a count of how many expressions they’ve parsed, which we keep as the value of the list’s LHS symbol, in this case `val_list`. A single element list has length 1, and at each stage, a multi-element list has one more element than its sublist. There are some constructs where the list of values is optional, so an `opt_val_list` is either empty, with a count value of zero, or a `val_list` with a count value of whatever the `val_list` had. (Remember the default action `$$ = $1` for rules with no explicit action.)
 
 Once we have the lists, we can parse the `IN` and `NOT IN` operators that test whether an expression is or isn’t in a list of values. Note that the emitted code includes the count of values. SQL also has a variant form where the values come from a `SELECT` statement.
 
@@ -738,10 +742,10 @@ For these statements, `IN` and `NOT IN` are equivalent to `= ANY` and `!= ALL`, 
 SQL has a limited set of functions that MySQL greatly extends. Parsing normal function calls is very simple, since we can use the `opt_val_list` rule and the RPN is `CALL` with the number of arguments, but the parsing is made much more complex by several functions that have their own quirky optional syntax.
 
 ```c
-  /* regular functions */
+/* regular functions */
 expr: NAME '(' opt_val_list ')' {  emit("CALL %d %s", $3, $1); free($1); }
    ;
-  /* functions with special syntax */
+/* functions with special syntax */
 expr: FCOUNT '(' '*' ')' { emit("COUNTALL") }
    | FCOUNT '(' expr ')' { emit(" CALL 1 COUNT"); }
 expr: FSUBSTRING '(' val_list ')'               {  emit("CALL %d SUBSTR", $3); }
@@ -796,69 +800,84 @@ expr: expr LIKE expr { emit("LIKE"); }
 expr: expr REGEXP expr { emit("REGEXP"); }
    | expr NOT REGEXP expr { emit("REGEXP"); emit("NOT"); }
    ;
-expr: CURRENT_TIMESTAMP { emit("NOW") };
-   | CURRENT_DATE       { emit("NOW") };
-   | CURRENT_TIME       { emit("NOW") };
+expr: CURRENT_TIMESTAMP { emit("NOW") }
+   | CURRENT_DATE       { emit("NOW") }
+   | CURRENT_TIME       { emit("NOW") }
    ;
 expr: BINARY expr %prec UMINUS { emit("STRTOBIN"); }
    ;
 ```
 
-The `CASE` statement comes in two forms. In the first, `CASE` is followed by a value that is compared against a list of test values with an expression value for each test, and an optional `ELSE` default, as in `CASE a WHEN 100 THEN 1 WHEN 200 THEN 2 ELSE 3 END`. The other is just a list of conditional expressions, as in `CASE WHEN a=100 THEN 1 WHEN a=200 THEN 2 END`. We have a rule `case_list` that builds up a list of `WHEN/THEN` expression pairs and then uses it in four variants of `CASE`, each of the two versions with and without `ELSE`. The RPN is `CASEVAL` or `CASE` for the versions with or without an initial value, with a count of `WHEN/THEN` pairs and `1` or `0` if there’s an `ELSE` value. The `LIKE` and `REGEXP` operators do forms of pattern matching. They’re basically binary operators except that they permit a preceding `NOT` to reverse the sense of the test. Finally, there are three versions of the keyword for the current time, as well as a unary `BINARY` operator that coerces an expression to be treated as binary rather than text data.
+The `CASE` statement comes in two forms. In the first, `CASE` is followed by a value that is compared against a list of test values with an expression value for each test, and an optional `ELSE` default, as in
+
+```sql
+CASE a WHEN 100 THEN 1 WHEN 200 THEN 2 ELSE 3 END
+```
+
+. The other is just a list of conditional expressions, as in
+
+```sql
+CASE WHEN a=100 THEN 1 WHEN a=200 THEN 2 END
+```
+
+. We have a rule `case_list` that builds up a list of `WHEN/THEN` expression pairs and then uses it in four variants of `CASE`, each of the two versions with and without `ELSE`. The RPN is `CASEVAL` or `CASE` for the versions with or without an initial value, with a count of `WHEN/THEN` pairs and `1` or `0` if there’s an `ELSE` value. The `LIKE` and `REGEXP` operators do forms of pattern matching. They’re basically binary operators except that they permit a preceding `NOT` to reverse the sense of the test. Finally, there are three versions of the keyword for the current time, as well as a unary `BINARY` operator that coerces an expression to be treated as binary rather than text data.
 
 ### Select Statements
 
 By far the most complex statement in SQL is `SELECT`, which retrieves data from SQL tables and summaries and manipulates it. We deal with it first because it will use several subrules that we can reuse when parsing other statements.
 
 ```c
-   /* statements: select statement */
+/* statements: select statement */
 stmt: select_stmt { emit("STMT"); }
    ;
 select_stmt: SELECT select_opts select_expr_list // simple select with no tables
-                        { emit("SELECTNODATA %d %d", $2, $3); } ;
-    | SELECT select_opts select_expr_list // select with tables
+                        { emit("SELECTNODATA %d %d", $2, $3); }
+   | SELECT select_opts select_expr_list // select with tables
      FROM table_references
      opt_where opt_groupby opt_having opt_orderby opt_limit
-     opt_into_list { emit("SELECT %d %d %d", $2, $3, $5); } ;
+     opt_into_list { emit("SELECT %d %d %d", $2, $3, $5); }
 ;
 ```
 
-The first rule says that a `select_stmt` is a kind of statement, and it emits an RPN STMT as a delimiter between statements. The syntax of `SELECT` lists the expressions that SQL needs to calculate for each record (aka tuple) it retrieves, lists an optional (but usual) `FROM` with the tables containing the data for the expressions, and lists optional qualifiers such as `WHERE`, `GROUP BY`, and `HAVING` that limit, combine, and sort the records retrieved.
+The first rule says that a `select_stmt` is a kind of statement, and it emits an RPN `STMT` as a delimiter between statements. The syntax of `SELECT` lists the expressions that SQL needs to calculate for each record (aka tuple) it retrieves, lists an optional (but usual) `FROM` with the tables containing the data for the expressions, and lists optional qualifiers such as `WHERE`, `GROUP BY`, and `HAVING` that limit, combine, and sort the records retrieved.
 
 Each qualifier has its own rules.
 
 ```c
 opt_where: /* nil */
-   | WHERE expr { emit("WHERE"); };
+   | WHERE expr { emit("WHERE"); }
+;
 opt_groupby: /* nil */
    | GROUP BY groupby_list opt_with_rollup
                              { emit("GROUPBYLIST %d %d", $3, $4); }
 ;
 groupby_list: expr opt_asc_desc
-                             { emit("GROUPBY %d",  $2); $$ = 1; }
+                             { emit("GROUPBY %d", $2); $$ = 1; }
    | groupby_list ',' expr opt_asc_desc
-                             { emit("GROUPBY %d",  $4); $$ = $1 + 1; }
+                             { emit("GROUPBY %d", $4); $$ = $1 + 1; }
    ;
 opt_asc_desc: /* nil */ { $$ = 0; }
    | ASC                { $$ = 0; }
    | DESC               { $$ = 1; }
-    ;
+   ;
 opt_with_rollup: /* nil */  { $$ = 0; }
    | WITH ROLLUP  { $$ = 1; }
    ;
 opt_having: /* nil */
-   | HAVING expr { emit("HAVING"); };
+   | HAVING expr { emit("HAVING"); }
+;
 opt_orderby: /* nil */
    | ORDER BY groupby_list { emit("ORDERBY %d", $3); }
    ;
-opt_limit: /* nil */ | LIMIT expr { emit("LIMIT 1"); }
-  | LIMIT expr ',' expr             { emit("LIMIT 2"); }
+opt_limit: /* nil */ 
+  | LIMIT expr          { emit("LIMIT 1"); }
+  | LIMIT expr ',' expr { emit("LIMIT 2"); }
   ;
 opt_into_list: /* nil */
-   | INTO column_list { emit("INTO %d", $2); }
+   | INTO column_list   { emit("INTO %d", $2); }
    ;
-column_list: NAME { emit("COLUMN %s", $1); free($1); $$ = 1; }
-  | column_list ',' NAME  { emit("COLUMN %s", $3); free($3); $$ = $1 + 1; }
+column_list:        NAME { emit("COLUMN %s", $1); free($1); $$ = 1; }
+  | column_list ',' NAME { emit("COLUMN %s", $3); free($3); $$ = $1 + 1; }
   ;
 ```
 
@@ -873,25 +892,32 @@ The `INTO` operator takes a plain list of names, which we call a `column_list`, 
 Now we handle the initial options and the main list of expressions in a `SELECT`.
 
 ```c
-select_opts:                          { $$ = 0; }
+select_opts:  { $$ = 0; }
 | select_opts ALL
-   { if($1 & 01) yyerror("duplicate ALL option"); $$ = $1 | 01; }
+   { if($1 & 01) yyerror("duplicate ALL option");
+     $$ = $1 | 01; }
 | select_opts DISTINCT
-   { if($1 & 02) yyerror("duplicate DISTINCT option"); $$ = $1 | 02; }
+   { if($1 & 02) yyerror("duplicate DISTINCT option"); 
+     $$ = $1 | 02; }
 | select_opts DISTINCTROW
-   { if($1 & 04) yyerror("duplicate DISTINCTROW option"); $$ = $1 | 04; }
+   { if($1 & 04) yyerror("duplicate DISTINCTROW option"); 
+     $$ = $1 | 04; }
 | select_opts HIGH_PRIORITY
-   { if($1 & 010) yyerror("duplicate HIGH_PRIORITY option"); $$ = $1 | 010; }
+   { if($1 & 010) yyerror("duplicate HIGH_PRIORITY option"); 
+     $$ = $1 | 010; }
 | select_opts STRAIGHT_JOIN
-   { if($1 & 020) yyerror("duplicate STRAIGHT_JOIN option"); $$ = $1 | 020; }
+   { if($1 & 020) yyerror("duplicate STRAIGHT_JOIN option"); 
+     $$ = $1 | 020; }
 | select_opts SQL_SMALL_RESULT
-   { if($1 & 040) yyerror("duplicate SQL_SMALL_RESULT option"); $$ = $1 | 040; }
+   { if($1 & 040) yyerror("duplicate SQL_SMALL_RESULT option");
+     $$ = $1 | 040; }
 | select_opts SQL_BIG_RESULT
-   { if($1 & 0100) yyerror("duplicate SQL_BIG_RESULT option"); $$ = $1 | 0100; }
+   { if($1 & 0100) yyerror("duplicate SQL_BIG_RESULT option");
+     $$ = $1 | 0100; }
 | select_opts SQL_CALC_FOUND_ROWS
-   { if($1 & 0200) yyerror("duplicate SQL_CALC_FOUND_ROWS option"); $$ =
-   $1 | 0200; }
-    ;
+   { if($1 & 0200) yyerror("duplicate SQL_CALC_FOUND_ROWS option");
+     $$ = $1 | 0200; }
+;
 select_expr_list: select_expr { $$ = 1; }
     | select_expr_list ',' select_expr {$$ = $1 + 1; }
     | '*' { emit("SELECTALL"); $$ = 1; }
@@ -905,23 +931,23 @@ opt_as_alias: AS NAME { emit ("ALIAS %s", $2); free($2); }
 
 The options are flags that affect the way that a `SELECT` is handled. The rules about what options are compatible with each other are too complex to encode into the grammar, so we just accept any set of options and build up a bitmask of them, which also lets us diagnose duplicate options. (When options can occur in any order, there’s no good way to prevent duplicates in the grammar, and it’s generally easy to detect them yourself as we do here.)
 
-The `SELECT` expression list is a comma-separated list of expressions, each optionally followed by an `AS` clause to give the expression a name to use to refer to it elsewhere in the `SELECT` statement. We emit an `ALIAS` operator in the RPN. As a special case, `*` means all of the fields in the source records, for which we emit `SELECTALL`.
+The `SELECT` expression list is a comma-separated list of expressions, each optionally followed by an `AS` clause to give the expression a name to use to refer to it elsewhere in the `SELECT` statement. We emit an ALIAS operator in the RPN. As a special case, `*` means all of the fields in the source records, for which we emit `SELECTALL`.
 
 #### SELECT table references
 
 The most complex and powerful part of `SELECT`, and the most powerful part of SQL, is the way it can refer to multiple tables. In a `SELECT`, you can tell it to create conceptual joined tables built from data stored in many actual tables, either by explicit joins or by recursive `SELECT` statements. Since tables can be rather large, there are also ways to give it hints about how to do the joining efficiently.
 
 ```c
-table_references:    table_reference { $$ = 1; }
+table_references:          table_reference { $$ = 1; }
     | table_references ',' table_reference { $$ = $1 + 1; }
     ;
 table_reference:  table_factor
   | join_table
 ;
 table_factor:
-    NAME opt_as_alias index_hint { emit("TABLE %s", $1); free($1); }
+    NAME          opt_as_alias index_hint { emit("TABLE %s", $1); free($1); }
   | NAME '.' NAME opt_as_alias index_hint { emit("TABLE %s.%s", $1, $3);
-                               free($1); free($3); }
+                                            free($1); free($3); }
   | table_subquery opt_as NAME { emit("SUBQUERYAS %s", $3); free($3); }
   | '(' table_references ')' { emit("TABLEREFERENCES %d", $2); }
   ;
@@ -979,7 +1005,7 @@ table_subquery: '(' select_stmt ')' { emit("SUBQUERY"); }
    ;
 ```
 
-Although the grammar for the table sublanguage is long, it’s not all that complex, consisting mostly of lists of items and a lot of optional clauses. Each `table_reference` can be a `table_factor` (which is a plain table, a nested `SELECT`, or a parenthesized list) or else a `join_table`, an explicit join. A plain table reference is the name of the table, with or without the name of the database that contains it; an optional `AS` clause to give an alias name (a table can usefully appear more than once in the same `SELECT`, and this makes it possible to tell which instance an expression refers to); and an optional hint about which indexes to use, described in a moment.
+Although the grammar for the table sublanguage is long, it’s not all that complex, consisting mostly of lists of items and a lot of optional clauses. Each `table_reference` can be a `table_factor` (which is a plain table, a nested `SELECT`, or a parenthesized list) or else a `join_table`, an explicit join. A plain table reference is the name of the table, with or without the name of the database that contains it; an optional `AS` clause to give an alias name (a table can usefully appear more than once in the same `SELECT`, and this makes it possible to tell which instance an expression refers to); and an optional hint about which indexes to use~~, described in a moment~~.
 
 A nested `SELECT` is a `SELECT` statement in parentheses, which must have a name assigned, although the `AS` before the name is optional. A `table_factor` can also be a parenthesized list of `table_references`, which can be useful when creating joins.
 
@@ -994,17 +1020,17 @@ A join specifies the way to combine two groups of tables. Joins come in a variet
 
 In a `NATURAL` join, the join matches on fields with the same name, and in a regular join, if there are no fields listed, it creates a cross-product, joining every record in the first group with every record in the second group. In this latter case, the result is usually whittled down by a `WHERE` or `HAVING` clause. For all the various sorts of joins, we emit a `JOIN` operator with subfields describing the exact kind of join.
 
-Note the separate rules `table_factor` and `table_reference`. They’re separate to set the associativity of `JOIN` operators and resolve the ambiguity in an expression like a `JOIN b JOIN c`, which means `(a JOIN b) JOIN c` rather than `a JOIN (b JOIN c)`. In the `join_table` rule, there’s a `table_reference` on the left side of each join and `table_factor` on the right, making the syntax left associative. Since a `table_factor` can be a parenthesized `table_reference`, you can use parentheses if that’s not what you want. In this case, we could have made everything a `table_reference` and used precedence to resolve the ambiguity, but this syntax comes directly from the SQL standard, and there seemed to be no reason to change it.
+Note the separate rules `table_factor` and `table_reference`. They’re separate to set the associativity of `JOIN` operators and resolve the ambiguity in an expression like `a JOIN b JOIN c`, which means `(a JOIN b) JOIN c` rather than `a JOIN (b JOIN c)`. In the `join_table` rule, there’s a `table_reference` on the left side of each join and `table_factor` on the right, making the syntax left associative. Since a `table_factor` can be a parenthesized `table_reference`, you can use parentheses if that’s not what you want. In this case, we could have made everything a `table_reference` and used precedence to resolve the ambiguity, but this syntax comes directly from the SQL standard, and there seemed to be no reason to change it.
 
 ### Delete Statement
 
 Once we have the `SELECT` statement under control, the other data manipulation statements are easy to parse. `DELETE` deletes records from a table, with the records to delete chosen using a `WHERE` clause identical to the `WHERE` clause in a `SELECT` or chosen from a group of tables also specified the same as in a `SELECT`.
 
 ```c
-   /* statements: delete statement */
+/* statements: delete statement */
 stmt: delete_stmt { emit("STMT"); }
    ;
-   /* single table delete */
+/* single table delete */
 delete_stmt: DELETE delete_opts FROM NAME
     opt_where opt_orderby opt_limit
                   { emit("DELETEONE %d %s", $2, $4); free($4); }
@@ -1019,7 +1045,7 @@ delete_opts: delete_opts LOW_PRIORITY { $$ = $1 + 01; }
 The `DELETE` statement reuses several rules we wrote for `SELECT`: `opt_where` for an optional `WHERE` clause, `opt_orderby` for an optional `ORDER BY` clause, and `opt_limit` for an optional `LIMIT` clause. Since the rules for each of those clauses emits its own RPN, we only have to write rules for some keywords specific to `DELETE`, `QUICK`, and `IGNORE`, and for the `DELETE` statement itself.
 
 ```c
-   /* multitable delete, first version */
+/* multitable delete, first version */
 delete_stmt: DELETE delete_opts
     delete_list
     FROM table_references opt_where
@@ -1029,7 +1055,7 @@ delete_list: NAME opt_dot_star { emit("TABLE %s", $1); free($1); $$ = 1; }
             { emit("TABLE %s", $3); free($3); $$ = $1 + 1; }
    ;
 opt_dot_star: /* nil */ | '.' '*' ;
-   /* multitable delete, second version */
+/* multitable delete, second version */
 delete_stmt: DELETE delete_opts
     FROM delete_list
     USING table_references opt_where
@@ -1037,15 +1063,18 @@ delete_stmt: DELETE delete_opts
 ;
 ```
 
-There are two different syntaxes for multitable DELETEs, to be compatible with various other implementations of SQL. One lists the tables followed by `FROM` and the `table_references`; the other says `FROM`, the list of tables, `USING`, and the `table_references`. Bison deals easily with these variants, and we emit the same RPN for both. The `delete_list` has a little optional “syntactic sugar,” letting you specify the table from which records are to be deleted as `name.*`, as well as plain name, to remind readers that all of the fields in each record are deleted.
+There are two different syntaxes for multi-table DELETEs, to be compatible with various other implementations of SQL. One lists the tables followed by `FROM` and the `table_references`; the other says `FROM`, the list of tables, `USING`, and the `table_references`. Bison deals easily with these variants, and we emit the same RPN for both. The `delete_list` has a little optional “syntactic sugar,” letting you specify the table from which records are to be deleted as `name.*`, as well as plain name, to remind readers that all of the fields in each record are deleted.
 
 ### Insert and Replace Statements
 
 The `INSERT` and `REPLACE` statements add records to a table. The only difference between them is that if the primary key fields in a new record have the same values as an existing record, `INSERT` fails with an error unless there’s an `ON DUPLICATE KEY` clause, while `REPLACE` replaces the existing record. `INSERT`, like `DELETE`, has two equivalent variant forms to insert new data, and it has a third form that inserts records created by a `SELECT`.
 
+```sql
+INSERT INTO a(b,c) values (1,2),(3,DEFAULT)
+```
+
 ```c
-   INSERT INTO a(b,c) values (1,2),(3,DEFAULT)
-   /* statements: insert statement */
+/* statements: insert statement */
 stmt: insert_stmt { emit("STMT"); }
    ;
 insert_stmt: INSERT insert_opts opt_into NAME
@@ -1079,14 +1108,14 @@ insert_vals:
 
 The first form specifies the name of the table and the list of fields to be provided (all of them if not specified), then specifies `VALUES`, and finally specifies lists of values. This form can insert multiple records, so the rule `insert_vals` matches the fields for one record enclosed in parentheses and `insert_vals_list` matches multiple comma-separated sets of fields. Each field value can be an expression or the keyword `DEFAULT`. There are a few optional keywords to control the details of the insert.
 
-The `opt_ondupupdate` rule handles the `ON DUPLICATE` clause, which gives a list of fields to change if an inserted record would have had a duplicate key. Since the syntax is `SET field=value` and `=` is scanned as a COMPARISON operator, we accept COMPARISON and check in our code to be sure that it’s an equal sign and not something else.[^ §]
+The `opt_ondupupdate` rule handles the `ON DUPLICATE` clause, which gives a list of fields to change if an inserted record would have had a duplicate key. Since the syntax is `SET field=value` and `=` is scanned as a COMPARISON operator, we accept COMPARISON and check in our code to be sure that it’s an equal sign and not something else.
 
-[^ §]: This could fairly be considered a kludge, but the alternative would be to treat `=` separately from the other comparison operators and add an extra rule every place a comparison can occur, which would result in more code.
+> This could fairly be considered a kludge, but the alternative would be to treat `=` separately from the other comparison operators and add an extra rule every place a comparison can occur, which would result in more code.
 
 Note that `ONDUPLICATE` is one token; in the lexer we treat the two words as one token to avoid ambiguity with `ON` clauses in nested SELECTs.
 
 ```sql
-   INSERT INTO a SET b=1, c=2
+INSERT INTO a SET b=1, c=2
 ```
 
 ```c
@@ -1101,19 +1130,21 @@ insert_asgn_list:
        emit("ASSIGN %s", $1); free($1); $$ = 1; }
    | NAME COMPARISON DEFAULT
        { if ($2 != 4) { yyerror("bad insert assignment to %s", $1); YYERROR; }
-                 emit("DEFAULT"); emit("ASSIGN %s", $1); free($1); $$ = 1; }
+         emit("DEFAULT"); emit("ASSIGN %s", $1); free($1); $$ = 1; }
    | insert_asgn_list ',' NAME COMPARISON expr
        { if ($4 != 4) { yyerror("bad insert assignment to %s", $1); YYERROR; }
-                 emit("ASSIGN %s", $3); free($3); $$ = $1 + 1; }
+         emit("ASSIGN %s", $3); free($3); $$ = $1 + 1; }
    | insert_asgn_list ',' NAME COMPARISON DEFAULT
        { if ($4 != 4) { yyerror("bad insert assignment to %s", $1); YYERROR; }
-                 emit("DEFAULT"); emit("ASSIGN %s", $3); free($3); $$ = $1 + 1; }
+         emit("DEFAULT"); emit("ASSIGN %s", $3); free($3); $$ = $1 + 1; }
    ;
 ```
 
 The second form uses an assignment syntax similar to the one for `ON DUPLICATE`. We have to check that the COMPARISON is really an `=`. If not, we produce an error message by calling `yyerror()`, and then we tell the parser to start error recovery with `YYERROR`.
 
-(In this version of the parser there’s no error recovery, but see Chapter 8.) This form uses same optional `ON DUPLICATE` syntax at the end of the statement, so we use the same rule.
+~~(In this version of the parser there’s no error recovery, but see Chapter 8.)~~ 
+
+This form uses same optional `ON DUPLICATE` syntax at the end of the statement, so we use the same rule.
 
 ```sql
    INSERT into a(b,c) SELECT x,y FROM z where x < 12
@@ -1133,7 +1164,7 @@ The third form of `INSERT` uses data from a `SELECT` statement to create new rec
 The syntax of the `REPLACE` statement is just like `INSERT`, so the rules for it are the same too, changing `INSERT` to `REPLACE` and renaming the top-level rules.
 
 ```c
-   /** replace just like insert **/
+/** replace just like insert **/
 stmt: replace_stmt { emit("STMT"); }
    ;
 replace_stmt: REPLACE insert_opts opt_into NAME
@@ -1156,35 +1187,34 @@ replace_stmt: REPLACE insert_opts opt_into NAME opt_col_names
 
 The `UPDATE` statement changes fields in existing records. Again, its syntax lets us reuse rules from previous statements.
 
-```sql
+```c
 /** update **/
 stmt: update_stmt { emit("STMT"); }
-   ;
+;
 update_stmt: UPDATE update_opts table_references
     SET update_asgn_list
     opt_where
     opt_orderby
-opt_limit { emit("UPDATE %d %d %d", $2, $3, $5); }
+    opt_limit { emit("UPDATE %d %d %d", $2, $3, $5); }
 ;
 update_opts: /* nil */ { $$ = 0; }
-   | insert_opts LOW_PRIORITY { $$ = $1 | 01 ; }
-   | insert_opts IGNORE { $$ = $1 | 010 ; }
-   ;
+| insert_opts LOW_PRIORITY { $$ = $1 | 01 ; }
+| insert_opts IGNORE { $$ = $1 | 010 ; }
+;
 update_asgn_list:
-     NAME COMPARISON expr
-     { if ($2 != 4) { yyerror("bad update assignment to %s", $1); YYERROR; }
-     emit("ASSIGN %s", $1); free($1); $$ = 1; }
-   | NAME '.' NAME COMPARISON expr
-       { if ($4 != 4) { yyerror("bad update assignment to %s", $1); YYERROR; }
-     emit("ASSIGN %s.%s", $1, $3); free($1); free($3); $$ = 1; }
-   | update_asgn_list ',' NAME COMPARISON expr
-       { if ($4 != 4) { yyerror("bad update assignment to %s", $3); YYERROR; }
-     emit("ASSIGN %s.%s", $3); free($3); $$ = $1 + 1; }
-   | update_asgn_list ',' NAME '.' NAME COMPARISON expr
-       { if ($6 != 4) { yyerror("bad update  assignment to %s.$s", $3, $5);
-          YYERROR; }
-         emit("ASSIGN %s.%s", $3, $5); free($3); free($5); $$ = 1; }
-   ;
+NAME COMPARISON expr
+{ if ($2 != 4) { yyerror("bad update assignment to %s", $1); YYERROR; }
+  emit("ASSIGN %s", $1); free($1); $$ = 1; }
+| NAME '.' NAME COMPARISON expr
+{ if ($4 != 4) { yyerror("bad update assignment to %s", $1); YYERROR; }
+  emit("ASSIGN %s.%s", $1, $3); free($1); free($3); $$ = 1; }
+| update_asgn_list ',' NAME COMPARISON expr
+{ if ($4 != 4) { yyerror("bad update assignment to %s", $3); YYERROR; }
+  emit("ASSIGN %s.%s", $3); free($3); $$ = $1 + 1; }
+| update_asgn_list ',' NAME '.' NAME COMPARISON expr
+{ if ($6 != 4) { yyerror("bad update  assignment to %s.$s", $3, $5); YYERROR; }
+  emit("ASSIGN %s.%s", $3, $5); free($3); free($5); $$ = 1; }
+;
 ```
 
 `UPDATE` has its own set of options in the `update_opts` rule. The list of assignments after `SET` is similar to the one in `INSERT`, but it allows qualified table names since you can update more than one table at a time, and it doesn’t have the default option in `INSERT`, so we have a similar but different `update_asgn_list`. `INSERT` uses the same `opt_where` and `opt_orderby` to limit and sort the records updated.
@@ -1208,7 +1238,7 @@ create_database_stmt:
 opt_if_not_exists:  /* nil */ { $$ = 0; }
    | IF EXISTS
        { if(!$2) { yyerror("IF EXISTS doesn't exist"); YYERROR; }
-                        $$ = $2; /* NOT EXISTS hack */ }
+         $$ = $2; /* NOT EXISTS hack */ }
    ;
 ```
 
@@ -1229,36 +1259,38 @@ create_table_stmt: CREATE opt_temporary TABLE opt_if_not_exists NAME
    ;
 create_table_stmt: CREATE opt_temporary TABLE opt_if_not_exists NAME '.' NAME
    '(' create_col_list ')' { emit("CREATE %d %d %d %s.%s", $2, $4, $9, $5, $7);
-                          free($5); free($7); }
+                             free($5); free($7); }
    ;
 create_table_stmt: CREATE opt_temporary TABLE opt_if_not_exists NAME
    '(' create_col_list ')'
 create_select_statement { emit("CREATESELECT %d %d %d %s", $2, $4, $7, $5); free($5); }
-    ;
+   ;
 create_table_stmt: CREATE opt_temporary TABLE opt_if_not_exists NAME
    create_select_statement { emit("CREATESELECT %d %d 0 %s", $2, $4, $5); free($5); }
-    ;
+   ;
 create_table_stmt: CREATE opt_temporary TABLE opt_if_not_exists NAME '.' NAME
    '(' create_col_list ')'
    create_select_statement  { emit("CREATESELECT %d %d 0 %s.%s", $2, $4, $5, $7);
                               free($5); free($7); }
-    ;
+   ;
 create_table_stmt: CREATE opt_temporary TABLE opt_if_not_exists NAME '.' NAME
    create_select_statement { emit("CREATESELECT %d %d 0 %s.%s", $2, $4, $5, $7);
-                          free($5); free($7); }
-    ;
-opt_temporary:   /* nil */ { $$ = 0; }
+                             free($5); free($7); }
+   ;
+opt_temporary: /* nil */ { $$ = 0; }
    | TEMPORARY { $$ = 1;}
    ;
 ```
 
-The heart of a `CREATE DATABASE` statement is the list of columns, or more precisely the list of `create_definitions`, which includes both columns and indexes. The indexes can be the `PRIMARY KEY`, which means that it’s unique for each record; a regular `INDEX` (also called `KEY`); or a `FULLTEXT` index, which indexes individual words in the data. Each of those takes a list of column names, for which we once again reuse the `column_list` rule we defined for SELECT.
+
+
+The heart of a CREATE DATABASE statement is the list of columns, or more precisely the list of `create_definitions`, which includes both columns and indexes. The indexes can be the `PRIMARY KEY`, which means that it’s unique for each record; a regular `INDEX` (also called `KEY`); or a `FULLTEXT` index, which indexes individual words in the data. Each of those takes a list of column names, for which we once again reuse the `column_list` rule we defined for SELECT.
 
 ```c
 create_col_list: create_definition { $$ = 1; }
     | create_col_list ',' create_definition { $$ = $1 + 1; }
     ;
-create_definition: PRIMARY KEY '(' column_list ')'    { emit("PRIKEY %d", $4); }
+create_definition: PRIMARY KEY '(' column_list ')' { emit("PRIKEY %d", $4); }
     | KEY '(' column_list ')'            { emit("KEY %d", $3); }
     | INDEX '(' column_list ')'          { emit("KEY %d", $3); }
     | FULLTEXT INDEX '(' column_list ')' { emit("TEXTINDEX %d", $4); }
@@ -1266,7 +1298,9 @@ create_definition: PRIMARY KEY '(' column_list ')'    { emit("PRIKEY %d", $4); }
     ;
 ```
 
-Each definition is bracketed by an RPN `STARTCOL` operator since the set of per-column options is large; this delimits each column’s options. The column itself is the name of the column, the data type, and the optional attributes, such as whether the column can contain null values, what its default value is, and whether it’s a key. (Declaring a column to be a key is equivalent to creating an index on the column.) For the attributes, we emit an `ATTR` operator for each one and count the number of attributes. The code here doesn’t check for duplicates, but we could do so by making the value of `column_atts` a structure with both a count and a bitmask and checking the bitmask as we did earlier in SELECT options.
+
+
+Each definition is bracketed by an RPN `STARTCOL` operator since the set of per-column options is large; this delimits each column’s options. The column itself is the name of the column, the data type, and the optional attributes, such as whether the column can contain null values, what its default value is, and whether it’s a key. (Declaring a column to be a key is equivalent to creating an index on the column.) For the attributes, we emit an ATTR operator for each one and count the number of attributes. The code here doesn’t check for duplicates, but we could do so by making the value of `column_atts` a structure with both a count and a bitmask and checking the bitmask as we did earlier in SELECT options.
 
 ```c
 create_definition: { emit("STARTCOL"); } NAME data_type column_atts
@@ -1367,14 +1401,14 @@ opt_ignore_replace: /* nil */ { $$ = 0; }
 The last statement we parse is a `SET` statement, which is a MySQL extension that sets user variables. The assignment can use either `:=`, which we call `ASSIGN`, or a plain `=` sign, checking as always to be sure it’s not some other comparison operator.
 
 ```c
-   /**** set user variables ****/
+/**** set user variables ****/
 stmt: set_stmt { emit("STMT"); }
    ;
 set_stmt: SET set_list ;
 set_list: set_expr | set_list ',' set_expr ;
 set_expr:
       USERVAR COMPARISON expr { if ($2 != 4) { yyerror("bad set to @%s", $1); YYERROR; }
-                 emit("SET %s", $1); free($1); }
+                                emit("SET %s", $1); free($1); }
     | USERVAR ASSIGN expr { emit("SET %s", $1); free($1); }
     ;
 ```
@@ -1390,40 +1424,40 @@ The `yyerror` and main routines should be familiar from the previous chapter. Th
 ```c
 %%
 void
-emit(char *s, ...)
+    emit(char *s, ...)
 {
-  extern yylineno;
-  va_list ap;
-  va_start(ap, s);
-  printf("rpn: ");
-  vfprintf(stdout, s, ap);
-  printf("\n");
+    extern yylineno;
+    va_list ap;
+    va_start(ap, s);
+    printf("rpn: ");
+    vfprintf(stdout, s, ap);
+    printf("\n");
 }
 void
-yyerror(char *s, ...)
+    yyerror(char *s, ...)
 {
-  extern yylineno;
-  va_list ap;
-  va_start(ap, s);
-  fprintf(stderr, "%d: error: ", yylineno);
-  vfprintf(stderr, s, ap);
-  fprintf(stderr, "\n");
+    extern yylineno;
+    va_list ap;
+    va_start(ap, s);
+    fprintf(stderr, "%d: error: ", yylineno);
+    vfprintf(stderr, s, ap);
+    fprintf(stderr, "\n");
 }
 main(int ac, char **av)
 {
-  extern FILE *yyin;
-  if(ac > 1 && !strcmp(av[1], "-d")) {
-    yydebug = 1; ac--; av++;
-  }
-  if(ac > 1 && (yyin = fopen(av[1], "r")) == NULL) {
-    perror(av[1]);
-    exit(1);
-  }
-  if(!yyparse())
-    printf("SQL parse worked\n");
-  else
-    printf("SQL parse failed\n");
-} /* main */
+    extern FILE *yyin;
+    if(ac > 1 && !strcmp(av[1], "-d")) {
+        yydebug = 1; ac--; av++;
+    }
+    if(ac > 1 && (yyin = fopen(av[1], "r")) == NULL) {
+        perror(av[1]);
+        exit(1);
+    }
+    if(!yyparse())
+        printf("SQL parse worked\n");
+    else
+        printf("SQL parse failed\n");
+}
 ```
 
 ## The Makefile for the SQL Parser
