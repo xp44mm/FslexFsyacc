@@ -415,10 +415,10 @@ The next thing showing may be a rule instead of a token:
 start: x1
      | x2
      | y R ;
-x1:   A R ;
-x2:   A z ;
-y:    A ;
-z:    R ;
+x1: A R ;
+x2: A z ;
+y:  A ;
+z:  R ;
 ```
 
 Bison reports several conflicts, including this one:
@@ -563,19 +563,21 @@ The state with a conflict is as follows:
 state 5
     2 expr: expr @ '-' expr
     2     | expr '-' expr @
-    '-'  shift, and go to state 4
-    '-'       [reduce using rule 2 (expr)]
-    $default  reduce using rule 2 (expr)
+    '-'      shift, and go to state 4
+    '-'      [reduce using rule 2 (expr)]
+    $default reduce using rule 2 (expr)
 ```
 
 Bison tells us that there is a shift/reduce conflict when it reads the minus token. We can add our pointers to get the following:
 
 ```js
-expr: expr @ '-' expr ;
-expr: expr '-' expr @ ;
+1 expr: expr @ '-' expr   ;
+2 expr: expr   '-' expr @ ;
 ```
 
-These are in the same rule, not even different alternatives with the same LHS. You can have a state where your pointers can be in two different places in the same rule, because the grammar is recursive. (In fact, all of the examples in this section are recursive. Most tricky bison problems turn out to involve recursive rules.)
+These are in the same rule, not even different alternatives with the same LHS. You can have a state where your pointers can be in two different places in the same rule, because the grammar is recursive. 
+
+> (In fact, all of the examples in this section are recursive. Most tricky bison problems turn out to involve recursive rules.)
 
 After accepting two `expr`s and `-`, the pointer is at the end of rule `expr`, as shown in the second line of the earlier pointer example. But `expr - expr` is also an `expr`, so the pointer can also be just after the first `expr`, as shown in the first line of the earlier example. If the next token is not `-`, then the pointer in the first line disappears because it wants `-` next, so you are back to one pointer. But if the next token is `-`, then the second line wants to reduce, and the first line wants to shift, causing a conflict.
 
@@ -591,13 +593,13 @@ The middle `expr` might be the second `expr` of an `expr - expr`, in which case 
 (expr - expr) - expr
 ```
 
-which is left associative, or might be the first `expr`, in which case the input is interpreted as follows:
+which is **left associative**, or might be the first `expr`, in which case the input is interpreted as follows:
 
 ```c
 expr - (expr - expr)
 ```
 
-which is right associative. After reading `expr - expr`, the parser could reduce if using left associativity or shift using right associativity. If not instructed to prefer one or the other, this ambiguity causes a shift/reduce conflict, which bison resolves by choosing the shift. Figure 7-1 shows the two possible parses.
+which is **right associative**. After reading `expr - expr`, the parser could reduce if using left associativity or shift using right associativity. If not instructed to prefer one or the other, this ambiguity causes a shift/reduce conflict, which bison resolves by choosing the shift. Figure 7-1 shows the two possible parses.
 
 Later in this chapter, we cover the ways to handle this kind of conflict.
 
@@ -618,20 +620,20 @@ Bison complains:
 
 ```js
 State 9 conflicts: 1 shift/reduce
-  ...
+
 state 9
     1 stmt: IF '(' cond ')' stmt @
     2     | IF '(' cond ')' stmt @ ELSE stmt
-    ELSE  shift, and go to state 10
-    ELSE      [reduce using rule 1 (stmt)]
-    $default  reduce using rule 1 (stmt)
+    ELSE     shift, and go to state 10
+    ELSE     [reduce using rule 1 (stmt)]
+    $default reduce using rule 1 (stmt)
 ```
 
 In terms of pointers this is as follows:
 
 ```js
-stmt: IF ( cond ) stmt @ ;
-stmt: IF ( cond ) stmt @ ELSE stmt ;
+1 stmt: IF '(' cond ')' stmt @ ;
+2 stmt: IF '(' cond ')' stmt @ ELSE stmt ;
 ```
 
 The first line is the reduce part of the conflict, and the second is the shift part. This time they are different rules with the same LHS. To figure out what is going wrong, we check to see where the first line reduces to. It has to be a call to `stmt`, followed by an `ELSE`.
@@ -639,31 +641,31 @@ The first line is the reduce part of the conflict, and the second is the shift p
 There is only one place where that happens:
 
 ```js
-stmt: IF ( cond ) stmt /*<return to here>*/ ELSE stmt ;
+stmt: IF '(' cond ')' stmt /*<return to here>*/ ELSE stmt ;
 ```
 
-After the reduction, the pointer returns to the same spot where it is for the shift part of the conflict. This problem is very similar to the one with `expr - expr - expr` in the previous example. And using similar logic, in order to reduce `IF ( cond ) stmt` into `stmt` and end up here:
+After the reduction, the pointer returns to the same spot where it is for the shift part of the conflict. This problem is very similar to the one with `expr - expr - expr` in the previous example. And using similar logic, in order to reduce `IF '(' cond ')' stmt` into `stmt` and end up here:
 
 ```js
-stmt: IF ( cond ) stmt /*<here>*/ ELSE stmt ;
+stmt: IF '(' cond ')' stmt /*<here>*/ ELSE stmt ;
 ```
 
 you have to have this token stream:
 
 ```c
-IF ( cond ) IF ( cond ) stmt ELSE
+IF '(' cond ')' IF '(' cond ')' stmt ELSE
 ```
 
 Again, do you want to group it like this:
 
 ```c
-IF ( cond ) { IF ( cond ) stmt } ELSE stmt
+IF '(' cond ')' { IF '(' cond ')' stmt } ELSE stmt
 ```
 
 or like this?
 
 ```c
-IF ( cond ) { IF ( cond ) stmt ELSE stmt }
+IF '(' cond ')' { IF '(' cond ')' stmt ELSE stmt }
 ```
 
 The next section explains what to do about this kind of conflict.
@@ -673,13 +675,17 @@ The next section explains what to do about this kind of conflict.
 Our final example is a simple version of a problem that novice bison programmers often encounter:
 
 ```js
-start:      outerList Z ;
-outerList:  /* empty */
-      |     outerList outerListItem ;
-outerListItem:    innerList ;
-innerList:  /* empty */
-      |     innerList innerListItem ;
-innerListItem:    I ;
+start: outerList Z ;
+
+outerList: /* empty */
+         | outerList outerListItem ;
+
+outerListItem: innerList ;
+
+innerList: /* empty */
+         | innerList innerListItem ;
+
+innerListItem: I ;
 ```
 
 Bison reports this conflict:
@@ -695,9 +701,11 @@ state 2
     innerList      go to state 6
 ```
 
-Once again we can analyze the problem step by step. The reduce rule is the empty alternative of `innerList`. That leaves two candidates for the shift problem. Rule start is one, because it explicitly takes `Z` as the next token. The nonempty alternative of `outerList` might be a candidate, if it takes `Z` next. We see that `outerList` includes an `outerListItem`, which is an `innerList`. In this situation, `innerList` can’t include an `innerListItem`, because that includes an `I`, and this conflict occurs only when the next token is a `Z`. But an `innerList` can be empty, so the `outerListItem` involves no tokens, so we might actually be at the end of the `outerList` as well, since as the first line in the conflict report told us, an `outerList` can be followed by a `Z`.
+Once again we can analyze the problem step by step. The reduce rule is the empty alternative of `innerList`. That leaves two candidates for the shift problem. Rule `start` is one, because it explicitly takes `Z` as the next token. The nonempty alternative of `outerList` might be a candidate, if it takes `Z` next. We see that `outerList` includes an `outerListItem`, which is an `innerList`. In this situation, `innerList` can’t include an `innerListItem`, because that includes an `I`, and this conflict occurs only when the next token is a `Z`. But an `innerList` can be empty, so the `outerListItem` involves no tokens, so we might actually be at the end of the `outerList` as well, since as the first line in the conflict report told us, an `outerList` can be followed by a `Z`.
 
 This all boils down to this state: We have just finished an `innerList`, possibly empty, or an `outerList`, possibly empty. How can it not know which list it has just finished? Look at the two list expressions. They can both be empty, and the inner one sits in the outer one without any token to say it is starting or finishing the inner loop. Assume the input stream consists solely of a `Z`. Is it an empty `outerList`, or is it an `outerList` with one item, an empty `innerList`? That’s ambiguous.
+
+
 
 The problem with this grammar is that it is redundant. It has to have a loop within a loop, with nothing to separate them. Since this grammar actually accepts a possibly empty list of `I`s followed by a `Z`, it can easily be rewritten using only one recursive rule:
 
@@ -727,23 +735,27 @@ We saw this conflict earlier in this chapter. Here we describe what to do with t
 
 Once you’ve verified that you’re getting what you want, you ought to make bison quit complaining. Conflict warnings may confuse or annoy anyone trying to maintain your code, and if there are other conflicts in the grammar that indicate genuine errors, it’s hard to tell the real problems from the false alarms.
 
-The standard way to resolve this conflict is to have separate rules for matched and unmatched IF/THEN statements and to rewrite the grammar this way:
+
+
+The standard way to resolve this conflict is to have separate rules for `matched` and `unmatched` IF/THEN statements and to rewrite the grammar this way:
 
 ```js
-stmt:       matched
-      |     unmatched
-      ;
-matched:    other_stmt
-      |     IF expr THEN matched ELSE matched
-      ;
-unmatched:  IF expr THEN stmt
-      |     IF expr THEN matched ELSE unmatched
-      ;
+stmt:     matched
+    |     unmatched
+    ;
+matched:  other_stmt
+       |  IF expr THEN matched ELSE matched
+       ;
+unmatched: IF expr THEN stmt
+         | IF expr THEN matched ELSE unmatched
+         ;
 other_stmt: /* rules for other kinds of statement */  
 ...
 ```
 
 The nonterminal `other_stmt` represents all of the other possible statements in the language.
+
+
 
 It’s also possible to use explicit precedence to tell bison which way to resolve the conflict and to keep it from issuing a warning. If your language uses a `THEN` keyword (as Pascal does), you can do this:
 
@@ -751,40 +763,43 @@ It’s also possible to use explicit precedence to tell bison which way to resol
 %nonassoc THEN
 %nonassoc ELSE
 %%
-stmt:     IF expr THEN stmt
-      |   IF expr stmt ELSE stmt
-      ;
+stmt:  IF expr THEN stmt
+    |  IF expr stmt ELSE stmt
+    ;
 ```
 
 In languages that don’t have a `THEN` keyword, you can use a fake token and `%prec` to accomplish the same result:
 
 ```js
-%nonassoc LOWER_THAN_ELSE
+%nonassoc THEN
 %nonassoc ELSE
  %%
-stmt:    IF expr stmt          %prec LOWER_THAN_ELSE ;
-    |    IF expr stmt ELSE stmt;
+stmt: IF expr stmt          %prec THEN
+    | IF expr stmt ELSE stmt
+    ;
 ```
 
-The shift/reduce conflict here is a conflict between shifting an `ELSE` token and reducing a `stmt` rule. You need to assign a precedence to the token (`%nonassoc ELSE`) and to the rule, with `%nonassoc THEN` or `%nonassoc LOWER_THAN_ELSE` and `%prec LOWER_THAN_ELSE`. The precedence of the token to shift must be higher than the precedence of the rule to reduce, so `%nonassoc ELSE` must come after `%nonassoc THEN` or `%nonassoc LOWER_THAN_ELSE`. It makes no difference for this application if you use `%nonassoc`, `%left`, or `%right`, since there’s no situation with a conflict that involves shifting a token and reducing a rule containing the same token.
+The shift/reduce conflict here is a conflict between shifting an `ELSE` token and reducing a `stmt` rule. You need to assign a precedence to the token (`%nonassoc ELSE`) and to the rule, with `%nonassoc THEN` and `%prec THEN`. The precedence of the token to shift must be higher than the precedence of the rule to reduce, so `%nonassoc ELSE` must come after `%nonassoc THEN`. It makes no difference for this application if you use `%nonassoc`, `%left`, or `%right`, since there’s no situation with a conflict that involves shifting a token and reducing a rule containing the same token.
 
 The goal here is to hide a conflict you know about and understand, not to hide any others. When you’re trying to mute bison’s warnings about other shift/reduce conflicts, the further you get from the previous example, the more careful you should be. Use `%nonassoc`, so if you accidentally do add other rules that create such a conflict, bison will still report it. Other shift/reduce conflicts may be amenable to a simple change in the bison description. And, as we mentioned, any conflict can be fixed by changing the language. For example, the IF/THEN/ELSE conflict can be eliminated by insisting on BEGIN-END or braces around the `stmt`.
+
+
 
 What would happen if you swapped the precedence of the token to shift and the rule to reduce? The normal IF-ELSE handling makes the following two equivalent:
 
 ```js
-    if expr if expr stmt else stmt
-    if expr { if expr stmt else stmt }
+if expr if expr stmt else stmt
+if expr { if expr stmt else stmt }
 ```
 
 It seems only fair that swapping the precedence would make the following two equivalent, right?
 
 ```js
-    if expr if expr stmt else stmt
-    if expr { if expr stmt } else stmt
+if expr if expr stmt else stmt
+if expr { if expr stmt } else stmt
 ```
 
-Nope. That’s not what it does. Having higher precedence on the shift (normal IF-ELSE) makes it always shift the ELSE. Swapping the precedence makes it never shift the ELSE, so your IF-ELSE can no longer have an else.
+Nope. That’s not what it does. Having higher precedence on the shift (normal IF-ELSE) makes it **always** shift the ELSE. Swapping the precedence makes it **never** shift the ELSE, so your IF-ELSE can no longer have an else.
 
 Normal IF-ELSE processing associates the `ELSE` with the most recent `IF`. Suppose you want it some other way. One possibility is that you allow only one `ELSE` with a sequence of `IF`s, and the `ELSE` is associated with the first `IF`. This would require a two-level statement definition, as follows:
 
@@ -792,10 +807,11 @@ Normal IF-ELSE processing associates the `ELSE` with the most recent `IF`. Suppo
 %nonassoc LOWER_THAN_ELSE
 %nonassoc ELSE
 %%
-stmt:     IF expr stmt2 %prec LOWER_THAN_ELSE
-    |     IF expr stmt2 ELSE stmt;
-
-stmt2:  IF expr stmt2;
+stmt: IF expr stmt2  %prec LOWER_THAN_ELSE
+    | IF expr stmt2 ELSE stmt
+    ;
+stmt2: IF expr stmt2
+     ;
 ```
 
 But don’t do that, since a language is extremely counter-intuitive.
@@ -805,31 +821,41 @@ But don’t do that, since a language is extremely counter-intuitive.
 This conflict occurs when the grammar has two nested list-creating loops, with no punctuation to say where the boundaries between entries in the outer list are.
 
 ```js
-start:     outerList Z ;
+start: outerList Z 
+     ;
 outerList: /* empty */
-      |    outerList outerListItem ;
-outerListItem:   innerList ;
+         | outerList outerListItem
+         ;
+outerListItem: innerList
+             ;
 innerList: /* empty */
-      |    innerList innerListItem ;
-innerListItem:   I ;
+         | innerList innerListItem
+         ;
+innerListItem: I
+             ;
 ```
 
 Assuming that’s really what you want, the resolution of this conflict depends on whether you want repetitions to be treated as one outer loop and many inner loops or as many outer loops of one inner loop each. The difference is whether the code associated with `outerListItem` gets executed once for each repetition or once for each set of repetitions. If it makes no difference, choose one or the other arbitrarily. If you want many outer loops, remove the inner loop:
 
 ```js
-start:        outerList Z ;
-outerList:    /* empty */
-      |       outerList innerListItem ;
-innerListItem:      I ;
+start:     outerList Z ;
+outerList: /* empty */
+         | outerList innerListItem
+         ;
+innerListItem: I 
+             ;
 ```
 
 If you want many inner loops, remove the outer loop:
 
 ```js
-start:        innerList Z ;
-innerList:    /* empty */
-      |       innerList innerListItem ;
-innerListItem:  I ;
+start: innerList Z 
+     ;
+innerList: /* empty */
+         | innerList innerListItem
+         ;
+innerListItem: I 
+             ;
 ```
 
 In practice, it’s pretty rare to have a pair of nested lists with no punctuation. It’s confusing to bison, and it’s confusing to us humans, too. If the outer list is something like a list of statements in a programming language, if you change the language and put a semicolon after each `outerListItem`, the conflicts go away:
@@ -838,7 +864,7 @@ In practice, it’s pretty rare to have a pair of nested lists with no punctuati
 start:     outerList Z ;
 outerList: /* empty */
       |    outerList outerListItem ';' ;
-outerListItem:   innerList ;
+outerListItem: innerList ;
 innerList: /* empty */
       |    innerList innerListItem ;
 innerListItem:   I ;
@@ -847,123 +873,129 @@ innerListItem:   I ;
 ### Expression Precedence (Shift/Reduce)
 
 ```js
-expr:        expr  '+'  expr
-      |      expr  '-'  expr
-      |      expr  '*'  expr
-      |      ...
-        ;
+expr: expr '+' expr
+    | expr '-' expr
+    | expr '*' expr
+    | ...
+    ;
 ```
 
 If you describe an expression grammar but forget to define the precedence with `%left` and `%right`, you get a truckload of shift/reduce conflicts. Assigning precedence to all of the operators should resolve the conflicts. Keep in mind that if you use any of the operators in other ways, for example, using a `-` to indicate a range of values, the precedence can also mask conflicts in the other contexts.
 
 ### Limited Lookahead (Shift/Reduce or Reduce/Reduce)
 
-Most shift/reduce conflicts are because of bison’s limited lookahead. That is, a parser that could look further ahead would not have a conflict. For example:
+Most shift/reduce conflicts are because of bison’s **limited lookahead**. That is, a parser that could look further ahead would not have a conflict. For example:
 
 ```js
 statement: command optional_keyword '('  identifier_list ')'
-      ;
+         ;
 optional_keyword: /* blank */
-      |      '(' keyword ')'
-      ;
+                | '(' keyword ')' ;
 ```
 
-The example describes a command line that starts with a required command, ends with a required identifier list in parentheses, and has in the middle an optional keyword in parentheses. Bison gets a shift/reduce conflict with this when it gets to the first parenthesis in the input stream, because it can’t tell whether it is part of the optional keyword or the identifier list. In the first case, the parser would shift the parenthesis within the `optional_keyword` rule, and in the second, it would reduce an empty `optional_key` word and move on to the identifier list. If a bison parser could look further ahead, it could tell the difference between the two. But a parser using the regular bison parsing algorithm can’t.
+The example describes a command line that starts with a required command, ends with a required identifier list in parentheses, and has in the middle an optional keyword in parentheses. Bison gets a shift/reduce conflict with this when it gets to the first parenthesis in the input stream, because it can’t tell whether it is part of the optional keyword or the identifier list. In the first case, the parser would shift the parenthesis within the `optional_keyword` rule, and in the second, it would reduce an empty `optional_keyword` and move on to the identifier list. If a bison parser could look further ahead, it could tell the difference between the two. But a parser using the regular bison parsing algorithm can’t.
 
 The default is for bison to choose the shift, which means it always assumes the optional keyword is there. (You can’t really call it optional in that case.) If you apply precedence, you could get the conflict to resolve in favor of the reduction, which would mean you could never have the optional keyword.
+
+
 
 We can flatten the description, expanding the `optional_keyword` rule where it occurs in statement:
 
 ```js
-statement:  command '(' keyword ')' '(' identifier_list  ')'
-         |  command '('  identifier_list ')'
+statement:  command '(' keyword ')' '(' identifier_list ')'
+         |  command                 '(' identifier_list ')'
          ;
 ```
 
 By flattening the list, we allow the parser to scan ahead with multiple possible pointers until it sees a keyword or identifier, at which point it can tell which rule to use. Flattening is a practical solution in this example, but when more rules are involved, it rapidly becomes impractical because of the exponential expansion of the bison description. You may run into a shift/reduce conflict from limited lookahead for which your only practical solution is to change the language or use a GLR parser.
 
+
+
 It’s also possible to get a reduce/reduce conflict because of limited lookahead. One way is to have an overlap of alternatives:
 
 ```js
-statement:  command_type_1 ':' '[' ...
-      |     command_type_2 ':' '(' ...
-command_type_1:  CMD_1  | CMD_2 | CMD_COMMON  ;
-command_type_2:  CMD_A  | CMD_B | CMD_COMMON  ;
+statement: command_type_1 ':' '[' ...
+         | command_type_2 ':' '(' ...
+command_type_1: CMD_1 | CMD_2 | CMD_COMMON ;
+command_type_2: CMD_A | CMD_B | CMD_COMMON ;
 ```
 
 If the input includes `CMD_COMMON`, the parser can’t tell whether it’s parsing a `command_type_1` or `command_type_2` until it sees the bracket or parenthesis, but that’s two tokens ahead. The solution for this is flattening, as we did earlier, or making the alternatives disjoint, as described in the following section.
+
+
 
 You can also get a reduce/reduce conflict from limited lookahead because actions in the middle of a rule are really anonymous rules that must be reduced:
 
 ```js
 statement: command_list { /*<action for '[' form>*/ } ':' '[' ...
-      |    command_list { /*<action for '(' form>*/ } ':' '(' ...
+         | command_list { /*<action for '(' form>*/ } ':' '(' ...
 ```
 
 This is already flattened, so there’s nothing you can do to get it to work without using a GLR parser. It simply needs a two-token lookahead, and LALR(1) parsers don’t have that. Unless you’re doing some sort of exotic communication between the parser and lexer, you can just move the action over:
 
 ```js
-statement:  command_list ':' '[' { /*<action for '[' form>*/ } ...
-       |    command_list ':' '(' { /*<action for '(' form>*/ } ...
+statement: command_list ':' '[' { /*<action for '[' form>*/ } ...
+         | command_list ':' '(' { /*<action for '(' form>*/ } ...
 ```
 
 ### Overlap of Alternatives (Reduce/Reduce)
 
-In this case, you have two alternative rules with the same LHS, and the inputs accepted by them overlap partially. The easiest way to make this work in a regular bison parser is to make the two input sets disjoint. For example:
+In this case, you have two alternative rules with the same LHS, and the inputs accepted by them overlap partially. The easiest way to make this work in a regular bison parser is to make the two input sets **disjoint**. For example:
 
 ```js
-person:     girls
-       |    boys
+person : girls
+       | boys
        ;
-girls:      ALICE
-       |    BETTY
-       |    CHRIS
-       |    DARRYL
+girls  : ALICE
+       | BETTY
+       | CHRIS  //*
+       | DARRYL //*
        ;
-boys:       ALLEN
-       |    BOB
-       |    CHRIS
-       |    DARRYL
+boys   : ALLEN
+       | BOB
+       | CHRIS  //*
+       | DARRYL //*
        ;
 ```
 
 You will get a reduce/reduce conflict on `CHRIS` and `DARRYL` because bison can’t tell whether they’re intended to be girls or boys. There are several ways to resolve the conflict. One is as follows:
 
 ```js
-person:    girls  | boys | either;
-girls:     ALICE
-      |    BETTY
+person: girls | boys | either
       ;
-boys:      ALLEN
-      |    BOB
+girls : ALICE
+      | BETTY
       ;
-either:    CHRIS
-      |    DARRYL
+boys  : ALLEN
+      | BOB
+      ;
+either: CHRIS
+      | DARRYL
       ;
 ```
 
 But what if these lists were really long or were complex rules rather than just lists of keywords? What would you do if you wanted to minimize duplication and girls and boys were referenced many other places in the bison description? Here’s one possibility:
 
 ```js
-    person:     just_girls
-          |     just_boys
-          |     either
+person: just_girls
+      | just_boys
+      | either
+      ;
+girls : just_girls
+      | either
+      ;
+boys  : just_boys
+      | either
+      ;
+just_girls: ALICE
+          | BETTY
           ;
-    girls:      just_girls
-          |     either
+just_boys : ALLEN
+          | BOB
           ;
-    boys:       just_boys
-          |     either
-          ;
-    just_girls: ALICE
-          |     BETTY
-          ;
-    just_boys:  ALLEN
-          |     BOB
-          ;
-    either:     CHRIS
-          |     DARRYL
-          ;
+either: CHRIS
+      | DARRYL
+      ;
 ```
 
 All references to `boys | girls` have to be fixed. GLR doesn’t help much here since the original grammar is ambiguous, so you’d still have to deal with the ambiguity. But what if it’s impractical to make the alternatives disjoint? If you just can’t figure out a clean way to break up the overlap, then you’ll have to leave the reduce/reduce conflict, use a GLR parser, and deal explicitly with the ambiguity using the techniques discussed in Chapter 9.

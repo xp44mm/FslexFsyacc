@@ -1,9 +1,9 @@
-﻿[<System.Obsolete("FsyaccFileRules")>]
-module FslexFsyacc.Fsyacc.FsyaccFileRefine
+﻿module FslexFsyacc.Fsyacc.FsyaccFileRefine
 
 open FSharp.Idioms
 
 ///重新定义规则
+[<System.Obsolete("FsyaccFileRules.replaceRule")>]
 let refineRules 
     (oldProd:string list)
     (newProd:string list)

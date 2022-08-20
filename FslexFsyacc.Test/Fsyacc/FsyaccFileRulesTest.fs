@@ -27,7 +27,7 @@ type FsyaccFileRulesTest(output:ITestOutputHelper) =
         Should.equal y e
 
     [<Fact>]
-    member _.``01 - normToRawRules``() =
+    member _.``11 - normToRawRules``() =
         let x = [
             ["AsyncArrowFunction";"async";"AsyncArrowBindingIdentifier";"=>";"AsyncConciseBody"],"","";
             ["AsyncArrowFunction";"CoverCallExpressionAndAsyncArrowHead";"=>";"AsyncConciseBody"],"",""
@@ -42,7 +42,7 @@ type FsyaccFileRulesTest(output:ITestOutputHelper) =
         Should.equal y z
 
     [<Fact>]
-    member _.``02 - addRule``() =
+    member _.``12 - addRule``() =
         let x = [
             ["AsyncArrowFunction";"async";"AsyncArrowBindingIdentifier";"=>";"AsyncConciseBody"],"","";
             ["AsyncArrowFunction";"CoverCallExpressionAndAsyncArrowHead";"=>";"AsyncConciseBody"],"",""
@@ -61,7 +61,7 @@ type FsyaccFileRulesTest(output:ITestOutputHelper) =
         Should.equal z e
 
     [<Fact>]
-    member _.``03 - removeRule``() =
+    member _.``13 - removeRule``() =
         let e = [
             ["AsyncArrowFunction";"async";"ArrowFormalParameters";"=>";"AsyncConciseBody"],"","";
             ["AsyncArrowFunction";"async";"AsyncArrowBindingIdentifier";"=>";"AsyncConciseBody"],"","";
@@ -82,7 +82,7 @@ type FsyaccFileRulesTest(output:ITestOutputHelper) =
 
         Should.equal y x
     [<Fact>]
-    member _.``04 - replaceRule``() =
+    member _.``14 - replaceRule``() =
         let rules = [
             ["AsyncArrowFunction";"async";"AsyncArrowBindingIdentifier";"=>";"AsyncConciseBody"],"","";
             ["AsyncArrowFunction";"CoverCallExpressionAndAsyncArrowHead";"=>";"AsyncConciseBody"],"",""
@@ -101,7 +101,7 @@ type FsyaccFileRulesTest(output:ITestOutputHelper) =
             ]
         Should.equal e y
     [<Fact>]
-    member _.``05 - findRule``() =
+    member _.``15 - findRule``() =
         let rules = [
             ["AsyncArrowFunction";"async";"AsyncArrowBindingIdentifier";"=>";"AsyncConciseBody"],"","";
             ["AsyncArrowFunction";"CoverCallExpressionAndAsyncArrowHead";"=>";"AsyncConciseBody"],"",""
@@ -115,7 +115,7 @@ type FsyaccFileRulesTest(output:ITestOutputHelper) =
         Should.equal y rules.[1]
 
     [<Fact>]
-    member _.``06 - findRuleByName``() =
+    member _.``16 - findRuleByName``() =
         let rules = [
             ["AsyncArrowFunction";"async";"AsyncArrowBindingIdentifier";"=>";"AsyncConciseBody"],"","";
             ["AsyncArrowFunction";"CoverCallExpressionAndAsyncArrowHead";"=>";"AsyncConciseBody"],"cover",""

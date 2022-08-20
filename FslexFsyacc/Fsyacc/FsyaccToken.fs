@@ -13,6 +13,4 @@ type FsyaccToken =
     | RIGHT
     | NONASSOC
     | PREC
-    //| BOF
-    //| EOF
 

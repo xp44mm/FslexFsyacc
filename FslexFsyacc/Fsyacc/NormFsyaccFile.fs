@@ -6,9 +6,8 @@ open FslexFsyacc.Yacc
 type NormFsyaccFile = 
     {
         rules:(string list*string)[]
-        productionNames:Map<string list,string>
+        productionNames:Map<string list,string> // to rename persudo token
         precedences:Map<string,int>
-
         header:string
         declarations:(string*string)list
     }

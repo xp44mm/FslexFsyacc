@@ -33,7 +33,7 @@ let renderSemantic(semantic:string) =
             |> String.concat "\r\n"
         else "{ " + semantic + " }"
 
-let renderComponent (body:string list,name:string,semantic:string) =
+let renderComponent (body:string list, name:string, semantic:string) =
     [
         yield "|"
         yield renderBody body
@@ -44,7 +44,7 @@ let renderComponent (body:string list,name:string,semantic:string) =
 
 let renderRhs(bodies:(string list*string*string)list) =
     bodies
-    |> List.map(renderComponent)
+    |> List.map renderComponent
     |> String.concat "\r\n"
 
 let renderRule (lhs:string,rhs:(string list*string*string)list) =

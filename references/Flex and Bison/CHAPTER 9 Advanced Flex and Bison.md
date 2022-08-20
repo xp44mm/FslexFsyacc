@@ -15,19 +15,19 @@ Unfortunately, as of the time this book went to press (mid-2009), the code for f
 A single scanning job may involve many calls to `yylex()` because it returns tokens to the calling program. Since the scanner’s state has to be saved between calls, you have to manage the per-scanner data yourself. Flex provides routines that create and destroy a scanner’s context, as well as routines to access scanner values that used to be in static variables like `yyin` and `yytext` to allow routines outside `yylex()` to get and set them.
 
 ```c
-   yyscan_t scaninfo; //        a pointer to the per-instance scanner data
-   int yylex_init(&scaninfo); //    create a scanner
-   int yylex_init_extra(userstuff, &scaninfo); //or create a scanner with a pointer to user data
-   yyset_in(stdin, scaninfo); //set the input file and other parameters
-   while( ... ) {
-      tok = yylex(scaninfo); // call until done
-   }
-   yylex_destroy(scaninfo); //  free the scanner data
+yyscan_t scaninfo; // a pointer to the per-instance scanner data
+int yylex_init(&scaninfo); // create a scanner
+int yylex_init_extra(userstuff, &scaninfo); // or create a scanner with a pointer to user data
+yyset_in(stdin, scaninfo); // set the input file and other parameters
+while( ... ) {
+    tok = yylex(scaninfo); // call until done
+}
+yylex_destroy(scaninfo); // free the scanner data
 ```
 
 The `yyscan_t` structure contains all of the per-scanner state such as the input and output files and pointers to remember where in the buffered input to resume scanning. It also includes a stack of pointers to `YY_BUFFER_STATE` structures to track the active input buffer. (As we saw in Chapter 2, the built-in buffer stack isn’t too useful since you usually need to remember extra per-buffer information.)
 
-The `userstuff` argument to `yylex_init_extra` allows you to provide your own per-instance data to the scanner, such as the address of the symbol table for it to use. It is a value of type `YY_EXTRA_TYPE`, by default defined to be `void *` but easily overridden with `%option extra-type`. The per-instance data is invariably stored in a structure, so the `userstuff` is a pointer to that structure. As we’ll see in a moment, in one line you can retrieve it within the scanner and put it in a pointer variable with a reasonable name and type.
+The `userstuff` argument to `yylex_init_extra` allows you to provide your own per-instance data to the scanner, such as the address of the symbol table for it to use. It is a value of type `YY_EXTRA_TYPE`, by default defined to be `void*` but easily overridden with `%option extra-type`. The per-instance data is invariably stored in a structure, so the `userstuff` is a pointer to that structure. As we’ll see in a moment, in one line you can retrieve it within the scanner and put it in a pointer variable with a reasonable name and type.
 
 Within the scanner, flex defines macros for `yytext`, `yyleng`, and a few other fields that refer to the instance data. The values of `yylineno` and `yycolumn`, which is a variable not present in nonreentrant scanners, are stored in the current buffer structure, making it easier to track line and column information in multiple input files, while the rest are in the `yyscan_t` structure. Flex maintains `yylineno` as it does in nonreentrant scanners, but the only thing it does automatically to `yycolumn` is set it to zero when it sees a `\n` character, so you still have to track the column yourself using the techniques in Chapter 8.
 
@@ -39,7 +39,7 @@ Example 9-1. Pure version of word count program
 /* pure version of word count program */
 %option noyywrap nodefault reentrant
 %{
-    struct pwc {   our per-scanner data
+    struct pwc {  // our per-scanner data
         int chars;
         int words;
         int lines;
@@ -47,12 +47,12 @@ Example 9-1. Pure version of word count program
 %}
 %option extra-type="struct pwc *"
 %%
-%{                         // this code goes at the top of yylex
+%{                          // this code goes at the top of yylex
   struct pwc *pp = yyextra; // yyextra is a flex-defined macro
 %}
-[a-zA-Z]+       { pp->words++; pp->chars += strlen(yytext); }
-\n              { pp->chars++; pp->lines++; }
-.               { pp->chars++; }
+[a-zA-Z]+ { pp->words++; pp->chars += strlen(yytext); }
+\n        { pp->chars++; pp->lines++; }
+.         { pp->chars++; }
 %%
 ```
 
@@ -66,31 +66,31 @@ main(argc, argv)
 int argc;
 char **argv;
 {
-  struct pwc mypwc = { 0, 0, 0 }; /* my instance data */
-  yyscan_t scanner;               /* flex instance data */
-  if(yylex_init_extra(&mypwc, &scanner)) {
-    perror("init alloc failed");
-    return 1;
-  }
-  if(argc > 1) {
-    FILE *f;
-    if(!(f = fopen(argv[1], "r"))) {
-      perror(argv[1]);
-      return (1);
+    struct pwc mypwc = { 0, 0, 0 }; /* my instance data */
+    yyscan_t scanner;               /* flex instance data */
+    if(yylex_init_extra(&mypwc, &scanner)) {
+        perror("init alloc failed");
+        return 1;
     }
-    yyset_in(f, scanner);
-  } else
-    yyset_in(stdin, scanner);
-  yylex(scanner);
-  printf("%8d%8d%8d\n", mypwc.lines, mypwc.words, mypwc.chars);
-  if(argc > 1)
-    fclose(yyget_in(scanner));
-  yylex_destroy( scanner );
+    if(argc > 1) {
+        FILE *f;
+        if(!(f = fopen(argv[1], "r"))) {
+            perror(argv[1]);
+            return (1);
+        }
+        yyset_in(f, scanner);
+    } else
+        yyset_in(stdin, scanner);
+    yylex(scanner);
+    printf("%8d%8d%8d\n", mypwc.lines, mypwc.words, mypwc.chars);
+    if(argc > 1)
+        fclose(yyget_in(scanner));
+    yylex_destroy( scanner );
 }
 ```
 
 
-The main routine declares and initializes `mypwc`, our own instance data, and declares scanner, which will be the flex instance data. The call to `yylex_init_extra` takes a pointer to scanner, so it can fill it in with a pointer to the newly allocated instance, and the call returns 0 for success or 1 for failure (the `malloc` for the instance data failed).
+The main routine declares and initializes `mypwc`, our own instance data, and declares scanner, which will be the flex instance data. The call to `yylex_init_extra` takes a pointer to scanner, so it can fill it in with a pointer to the newly allocated instance, and the call returns `0` for success or `1` for failure (the `malloc` for the instance data failed).
 
 If there’s a file argument, we open the file and use `yyset_in` to store it in the `yyin`-ish field in the scanner data. Then we call `yylex`, passing it the flex instance data; print out the results that the scanner stored in our own instance data; and then free and deallocate the scanner.
 
@@ -123,18 +123,20 @@ If you want to pass application data, you can declare it with `%lex-param{ }` or
 #define YYLEX_PARAM pp->scaninfo
 %}
 %%
-   /* generated calls within the parser */
-   token = yylex(YYSTYPE *yylvalp, pp->scaninfo); // without locations
-   token = yylex(YYSTYPE *yylvalp, YYLTYPE *yylocp, pp->scaninfo); //with them
+/* generated calls within the parser */
+token = yylex(YYSTYPE *yylvalp, pp->scaninfo); // without locations
+token = yylex(YYSTYPE *yylvalp, YYLTYPE *yylocp, pp->scaninfo); //with them
 ```
 
-When the generated parser encounters a syntax error, it calls `yyerror()`, passing a pointer to the current location, if the parser uses locations, and the parser parameter in addition to the usual error message string: [^ *]
+When the generated parser encounters a syntax error, it calls `yyerror()`, passing a pointer to the current location, if the parser uses locations, and the parser parameter in addition to the usual error message string:
 
-[^ *]: If you pass multiple arguments to the parser, each one has to be in a separate `%parse-param`. If you put two arguments in the same `%parse-param`, bison won't report an error but the second parameter will disappear.
+>If you pass multiple arguments to the parser, each one has to be in a separate `%parse-param`. If you put two arguments in the same `%parse-param`, bison won’t report an error but the second parameter will disappear.
 
 ```c
-yyerror(struct pureparse *pp, "Syntax error"); // without locations
-yyerror(YYLTYPE &yyllocp,struct pureparse *pp, "Syntax error"); // with them
+// without locations
+yyerror(struct pureparse *pp, "Syntax error");
+// with them
+yyerror(YYLTYPE &yyllocp,struct pureparse *pp, "Syntax error"); 
 ```
 
 
@@ -142,13 +144,25 @@ If you’re using a handwritten scanner, these are all the hooks you need for a 
 
 ### Using Pure Scanners and Parsers Together
 
-If you compare the calling sequence for `yylex` in pure scanners and pure parsers, you’ll note that they’re incompatible. Flex wants the first argument to be the scanner instance data, but bison makes the first argument a pointer to `yylval`. While it is possible to use some undocumented C preprocessor symbols to fudge this, the maintainer of flex took pity on programmers and added the bison-bridge option to make its pure calling sequence compatible with bison’s. If you use `%option bison-bridge`, the declaration of `yylex` becomes the following:
+If you compare the calling sequence for `yylex` in pure scanners and pure parsers, you’ll note that they’re incompatible. Flex wants the first argument to be the scanner instance data, but bison makes the first argument a pointer to `yylval`. While it is possible to use some undocumented C preprocessor symbols to fudge this, the maintainer of flex took pity on programmers and added the bison-bridge option to make its pure calling sequence compatible with bison’s. If you use 
+
+```c
+%option bison-bridge
+```
+
+, the declaration of `yylex` becomes the following:
 
 ```c
 int yylex(YYSTYPE* lvalp, yyscan_t scaninfo);
 ```
 
-If you use `%option bison-bridge bison-locations`, the declaration is as follows:
+If you use 
+
+```c
+%option bison-bridge bison-locations
+```
+
+, the declaration is as follows:
 
 ```c
 int yylex (YYSTYPE* lvalp, YYLTYPE* llocp, yyscan_t scaninfo);
@@ -169,14 +183,14 @@ Example 9-2. Reentrant calc header file `purecalc.h`
  */
 /* per-parse data */
 struct pcdata {
-  yyscan_t scaninfo;            /* scanner context */
-  struct symbol *symtab;        /* symbols for this parse */
-  struct ast *ast;              /* most recently parsed AST */
+  yyscan_t scaninfo;     /* scanner context */
+  struct symbol *symtab; /* symbols for this parse */
+  struct ast *ast;       /* most recently parsed AST */
 };
 ```
 
 
-The new structure `pcdata` contains the application context for the parser. It points to the symbol table, allowing different parses to have different namespaces; the scanner context that the parser passes to `yylex`; and a place for the parser to return the AST that it parsed. (Remember that the value of `yyparse` is 1 or 0 to report whether the parse succeeded, so it can’t directly return the AST.)
+The new structure `pcdata` contains the application context for the parser. It points to the symbol table, allowing different parses to have different namespaces; the scanner context that the parser passes to `yylex`; and a place for the parser to return the AST that it parsed. (Remember that the value of `yyparse` is `1` or `0` to report whether the parse succeeded, so it can’t directly return the AST.)
 
 The changes in the rest of the header add an initial context argument to all of the functions, both the ones specific to the calculator and `yyerror`.
 
@@ -213,7 +227,7 @@ void symlistfree(struct pcdata *, struct symlist *sl);
  *  F built in function call
  *  C user function call
  */
-enum bifs {                     /* built-in functions */
+enum bifs { /* built-in functions */
   B_sqrt = 1,
   B_exp,
   B_log,
@@ -221,18 +235,18 @@ enum bifs {                     /* built-in functions */
 };
 /* nodes in the abstract syntax tree */
 /* all have common initial nodetype */
-  ... all nodes unchanged from the original version ...
+/* ... all nodes unchanged from the original version ... */
+
 /* build an AST */
 struct ast *newast(struct pcdata *, int nodetype, struct ast *l, struct ast *r);
 struct ast *newcmp(struct pcdata *, int cmptype, struct ast *l, struct ast *r);
-
 struct ast *newfunc(struct pcdata *, int functype, struct ast *l);
 struct ast *newcall(struct pcdata *, struct symbol *s, struct ast *l);
 struct ast *newref(struct pcdata *, struct symbol *s);
 struct ast *newasgn(struct pcdata *, struct symbol *s, struct ast *v);
 struct ast *newnum(struct pcdata *, double d);
-struct ast *newflow(struct pcdata *, int nodetype, struct ast *cond, struct ast *tl,
-            struct ast *tr);
+struct ast *newflow(struct pcdata *, int nodetype, struct ast *cond, struct ast *tl, struct ast *tr);
+
 /* define a function */
 void dodef(struct pcdata *, struct symbol *name, struct symlist *syms, struct ast *stmts);
 /* evaluate an AST */
@@ -244,7 +258,8 @@ void yyerror(struct pcdata *pp, char *s, ...);
 ```
 
 
-The scanner has the reentrant and bison-bridge options to make a reentrant bison-compatible scanner. For the first time we also tell flex to create a header file analogous to the one that bison creates. The file contains declarations of the various routines used to get and set variables in a scanner context, as well as the definition of `yyscan_t` that the parser will need.
+
+The scanner has the `reentrant` and `bison-bridge` options to make a reentrant bison-compatible scanner. For the first time we also tell flex to create a header file analogous to the one that bison creates. The file contains declarations of the various routines used to get and set variables in a scanner context, as well as the definition of `yyscan_t` that the parser will need.
 
 Example 9-3. Reentrant calculator scanner `purecalc.l`
 
@@ -266,7 +281,7 @@ EXP     ([Ee][-+]?[0-9]+)
 %{
   struct pcdata *pp = yyextra;
 %}
- /* single character ops */
+/* single character ops */
 "+" |
 "-" |
 "*" |
@@ -277,34 +292,34 @@ EXP     ([Ee][-+]?[0-9]+)
 ";" |
 "(" |
 ")"     { return yytext[0]; }
- /* comparison ops */
+/* comparison ops */
 ">"     { yylval->fn = 1; return CMP; }
 "<"     { yylval->fn = 2; return CMP; }
 "<>"    { yylval->fn = 3; return CMP; }
 "=="    { yylval->fn = 4; return CMP; }
 ">="    { yylval->fn = 5; return CMP; }
 "<="    { yylval->fn = 6; return CMP; }
- /* keywords */
+/* keywords */
 "if"    { return IF; }
 "then"  { return THEN; }
 "else"  { return ELSE; }
 "while" { return WHILE; }
 "do"    { return DO; }
 "let"   { return LET;}
- /* built-in functions */
-"sqrt"  { yylval->fn = B_sqrt; return FUNC; }
-"exp"   { yylval->fn = B_exp; return FUNC; }
-"log"   { yylval->fn = B_log; return FUNC; }
+/* built-in functions */
+"sqrt"  { yylval->fn = B_sqrt ; return FUNC; }
+"exp"   { yylval->fn = B_exp  ; return FUNC; }
+"log"   { yylval->fn = B_log  ; return FUNC; }
 "print" { yylval->fn = B_print; return FUNC; }
- /* names */
+/* names */
 [a-zA-Z][a-zA-Z0-9]*  { yylval->s = lookup(pp, yytext); return NAME; }
 [0-9]+"."[0-9]*{EXP}? |
-"."?[0-9]+{EXP}? { yylval->d = atof(yytext); return NUMBER; }
+"."?[0-9]+{EXP}?      { yylval->d = atof(yytext); return NUMBER; }
 "//".*
-[ \t]   /* ignore whitespace */
-\\n    printf("c> "); /* ignore line continuation */
-"\n"    { return EOL; }
-.       { yyerror(pp, "Mystery character %c\n", *yytext); }
+[ \t]    /* ignore whitespace */
+\\n      printf("c> "); /* ignore line continuation */
+"\n"     { return EOL; }
+.        { yyerror(pp, "Mystery character %c\n", *yytext); }
 <<EOF>>  { exit(0); }
 %%
 ```
@@ -326,74 +341,75 @@ Example 9-4. Reentrant calculator parser `purecalc.y`
 %define api.pure
 %parse-param { struct pcdata *pp }
 %{
-#  include <stdio.h>
-#  include <stdlib.h>
+#include<stdio.h>
+#include<stdlib.h>
 %}
 %union {
-  struct ast *a;
-  double d;
-  struct symbol *s;             /* which symbol */
-  struct symlist *sl;
-  int fn;                       /* which function */
+    struct ast *a;
+    double d;
+    struct symbol *s;     /* which symbol */
+    struct symlist *sl;
+    int fn;               /* which function */
 }
 %{
-#  include "purecalc.lex.h"
-#  include "purecalc.h"
-#define YYLEX_PARAM pp->scaninfo
+    #include "purecalc.lex.h"
+    #include "purecalc.h"
+    #define YYLEX_PARAM pp->scaninfo
 %}
 /* declare tokens */
-%token <d> NUMBER
-%token <s> NAME
-%token <fn> FUNC
+%token<d> NUMBER
+%token<s> NAME
+%token<fn> FUNC
 %token EOL
 %token IF THEN ELSE WHILE DO LET
-%nonassoc <fn> CMP
+%nonassoc<fn> CMP
 %right '='
 %left '+' '-'
 %left '*' '/'
 %nonassoc '|' UMINUS
-%type <a> exp stmt list explist
-%type <sl> symlist
+%type<a> exp stmt list explist
+%type<sl> symlist
 %start calc
 %%
 ```
 
 
-The parser file defines `api.pure` to generate a reentrant parser and uses parse-param to declare that the parser now takes an argument, which is the pointer to the application state. A few lines further down, a code block includes `purecalc.lex.h`, which is the header generated by flex, and defines `YYLEX_PARAM` to pass the scanner state, which is stored in the instance state, to the scanner.
+The parser file defines `api.pure` to generate a reentrant parser and uses `parse-param` to declare that the parser now takes an argument, which is the pointer to the application state. A few lines further down, a code block includes `purecalc.lex.h`, which is the header generated by flex, and defines `YYLEX_PARAM` to pass the scanner state, which is stored in the instance state, to the scanner.
 
 
 ```c
 calc: /* nothing */ EOL { pp->ast = NULL; YYACCEPT; }
-   | stmt EOL { pp->ast = $1; YYACCEPT; }
-   | LET NAME '(' symlist ')' '=' list EOL {
-                       dodef(pp, $2, $4, $7);
-                       printf("%d: Defined %s\n", yyget_lineno(pp->scaninfo),
-                              $2->name);
-                       pp->ast = NULL; YYACCEPT; }
- ;
+    | stmt EOL { pp->ast = $1; YYACCEPT; }
+    | LET NAME '(' symlist ')' '=' list EOL 
+      {
+           dodef(pp, $2, $4, $7);
+           printf("%d: Defined %s\n", yyget_lineno(pp->scaninfo), $2->name);
+           pp->ast = NULL; YYACCEPT;
+      }
+    ;
 ```
 
 
-The top-level rule is now `calc`, which handles an empty line, a statement that is parsed into an AST, or a function definition that is stored in the local symbol table. Normally a bison parser reads a token stream up to the end-of file-token. This parser uses `YYACCEPT` to end the parse. When the parser ends, it leaves the scanner’s state unchanged, so the next time the parser starts up, using the same scanner state, it resumes reading where the previous parse left off. An alternate approach would be to have the lexer return an end-of-file token when the user types a newline, which would also work; in a situation like this, there’s no strong reason to prefer one approach or the other.
+The top-level rule is now `calc`, which handles an empty line, a statement that is parsed into an AST, or a function definition that is stored in the local symbol table. Normally a bison parser reads a token stream up to the end-of-file token. This parser uses `YYACCEPT` to end the parse. When the parser ends, it leaves the scanner’s state unchanged, so the next time the parser starts up, using the same scanner state, it resumes reading where the previous parse left off. An alternate approach would be to have the lexer return an end-of-file token when the user types a newline, which would also work; in a situation like this, there’s no strong reason to prefer one approach or the other.
 
-The rest of the parser is the same as the nonreentrant version, except that every call to an external routine now passes the pointer to the instance state. As we will see, many of the routines don’t do anything with the state variable, but it’s easier to pass it to all of them than to try to remember which ones need it and which ones don’t.
+The rest of the parser is the same as the non-reentrant version, except that every call to an external routine now passes the pointer to the instance state. As we will see, many of the routines don’t do anything with the state variable, but it’s easier to pass it to all of them than to try to remember which ones need it and which ones don’t.
 
 ```c
 stmt: IF exp THEN list           { $$ = newflow(pp, 'I', $2, $4, NULL); }
-   | IF exp THEN list ELSE list  { $$ = newflow(pp, 'I', $2, $4, $6); }
-   | WHILE exp DO list           { $$ = newflow(pp, 'W', $2, $4, NULL); }
-   | exp
+    | IF exp THEN list ELSE list { $$ = newflow(pp, 'I', $2, $4, $6); }
+    | WHILE exp DO list          { $$ = newflow(pp, 'W', $2, $4, NULL); }
+    | exp
 ;
 list: /* nothing */ { $$ = NULL; }
-   | stmt ';' list { if ($3 == NULL)
+    | stmt ';' list { if ($3 == NULL)
                         $$ = $1;
                       else
                         $$ = newast(pp, 'L', $1, $3);
                     }
-   ;
+;
 exp: exp CMP exp          { $$ = newcmp(pp, $2, $1, $3); }
    | exp '+' exp          { $$ = newast(pp, '+', $1,$3); }
-   | exp '-' exp          { $$ = newast(pp, '-', $1,$3);}
+   | exp '-' exp          { $$ = newast(pp, '-', $1,$3); }
    | exp '*' exp          { $$ = newast(pp, '*', $1,$3); }
    | exp '/' exp          { $$ = newast(pp, '/', $1,$3); }
    | '|' exp              { $$ = newast(pp, '|', $2, NULL); }
@@ -406,10 +422,10 @@ exp: exp CMP exp          { $$ = newcmp(pp, $2, $1, $3); }
    | NAME '(' explist ')' { $$ = newcall(pp, $1, $3); }
 ;
 explist: exp
- | exp ',' explist  { $$ = newast(pp, 'L', $1, $3); }
+       | exp ',' explist  { $$ = newast(pp, 'L', $1, $3); }
 ;
-symlist: NAME       { $$ = newsymlist(pp, $1, NULL); }
- | NAME ',' symlist { $$ = newsymlist(pp, $1, $3); }
+symlist: NAME             { $$ = newsymlist(pp, $1, NULL); }
+       | NAME ',' symlist { $$ = newsymlist(pp, $1, $3); }
 ;
 %%
 ```
@@ -417,7 +433,7 @@ symlist: NAME       { $$ = newsymlist(pp, $1, NULL); }
 
 Example 9-5 shows the helper functions, adjusted for a reentrant scanner and parser.
 
-There is now a symbol table per instance state, so the routines that do symbol table lookups need to get the symbol table pointer from the state structure.
+There is now a symbol table per-instance state, so the routines that do symbol table lookups need to get the symbol table pointer from the state structure.
 
 Example 9-5. Helper functions `purecalcfuncs.c`
 
@@ -433,353 +449,342 @@ Example 9-5. Helper functions `purecalcfuncs.c`
 #include "purecalc.tab.h"
 #include "purecalc.lex.h"
 #include "purecalc.h"
+
 /* symbol table */
 /* hash a symbol */
 static unsigned
-symhash(char *sym)
+    symhash(char *sym)
 {
-  unsigned int hash = 0;
-  unsigned c;
-  while(c = *sym++) hash = hash*9 ^ c;
-  return hash;
+    unsigned int hash = 0;
+    unsigned c;
+    while(c = *sym++) hash = hash*9 ^ c;
+    return hash;
 }
 struct symbol *
-lookup(struct pcdata *pp, char* sym)
+    lookup(struct pcdata *pp, char* sym)
 {
-  struct symbol *sp = &(pp->symtab)[symhash(sym)%NHASH];
-  int scount = NHASH;           /* how many have we looked at */
-  while(--scount >= 0) {
-    if(sp->name && !strcmp(sp->name, sym)) { return sp; }
-    if(!sp->name) {             /* new entry */
-      sp->name = strdup(sym);
-      sp->value = 0;
-      sp->func = NULL;
-      sp->syms = NULL;
-      return sp;
+    struct symbol *sp = &(pp->symtab)[symhash(sym)%NHASH];
+    int scount = NHASH;           /* how many have we looked at */
+    while(--scount >= 0) {
+        if(sp->name && !strcmp(sp->name, sym)) { return sp; }
+        if(!sp->name) {          /* new entry */
+            sp->name = strdup(sym);
+            sp->value = 0;
+            sp->func = NULL;
+            sp->syms = NULL;
+            return sp;
+        }
+        if(++sp >= pp->symtab+NHASH) sp = pp->symtab; /* try the next entry */
     }
-    if(++sp >= pp->symtab+NHASH) sp = pp->symtab; /* try the next entry */
-  }
-  yyerror(pp, "symbol table overflow\n");
-  abort(); /* tried them all, table is full */
+    yyerror(pp, "symbol table overflow\n");
+    abort(); /* tried them all, table is full */
 }
 struct ast *
-newast(struct pcdata *pp, int nodetype, struct ast *l, struct ast *r)
+    newast(struct pcdata *pp, int nodetype, struct ast *l, struct ast *r)
 {
-  struct ast *a = malloc(sizeof(struct ast));
-
-  if(!a) {
-    yyerror(pp, "out of space");
-    exit(0);
-  }
-  a->nodetype = nodetype;
-  a->l = l;
-  a->r = r;
-  return a;
+    struct ast *a = malloc(sizeof(struct ast));
+    if(!a) {
+        yyerror(pp, "out of space");
+        exit(0);
+    }
+    a->nodetype = nodetype;
+    a->l = l;
+    a->r = r;
+    return a;
 }
 struct ast *
-newnum(struct pcdata *pp, double d)
+    newnum(struct pcdata *pp, double d)
 {
-  struct numval *a = malloc(sizeof(struct numval));
-
-  if(!a) {
-    yyerror(pp, "out of space");
-    exit(0);
-  }
-  a->nodetype = 'K';
-  a->number = d;
-  return (struct ast *)a;
+    struct numval *a = malloc(sizeof(struct numval));
+    if(!a) {
+        yyerror(pp, "out of space");
+        exit(0);
+    }
+    a->nodetype = 'K';
+    a->number = d;
+    return (struct ast *)a;
 }
 struct ast *
-newcmp(struct pcdata *pp, int cmptype, struct ast *l, struct ast *r)
+    newcmp(struct pcdata *pp, int cmptype, struct ast *l, struct ast *r)
 {
-  struct ast *a = malloc(sizeof(struct ast));
-
-  if(!a) {
-    yyerror(pp, "out of space");
-    exit(0);
-  }
-  a->nodetype = '0' + cmptype;
-  a->l = l;
-  a->r = r;
-  return a;
+    struct ast *a = malloc(sizeof(struct ast));
+    if(!a) {
+        yyerror(pp, "out of space");
+        exit(0);
+    }
+    a->nodetype = '0' + cmptype;
+    a->l = l;
+    a->r = r;
+    return a;
 }
 struct ast *
-newfunc(struct pcdata *pp, int functype, struct ast *l)
+    newfunc(struct pcdata *pp, int functype, struct ast *l)
 {
-  struct fncall *a = malloc(sizeof(struct fncall));
-
-  if(!a) {
-    yyerror(pp, "out of space");
-    exit(0);
-  }
-  a->nodetype = 'F';
-  a->l = l;
-  a->functype = functype;
-  return (struct ast *)a;
+    struct fncall *a = malloc(sizeof(struct fncall));
+    if(!a) {
+        yyerror(pp, "out of space");
+        exit(0);
+    }
+    a->nodetype = 'F';
+    a->l = l;
+    a->functype = functype;
+    return (struct ast *)a;
 }
 struct ast *
-newcall(struct pcdata *pp, struct symbol *s, struct ast *l)
+    newcall(struct pcdata *pp, struct symbol *s, struct ast *l)
 {
-  struct ufncall *a = malloc(sizeof(struct ufncall));
-
-  if(!a) {
-    yyerror(pp, "out of space");
-    exit(0);
-  }
-  a->nodetype = 'C';
-  a->l = l;
-  a->s = s;
-  return (struct ast *)a;
+    struct ufncall *a = malloc(sizeof(struct ufncall));
+    if(!a) {
+        yyerror(pp, "out of space");
+        exit(0);
+    }
+    a->nodetype = 'C';
+    a->l = l;
+    a->s = s;
+    return (struct ast *)a;
 }
 struct ast *
-newref(struct pcdata *pp, struct symbol *s)
+    newref(struct pcdata *pp, struct symbol *s)
 {
-  struct symref *a = malloc(sizeof(struct symref));
-
-  if(!a) {
-    yyerror(pp, "out of space");
-    exit(0);
-  }
-  a->nodetype = 'N';
-  a->s = s;
-  return (struct ast *)a;
+    struct symref *a = malloc(sizeof(struct symref));
+    if(!a) {
+        yyerror(pp, "out of space");
+        exit(0);
+    }
+    a->nodetype = 'N';
+    a->s = s;
+    return (struct ast *)a;
 }
 struct ast *
-newasgn(struct pcdata *pp, struct symbol *s, struct ast *v)
+    newasgn(struct pcdata *pp, struct symbol *s, struct ast *v)
 {
-  struct symasgn *a = malloc(sizeof(struct symasgn));
-
-  if(!a) {
-    yyerror(pp, "out of space");
-    exit(0);
-  }
-  a->nodetype = '=';
-  a->s = s;
-  a->v = v;
-  return (struct ast *)a;
+    struct symasgn *a = malloc(sizeof(struct symasgn));
+    if(!a) {
+        yyerror(pp, "out of space");
+        exit(0);
+    }
+    a->nodetype = '=';
+    a->s = s;
+    a->v = v;
+    return (struct ast *)a;
 }
 struct ast *
-newflow(struct pcdata *pp, int nodetype, struct ast *cond, struct ast *tl, struct ast *el)
+    newflow(struct pcdata *pp, int nodetype, struct ast *cond, struct ast *tl, struct ast *el)
 {
-  struct flow *a = malloc(sizeof(struct flow));
-
-  if(!a) {
-    yyerror(pp, "out of space");
-    exit(0);
-  }
-  a->nodetype = nodetype;
-  a->cond = cond;
-  a->tl = tl;
-  a->el = el;
-  return (struct ast *)a;
+    struct flow *a = malloc(sizeof(struct flow));
+    if(!a) {
+        yyerror(pp, "out of space");
+        exit(0);
+    }
+    a->nodetype = nodetype;
+    a->cond = cond;
+    a->tl = tl;
+    a->el = el;
+    return (struct ast *)a;
 }
 struct symlist *
-newsymlist(struct pcdata *pp, struct symbol *sym, struct symlist *next)
+    newsymlist(struct pcdata *pp, struct symbol *sym, struct symlist *next)
 {
-  struct symlist *sl = malloc(sizeof(struct symlist));
-
-  if(!sl) {
-    yyerror(pp, "out of space");
-    exit(0);
-  }
-  sl->sym = sym;
-  sl->next = next;
-  return sl;
+    struct symlist *sl = malloc(sizeof(struct symlist));
+    if(!sl) {
+        yyerror(pp, "out of space");
+        exit(0);
+    }
+    sl->sym = sym;
+    sl->next = next;
+    return sl;
 }
 void
-symlistfree(struct pcdata *pp, struct symlist *sl)
+    symlistfree(struct pcdata *pp, struct symlist *sl)
 {
-  struct symlist *nsl;
-  while(sl) {
-    nsl = sl->next;
-    free(sl);
-    sl = nsl;
-  }
+    struct symlist *nsl;
+    while(sl) {
+        nsl = sl->next;
+        free(sl);
+        sl = nsl;
+    }
 }
+
 /* define a function */
 void
-dodef(struct pcdata *pp, struct symbol *name, struct symlist *syms, struct ast *func)
+    dodef(struct pcdata *pp, struct symbol *name, struct symlist *syms, struct ast *func)
 {
-  if(name->syms) symlistfree(pp, name->syms);
-  if(name->func) treefree(pp, name->func);
-  name->syms = syms;
-  name->func = func;
+    if(name->syms) symlistfree(pp, name->syms);
+    if(name->func) treefree(pp, name->func);
+    name->syms = syms;
+    name->func = func;
 }
 static double callbuiltin(struct pcdata *pp, struct fncall *);
 static double calluser(struct pcdata *pp, struct ufncall *);
 double
-eval(struct pcdata *pp, struct ast *a)
+    eval(struct pcdata *pp, struct ast *a)
 {
-  double v;
-  if(!a) {
-    yyerror(pp, "internal error, null eval");
-    return 0.0;
-  }
-  switch(a->nodetype) {
-    /* constant */
-  case 'K': v = ((struct numval *)a)->number; break;
-    /* name reference */
-  case 'N': v = ((struct symref *)a)->s->value; break;
-    /* assignment */
-  case '=': v = ((struct symasgn *)a)->s->value =
-      eval(pp, ((struct symasgn *)a)->v); break;
-    /* expressions */
-  case '+': v = eval(pp, a->l) + eval(pp, a->r); break;
-  case '-': v = eval(pp, a->l) - eval(pp, a->r); break;
-  case '*': v = eval(pp, a->l) * eval(pp, a->r); break;
-  case '/': v = eval(pp, a->l) / eval(pp, a->r); break;
-  case '|': v = fabs(eval(pp, a->l)); break;
-  case 'M': v = -eval(pp, a->l); break;
-    /* comparisons */
-  case '1': v = (eval(pp, a->l) > eval(pp, a->r))? 1 : 0; break;
-  case '2': v = (eval(pp, a->l) < eval(pp, a->r))? 1 : 0; break;
-  case '3': v = (eval(pp, a->l) != eval(pp, a->r))? 1 : 0; break;
-  case '4': v = (eval(pp, a->l) == eval(pp, a->r))? 1 : 0; break;
-  case '5': v = (eval(pp, a->l) >= eval(pp, a->r))? 1 : 0; break;
-  case '6': v = (eval(pp, a->l) <= eval(pp, a->r))? 1 : 0; break;
-  /* control flow */
-  /* null if/else/do expressions allowed in the grammar, so check for them */
-  case 'I':
-    if( eval(pp,  ((struct flow *)a)->cond) != 0) {
-      if( ((struct flow *)a)->tl) {
-        v = eval(pp,  ((struct flow *)a)->tl);
-      } else
-        v = 0.0;                /* a default value */
-    } else {
-      if( ((struct flow *)a)->el) {
-        v = eval(pp, ((struct flow *)a)->el);
-      } else
-        v = 0.0;                /* a default value */
+    double v;
+    if(!a) {
+        yyerror(pp, "internal error, null eval");
+        return 0.0;
     }
-    break;
-  case 'W':
-    v = 0.0;            /* a default value */
-
-    if( ((struct flow *)a)->tl) {
-      while( eval(pp, ((struct flow *)a)->cond) != 0)
-        v = eval(pp, ((struct flow *)a)->tl);
+    switch(a->nodetype) {
+        /* constant */
+        case 'K': v = ((struct numval *)a)->number; break;
+        /* name reference */
+        case 'N': v = ((struct symref *)a)->s->value; break;
+        /* assignment */
+        case '=': v = ((struct symasgn *)a)->s->value = eval(pp, ((struct symasgn *)a)->v); break;
+        /* expressions */
+        case '+': v = eval(pp, a->l) + eval(pp, a->r); break;
+        case '-': v = eval(pp, a->l) - eval(pp, a->r); break;
+        case '*': v = eval(pp, a->l) * eval(pp, a->r); break;
+        case '/': v = eval(pp, a->l) / eval(pp, a->r); break;
+        case '|': v = fabs(eval(pp, a->l)); break;
+        case 'M': v = -eval(pp, a->l); break;
+        /* comparisons */
+        case '1': v = (eval(pp, a->l) > eval(pp, a->r))? 1 : 0; break;
+        case '2': v = (eval(pp, a->l) < eval(pp, a->r))? 1 : 0; break;
+        case '3': v = (eval(pp, a->l) != eval(pp, a->r))? 1 : 0; break;
+        case '4': v = (eval(pp, a->l) == eval(pp, a->r))? 1 : 0; break;
+        case '5': v = (eval(pp, a->l) >= eval(pp, a->r))? 1 : 0; break;
+        case '6': v = (eval(pp, a->l) <= eval(pp, a->r))? 1 : 0; break;
+        /* control flow */
+        /* null if/else/do expressions allowed in the grammar, so check for them */
+        case 'I':
+            if(eval(pp, ((struct flow *)a)->cond) != 0) {
+                if(((struct flow *)a)->tl) {
+                    v = eval(pp, ((struct flow *)a)->tl);
+                } else
+                    v = 0.0;                /* a default value */
+            } else {
+                if(((struct flow *)a)->el) {
+                    v = eval(pp, ((struct flow *)a)->el);
+                } else
+                    v = 0.0;                /* a default value */
+            }
+            break;
+        case 'W':
+            v = 0.0;            /* a default value */
+            if(((struct flow *)a)->tl) {
+                while(eval(pp, ((struct flow *)a)->cond) != 0)
+                    v = eval(pp, ((struct flow *)a)->tl);
+            }
+            break;                      /* last value is value */
+        case 'L': eval(pp, a->l); v = eval(pp, a->r); break;
+        case 'F': v = callbuiltin(pp, (struct fncall *)a); break;
+        case 'C': v = calluser(pp, (struct ufncall *)a); break;
+        default: printf("internal error: bad node %c\n", a->nodetype);
     }
-    break;                      /* last value is value */
-
-  case 'L': eval(pp, a->l); v = eval(pp, a->r); break;
-  case 'F': v = callbuiltin(pp, (struct fncall *)a); break;
-  case 'C': v = calluser(pp, (struct ufncall *)a); break;
-  default: printf("internal error: bad node %c\n", a->nodetype);
-  }
-  return v;
+    return v;
 }
 static double
-callbuiltin(struct pcdata *pp, struct fncall *f)
+    callbuiltin(struct pcdata *pp, struct fncall *f)
 {
-  enum bifs functype = f->functype;
-  double v = eval(pp, f->l);
- switch(functype) {
- case B_sqrt:
-   return sqrt(v);
- case B_exp:
-   return exp(v);
- case B_log:
-   return log(v);
- case B_print:
-   printf("= %4.4g\n", v);
-   return v;
- default:
-   yyerror(pp, "Unknown built-in function %d", functype);
-   return 0.0;
- }
+    enum bifs functype = f->functype;
+    double v = eval(pp, f->l);
+    switch(functype) {
+        case B_sqrt:
+            return sqrt(v);
+        case B_exp:
+            return exp(v);
+        case B_log:
+            return log(v);
+        case B_print:
+            printf("= %4.4g\n", v);
+            return v;
+        default:
+            yyerror(pp, "Unknown built-in function %d", functype);
+            return 0.0;
+    }
 }
 static double
-calluser(struct pcdata *pp, struct ufncall *f)
+    calluser(struct pcdata *pp, struct ufncall *f)
 {
-  struct symbol *fn = f->s;     /* function name */
-  struct symlist *sl;           /* dummy arguments */
-  struct ast *args = f->l;      /* actual arguments */
-  double *oldval, *newval;      /* saved arg values */
-  double v;
-  int nargs;
-  int i;
-  if(!fn->func) {
-    yyerror(pp, "call to undefined function", fn->name);
-    return 0;
-  }
-  /* count the arguments */
-  sl = fn->syms;
-  for(nargs = 0; sl; sl = sl->next)
-    nargs++;
-  /* prepare to save them */
-  oldval = (double *)malloc(nargs * sizeof(double));
-  newval = (double *)malloc(nargs * sizeof(double));
-  if(!oldval || !newval) {
-    yyerror(pp, "Out of space in %s", fn->name); return 0.0;
-  }
-
-  /* evaluate the arguments */
-  for(i = 0; i < nargs; i++) {
-    if(!args) {
-      yyerror(pp, "too few args in call to %s", fn->name);
-      free(oldval); free(newval);
-      return 0;
+    struct symbol *fn = f->s;     /* function name */
+    struct symlist *sl;           /* dummy arguments */
+    struct ast *args = f->l;      /* actual arguments */
+    double *oldval, *newval;      /* saved arg values */
+    double v;
+    int nargs;
+    int i;
+    if(!fn->func) {
+        yyerror(pp, "call to undefined function", fn->name);
+        return 0;
     }
-    if(args->nodetype == 'L') { /* if this is a list node */
-      newval[i] = eval(pp, args->l);
-      args = args->r;
-    } else {                    /* if it's the end of the list */
-      newval[i] = eval(pp, args);
-      args = NULL;
+    /* count the arguments */
+    sl = fn->syms;
+    for(nargs = 0; sl; sl = sl->next)
+        nargs++;
+    /* prepare to save them */
+    oldval = (double *)malloc(nargs * sizeof(double));
+    newval = (double *)malloc(nargs * sizeof(double));
+    if(!oldval || !newval) {
+        yyerror(pp, "Out of space in %s", fn->name); return 0.0;
     }
-  }
+    /* evaluate the arguments */
+    for(i = 0; i < nargs; i++) {
+        if(!args) {
+            yyerror(pp, "too few args in call to %s", fn->name);
+            free(oldval); free(newval);
+            return 0;
+        }
+        if(args->nodetype == 'L') { /* if this is a list node */
+            newval[i] = eval(pp, args->l);
+            args = args->r;
+        } else {                    /* if it's the end of the list */
+            newval[i] = eval(pp, args);
+            args = NULL;
+        }
+    }
 
-  /* save old values of dummies, assign new ones */
-  sl = fn->syms;
-  for(i = 0; i < nargs; i++) {
-    struct symbol *s = sl->sym;
-    oldval[i] = s->value;
-    s->value = newval[i];
-    sl = sl->next;
-  }
-  free(newval);
-  /* evaluate the function */
-  v = eval(pp, fn->func);
-  /* put the dummies back */
-  sl = fn->syms;
-  for(i = 0; i < nargs; i++) {
-    struct symbol *s = sl->sym;
-    s->value = oldval[i];
-    sl = sl->next;
-  }
-  free(oldval);
-  return v;
+    /* save old values of dummies, assign new ones */
+    sl = fn->syms;
+    for(i = 0; i < nargs; i++) {
+        struct symbol *s = sl->sym;
+        oldval[i] = s->value;
+        s->value = newval[i];
+        sl = sl->next;
+    }
+    free(newval);
+    /* evaluate the function */
+    v = eval(pp, fn->func);
+    /* put the dummies back */
+    sl = fn->syms;
+    for(i = 0; i < nargs; i++) {
+        struct symbol *s = sl->sym;
+        s->value = oldval[i];
+        sl = sl->next;
+    }
+    free(oldval);
+    return v;
 }
 void
-treefree(struct pcdata *pp, struct ast *a)
+    treefree(struct pcdata *pp, struct ast *a)
 {
-  switch(a->nodetype) {
-    /* two subtrees */
-  case '+':
-  case '-':
-  case '*':
-  case '/':
-  case '1':  case '2':  case '3':  case '4':  case '5':  case '6':
-  case 'L':
-    treefree(pp, a->r);
-    /* one subtree */
-  case '|':
-  case 'M': case 'C': case 'F':
-    treefree(pp, a->l);
-    /* no subtree */
-  case 'K': case 'N':
-    break;
-  case '=':
-    free( ((struct symasgn *)a)->v);
-    break;
-  case 'I': case 'W':
-    free( ((struct flow *)a)->cond);
-    if( ((struct flow *)a)->tl) free( ((struct flow *)a)->tl);
-    if( ((struct flow *)a)->el) free( ((struct flow *)a)->el);
-    break;
-  default: printf("internal error: free bad node %c\n", a->nodetype);
-  }
-  free(a); /* always free the node itself */
+    switch(a->nodetype) {
+        /* two subtrees */
+        case '+':
+        case '-':
+        case '*':
+        case '/':
+        case '1':  case '2':  case '3':  case '4':  case '5':  case '6':
+        case 'L':
+            treefree(pp, a->r);
+        /* one subtree */
+        case '|':
+        case 'M': case 'C': case 'F':
+            treefree(pp, a->l);
+        /* no subtree */
+        case 'K': case 'N':
+            break;
+        case '=':
+            free( ((struct symasgn *)a)->v);
+            break;
+        case 'I': case 'W':
+            free( ((struct flow *)a)->cond);
+            if( ((struct flow *)a)->tl) free( ((struct flow *)a)->tl);
+            if( ((struct flow *)a)->el) free( ((struct flow *)a)->el);
+            break;
+        default: printf("internal error: free bad node %c\n", a->nodetype);
+    }
+    free(a); /* always free the node itself */
 }
 ```
 
@@ -788,46 +793,49 @@ The `yyerror` function now gets the current line number that was in the static `
 
 ```c
 void
-yyerror(struct pcdata *pp, char *s, ...)
+    yyerror(struct pcdata *pp, char *s, ...)
 {
-  va_list ap;
-  va_start(ap, s);
-  fprintf(stderr, "%d: error: ", yyget_lineno(pp->scaninfo));
-  vfprintf(stderr, s, ap);
-  fprintf(stderr, "\n");
+    va_list ap;
+    va_start(ap, s);
+    fprintf(stderr, "%d: error: ", yyget_lineno(pp->scaninfo));
+    vfprintf(stderr, s, ap);
+    fprintf(stderr, "\n");
 }
 ```
 
 
-The main function needs to create instance data and link it together, putting a pointer to the application instance data into the scanner instance via `yylex_init_extra` and storing the pointer to the scanner instance into `p.scaninfo`. Then it allocates a fresh symbol table, and it’s ready to start parsing.
+
+The `main` function needs to create instance data and link it together, putting a pointer to the application instance data into the scanner instance via `yylex_init_extra` and storing the pointer to the scanner instance into `p.scaninfo`. Then it allocates a fresh symbol table, and it’s ready to start parsing.
 
 In this simple example, each time it calls the parser, if the parser returns an AST, it immediately evaluates the AST and frees it.
 
 
 ```c
 int
-main()
+    main()
 {
-  struct pcdata p = { NULL, 0, NULL };
-  /* set up scanner */
-  if(yylex_init_extra(&p, &p.scaninfo)) {
-    perror("init alloc failed");
-    return 1;
-  }
-  /* allocate and zero out the symbol table */
-  if(!(p.symtab = calloc(NHASH, sizeof(struct symbol)))) {
-    perror("sym alloc failed");
-    return 1;
-  }
-  for(;;) {
-    printf("> ");
-    yyparse(&p);
-    if(p.ast) {
-      printf("= %4.4g\n", eval(&p, p.ast));
-      treefree(&p, p.ast);
-      p.ast = 0;
+    struct pcdata p = { NULL, 0, NULL };
+    
+    /* set up scanner */
+    if(yylex_init_extra(&p, &p.scaninfo)) {
+        perror("init alloc failed");
+        return 1;
     }
-  }
+    
+    /* allocate and zero out the symbol table */
+    if(!(p.symtab = calloc(NHASH, sizeof(struct symbol)))) {
+        perror("sym alloc failed");
+        return 1;
+    }
+    for(;;) {
+        printf("> ");
+        yyparse(&p);
+        if(p.ast) {
+            printf("= %4.4g\n", eval(&p, p.ast));
+            treefree(&p, p.ast);
+            p.ast = 0;
+        }
+    }
 }
 ```
 
@@ -846,8 +854,8 @@ While a GLR parser is handling multiple possible parses, it remembers what reduc
 The SQL parser in Chapter 4 has a few lexical hacks to deal with the limits of LALR parsers. We’ll take the hacks out and use a GLR parser instead. One hack made `ON DUPLICATE` a single token because of a lookahead limitation. The other made `NOT EXISTS` a single token that was a variant of `EXISTS` because of ambiguity in the expression grammar. This version of the scanner simply takes out those hacks and makes `EXISTS`, `ON`, and `DUPLICATE` ordinary keyword tokens.
 
 ```c
-EXISTS  { return EXISTS; }
-ON      { return ON; }
+EXISTS    { return EXISTS; }
+ON        { return ON; }
 DUPLICATE { return DUPLICATE; }
 ```
 
@@ -859,11 +867,11 @@ In the parser, the grammar becomes more straightforward with `ON DUPLICATE` as s
 opt_ondupupdate: /* nil */
    | ON DUPLICATE KEY UPDATE insert_asgn_list { emit("DUPUPDATE %d", $5); }
    ;
-    ...
+...
 expr: ...
-   | NOT expr                        { emit("NOT"); }
-   | EXISTS '(' select_stmt ')'      { emit("EXISTS 1"); }
-   | NOT EXISTS '(' select_stmt ')'  { emit("EXISTS 0"); }
+   | NOT expr                       { emit("NOT"); }
+   | EXISTS '(' select_stmt ')'     { emit("EXISTS 1"); }
+   | NOT EXISTS '(' select_stmt ')' { emit("EXISTS 0"); }
    ;
 ```
 
@@ -879,30 +887,30 @@ State 345 conflicts: 59 reduce/reduce
 
 Before throwing the switch to GLR, it’s important to be sure that the conflicts are the ones we were expecting, so we look at those three states in the listing file:
 
-```c
+```js
 state 249
-   55 join_table: table_reference STRAIGHT_JOIN table_factor .
-   56           | table_reference STRAIGHT_JOIN table_factor . ON expr
-    ON  shift, and go to state 316
+   55 join_table: table_reference STRAIGHT_JOIN table_factor @
+   56           | table_reference STRAIGHT_JOIN table_factor @ ON expr
+    ON        shift, and go to state 316
     ON        [reduce using rule 55 (join_table)]
     $default  reduce using rule 55 (join_table)
 state 317
-   54 join_table: table_reference opt_inner_cross JOIN table_factor . opt_join_condition
-    ON     shift, and go to state 377
-    USING  shift, and go to state 378
+   54 join_table: table_reference opt_inner_cross JOIN table_factor @ opt_join_condition
+    ON        shift, and go to state 377
+    USING     shift, and go to state 378
     ON        [reduce using rule 70 (opt_join_condition)]
     $default  reduce using rule 70 (opt_join_condition)
     opt_join_condition  go to state 379
     join_condition      go to state 380
 state 345
-  263 expr: EXISTS '(' select_stmt ')' .
-  264     | NOT EXISTS '(' select_stmt ')' .
-    NAME              reduce using rule 263 (expr)
-    NAME              [reduce using rule 264 (expr)]
-     ... 57 more reduce/reduce conflicts ...
-    ')'               reduce using rule 263 (expr)
-    ')'               [reduce using rule 264 (expr)]
-    $default          reduce using rule 263 (expr)
+  263 expr: EXISTS '(' select_stmt ')' @
+  264     | NOT EXISTS '(' select_stmt ')' @
+   NAME              reduce using rule 263 (expr)
+   NAME              [reduce using rule 264 (expr)]
+     /* ... 57 more reduce/reduce conflicts ... */
+   ')'               reduce using rule 263 (expr)
+   ')'               [reduce using rule 264 (expr)]
+   $default          reduce using rule 263 (expr)
 ```
 
 States 249 and 317 are indeed limited lookahead for `ON`, and state 345 is the ambiguity of treating `NOT EXISTS` as one operator or two. (The large number of conflicts is because the token that follows `NOT EXISTS` can be any token that’s valid in or after an expression.)
@@ -971,9 +979,9 @@ Bison produces excellent diagnostics in GLR parsers. Here we can see the two pos
 
 ```c
 expr: ...
-   | NOT expr { emit("NOT"); }  %dprec 1
+   | NOT expr { emit("NOT"); } %dprec 1
    ...
-   | NOT EXISTS '(' select_stmt ')'  { emit("EXISTS 0"); } %dprec 2
+   | NOT EXISTS '(' select_stmt ')' { emit("EXISTS 0"); } %dprec 2
 ```
 
 
@@ -985,9 +993,9 @@ Now the parser works correctly. The other way to resolve ambiguous parses is to 
 YYSTYPE exprmerge(YYSTYPE x1, YYSTYPE x2);
 %}
 expr: ...
-   | NOT expr { emit("NOT"); } %merge <exprmerge>
+   | NOT expr { emit("NOT"); } %merge<exprmerge>
    ...
-   | NOT EXISTS '(' select_stmt ')'  { emit("EXISTS 0"); } %merge <exprmerge>
+   | NOT EXISTS '(' select_stmt ')'  { emit("EXISTS 0"); } %merge<exprmerge>
 ```
 
 
@@ -997,7 +1005,7 @@ In many cases, GLR parsers are overkill, and you’re better off tweaking your s
 
 ## C++ Parsers
 
-Bison can create parsers in C++. Although flex appears to be able to create C++, scanners, the C++ code doesn’t work. Fortunately, C scanners created by flex compile under C++ and it is not hard to use a flex C scanner with a bison C++ parser, which is what we’ll do in the next example.
+Bison can create parsers in C++. ~~Although flex appears to be able to create C++, scanners, the C++ code doesn’t work. Fortunately,~~ C scanners created by flex compile under C++ and it is not hard to use a flex C scanner with a bison C++ parser, which is what we’ll do in the next example.
 
 All bison C++ parsers are reentrant, so bison creates a class for the parser. As with reentrant C parsers, the programmer can create as many instances as needed and usually passes in per-instance application data kept in a separate class.
 
@@ -1013,17 +1021,17 @@ Example 9-6. Application context class for the C++ calculator `cppcalc-ctx.hh`
 
 ```cpp
 class cppcalc_ctx {
-public:
-  cppcalc_ctx(int r) { assert(r > 1 && r <= 10); radix = r; }
-  inline int getradix(void) { return radix; }
-private:
-  int radix;
+    public:
+    cppcalc_ctx(int r) { assert(r > 1 && r <= 10); radix = r; }
+    inline int getradix(void) { return radix; }
+    private:
+    int radix;
 };
 ```
 
 ### C++ Parser Naming
 
-Unless otherwise instructed, bison creates the parser in the `yy` namespace, specifically in a class called parser. The parser itself is a class method called `parse`, which you call after creating an instance of the class. The namespace can be changed by the declaration `%define` namespace, and the class can be changed by `%define parser_class_name`. In this example we change the class name to `cppcalc`. The class contains the private data for a parser. It also has some debugging methods enabled by defining the preprocessor symbol `YYDEBUG`, notably `set_debug_level(N)`, which turns on parser tracing if N is nonzero.
+Unless otherwise instructed, bison creates the parser in the `yy` namespace, specifically in a class called `parser`. The parser itself is a class method called `parse`, which you call after creating an instance of the class. The namespace can be changed by the declaration `%define` namespace, and the class can be changed by `%define parser_class_name`. In this example we change the class name to `cppcalc`. The class contains the private data for a parser. It also has some debugging methods enabled by defining the preprocessor symbol `YYDEBUG`, notably `set_debug_level(N)`, which turns on parser tracing if `N` is nonzero.
 
 ### A C++ Parser
 
@@ -1036,7 +1044,7 @@ Example 9-7. C++ calculator parser `cppcalc.yy`
 %language "C++"
 %defines
 %locations
-%define parser_class_name "cppcalc"
+%define parser_class_name "cppcalc" // `parser` rename to `cppcalc`
 %{
 #include <iostream>
 using namespace std;
@@ -1048,16 +1056,16 @@ using namespace std;
     int ival;
 };
 /* declare tokens */
-%token <ival> NUMBER
+%token<ival> NUMBER
 %token ADD SUB MUL DIV ABS
 %token OP CP
 %token EOL
-%type <ival> exp factor term
+%type<ival> exp factor term
 %{
-extern int yylex(yy::cppcalc::semantic_type *yylval,
-       yy::cppcalc::location_type* yylloc,
-       cppcalc_ctx &ctx);
-void myout(int val, int radix);
+extern int yylex(yy::cppcalc::semantic_type* yylval,
+                 yy::cppcalc::location_type* yylloc,
+                 cppcalc_ctx &ctx);
+void myout(int val, int radix); // calclist
 %}
 %initial-action {
     // Filename for locations here
@@ -1067,21 +1075,23 @@ void myout(int val, int radix);
 %%
 ```
 
-The parser uses `%language` to declare that it’s written in C++ rather than in C, `%defines` to create the header file, `%locations` to put code to handle locations into the parser, and `%define` to call the class `cppcalc` rather than the default parser. Then some C++ code includes the iostream library and the context header described earlier.
+The parser uses `%language` to declare that it’s written in C++ rather than in C, `%defines` to create the header file, `%locations` to put code to handle locations into the parser, and `%define` to call the class `cppcalc` rather than the default `parser`. Then some C++ code includes the iostream library and the context header described earlier.
 
-The `%parser-param` and `%lex-param` declarations are the ones we met in the section “Pure Parsers in Bison” on page 212, and we define an extra argument to the parser (the parser’s class constructor) and to `yylex`. In this example we’re not using a reentrant lexer, but if we were, the parameter to the lexer would have to be a flex scanner context `yyscan_t` as it was in the previous example. It would use the same trick of storing it in a field in the parser parameter, which is now an instance of the context class.
+The `%parser-param` and `%lex-param` declarations are the ones we met in the section “Pure Parsers in Bison” ~~on page 212~~, and we define an extra argument to the parser (the parser’s class constructor) and to `yylex`. In this example we’re not using a reentrant lexer, but if we were, the parameter to the lexer would have to be a flex scanner context `yyscan_t` as it was in the previous example. It would use the same trick of storing it in a field in the parser parameter, which is now an instance of the context class.
 
 We declare a `%union`, which works the same way it does in C. In this simple case it has one member, the integer value of an expression. Following that are the token and nonterminal declarations.
 
 For some reason, bison doesn’t create the declaration of `yylex` that C++ requires, so we do it manually here. Its arguments are the same as in the pure C example: pointers to the token value, token location, and the lex-param context pointer. In a C++ parser, token values and locations have the types `semantic_type` and `location_type`, both members of the parser class. We also define `myout`, an output routine defined later that prints values using a particular radix.
 
-In a C parser that uses locations, if you want to report the filename, you have to add your own code to do so, as in section “More Sophisticated Locations with Filenames” on page 202, but the C++ version of locations fixes that oversight, adding a filename string field to the begin and end positions in each location. The `%initial-action` sets the filename for the initial location in `$@`, which is the location that’s passed to the scanner. That is all we need since the scanner in this example reads only one file and never updates the location filename.
+In a C parser that uses locations, if you want to report the filename, you have to add your own code to do so, as in section “More Sophisticated Locations with Filenames” ~~on page 202~~, but the C++ version of locations fixes that oversight, adding a `filename` string field to the `begin` and `end` positions in each location. The `%initial-action` sets the `filename` for the initial location in `$@`, which is the location that’s passed to the scanner. That is all we need since the scanner in this example reads only one file and never updates the location filename.
+
+
 
 ```c
  // bison rules for the C++ parser
 calclist: /* nothing */
  | calclist exp EOL { cout << "= "; myout(ctx.getradix(), $2); cout << "\n> "; }
- | calclist EOL { cout <<  "> "; } /* blank line or a comment */
+ | calclist     EOL { cout <<  "> "; } /* blank line or a comment */
  ;
 exp: factor
  | exp ADD factor { $$ = $1 + $3; }
@@ -1091,7 +1101,7 @@ exp: factor
 factor: term
  | factor MUL term { $$ = $1 * $3; }
  | factor DIV term { if($3 == 0) {
-                         error(@3, "zero divide");
+                         error(@3, "zero divide"); //yyerror
                          YYABORT;
                      }
                      $$ = $1 / $3; }
@@ -1103,56 +1113,58 @@ term: NUMBER
 %%
 ```
 
-The rules in the parser are the same as they were in Chapter 1, with the action code changed from C to C++. Note that the rule that prints a top-level `calclist` expression now calls `myout`, passing it the radix fetched from the `ctx` structure. The rule for division now has a zero divide test, calling parser class member function error, which replaces `yyerror`.
+The rules in the parser are the same as they were in Chapter 1, with the action code changed from C to C++. Note that the rule that prints a top-level `calclist` expression now calls `myout`, passing it the `radix` fetched from the `ctx` structure. The rule for division now has a zero divide test, calling parser class member function `error`, which replaces `yyerror`.
 
-> (Because of a bug in the C++ parser skeleton, it always calls error with a location argument even if you don’t use `%location`. The easiest workaround is always to use locations in a C++ parser.)
+> (Because of a bug in the C++ parser skeleton, it always calls `error` with a location argument even if you don’t use `%location`. The easiest workaround is always to use locations in a C++ parser.)
 
 
-```c++
+```cpp
 // C++ code section of parser
-main()
+int
+    main()
 {
-  cppcalc_ctx ctx(8);      // work in octal today
-  cout << "> ";
-  yy::cppcalc parser(ctx); // make a cppcalc parser
-  int v = parser.parse();  // and run it
-  return v;
+    cppcalc_ctx ctx(8);      // work in octal today
+    cout << "> ";
+    yy::cppcalc parser(ctx); // make a cppcalc parser
+    int v = parser.parse();  // and run it
+    return v;
 }
 // print an integer in given radix
 void
-myout(int radix, int val)
+    myout(int radix, int val)
 {
-  if(val < 0) {
-    cout << "-";
-    val = -val;
-  }
-  if(val > radix) {
-    myout(radix, val/radix);
-    val %= radix;
-  }
-  cout << val;
+    if(val < 0) {
+        cout << "-";
+        val = -val;
+    }
+    if(val > radix) {
+        myout(radix, val/radix);
+        val %= radix;
+    }
+    cout << val;
 }
 int
-myatoi(int radix, char *s)
+    myatoi(int radix, char *s)
 {
-  int v = 0;
-  while(*s) {
-    v = v*radix + *s++ - '0';
-  }
-  return v;
+    int v = 0;
+    while(*s) {
+        v = v*radix + *s++ - '0';
+    }
+    return v;
 }
 namespace yy {
-  void
-  cppcalc::error(location const &loc, const std::string& s) {
-     std::cerr << "error at "  << loc << ": " << s << std::endl;
-  }
+    void
+        cppcalc::error(location const &loc, const std::string& s) 
+    {
+        std::cerr << "error at "  << loc << ": " << s << std::endl;
+    }
 }
 ```
 
 
-Unlike a C pure parser, a C++ pure parser requires that you first create an instance of the parser then call it. Hence, the main program creates a `ctx` structure with an appropriate radix, creates an instance of `yy::cppcalc` called parser using that context, and then calls the parse method to do the actual parsing.
+Unlike a C pure parser, a C++ pure parser requires that you first create an instance of the parser then call it. Hence, the main program creates a `ctx` structure with an appropriate radix, creates an instance of `yy::cppcalc` called parser using that context, and then calls the `parse` method to do the actual parsing.
 
-Two helper routines, `myout` and `myatoi`, do radix to binary conversion, and finally we define `yy::error`, the error routine analogous to `yyerror`. For some reason, bison declares `error` as a private member function in the parser class, which means you can’t call it from elsewhere; in particular, you can’t call it from the scanner. The bison manual suggests that `yy::error` call the real error routine, which is defined in a context visible to the scanner and is probably the best workaround. Notice, incidentally, that the error routine outputs the location of the error using the normal C++ `<<` operator. This works because the location class defines a variety of operators including output formatting.
+Two helper routines, `myout` and `myatoi`, do radix to binary conversion, and finally we define `yy::error`, the error routine analogous to `yyerror`. For some reason, bison declares `error` as a private member function in the `parser` class, which means you can’t call it from elsewhere; in particular, you can’t call it from the scanner. The bison manual suggests that `yy::error` call the real error routine, which is defined in a context visible to the scanner and is probably the best workaround. Notice, incidentally, that the error routine outputs the location of the error using the normal C++ `<<` operator. This works because the location class defines a variety of operators including output formatting.
 
 ### Interfacing a Scanner with a C++ Parser
 
@@ -1168,6 +1180,7 @@ Example 9-8. C++ calculator scanner `cppcalc.l`
 #include <cstdlib>
 #include "cppcalc-ctx.hh"
 #include "cppcalc.tab.hh"
+
 #define YY_DECL int yylex(yy::cppcalc::semantic_type *yylval, \
     yy::cppcalc::location_type *yylloc, cppcalc_ctx &ctx)
 // make location include the current token
@@ -1180,7 +1193,7 @@ extern int myatoi(int radix, char *s); // defined in the parser
 
 The declaration part of the scanner includes the standard C library and the header files for the context and parser classes. It defines `YY_DECL` to declare the calling sequence for `yylex` to match what the parser expects, and it defines `YY_USER_ACTION`, the macro invoked before the action for each token, to set the location based on the length of the token. This is the same trick we did in Chapter 8, but the code is much shorter since C++ locations have a method that does what we want.
 
-The parser token numbers are defined in the token member of the parser class, so a `typedef` for the plain name token will make the token values easier to type.
+The parser token numbers are defined in the token member of the parser class, so a `typedef` for the plain name `token` will make the token values easier to type.
 
 
 ```c
@@ -1198,7 +1211,7 @@ The parser token numbers are defined in the token member of the parser class, so
 ")"     { return token::CP; }
 [0-9]+  { yylval->ival = myatoi(ctx.getradix(), yytext); return token::NUMBER; }
 \n      { yylloc->lines(1); return token::EOL; }
-  /* skip over comments and whitespace */
+/* skip over comments and whitespace */
 "//".*  |
 [ \t]   {  yylloc->step (); }
 .       { printf("Mystery character %c\n", *yytext); }
@@ -1211,19 +1224,19 @@ The `step` method sets the beginning of the location equal to the end, so the lo
 
 > (An alternative would be what we did in Chapter 8, tracking the line and column in local variables and copying them into the location for each token, but this takes advantage of predefined methods on C++ locations to make the code shorter.)
 
-The action code prefixes the token names with `token::` since the token names are now parser class members. The action for a newline uses the lines method to update the location line number, the action for comments and whitespace invokes `step` since they don’t return from the scanner, and the previous step is invoked only when `yylex` has returned and is called again.
+The action code prefixes the token names with `token::` since the token names are now parser class members. The action for a newline uses the `lines` method to update the location line number, the action for comments and whitespace invokes `step` since they don’t return from the scanner, and the previous `step` is invoked only when `yylex` has returned and is called again.
 
 The last catchall rule prints an error message. In the original C version of the scanner it called `yyerror`, but since this scanner isn’t part of the C++ parser class, it can’t call the parser error routine. Rather than write glue routines to allow the various parts of the program to call the same error reporting routine, for simplicity we just call `printf`.
 
 ### Should You Write Your Parser in C++ ?
 
-As should be apparent by now, the C++ support in bison is nowhere near as mature as the C support, which is not surprising since it’s about 30 years newer. The fact that `%union` can’t include class instances can require some extra work, and the less than seamless integration between C++ bison and C flex requires careful programming, particularly if they need to share significant data structures accessed from C in the scanner and C++ in the parser or if they need to have the scanner read its input using C stdio while the rest of the program uses C++ library I/O. A good object design would wrap a class around the application context (`ctx` in this example), the parser, and probably the scanner to present a unified interface to the rest of the program.
+As should be apparent by now, the C++ support in bison is nowhere near as mature as the C support, which is not surprising since it’s about 30 years newer. The fact that `%union` can’t include class instances can require some extra work, and the less than seamless integration between C++ bison and C flex requires careful programming, particularly if they need to share significant data structures accessed from C in the scanner and C++ in the parser or if they need to have the scanner read its input using C `stdio` while the rest of the program uses C++ library I/O. A good object design would wrap a class around the application context (`ctx` in this example), the parser, and probably the scanner to present a unified interface to the rest of the program.
 
 Nonetheless, C++ bison parsers do work, and the design of the parser class is a reasonable one. If you’re integrating your parser into a larger C++ project or if you want to use C++ libraries that don’t have C equivalents, a C++ parser can work well.
 
 ## Exercises
 
-1. Modify the parser in the pure calculator to parse one statement at a time and return without using `YYACCEPT`. You’ll probably want to change the scanner so it returns a zero token at end-of-line rather than using EOL.
+1. Modify the parser in the pure calculator to parse one statement at a time and return without using `YYACCEPT`. You’ll probably want to change the scanner so it returns a zero token at end-of-line rather than using `EOL`.
 
 2. Does the GLR version of the SQL parser accept the same language as the original version? Come up with an example that would be accepted and one that wouldn’t.
 
