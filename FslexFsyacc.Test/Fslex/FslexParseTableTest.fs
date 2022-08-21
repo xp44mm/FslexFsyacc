@@ -142,11 +142,11 @@ type FslexParseTableTest(output: ITestOutputHelper) =
         Should.equal src.closures FslexParseTable.closures
 
         let prodsFsyacc = 
-            Array.map fst src.rules
+            List.map fst src.rules
 
         let prodsParseTable = 
             Array.map fst FslexParseTable.rules
-
+            |> List.ofArray
         Should.equal prodsFsyacc prodsParseTable
 
         let headerFromFsyacc =

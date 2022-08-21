@@ -7,11 +7,11 @@ open FslexFsyacc.Runtime
 
 type FsyaccParseTableFile =
     {
-        rules:(string list*string)[]
+        rules:(string list*string)list
         actions:(string*int)[][]
         closures:(int*int*string[])[][]
         header: string
-        declarations:(string*string)[]
+        declarations:(string*string)list
     }
 
     ///闭包就是状态
@@ -19,13 +19,13 @@ type FsyaccParseTableFile =
         let startSymbol = (fst this.rules.[0]).[0]
 
         let rules =
-            [|
-                yield ["";startSymbol], ""
+            [
+                yield (["";startSymbol], "")
                 yield! this.rules
-            |]
-            |> Array.sortBy fst
-            |> Array.mapi(fun i entry -> -i, entry)
-            |> Map.ofArray
+            ]
+            |> List.sortBy fst
+            |> List.mapi(fun i entry ->(-i, entry))
+            |> Map.ofList
 
         let closures =
             this.closures
@@ -47,11 +47,11 @@ type FsyaccParseTableFile =
     /// 生成ParseTable Module
     /// 输入模块带名字空间的全名
     member this.generate(moduleName:string) =
-        let types = Map.ofArray this.declarations // symbol -> type of symbol
+        let types = Map.ofList this.declarations // symbol -> type of symbol
         
         let rules =
             this.rules
-            |> Array.map(fun(prod, semantic) ->
+            |> List.map(fun(prod, semantic) ->
                 let mapper = SemanticGenerator.decorateSemantic types prod semantic
                 $"{Literal.stringify prod},{mapper}"
                 )
@@ -85,9 +85,10 @@ type FsyaccParseTableFile =
 
     /// 单独生成action code的源代码module
     member this.generateMappers() =
-        let types = Map.ofArray this.declarations // symbol -> type of symbol
+        let types = Map.ofList this.declarations // symbol -> type of symbol
+
         this.rules
-        |> Array.map(fun(prod, semantic) ->
+        |> List.map(fun(prod, semantic) ->
             SemanticGenerator.decorateSemantic types prod semantic
             )
         |> String.concat Environment.NewLine

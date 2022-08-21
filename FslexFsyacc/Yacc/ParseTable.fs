@@ -29,9 +29,7 @@ type ParseTable =
             }:ParseTableEncoder
 
         {
-            actions =
-                encoder.encodeActions tbl.actions
-            closures =
-                encoder.encodeClosures tbl.closures
-            encoder = encoder
+            actions  = encoder.encodeActions  tbl.actions
+            closures = encoder.encodeClosures tbl.closures
+            encoder  = encoder
         }

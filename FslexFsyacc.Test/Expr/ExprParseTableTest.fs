@@ -114,10 +114,10 @@ type ExprParseTableTest(output:ITestOutputHelper) =
         Should.equal src.closures ExprParseTable.closures
 
         let prodsFsyacc = 
-            Array.map fst src.rules
+            List.map fst src.rules
 
         let prodsParseTable = 
-            Array.map fst ExprParseTable.rules
+            List.map fst (List.ofArray ExprParseTable.rules)
 
         Should.equal prodsFsyacc prodsParseTable
 

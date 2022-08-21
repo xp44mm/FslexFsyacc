@@ -95,11 +95,11 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
         Should.equal src.closures FsyaccParseTable.closures
 
         let prodsFsyacc =
-            Array.map fst src.rules
+            List.map fst src.rules
 
         let prodsParseTable =
             Array.map fst FsyaccParseTable.rules
-
+            |> Array.toList
         Should.equal prodsFsyacc prodsParseTable
 
         let headerFromFsyacc =

@@ -5,7 +5,7 @@ open FslexFsyacc.Yacc
 
 type NormFsyaccFile = 
     {
-        rules:(string list*string)[]
+        rules:(string list*string)list
         productionNames:Map<string list,string> // to rename persudo token
         precedences:Map<string,int>
         header:string
@@ -42,7 +42,7 @@ type NormFsyaccFile =
             |> Map.ofSeq
 
         {
-            rules = rules |> Seq.map Triple.ends |> Seq.toArray
+            rules = rules |> List.map Triple.ends
             productionNames = productionNames
             precedences = precedences
             header = fsyacc.header
@@ -50,7 +50,7 @@ type NormFsyaccFile =
         }
 
     member this.getMainProductions() =
-        this.rules |> Array.map fst |> Array.toList
+        this.rules |> List.map fst
             
     member this.toFsyaccParseTableFile() = 
         let parseTable = 
@@ -63,5 +63,5 @@ type NormFsyaccFile =
             actions = parseTable.actions
             closures = parseTable.closures
             header = this.header
-            declarations = Array.ofList this.declarations
+            declarations = this.declarations
         }
