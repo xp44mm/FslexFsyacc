@@ -4,118 +4,119 @@ open FSharp.Idioms
 open FSharp.Literals
 open FslexFsyacc.Runtime.ParserTableAction
 
-//type Parser<'tok> (
-//        rules: (string list*(obj[]->obj))[],
-//        actions: (string*int)[][],
-//        closures: (int*int*string[])[][],
-//        getTag:'tok -> string,
-//        getLexeme:'tok->obj
-//    ) =
+[<System.Obsolete("instead of ParserL")>]
+type Parser<'tok> (
+        rules: (string list*(obj[]->obj))[],
+        actions: (string*int)[][],
+        closures: (int*int*string[])[][],
+        getTag:'tok -> string,
+        getLexeme:'tok->obj
+    ) =
 
-//    let tbl =
-//        ParserTable.create(rules, actions, closures)
+    let tbl =
+        ParserTable.create(rules, actions, closures)
 
-//    member this.getParserTable() = tbl
+    member this.getParserTable() = tbl
 
-//    ///状态的符号
-//    member this.getSymbol(state) = tbl.getSymbol(state)
+    ///状态的符号
+    member this.getSymbol(state) = tbl.getSymbol(state)
 
-//    ///将token压入状态栈中。
-//    member this.shift(states,token:'tok) =
-//        let ai = getTag token
-//        let rec loop states =
-//            match tbl.tryNextAction(states,ai) with
-//            | None ->
-//                failwith $"next state is dead state."
-//            | Some i when isRuleOfReduce i ->
-//                let states = reduce(tbl.rules,tbl.actions,states,i)
-//                loop states
-//            | Some i when isStateOfShift i ->
-//                let states = shift(getLexeme,states,token,i)
-//                states
-//            | Some i -> failwith $"unexpected action:{i}."
-//        loop states
+    ///将token压入状态栈中。
+    member this.shift(states,token:'tok) =
+        let ai = getTag token
+        let rec loop states =
+            match tbl.tryNextAction(states,ai) with
+            | None ->
+                failwith $"next state is dead state."
+            | Some i when isRuleOfReduce i ->
+                let states = reduce(tbl.rules,tbl.actions,states,i)
+                loop states
+            | Some i when isStateOfShift i ->
+                let states = shift(getLexeme,states,token,i)
+                states
+            | Some i -> failwith $"unexpected action:{i}."
+        loop states
 
-//    ///对状态栈连续执行reduce，直到非reduce动作:shift,accept（不执行）
-//    ///如果改变了states返回Some newStates，如果states保持不变，返回None
-//    member this.tryReduce(states,token:'tok) =
-//        let ai = getTag token
-//        let rec loop times states =
-//            match tbl.tryNextAction(states,ai) with
-//            | None ->
-//                failwith $"next state is dead state."
-//            | Some i when isRuleOfReduce i ->
-//                let pushedStates = reduce(tbl.rules,tbl.actions,states,i)
-//                loop (times+1) pushedStates
-//            | Some i ->
-//                if times > 0 then
-//                    Some states
-//                else None
-//        loop 0 states
+    ///对状态栈连续执行reduce，直到非reduce动作:shift,accept（不执行）
+    ///如果改变了states返回Some newStates，如果states保持不变，返回None
+    member this.tryReduce(states,token:'tok) =
+        let ai = getTag token
+        let rec loop times states =
+            match tbl.tryNextAction(states,ai) with
+            | None ->
+                failwith $"next state is dead state."
+            | Some i when isRuleOfReduce i ->
+                let pushedStates = reduce(tbl.rules,tbl.actions,states,i)
+                loop (times+1) pushedStates
+            | Some i ->
+                if times > 0 then
+                    Some states
+                else None
+        loop 0 states
 
-//    ///对状态栈执行reduce，直到非reduce动作:shift,accept（不执行）
-//    ///如果改变了states返回Some newStates，如果states保持不变，返回None
-//    member this.tryReduce(states) =
-//        let rec loop times states =
-//            match tbl.tryNextAction(states,"") with
-//            | None ->
-//                failwith $"next state is dead state."
-//            | Some i when isRuleOfReduce i ->
-//                let pushedStates = reduce(tbl.rules,tbl.actions,states,i)
-//                loop (times+1) pushedStates
-//            | Some 0 ->
-//                if times > 0 then
-//                    Some states
-//                else None
-//            | Some i -> failwith $"unexpected action:{i}."
+    ///对状态栈执行reduce，直到非reduce动作:shift,accept（不执行）
+    ///如果改变了states返回Some newStates，如果states保持不变，返回None
+    member this.tryReduce(states) =
+        let rec loop times states =
+            match tbl.tryNextAction(states,"") with
+            | None ->
+                failwith $"next state is dead state."
+            | Some i when isRuleOfReduce i ->
+                let pushedStates = reduce(tbl.rules,tbl.actions,states,i)
+                loop (times+1) pushedStates
+            | Some 0 ->
+                if times > 0 then
+                    Some states
+                else None
+            | Some i -> failwith $"unexpected action:{i}."
 
-//        loop 0 states
+        loop 0 states
 
-//    ///返回接受状态
-//    member this.isAccept(states) =
-//        match tbl.tryNextAction(states,"") with
-//        | None ->
-//            failwith $"next state is dead state."
-//        | Some 0 -> true
-//        | Some _ -> false
+    ///返回接受状态
+    member this.isAccept(states) =
+        match tbl.tryNextAction(states,"") with
+        | None ->
+            failwith $"next state is dead state."
+        | Some 0 -> true
+        | Some _ -> false
 
-//    member this.parse(tokens:seq<'tok>) =
-//        let iterator =
-//            tokens.GetEnumerator()
-//            |> Iterator
+    member this.parse(tokens:seq<'tok>) =
+        let iterator =
+            tokens.GetEnumerator()
+            |> Iterator
 
-//        let rec loop(states: (int*obj) list)(maybeToken: 'tok option)=
-//            let action() =
-//                match maybeToken with
-//                | Some token ->
-//                    tbl.next(getTag,getLexeme,states,token)
-//                | None ->
-//                    tbl.complete(states)
+        let rec loop(states: (int*obj) list)(maybeToken: 'tok option)=
+            let action() =
+                match maybeToken with
+                | Some token ->
+                    tbl.next(getTag,getLexeme,states,token)
+                | None ->
+                    tbl.complete(states)
 
-//            match action() with
-//            | Some(i,nextStates) ->
-//                if isStateOfShift i then
-//                    iterator.tryNext()
-//                    |> loop nextStates
-//                elif isRuleOfReduce i then
-//                    loop nextStates maybeToken
-//                elif i = 0 then
-//                    nextStates
-//                else failwith ""
-//            | None ->
-//                let sm,_ = states.Head
-//                let closure =
-//                    tbl.closures.[sm]
-//                    |> Array.map (fun(a,b,c)->a,b,Array.toList c) |> Array.toList
-//                    |> RenderUtils.renderClosure
+            match action() with
+            | Some(i,nextStates) ->
+                if isStateOfShift i then
+                    iterator.tryNext()
+                    |> loop nextStates
+                elif isRuleOfReduce i then
+                    loop nextStates maybeToken
+                elif i = 0 then
+                    nextStates
+                else failwith ""
+            | None ->
+                let sm,_ = states.Head
+                let closure =
+                    tbl.closures.[sm]
+                    |> Array.map (fun(a,b,c)->a,b,Array.toList c) |> Array.toList
+                    |> RenderUtils.renderClosure
 
-//                let tok =
-//                    match maybeToken with
-//                    | None -> "EOF"
-//                    | Some tok -> Literal.stringify tok
-//                failwith $"\r\nlookahead:{tok}\r\nclosure {sm}:\r\n{closure}"
+                let tok =
+                    match maybeToken with
+                    | None -> "EOF"
+                    | Some tok -> Literal.stringify tok
+                failwith $"\r\nlookahead:{tok}\r\nclosure {sm}:\r\n{closure}"
 
-//        iterator.tryNext()
-//        |> loop [0,null]
-//        |> List.head
-//        |> snd
+        iterator.tryNext()
+        |> loop [0,null]
+        |> List.head
+        |> snd

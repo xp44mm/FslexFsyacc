@@ -2,6 +2,7 @@
 
 open FSharp.Idioms
 
+[<System.Obsolete("instead of AnalyzerL")>]
 /// 解析带数据的对象
 type Analyzer<'tok,'u>
     (
