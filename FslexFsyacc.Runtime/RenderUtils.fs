@@ -1,5 +1,6 @@
 ﻿module FslexFsyacc.Runtime.RenderUtils
 
+open System
 open System.Text.RegularExpressions
 open FSharp.Literals
 
@@ -23,27 +24,27 @@ let renderItemCore (prod:string list) dot =
         let ls1,ls2 =
             symbols.Tail
             |> List.splitAt dot
-        [|
+        [
             yield! ls1
             yield "@"
             yield! ls2
-        |] |> String.concat " "
+        ] |> String.concat " "
 
     sprintf "%s -> %s" symbols.Head body
 
-let renderEntry (prod:string list) (dot:int) (lookaheads:string[]) = 
+let renderEntry (prod:string list) (dot:int) (lookaheads:string list) = 
     if lookaheads.Length = 0 then
         renderItemCore prod dot
     else
         [
-            renderProduction prod 
-            Literal.stringify (List.ofArray lookaheads)
+            renderItemCore prod dot
+            Literal.stringify lookaheads
         ]
         |> String.concat " "
 
-let renderClosure (closure: (string list*int*string[])[]) =
-    seq {
+let renderClosure (closure: (string list*int*string list)list) =
+    [
         for (prod,dot,las) in closure ->
             renderEntry prod dot las
-    }
-    |> String.concat System.Environment.NewLine
+    ]
+    |> String.concat Environment.NewLine

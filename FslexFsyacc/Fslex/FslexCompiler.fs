@@ -32,13 +32,3 @@ let getUsedNames
 
     usednames
 
-
-//let characterclass 
-//    (
-//        definitions: (string*RegularExpression<string>)list
-//    ) =
-
-//    fun def ->
-//        definitions
-//        |> List.pick(fun(k,v)-> if k = def then Some v else None)
-//        |> LexFileNormalization.characterclass

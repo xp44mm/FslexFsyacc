@@ -18,7 +18,7 @@ type RegularExpression<'c> =
     | Hole of id:string
 
     member this.getCharacters() =
-        [|
+        [
             match this with
             | Character c -> yield c
             | Uion(x,y) 
@@ -29,4 +29,4 @@ type RegularExpression<'c> =
             | Maybe x
                 -> yield! x.getCharacters()
             | _ -> ()
-        |]
+        ]

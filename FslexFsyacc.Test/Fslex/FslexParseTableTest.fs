@@ -145,8 +145,8 @@ type FslexParseTableTest(output: ITestOutputHelper) =
             List.map fst src.rules
 
         let prodsParseTable = 
-            Array.map fst FslexParseTable.rules
-            |> List.ofArray
+            List.map fst FslexParseTable.rules
+
         Should.equal prodsFsyacc prodsParseTable
 
         let headerFromFsyacc =

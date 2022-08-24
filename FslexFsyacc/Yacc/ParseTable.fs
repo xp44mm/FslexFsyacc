@@ -1,9 +1,10 @@
 ﻿namespace FslexFsyacc.Yacc
 
+/// BNF不带优先级
 type ParseTable =
     {
-        actions:(string*int)[][]
-        closures:(int*int*string[])[][]
+        actions:(string*int)list list
+        closures:(int*int*string list)list list
         encoder:ParseTableEncoder
     }
 

@@ -41,11 +41,11 @@ type TermDFATest(output:ITestOutputHelper) =
 
         let y = 
             res
-            |> Array.collect(fun re -> re.getCharacters())
-            |> Set.ofArray
+            |> List.collect(fun re -> re.getCharacters())
+            |> Set.ofList
         show y
 
-    [<Fact>] // (Skip="once and for all!")
+    [<Fact(Skip="once and for all!")>] // 
     member _.``3 = generate DFA``() =
         let name = "TermDFA"
         let moduleName = $"PolynomialExpressions.{name}"

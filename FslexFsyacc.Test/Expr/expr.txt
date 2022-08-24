@@ -1,4 +1,4 @@
-﻿0/"" :
+﻿state 0 "" :
     "" -> @ expr
     expr -> @ "(" expr ")"
     expr -> @ "-" expr
@@ -7,13 +7,13 @@
     expr -> @ expr "+" expr
     expr -> @ expr "-" expr
     expr -> @ expr "/" expr
-1/expr :
-    "" -> expr [""]
+state 1 "expr" :
+    "" -> expr @ [""]
     expr -> expr @ "*" expr
     expr -> expr @ "+" expr
     expr -> expr @ "-" expr
     expr -> expr @ "/" expr
-2/"(" :
+state 2 "(" :
     expr -> @ "(" expr ")"
     expr -> "(" @ expr ")"
     expr -> @ "-" expr
@@ -22,15 +22,15 @@
     expr -> @ expr "+" expr
     expr -> @ expr "-" expr
     expr -> @ expr "/" expr
-3/expr :
+state 3 "expr" :
     expr -> "(" expr @ ")"
     expr -> expr @ "*" expr
     expr -> expr @ "+" expr
     expr -> expr @ "-" expr
     expr -> expr @ "/" expr
-4/")" :
-    expr -> "(" expr ")" ["";")";"*";"+";"-";"/"]
-5/"-" :
+state 4 ")" :
+    expr -> "(" expr ")" @ ["";")";"*";"+";"-";"/"]
+state 5 "-" :
     expr -> @ "(" expr ")"
     expr -> @ "-" expr
     expr -> "-" @ expr
@@ -39,23 +39,23 @@
     expr -> @ expr "+" expr
     expr -> @ expr "-" expr
     expr -> @ expr "/" expr
-6/expr :
-    expr -> "-" expr ["";")";"*";"+";"-";"/"]
-7/NUMBER :
-    expr -> NUMBER ["";")";"*";"+";"-";"/"]
-8/expr :
-    expr -> expr "*" expr ["";")";"*";"+";"-";"/"]
-9/expr :
+state 6 "expr" :
+    expr -> "-" expr @ ["";")";"*";"+";"-";"/"]
+state 7 "NUMBER" :
+    expr -> NUMBER @ ["";")";"*";"+";"-";"/"]
+state 8 "expr" :
+    expr -> expr "*" expr @ ["";")";"*";"+";"-";"/"]
+state 9 "expr" :
     expr -> expr @ "*" expr
-    expr -> expr "+" expr ["";")";"+";"-"]
+    expr -> expr "+" expr @ ["";")";"+";"-"]
     expr -> expr @ "/" expr
-10/expr :
+state 10 "expr" :
     expr -> expr @ "*" expr
-    expr -> expr "-" expr ["";")";"+";"-"]
+    expr -> expr "-" expr @ ["";")";"+";"-"]
     expr -> expr @ "/" expr
-11/expr :
-    expr -> expr "/" expr ["";")";"*";"+";"-";"/"]
-12/"*" :
+state 11 "expr" :
+    expr -> expr "/" expr @ ["";")";"*";"+";"-";"/"]
+state 12 "*" :
     expr -> @ "(" expr ")"
     expr -> @ "-" expr
     expr -> @ NUMBER
@@ -64,7 +64,7 @@
     expr -> @ expr "+" expr
     expr -> @ expr "-" expr
     expr -> @ expr "/" expr
-13/"+" :
+state 13 "+" :
     expr -> @ "(" expr ")"
     expr -> @ "-" expr
     expr -> @ NUMBER
@@ -73,7 +73,7 @@
     expr -> expr "+" @ expr
     expr -> @ expr "-" expr
     expr -> @ expr "/" expr
-14/"-" :
+state 14 "-" :
     expr -> @ "(" expr ")"
     expr -> @ "-" expr
     expr -> @ NUMBER
@@ -82,7 +82,7 @@
     expr -> @ expr "-" expr
     expr -> expr "-" @ expr
     expr -> @ expr "/" expr
-15/"/" :
+state 15 "/" :
     expr -> @ "(" expr ")"
     expr -> @ "-" expr
     expr -> @ NUMBER

@@ -44,7 +44,6 @@ type ExprParseTableTest(output:ITestOutputHelper) =
         let grammar = 
             fsyacc.getMainProductions() 
             |> Grammar.from
-
         //show tokens
         let y = set ["(";")";"*";"+";"-";"/";"NUMBER"]
         Should.equal y grammar.terminals
@@ -117,7 +116,7 @@ type ExprParseTableTest(output:ITestOutputHelper) =
             List.map fst src.rules
 
         let prodsParseTable = 
-            List.map fst (List.ofArray ExprParseTable.rules)
+            List.map fst ExprParseTable.rules
 
         Should.equal prodsFsyacc prodsParseTable
 

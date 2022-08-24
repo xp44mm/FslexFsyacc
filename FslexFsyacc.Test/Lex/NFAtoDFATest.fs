@@ -81,9 +81,9 @@ type NFAtoDFATest(output:ITestOutputHelper) =
             (3u,'b',0u)
             ]
 
-        let finalLexemes = [|
+        let finalLexemes = [
             set [3u], Set.empty
-            |]
+            ]
 
         Should.equal dfa.nextStates (DFATools.getNextStates dtran)
         Should.equal dfa.finalLexemes finalLexemes
@@ -112,9 +112,9 @@ type NFAtoDFATest(output:ITestOutputHelper) =
             1u,'b',1u
             ]
 
-        let finalLexemes = [|
+        let finalLexemes = [
             set [1u],Set.empty
-            |]
+            ]
 
         Should.equal dfa.nextStates (DFATools.getNextStates dtran)
         Should.equal dfa.finalLexemes finalLexemes
@@ -154,11 +154,11 @@ type NFAtoDFATest(output:ITestOutputHelper) =
             (4u,'b',5u);
             (5u,'b',5u)]
 
-        let finalLexemes = [|
+        let finalLexemes = [
             set [1u]   ,Set.empty
             set [3u]   ,Set.empty
             set [2u;5u],Set.empty
-            |]
+            ]
 
         Should.equal dfa.nextStates (DFATools.getNextStates dtran)
         Should.equal dfa.finalLexemes finalLexemes

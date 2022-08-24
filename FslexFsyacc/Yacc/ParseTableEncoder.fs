@@ -30,31 +30,30 @@ type ParseTableEncoder =
 
     member encoder.encodeActions(actions: Map<int,Map<string,Action>>) =
         encoder.kernels
-        |> Map.toArray
-        |> Array.map(fun (_,i) ->
+        |> Map.toList
+        |> List.map(fun(_,i)->
             if actions.ContainsKey i then
                 actions.[i]
-                |> Map.toArray
-                |> Array.map(fun(la,action)->
+                |> Map.toList
+                |> List.map(fun(la,action)->
                     try
                         let iaction = encoder.encodeAction action
                         la,iaction
                     with _ -> failwithf "%A" (la,action)
                 )
-            else Array.empty
+            else []
         )
 
     member encoder.encodeClosures(closures: Map<int,Map<ItemCore,Set<string>>>) =
         encoder.kernels
-        |> Map.toArray
-        |> Array.map(fun (_,i) ->
+        |> Map.toList
+        |> List.map(fun (_,i) ->
             if closures.ContainsKey i then
                 closures.[i]
-                |> Map.toArray
-                |> Array.map(fun(icore,las)->
+                |> Map.toList
+                |> List.map(fun(icore,las)->
                     let prod,dot = encoder.encodeItemCore icore
-                    prod,dot,Set.toArray las
+                    prod,dot,Set.toList las
                 )
-            else Array.empty
+            else []
         )
-        

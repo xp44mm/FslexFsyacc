@@ -2,7 +2,11 @@
 module FslexFsyacc.Lex.LexFileNormalization
 
 /// 代入正则定义
-let substitute (definitions:Map<string,_>) (expr:RegularExpression<_>) =
+let substitute 
+    (definitions:Map<string,RegularExpression<_>>) 
+    (expr:RegularExpression<_>) 
+    =
+
     let rec loop = function
         | Character x  -> Character x
         | Uion (x,y)   -> Uion(loop x, loop y)
@@ -18,12 +22,12 @@ let definitionNames (expr:RegularExpression<_>) =
     let rec loop (expr:RegularExpression<_>) = 
         seq {
             match expr with
-            | Character _   -> ()
+            | Character _  -> ()
             | Uion (x,y)
-            | Concat (x,y)  -> yield! loop x; yield! loop y;
+            | Concat (x,y) -> yield! loop x; yield! loop y;
             | Natural x
             | Positive x
-            | Maybe x       -> yield! loop x;
+            | Maybe x      -> yield! loop x;
             | Hole id -> yield id
         }
 

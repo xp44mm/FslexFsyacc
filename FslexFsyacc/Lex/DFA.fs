@@ -9,7 +9,7 @@ type DFA<'tag when 'tag: comparison> =
         nextStates:Map<uint32,Map<'tag,uint32>>
 
         ///每个正则表达式对应的接受狀態：finals，实际取词状态：lexemes
-        finalLexemes:(Set<uint32>*Set<uint32>)[]
+        finalLexemes:(Set<uint32>*Set<uint32>)list
     }
 
     static member fromNFA(ntran:Set<uint32*'tag option*uint32>, nfaFinalLexemes:(uint32*uint32) list) =
@@ -46,9 +46,8 @@ type DFA<'tag when 'tag: comparison> =
         
         let finalLexemes = 
             (encodemDfa.dfinals, lexemes)
-            ||> Seq.zip
-            |> Array.ofSeq
-            |> Array.map(fun((fnls,lxms) as pair)->
+            ||> List.zip
+            |> List.map(fun((fnls,lxms) as pair)->
                 let x = Set.intersect fnls lxms
                 if x.IsEmpty then
                     pair
@@ -64,4 +63,3 @@ type DFA<'tag when 'tag: comparison> =
     static member fromRgx(patterns:RegularExpression<'tag> list list) =
         let nfa = AnalyzerNFA.fromRgx patterns
         DFA.fromNFA(nfa.transition, nfa.finalLexemes)
-    

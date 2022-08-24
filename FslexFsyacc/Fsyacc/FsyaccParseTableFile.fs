@@ -8,8 +8,8 @@ open FslexFsyacc.Runtime
 type FsyaccParseTableFile =
     {
         rules:(string list*string)list
-        actions:(string*int)[][]
-        closures:(int*int*string[])[][]
+        actions:(string*int)list list
+        closures:(int*int*string list)list list
         header: string
         declarations:(string*string)list
     }
@@ -29,18 +29,19 @@ type FsyaccParseTableFile =
 
         let closures =
             this.closures
-            |> Array.mapi(fun state closure ->
+            |> List.mapi(fun state closure ->
                 let closure =
                     closure
-                    |> Array.map(fun(prod,dot,las) ->
+                    |> List.map(fun(prod,dot,las) ->
                         let prod = fst rules.[prod]
                         prod,dot,las
                     )
                 state,closure
             )
+        //打印
         closures
-        |> Array.map(fun(state,closure)->
-            $"closure {state}:\r\n{RenderUtils.renderClosure closure}"
+        |> List.map(fun(state,closure)->
+            $"state {state}:\r\n{RenderUtils.renderClosure closure}"
         )
         |> String.concat "\r\n"
 
@@ -72,10 +73,10 @@ type FsyaccParseTableFile =
                 $"let actions = {Literal.stringify this.actions}"
                 $"let closures = {Literal.stringify this.closures}"
                 this.header
-                $"let rules:(string list*(obj[]->obj))[] = [|"
+                $"let rules:(string list*(obj list->obj))list = ["
                 rules |> Line.indentCodeBlock 4
-                "|]"
-                "let parser = Parser<token>(rules,actions,closures,getTag,getLexeme)"
+                "]"
+                "let parser = ParserL<token>(rules,actions,closures,getTag,getLexeme)"
                 "let parse(tokens:seq<token>) ="
                 "    tokens"
                 $"    |> parser.parse"

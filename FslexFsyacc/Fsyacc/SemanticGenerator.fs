@@ -38,9 +38,9 @@ let decorateSemantic (typeAnnotations:Map<string,string>) (prodSymbols:string li
     let body = semanticBody typeAnnotations prodSymbols semantic
     let funcDef =
         [
-            "fun (ss:obj[]) ->"
+            "fun(ss:obj list)->"
             body 
             |> Line.indentCodeBlock 4
-
-        ] |> String.concat Environment.NewLine
+        ] 
+        |> String.concat Environment.NewLine
     funcDef

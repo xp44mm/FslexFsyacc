@@ -19,8 +19,11 @@
   <ItemGroup>
     <Compile Include="Position.fs" />
     <Compile Include="RenderUtils.fs" />
+    <Compile Include="AnalyzerL.fs" />
     <Compile Include="Analyzer.fs" />
     <Compile Include="ParserTableAction.fs" />
+    <Compile Include="ParserTableL.fs" />
+    <Compile Include="ParserL.fs" />
     <Compile Include="ParserTable.fs" />
     <Compile Include="Parser.fs" />
     <Compile Include="BalancedBracketCounter.fs" />
