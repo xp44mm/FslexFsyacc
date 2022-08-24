@@ -45,7 +45,7 @@ type FslexDFATest(output:ITestOutputHelper) =
             |> Set.ofList
         show y
 
-    [<Fact>] // (Skip="once and for all!")
+    [<Fact(Skip="once and for all!")>] // 
     member _.``04 - generate DFA``() =
         let name = "FslexDFA"
         let moduleName = $"FslexFsyacc.Fslex.{name}"
@@ -71,8 +71,8 @@ type FslexDFATest(output:ITestOutputHelper) =
 
         let header,semans =
             let filePath = Path.Combine(sourcePath, "FslexDFA.fs")
-            let text = File.ReadAllText(filePath, Encoding.UTF8)
-            FSharp.Compiler.SyntaxTreeX.SourceCodeParser.getHeaderSemansFromFSharp 1 text
+            let src = File.ReadAllText(filePath, Encoding.UTF8)
+            FSharp.Compiler.SyntaxTreeX.SourceCodeParser.getHeaderSemansFromFSharp 1 src
 
         Should.equal headerFslex header
         Should.equal semansFslex semans
