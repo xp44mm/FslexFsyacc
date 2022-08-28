@@ -1,48 +1,49 @@
 ﻿namespace FslexFsyacc.Runtime
+
 open FslexFsyacc.Runtime.ParserTableAction
-
 open FSharp.Idioms
+open FSharp.Literals
 
-[<System.Obsolete("instead of ParserTableL")>]
 type ParserTable =
     {
-        rules: Map<int,string list*(obj[]->obj)>
+        rules: Map<int,string list*(obj list->obj)>
         actions: Map<int,Map<string,int>>
-        closures: (string list*int*string[])[][]
+        closures: (string list*int*string list)list list
     }
 
     static member create(
-        rules: (string list*(obj[]->obj))[],
-        actions: (string*int)[][],
-        closures: (int*int*string[])[][]
+        rules: (string list*(obj list->obj))list,
+        actions: (string*int)list list,
+        closures: (int*int*string list)list list
         ) =
         /// action -> rule(prod,mapper)
         let startSymbol =
             rules.[0]
-            |> fst  // production
+            |> fst  //production
             |> List.head
 
-        let rules: Map<int,string list*(obj[]->obj)> =
-            [|
+        let rules: Map<int,string list*(obj list->obj)> =
+            [
                 yield ["";startSymbol], (fun _ -> null)
                 yield! rules
-            |]
-            |> Array.sortBy fst
-            |> Array.mapi(fun i entry -> -i, entry)
-            |> Map.ofArray
+            ]
+            |> List.sortBy fst
+            |> List.mapi(fun i entry -> -i, entry)
+            |> Map.ofList
+
         /// state -> lookahead -> action
         let actions:Map<int,Map<string,int>> =
             actions
-            |> Array.mapi(fun src pairs ->
-                let mp = Map.ofArray pairs
+            |> List.mapi(fun src pairs ->
+                let mp = Map.ofList pairs
                 src,mp)
-            |> Map.ofArray
+            |> Map.ofList
 
         let closures =
             closures
-            |> Array.map(fun closure ->
+            |> List.map(fun closure ->
                 closure
-                |> Array.map(fun(prod,dot,las) ->
+                |> List.map(fun(prod,dot,las) ->
                     let prod = fst rules.[prod]
                     prod,dot,las
                 )
@@ -63,26 +64,24 @@ type ParserTable =
         //闭包的kernel
         let kernel =
             this.closures.[state]
-            |> Array.filter(fun(prod,dot,_)-> List.head prod = "" || dot > 0)
+            |> List.filter(fun(prod,dot,_)-> List.head prod = "" || dot > 0)
         kernel
         |> Seq.map(fun(prod,dot,_)->prod.[dot])
         |> Seq.head
-
+    // print state
     member this.collection() =
         this.closures
-        |> Array.toList
-        |> List.map(fun cls -> cls
-                            |>Array.map(fun(a,b,c)->a,b,Array.toList c)
-                            |>Array.toList)
         |> List.mapi(fun i cls ->
             let symbol =
                 i
                 |> this.getSymbol
-                |> RenderUtils.renderSymbol
+                |> Literal.stringify
+                //|> RenderUtils.renderSymbol
+
             let ls =
                 RenderUtils.renderClosure cls
                 |> Line.indentCodeBlock 4
-            $"{i}/{symbol} :\r\n{ls}"
+            $"state {i} {symbol} :\r\n{ls}"
         )
         |> String.concat "\r\n"
 

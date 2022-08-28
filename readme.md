@@ -85,16 +85,4 @@ Should.equal y [Term(2,"x",2);Term(3,"x",1);Const -5]
 
 - Flexiblely compose of tokenize, regular expressions, BNF technology.
 
-~~1. 可以重复非终结符产生式：已经实现了~~
 
-7. list 代替 array
-
-2. 错误检测：产生式不重复，产生式的名称不能重名，不能与现有token重名。
-3. 错误检测：无限递归的非终结符。
-4. 规则簇(bunch)
-5. 改名：precedence level
-~~6. 三部分改为两部分。规则，定义~~
-8. 坚持显式解决冲突
-9. 优先级也可以带类型
-一个符号就是一个名字，符号加上和它相关的语义值称为符记。token被抽象成一个名称，类型，符号。
-产生式名称称呼！

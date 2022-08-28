@@ -160,7 +160,7 @@ let rules:(string list*(obj list->obj))list = [
             s0,s2.Trim()
         box result
 ]
-let parser = ParserL<token>(rules,actions,closures,getTag,getLexeme)
+let parser = Parser<token>(rules,actions,closures,getTag,getLexeme)
 let parse(tokens:seq<token>) =
     tokens
     |> parser.parse

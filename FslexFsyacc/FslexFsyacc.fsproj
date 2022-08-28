@@ -10,10 +10,10 @@
 		<PackageProjectUrl>https://github.com/xp44mm/FslexFsyacc</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/xp44mm/FslexFsyacc</RepositoryUrl>
 		<PackageTags>lex;yacc;compiler;parser;analyzer</PackageTags>
-		<PackageReleaseNotes>FlatFsyaccFile</PackageReleaseNotes>
+		<PackageReleaseNotes>delete obsolete</PackageReleaseNotes>
 		<Company>34696643@qq.com</Company>
 		<Authors>xp44m</Authors>
-		<Version>1.2.29</Version>
+		<Version>1.2.30</Version>
 		<IsPublishable>True</IsPublishable>
 		<PackageReadmeFile>readme.md</PackageReadmeFile>
 	</PropertyGroup>
@@ -84,8 +84,6 @@
 		<Compile Include="Fsyacc\FsyaccFileShaking.fs" />
 		<Compile Include="Fsyacc\FsyaccFilePrecedences.fs" />
 		<Compile Include="Fsyacc\FlatFsyaccFile.fs" />
-		<Compile Include="Fsyacc\NormFsyaccFile.fs" />
-		<Compile Include="Fsyacc\FsyaccFileName.fs" />
 		
 		<None Include="..\readme.md">
 		  <Pack>True</Pack>

@@ -27,7 +27,7 @@ type FslexDFAFile =
             "let rules:list<uint32 list*uint32 list*_> = ["
             fxRules |> Line.indentCodeBlock 4
             "]"
-            "let analyzer = AnalyzerL(nextStates, rules)"
+            "let analyzer = Analyzer(nextStates, rules)"
             "let analyze (tokens:seq<_>) = "
             "    analyzer.analyze(tokens,getTag)"
         ]

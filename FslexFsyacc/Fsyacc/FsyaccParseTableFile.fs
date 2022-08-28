@@ -76,7 +76,7 @@ type FsyaccParseTableFile =
                 $"let rules:(string list*(obj list->obj))list = ["
                 rules |> Line.indentCodeBlock 4
                 "]"
-                "let parser = ParserL<token>(rules,actions,closures,getTag,getLexeme)"
+                "let parser = Parser<token>(rules,actions,closures,getTag,getLexeme)"
                 "let parse(tokens:seq<token>) ="
                 "    tokens"
                 $"    |> parser.parse"

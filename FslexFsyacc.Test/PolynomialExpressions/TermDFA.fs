@@ -10,6 +10,6 @@ let rules:list<uint32 list*uint32 list*_> = [
     [3u;5u],[],fun(lexbuf:token list)->
         toTerm lexbuf
 ]
-let analyzer = AnalyzerL(nextStates, rules)
+let analyzer = Analyzer(nextStates, rules)
 let analyze (tokens:seq<_>) = 
     analyzer.analyze(tokens,getTag)

@@ -4,11 +4,10 @@ open FSharp.Idioms
 open FSharp.Literals
 open FslexFsyacc.Runtime.ParserTableAction
 
-[<System.Obsolete("instead of ParserL")>]
 type Parser<'tok> (
-        rules: (string list*(obj[]->obj))[],
-        actions: (string*int)[][],
-        closures: (int*int*string[])[][],
+        rules: (string list*(obj list->obj))list,
+        actions: (string*int)list list,
+        closures: (int*int*string list)list list,
         getTag:'tok -> string,
         getLexeme:'tok->obj
     ) =
@@ -21,7 +20,7 @@ type Parser<'tok> (
     ///状态的符号
     member this.getSymbol(state) = tbl.getSymbol(state)
 
-    ///将token压入状态栈中。
+    ///将lookahead token压入状态栈中。
     member this.shift(states,token:'tok) =
         let ai = getTag token
         let rec loop states =
@@ -107,7 +106,6 @@ type Parser<'tok> (
                 let sm,_ = states.Head
                 let closure =
                     tbl.closures.[sm]
-                    |> Array.map (fun(a,b,c)->a,b,Array.toList c) |> Array.toList
                     |> RenderUtils.renderClosure
 
                 let tok =
@@ -120,3 +118,4 @@ type Parser<'tok> (
         |> loop [0,null]
         |> List.head
         |> snd
+

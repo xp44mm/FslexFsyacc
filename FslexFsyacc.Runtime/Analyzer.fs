@@ -2,46 +2,45 @@
 
 open FSharp.Idioms
 
-[<System.Obsolete("instead of AnalyzerL")>]
 /// 解析带数据的对象
 type Analyzer<'tok,'u>
     (
-        nextStates: (uint32*(string*uint32)[])[], // state -> tag -> state
-        rules: (uint32[]*uint32[]*('tok list -> 'u))[]
+        nextStates: (uint32*(string*uint32)list)list, // state -> tag -> state
+        rules: (uint32 list*uint32 list*('tok list -> 'u))list
     ) =
 
     // state -> tag -> state
     let nextStates = 
         nextStates
-        |> Map.ofArray
-        |> Map.map(fun _ arr -> Map.ofArray arr)
+        |> Map.ofList
+        |> Map.map(fun _ ls -> Map.ofList ls)
 
     /// final状态是包括向前看的最长状态。
     let finals =
         rules
-        |> Array.map Triple.first
+        |> List.map Triple.first
 
     let universalFinals = 
         finals
-        |> Array.concat
-        |> Set.ofArray
+        |> List.concat
+        |> Set.ofList
 
     /// lexeme状态是回退后，实际取词状态。
     // final -> lexemes
     let lexemesFromFinal =
         rules
-        |> Array.filter(fun(_,lxms,_)-> lxms.Length>0) // 不包含沒有lookahead的接受狀態。
-        |> Array.collect(fun(finals,lexemes,_) ->
+        |> List.filter(fun(_,lxms,_)-> lxms.Length>0) // 不包含沒有lookahead的接受狀態。
+        |> List.collect(fun(finals,lexemes,_) ->
             finals
-            |> Array.map(fun e -> e, Set.ofArray lexemes)
+            |> List.map(fun e -> e, Set.ofList lexemes)
         )
-        |> Map.ofArray
+        |> Map.ofList
 
     let indicesFromFinal =
         finals
-        |> Array.mapi(fun i fs -> fs |> Array.map(fun f -> f,i))
-        |> Array.concat
-        |> Map.ofArray
+        |> List.mapi(fun i fs -> fs |> List.map(fun f -> f,i))
+        |> List.concat
+        |> Map.ofList
 
     let finalMappers =
         indicesFromFinal
