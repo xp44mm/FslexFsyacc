@@ -2,6 +2,7 @@
 
 open FSharp.Idioms
 
+/// 原始解析表
 type ParsingTable =
     {
         grammar : Grammar
@@ -55,17 +56,17 @@ type ParsingTable =
 
                 let reduces =
                     reduceMp
-                    |> Map.toArray
-                    |> Array.map(fun(la, icores) -> Seq.exactlyOne icores, la)
-                    |> Array.groupBy fst
-                    |> Array.map(fun(icore,las)-> // 合并lookaheads
+                    |> Map.toList
+                    |> List.map(fun(la, icores) -> Seq.exactlyOne icores, la)
+                    |> List.groupBy fst
+                    |> List.map(fun(icore,las)-> // 合并lookaheads
                         let las =
                             las
                             |> Seq.map snd
                             |> Set.ofSeq
                         icore, las
                         )
-                    |> Set.ofArray
+                    |> Set.ofList
 
                 let shifts =
                     gotoMp

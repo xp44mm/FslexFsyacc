@@ -10,9 +10,9 @@ type ParseTableEncoder =
     /// 产生式编码为负
     static member getProductions(productions:Set<string list>)=
         productions
-        |> Set.toArray
-        |> Array.mapi(fun i p -> p,-i)
-        |> Map.ofArray
+        |> Set.toList
+        |> List.mapi(fun i p -> p,-i)
+        |> Map.ofList
 
     /// 具体数据编码成整数的表
     member this.encodeAction(action:Action) =

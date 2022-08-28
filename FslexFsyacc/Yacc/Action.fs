@@ -8,25 +8,25 @@ type Action =
     static member from(closure:Map<string,ItemCore>) =
         let rItems,gItems =
             closure
-            |> Map.toArray
-            |> Array.partition(fun(la,item)-> item.dotmax)
+            |> Map.toList
+            |> List.partition(fun(la,item)-> item.dotmax)
     
         let reduces =
             rItems
-            |> Array.map(fun(la,i) ->
+            |> List.map(fun(la,i) ->
                 la, Reduce i.production
             )
     
         let shifts =
             gItems
-            |> Array.groupBy(fun (la,_) -> la)
-            |> Array.map(fun(la,pairs)->
+            |> List.groupBy(fun (la,_) -> la)
+            |> List.map(fun(la,pairs)->
                 let items = 
                     pairs 
-                    |> Array.map(fun(la,itemcore) ->
+                    |> List.map(fun(la,itemcore) ->
                         itemcore.dotIncr()
                     )
-                    |> Set.ofArray
+                    |> Set.ofList
                 la, Shift items
             )
 

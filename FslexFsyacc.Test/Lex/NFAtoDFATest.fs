@@ -38,11 +38,10 @@ type NFAtoDFATest(output:ITestOutputHelper) =
         let nfinals = 
             nfinalLexemes
             |> List.map fst
-            |> Array.ofList
 
         Should.equal dfa {dtran=set [set [0u;1u;2u;4u;7u],'a',set [1u;2u;3u;4u;6u;7u;8u];set [0u;1u;2u;4u;7u],'b',set [1u;2u;4u;5u;6u;7u];set [1u;2u;3u;4u;6u;7u;8u],'a',set [1u;2u;3u;4u;6u;7u;8u];set [1u;2u;3u;4u;6u;7u;8u],'b',set [1u;2u;4u;5u;6u;7u;9u];set [1u;2u;4u;5u;6u;7u],'a',set [1u;2u;3u;4u;6u;7u;8u];set [1u;2u;4u;5u;6u;7u],'b',set [1u;2u;4u;5u;6u;7u];set [1u;2u;4u;5u;6u;7u;9u],'a',set [1u;2u;3u;4u;6u;7u;8u];set [1u;2u;4u;5u;6u;7u;9u],'b',set [1u;2u;4u;5u;6u;7u;10u];set [1u;2u;4u;5u;6u;7u;10u],'a',set [1u;2u;3u;4u;6u;7u;8u];set [1u;2u;4u;5u;6u;7u;10u],'b',set [1u;2u;4u;5u;6u;7u]];allStates=set [set [0u;1u;2u;4u;7u];set [1u;2u;3u;4u;6u;7u;8u];set [1u;2u;4u;5u;6u;7u];set [1u;2u;4u;5u;6u;7u;9u];set [1u;2u;4u;5u;6u;7u;10u]]}
 
-        Should.equal nfinals [|10u|]
+        Should.equal nfinals [10u]
 
     [<Fact>]
     member _.``Example 3-21: nfa to dfa``() =

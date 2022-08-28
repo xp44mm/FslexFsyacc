@@ -27,32 +27,32 @@ let precedenceOfProductions (terminals:Set<string>)(productions:Set<string list>
 
     let nonterminalProductions,terminalProductions =
         productions
-        |> Seq.toArray
-        |> Array.partition(fun(prod, maybeTerminal)->
+        |> Seq.toList
+        |> List.partition(fun(prod, maybeTerminal)->
             maybeTerminal.IsEmpty
         )
 
     let nonterminalProductions =
         nonterminalProductions
-        |> Array.map(fun(prod,_)-> prod," No exist terminal!")
-        |> Set.ofArray
+        |> List.map(fun(prod,_)-> prod," No exist terminal!")
+        |> Set.ofList
 
     let terminalProductions =
         terminalProductions
-        |> Array.map(fun(prod,maybeTerminal)-> prod,maybeTerminal.[0])
-        |> Array.groupBy(fun(prod,terminal)-> terminal)
-        |> Array.map(fun(terminal,items)->
+        |> List.map(fun(prod,maybeTerminal)-> prod,maybeTerminal.[0])
+        |> List.groupBy(fun(prod,terminal)-> terminal)
+        |> List.map(fun(terminal,items)->
             if items.Length = 1 then
                 items
             else
                 items
-                |> Array.mapi(fun i (prod,term) -> prod, $" {term} {i}")
+                |> List.mapi(fun i (prod,term) -> prod, $" {term} {i}")
         )
-        |> Array.concat
+        |> List.concat
 
-    let productions = [|
+    let productions = [
         yield! nonterminalProductions;
-        yield! terminalProductions|]
+        yield! terminalProductions]
     productions
-    |> Array.sortBy snd
+    |> List.sortBy snd
 

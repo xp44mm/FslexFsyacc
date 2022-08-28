@@ -29,13 +29,13 @@ let mergeClrKernels (slrKernel:Set<ItemCore>) (clrKernels:seq<Set<ItemCore*Set<s
     let lookaheadsArray =
         clrKernels
         |> Seq.map ClosureOperators.getLookaheads
-        |> Array.transpose
-        |> Array.map Set.unionMany
+        |> List.transpose
+        |> List.map Set.unionMany
 
     slrKernel
-    |> Set.toArray
-    |> Array.zip <| lookaheadsArray
-    |> Set.ofArray
+    |> Set.toList
+    |> List.zip <| lookaheadsArray
+    |> Set.ofList
 
 /// the collection of sets of items
 let make (itemCores:Set<ItemCore>) (itemCoreAttributes:Map<ItemCore, bool*Set<string>>) (productions:Set<string list>) =

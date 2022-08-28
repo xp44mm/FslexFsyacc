@@ -22,8 +22,8 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
     let sourcePath = Path.Combine(solutionPath, @"FslexFsyacc\Fsyacc")
     let filePath = Path.Combine(sourcePath, @"fsyacc.fsyacc")
     let text = File.ReadAllText(filePath)
-    let rawFsyacc = FsyaccFile.parse text
-    let fsyacc = NormFsyaccFile.fromRaw rawFsyacc
+    let rawFsyacc = RawFsyaccFile.parse text
+    let fsyacc = FlatFsyaccFile.fromRaw rawFsyacc
 
     [<Fact>]
     member _.``01 - compiler test``() =
@@ -32,7 +32,7 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``02 - extract FsyaccFile test``() =
-        let fsyacc = rawFsyacc.start("rules",Set.empty).render()
+        let fsyacc = fsyacc.start("rules",Set.empty).toRaw().render()
         output.WriteLine(fsyacc)
 
     [<Fact>]

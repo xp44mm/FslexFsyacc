@@ -2,20 +2,22 @@
 
 open FSharp.Idioms
 open FslexFsyacc.Yacc
+open System
 
+[<Obsolete(nameof FlatFsyaccFile)>]
 type NormFsyaccFile = 
     {
-        rules:(string list*string)list
+        rules:list<string list*string>
         productionNames:Map<string list,string> // to rename persudo token
         precedences:Map<string,int>
         header:string
         declarations:(string*string)list
     }
 
-    static member fromRaw(fsyacc:FsyaccFile) =
+    static member fromRaw(fsyacc:RawFsyaccFile) =
         let rules =
             fsyacc.rules
-            |> FsyaccFileRules.rawToNormRules
+            |> FsyaccFileRules.rawToFlatRules
 
         // production -> name
         let productionNames =

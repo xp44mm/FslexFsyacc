@@ -38,8 +38,8 @@
 		<Compile Include="Fsyacc\FsyaccParseTableFileTest.fs" />
 		<Compile Include="Fsyacc\FsyaccFileStartTest.fs" />
 		<Compile Include="Fsyacc\FsyaccFileNameTest.fs" />
-		<Compile Include="Fsyacc\FsyaccFileRefineTest.fs" />
 		<Compile Include="Fsyacc\FsyaccFileRulesTest.fs" />
+		<Compile Include="Fsyacc\ParsParseTableTest.fs" />
 		<Compile Include="Expr\ExprToken.fs" />
 		<None Include="Expr\expr.fsyacc" />
 		<Compile Include="Expr\ExprParseTable.fs" />

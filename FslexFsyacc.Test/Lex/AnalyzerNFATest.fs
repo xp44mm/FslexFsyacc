@@ -23,8 +23,6 @@ type AnalyzerNFATest(output:ITestOutputHelper) =
 
         let nfa = AnalyzerNFA.fromRgx(lookaheads)
 
-        //let nfas = lookaheads |> Array.map(fun ln -> LookaheadNFA.fromRgx ln)
-
         let y = {
             transition=set [
                 0u,None,1u    ;0u,None,3u    ;0u,None,7u      ;

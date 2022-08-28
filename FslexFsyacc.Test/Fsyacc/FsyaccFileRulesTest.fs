@@ -13,32 +13,32 @@ type FsyaccFileRulesTest(output:ITestOutputHelper) =
         |> output.WriteLine
 
     [<Fact>]
-    member _.``00 - rawToNormRules``() =
+    member _.``00 - rawToFlatRules``() =
         let rawRules = [
             "AsyncArrowFunction",[
                 ["async";"AsyncArrowBindingIdentifier";"=>";"AsyncConciseBody"],"","";
                 ["CoverCallExpressionAndAsyncArrowHead";"=>";"AsyncConciseBody"],"",""]]
-        let y = FsyaccFileRules.rawToNormRules rawRules
+        let y = FsyaccFileRules.rawToFlatRules rawRules
         let e = [
             ["AsyncArrowFunction";"async";"AsyncArrowBindingIdentifier";"=>";"AsyncConciseBody"],"","";
             ["AsyncArrowFunction";"CoverCallExpressionAndAsyncArrowHead";"=>";"AsyncConciseBody"],"",""
             ]
-        show y
+        //show y
         Should.equal y e
 
     [<Fact>]
-    member _.``11 - normToRawRules``() =
+    member _.``11 - flatToRawRules``() =
         let x = [
             ["AsyncArrowFunction";"async";"AsyncArrowBindingIdentifier";"=>";"AsyncConciseBody"],"","";
             ["AsyncArrowFunction";"CoverCallExpressionAndAsyncArrowHead";"=>";"AsyncConciseBody"],"",""
             ]
-        let y = FsyaccFileRules.normToRawRules x
+        let y = FsyaccFileRules.flatToRawRules x
 
         let z = [
             "AsyncArrowFunction",[
                 ["async";"AsyncArrowBindingIdentifier";"=>";"AsyncConciseBody"],"","";
                 ["CoverCallExpressionAndAsyncArrowHead";"=>";"AsyncConciseBody"],"",""]]
-        show y
+        //show y
         Should.equal y z
 
     [<Fact>]
@@ -51,12 +51,12 @@ type FsyaccFileRulesTest(output:ITestOutputHelper) =
         let z = x |> FsyaccFileRules.addRule(y,"","")
 
         let e = [
-            ["AsyncArrowFunction";"async";"ArrowFormalParameters";"=>";"AsyncConciseBody"],"","";
             ["AsyncArrowFunction";"async";"AsyncArrowBindingIdentifier";"=>";"AsyncConciseBody"],"","";
             ["AsyncArrowFunction";"CoverCallExpressionAndAsyncArrowHead";"=>";"AsyncConciseBody"],"",""
+            ["AsyncArrowFunction";"async";"ArrowFormalParameters";"=>";"AsyncConciseBody"],"","";
             ]
 
-        show z
+        //show z
 
         Should.equal z e
 
@@ -74,17 +74,18 @@ type FsyaccFileRulesTest(output:ITestOutputHelper) =
             e 
             |> FsyaccFileRules.removeRule oldProd
 
-        show y
+        //show y
         let x = [
             ["AsyncArrowFunction";"async";"ArrowFormalParameters";"=>";"AsyncConciseBody"],"","";
             ["AsyncArrowFunction";"async";"AsyncArrowBindingIdentifier";"=>";"AsyncConciseBody"],"",""
             ]
 
         Should.equal y x
+
     [<Fact>]
     member _.``14 - replaceRule``() =
         let rules = [
-            ["AsyncArrowFunction";"async";"AsyncArrowBindingIdentifier";"=>";"AsyncConciseBody"],"","";
+            ["AsyncArrowFunction";"async";"AsyncArrowBindingIdentifier";"=>";"AsyncConciseBody"],"",""
             ["AsyncArrowFunction";"CoverCallExpressionAndAsyncArrowHead";"=>";"AsyncConciseBody"],"",""
             ]
 
@@ -94,12 +95,13 @@ type FsyaccFileRulesTest(output:ITestOutputHelper) =
         let y = 
             rules 
             |> FsyaccFileRules.replaceRule oldProd (newProd,"","")
-        show y
+        //show y
         let e = [
-            ["AsyncArrowFunction";"async";"ArrowFormalParameters";"=>";"AsyncConciseBody"],"","";
             ["AsyncArrowFunction";"async";"AsyncArrowBindingIdentifier";"=>";"AsyncConciseBody"],"",""
+            ["AsyncArrowFunction";"async";"ArrowFormalParameters";"=>";"AsyncConciseBody"],"",""
             ]
         Should.equal e y
+
     [<Fact>]
     member _.``15 - findRule``() =
         let rules = [
@@ -110,9 +112,9 @@ type FsyaccFileRulesTest(output:ITestOutputHelper) =
         let oldProd = ["AsyncArrowFunction";"CoverCallExpressionAndAsyncArrowHead";"=>";"AsyncConciseBody"]
         let y = 
             rules
-            |> FsyaccFileRules.findRule oldProd
+            |> FsyaccFileRules.findRuleIndex oldProd
 
-        Should.equal y rules.[1]
+        Should.equal y 1
 
     [<Fact>]
     member _.``16 - findRuleByName``() =

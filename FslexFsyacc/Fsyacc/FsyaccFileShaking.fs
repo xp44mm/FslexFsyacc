@@ -1,19 +1,28 @@
-﻿module FslexFsyacc.Fsyacc.FsyaccFileStart
+﻿module FslexFsyacc.Fsyacc.FsyaccFileShaking
 open FSharp.Idioms
 
-//左手边必须唯一，不然后来者赢
-let getParentChildren (rules:(string*((string list)list))list) =
+let getProductions (rules:list<string list*string*string>) =
+    rules
+    |> List.map(fun(prod,_,_)->
+        match prod with
+        | lhs::rhs -> lhs,rhs
+        | _ -> failwith $"never"
+    )
+
+let getParentChildren (productions:list<string*string list>) =
     //左手边符号的集合
     let nonterminals = 
-        rules
+        productions
         |> List.map fst
         |> Set.ofList
 
-    rules
-    |> List.map(fun (lhs,rhs) -> 
+    productions
+    |> List.groupBy fst
+    |> List.map(fun (lhs,rules) -> 
+        //下一组符号
         let children =
-            rhs
-            |> List.concat
+            rules
+            |> List.collect(fun(lhs,rhs)->rhs)
             |> List.distinct
             |> List.filter(fun sym -> nonterminals.Contains sym)
             |> List.filter(fun sym -> sym <> lhs)
@@ -21,8 +30,9 @@ let getParentChildren (rules:(string*((string list)list))list) =
     )
     |> Map.ofList
 
-let deepFirstSort (rules:(string*((string list)list))list) (start:string) =
-    let parentChildrenMap = getParentChildren rules
+///返回符号的深度优先顺序列表。
+let deepFirstSort (productions:list<string*string list>) (start:string) =
+    let parentChildrenMap = getParentChildren productions
 
     let rec loop (acc:string list) (handlings:list<string>)(current:string) =
         let next() =
@@ -43,25 +53,20 @@ let deepFirstSort (rules:(string*((string list)list))list) (start:string) =
 
     loop [start] [] start
 
-let getProductions (rules:(string*((string list*string*string)list))list) =
-    rules
-    |> List.map(fun(a,ls)->a, ls|>List.map Triple.first)
-
-let extractRules (rules:(string*((string list*string*string)list))list) (start:string) =
-    let ls = 
-        rules
-        |> getProductions
-        |> deepFirstSort <| start
+let extractRules (rules:list<string list*string*string>) (start:string) =
+    let productions = getProductions rules
+    let nonterminals = deepFirstSort productions start
     
-    let mp = rules |> Map.ofList
-
-    let rules =
-        ls
-        |> List.map(fun s -> s,mp.[s])
-
-    let productions =
+    let mp = 
         rules
-        |> getProductions
+        |> FsyaccFileRules.flatToRawRules
+        |> Map.ofList
+
+    //根据nonterminals的顺序排列规则
+    let rules =
+        nonterminals
+        |> List.map(fun s -> s,mp.[s])
+        |> FsyaccFileRules.rawToFlatRules
 
     {|
         rules = rules
@@ -69,8 +74,8 @@ let extractRules (rules:(string*((string list*string*string)list))list) (start:s
             productions
             |> List.collect(fun(lhs,rhs)->
                 [
-                    yield lhs
-                    yield! List.concat rhs
+                    lhs
+                    yield! rhs
                 ]
             )
             |> Set.ofList

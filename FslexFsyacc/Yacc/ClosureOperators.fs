@@ -18,5 +18,5 @@ let getCore (items:Set<ItemCore*Set<string>>) = Set.map fst items
 
 let getLookaheads (items:Set<ItemCore*Set<string>>) = 
     items 
-    |> Set.toArray 
-    |> Array.map snd
+    |> Set.toList
+    |> List.map snd

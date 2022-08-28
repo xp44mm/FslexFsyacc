@@ -1,7 +1,7 @@
 ﻿namespace FslexFsyacc.Fsyacc
 open System
 
-type FsyaccFile = 
+type RawFsyaccFile = 
     {
         header:string
         rules:(string*((string list*string*string)list))list
@@ -36,6 +36,7 @@ type FsyaccFile =
             this.precedences
             this.declarations
 
+    [<Obsolete("FlatFsyaccFile.start")>]
     ///根据startSymbol提取相关规则，无用规则被无视忽略。
     member this.start(startSymbol:string, terminals:Set<string>) =
         let o = 

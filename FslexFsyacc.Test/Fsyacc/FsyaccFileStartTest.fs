@@ -50,7 +50,7 @@ type FsyaccFileStartTest(output:ITestOutputHelper) =
                 "f",[["g"]]
 
             ]
-        let result = FsyaccFileStart.dfsort x "a"
+        let result = FsyaccFileStart.deepFirstSort x "a"
         show result
 
         let y = ["a";"c";"f";"d"]

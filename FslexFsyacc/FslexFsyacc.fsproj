@@ -10,10 +10,10 @@
 		<PackageProjectUrl>https://github.com/xp44mm/FslexFsyacc</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/xp44mm/FslexFsyacc</RepositoryUrl>
 		<PackageTags>lex;yacc;compiler;parser;analyzer</PackageTags>
-		<PackageReleaseNotes>array-&gt;list</PackageReleaseNotes>
+		<PackageReleaseNotes>FlatFsyaccFile</PackageReleaseNotes>
 		<Company>34696643@qq.com</Company>
 		<Authors>xp44m</Authors>
-		<Version>1.2.28</Version>
+		<Version>1.2.29</Version>
 		<IsPublishable>True</IsPublishable>
 		<PackageReadmeFile>readme.md</PackageReadmeFile>
 	</PropertyGroup>
@@ -79,12 +79,13 @@
 		<Compile Include="Fsyacc\FsyaccParseTableFile.fs" />
 		<Compile Include="Fsyacc\FsyaccFileRender.fs" />
 		<Compile Include="Fsyacc\FsyaccFileStart.fs" />
-		<Compile Include="Fsyacc\FsyaccFileName.fs" />
-		<Compile Include="Fsyacc\FsyaccFileRefine.fs" />
 		<Compile Include="Fsyacc\FsyaccFileRules.fs" />
-		<Compile Include="Fsyacc\FsyaccFile.fs" />
+		<Compile Include="Fsyacc\RawFsyaccFile.fs" />
+		<Compile Include="Fsyacc\FsyaccFileShaking.fs" />
 		<Compile Include="Fsyacc\FsyaccFilePrecedences.fs" />
+		<Compile Include="Fsyacc\FlatFsyaccFile.fs" />
 		<Compile Include="Fsyacc\NormFsyaccFile.fs" />
+		<Compile Include="Fsyacc\FsyaccFileName.fs" />
 		
 		<None Include="..\readme.md">
 		  <Pack>True</Pack>

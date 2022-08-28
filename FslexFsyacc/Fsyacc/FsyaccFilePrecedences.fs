@@ -7,7 +7,7 @@ let normToRawPrecedences
     |> Map.toList
     |> List.groupBy snd
     |> List.map(fun(i,groups)->
-        let symbols =
+        let tokens =
             groups
             |> List.map fst
 
@@ -16,8 +16,8 @@ let normToRawPrecedences
             | 0 -> "nonassoc"
             | 1 -> "right"
             | 9 -> "left"
-            | _ -> failwith $"precedence 019: {i}"
+            | _ -> failwith $"precedence nonassoc(0)/right(1)/left(9): {i}"
 
-        assoc,symbols
+        assoc,tokens
     )
 

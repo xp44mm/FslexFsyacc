@@ -62,10 +62,10 @@ type Section4_8_1Test(output:ITestOutputHelper) =
                 productions
             
         //show operators
-        let y = [|
+        let y = [
             ["E"; "E"; "*"; "E"],"*"
             ["E"; "E"; "+"; "E"],"+"
-        |]
+        ]
 
         Should.equal y operators
 

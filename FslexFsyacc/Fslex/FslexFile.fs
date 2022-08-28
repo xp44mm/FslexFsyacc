@@ -72,7 +72,6 @@ type FslexFile =
 
         let rules =
             dfa.finalLexemes
-            //|> Array.toList
             |> List.mapi(fun i (fnls,lxms)->
                 let _,sem = this.rules.[i]
                 Set.toList fnls,Set.toList lxms,sem)

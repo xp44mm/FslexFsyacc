@@ -29,8 +29,8 @@ type FslexParseTableTest(output: ITestOutputHelper) =
     let sourcePath = Path.Combine(solutionPath, @"FslexFsyacc\Fslex")
     let filePath = Path.Combine(sourcePath, @"fslex.fsyacc")
     let text = File.ReadAllText(filePath)
-    let rawFsyacc = FsyaccFile.parse text
-    let fsyacc = NormFsyaccFile.fromRaw rawFsyacc
+    let rawFsyacc = RawFsyaccFile.parse text
+    let fsyacc = FlatFsyaccFile.fromRaw rawFsyacc
 
     [<Fact>]
     member _.``01 - compiler test``() =
@@ -60,7 +60,6 @@ type FslexParseTableTest(output: ITestOutputHelper) =
         // production -> %prec
         let pprods =
             ProductionUtils.precedenceOfProductions collection.grammar.terminals productions
-            |> List.ofArray
         //优先级应该据此结果给出，不能少，也不应该多。
         let y =
             [ [ "expr"; "expr"; "&"; "expr" ], "&"
@@ -117,7 +116,6 @@ type FslexParseTableTest(output: ITestOutputHelper) =
     member _.``06 - generate ParseTable``() =
         let name = "FslexParseTable"
         let moduleName = $"FslexFsyacc.Fslex.{name}"
-        let fsyacc = NormFsyaccFile.fromRaw rawFsyacc
         let parseTbl = fsyacc.toFsyaccParseTableFile ()
         let fsharpCode = parseTbl.generate (moduleName)
         let outputDir = Path.Combine(sourcePath, $"{name}.fs")

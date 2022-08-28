@@ -71,7 +71,7 @@ type AmbiguousCollection =
                 terminals = this.grammar.terminals
                 names = names
                 precedences = precedences
-            } : AmbiguityEliminator
+            }:AmbiguityEliminator
 
         let unambiguousClosures =
             this.closures

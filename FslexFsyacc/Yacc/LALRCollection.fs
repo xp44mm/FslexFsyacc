@@ -8,7 +8,7 @@ type LALRCollection =
         closures: Map<int,Set<string*ItemCore>> // index -> lookahead*action
     }
 
-    static member create(mainProductions:string list list)  =
+    static member create(mainProductions:string list list) =
         let grammar = Grammar.from mainProductions
         let itemCores = ItemCoreFactory.make grammar.productions
         let itemCoreAttributes =
@@ -19,19 +19,19 @@ type LALRCollection =
         let kernels =
             closures
             |> Set.map fst
-            |> Set.toArray
-            |> Array.mapi(fun i k -> k,i)
-            |> Map.ofArray
+            |> Set.toList
+            |> List.mapi(fun i k -> k,i)
+            |> Map.ofList
 
         let closures =
             closures
-            |> Set.toArray
-            |> Array.mapi(fun i (kernels,closure) -> //需要检查状态编号是否是从0开始
+            |> Set.toList
+            |> List.mapi(fun i (kernels,closure) -> //需要检查状态编号是否是从0开始
                 ///展开lookaheads的closure
                 let spreadedClosure =
                     closure
-                    |> Set.toArray
-                    |> Array.collect(fun (itemCore,lookaheads) ->
+                    |> Set.toList
+                    |> List.collect(fun (itemCore,lookaheads) ->
                         let lookaheads =
                             if itemCore.dotmax then
                                 lookaheads
@@ -41,13 +41,13 @@ type LALRCollection =
                                 //当nextSymbol是nonterminal时仅用于占位
                                 Set.singleton itemCore.nextSymbol
                         lookaheads
-                        |> Set.toArray
-                        |> Array.map(fun lookahead -> lookahead, itemCore)
+                        |> Set.toList
+                        |> List.map(fun lookahead -> lookahead, itemCore)
                     )
-                    |> Set.ofArray
+                    |> Set.ofList
                 i,spreadedClosure
             )
-            |> Map.ofArray
+            |> Map.ofList
         {
             grammar = grammar
             kernels = kernels

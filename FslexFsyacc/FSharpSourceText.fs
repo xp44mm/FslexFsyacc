@@ -156,11 +156,11 @@ let formatNestedCode (spaceCount:int) (code:string) =
         |> Line.splitLines //分行
         |> Seq.map(fun (i,line) -> line.TrimEnd()) //去掉行尾空格
         |> Seq.filter(fun line -> line > "") // 删除空行
-        |> Seq.toArray
+        |> Seq.toList
 
     //行首空格数
     let spaces = Line.startSpaces lines
 
     lines
-    |> Array.map(fun line -> line.[spaces..])
+    |> List.map(fun line -> line.[spaces..])
     |> String.concat Environment.NewLine
