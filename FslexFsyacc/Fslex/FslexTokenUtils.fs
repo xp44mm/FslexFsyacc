@@ -8,7 +8,7 @@ let getTag(pos,len,token) =
     | HEADER   _ -> "HEADER"
     | ID       _ -> "ID"
     | CAP      _ -> "CAP"
-    | QUOTE    _ -> "QUOTE"
+    | LITERAL  _ -> "LITERAL"
     | SEMANTIC _ -> "SEMANTIC"
     | HOLE     _ -> "HOLE"
     | EQUALS    -> "="
@@ -29,7 +29,7 @@ let getLexeme (pos,len,token) =
     | HEADER x -> box x
     | ID x -> box x
     | CAP x -> box x
-    | QUOTE x -> box x
+    | LITERAL x -> box x
     | SEMANTIC x -> box x
     | HOLE x -> box x
     | _ -> null
@@ -65,7 +65,7 @@ let tokenize inp =
 
             | On trySingleQuoteString (x, rest) ->
                 let len = x.Length
-                yield pos,len,QUOTE(Quotation.unquote x)
+                yield pos,len,LITERAL(Quotation.unquote x)
                 yield! loop (lpos,linp) (pos+len,rest)
 
             | On(tryMatch(Regex @"^%%+")) (x, rest) ->

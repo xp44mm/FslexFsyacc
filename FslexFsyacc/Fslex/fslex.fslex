@@ -5,9 +5,9 @@ open FslexFsyacc.Fslex.FslexTokenUtils
 type token = int*int*FslexToken
 %}
 
-last = [")" "*" "+" "?" HOLE ID QUOTE "]"]
-first = ["(" HOLE ID QUOTE "["]
-any = ["%%" "&" "(" ")" "*" "+" "/" "=" "?" CAP HEADER HOLE ID QUOTE SEMANTIC "[" "]" "|"]
+last = [")" "*" "+" "?" HOLE ID LITERAL "]"]
+first = ["(" HOLE ID LITERAL "["]
+any = ["%%" "&" "(" ")" "*" "+" "/" "=" "?" CAP HEADER HOLE ID LITERAL SEMANTIC "[" "]" "|"]
 
 %%
 

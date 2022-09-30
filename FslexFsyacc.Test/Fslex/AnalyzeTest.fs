@@ -23,10 +23,10 @@ type AnalyzeTest(output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``explicit amp test``() =
-        let tokens = [LPAREN;ID "";RPAREN;LBRACK;RBRACK;STAR;QUOTE ""] |> List.map(fun t -> 0,0,t)
+        let tokens = [LPAREN;ID "";RPAREN;LBRACK;RBRACK;STAR;LITERAL ""] |> List.map(fun t -> 0,0,t)
         let y = analyze tokens |> List.map Triple.last
         //show y
 
-        let e = [LPAREN;ID "";RPAREN;AMP;LBRACK;RBRACK;STAR;AMP;QUOTE ""]
+        let e = [LPAREN;ID "";RPAREN;AMP;LBRACK;RBRACK;STAR;AMP;LITERAL ""]
         Should.equal e y
 

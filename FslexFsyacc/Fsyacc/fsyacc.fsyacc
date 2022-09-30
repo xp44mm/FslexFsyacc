@@ -46,7 +46,7 @@ symbols    :         symbol    {[s0]}
            | symbols symbol    {s1::s0}
 
 symbol     : ID    { s0 }
-           | QUOTE { s0 }
+           | LITERAL { s0 }
 
 assoc      : "%left"         { "left"     }
            | "%right"        { "right"    }
@@ -61,7 +61,7 @@ declaration: symbol ":" symbol { s0,s2.Trim() }
 
 HEADER      : "string"
 ID          : "string"
-QUOTE       : "string"
+LITERAL       : "string"
 SEMANTIC    : "string"
 assoc       : "string"
 bodies      : "(string list*string*string)list"

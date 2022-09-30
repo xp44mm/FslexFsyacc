@@ -103,7 +103,7 @@ type FslexParseTableTest(output: ITestOutputHelper) =
                   "HEADER"
                   "HOLE"
                   "ID"
-                  "QUOTE"
+                  "LITERAL"
                   "SEMANTIC"
                   "["
                   "]"

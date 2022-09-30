@@ -6,7 +6,7 @@ type FslexToken =
     | ID of string
     | CAP of string
     /// quote string literal(unquoted)
-    | QUOTE of string
+    | LITERAL of string
 
     | SEMANTIC of string
 

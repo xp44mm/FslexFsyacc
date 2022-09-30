@@ -3847,7 +3847,7 @@ atomicExpr:
         if not (IsValidPrefixOperatorUse $1) then reportParseErrorAt arg2.Range (FSComp.SR.parsInvalidPrefixOperator())
         mkSynPrefixPrim (rhs parseState 1) (unionRanges (rhs parseState 1) arg2.Range) $1 arg2, hpa2 }
 
-  | QUOTE ident
+  | LITERAL ident
       { let id = mkSynId (lhs parseState) ($2).idText
         let typar = SynTypar(id, TyparStaticReq.None, false)
         let lhsm = rhs2 parseState 1 2
@@ -5005,7 +5005,7 @@ measureTypeExpr:
        SynMeasure.Divide(SynMeasure.One, $2, lhs parseState) }
    
 typar: 
-  | QUOTE ident 
+  | LITERAL ident 
      {  let id = mkSynId (lhs parseState) ($2).idText
         SynTypar(id, TyparStaticReq.None, false) }
 

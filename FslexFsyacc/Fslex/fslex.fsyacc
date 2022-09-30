@@ -30,7 +30,7 @@ expr       : character          {s0}
            | "[" characters "]" {s1 |> List.rev |> List.reduce(fun a b -> Uion(a,b))}
 
 character  : ID    { Character s0 }
-           | QUOTE { Character s0 }
+           | LITERAL { Character s0 }
 
 characters : characters "&" character {s2::s0}
            | character                {[s0]}
@@ -46,7 +46,7 @@ characters : characters "&" character {s2::s0}
 HEADER     : "string"
 ID         : "string"
 CAP        : "string"
-QUOTE      : "string"
+LITERAL      : "string"
 SEMANTIC   : "string"
 HOLE       : "string"
 character  : "RegularExpression<string>"

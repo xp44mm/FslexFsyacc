@@ -3,7 +3,7 @@
 type FsyaccToken =
     | HEADER of string
     | ID of string
-    | QUOTE of string
+    | LITERAL of string
     | SEMANTIC of string
     | COLON
     | SEMICOLON
@@ -13,4 +13,8 @@ type FsyaccToken =
     | RIGHT
     | NONASSOC
     | PREC
+
+    //| QMARK
+    //| PLUS
+    //| STAR
 
