@@ -10,10 +10,10 @@
 		<PackageProjectUrl>https://github.com/xp44mm/FslexFsyacc</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/xp44mm/FslexFsyacc</RepositoryUrl>
 		<PackageTags>lex;yacc;compiler;parser;analyzer</PackageTags>
-		<PackageReleaseNotes>delete obsolete</PackageReleaseNotes>
+		<PackageReleaseNotes>Fsyacc.eliminate</PackageReleaseNotes>
 		<Company>34696643@qq.com</Company>
 		<Authors>xp44m</Authors>
-		<Version>1.2.30</Version>
+		<Version>1.2.31</Version>
 		<IsPublishable>True</IsPublishable>
 		<PackageReadmeFile>readme.md</PackageReadmeFile>
 	</PropertyGroup>
@@ -55,6 +55,7 @@
 		<Compile Include="Yacc\ParsingTable.fs" />
 		<Compile Include="Yacc\ParseTableEncoder.fs" />
 		<Compile Include="Yacc\ParseTable.fs" />
+		<Compile Include="Yacc\BNF.fs" />
 		
 		<Compile Include="FSharpSourceText.fs" />
 		
@@ -80,8 +81,9 @@
 		<Compile Include="Fsyacc\FsyaccFileRender.fs" />
 		<Compile Include="Fsyacc\FsyaccFileStart.fs" />
 		<Compile Include="Fsyacc\FsyaccFileRules.fs" />
-		<Compile Include="Fsyacc\RawFsyaccFile.fs" />
 		<Compile Include="Fsyacc\FsyaccFileShaking.fs" />
+		<Compile Include="Fsyacc\FsyaccRules.fs" />
+		<Compile Include="Fsyacc\RawFsyaccFile.fs" />
 		<Compile Include="Fsyacc\FsyaccFilePrecedences.fs" />
 		<Compile Include="Fsyacc\FlatFsyaccFile.fs" />
 		
@@ -93,7 +95,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="FSharp.Idioms" Version="1.2.9" />
+		<PackageReference Include="FSharp.Idioms" Version="1.2.10" />
 		<PackageReference Include="FSharp.Literals" Version="2.2.9" />
 	</ItemGroup>
 

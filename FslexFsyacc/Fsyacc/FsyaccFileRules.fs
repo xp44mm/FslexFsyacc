@@ -36,18 +36,18 @@ let addRule
     rules @ [rule]
 
 let removeRule
-    (rule:string list)
+    (production:string list)
     (rules:list<string list*string*string>)
     =
     rules
-    |> List.filter(fun(x,_,_) -> x<>rule)
+    |> List.filter(fun(x,_,_) -> x<>production)
 
 let findRuleIndex
-    (prod:string list)
+    (production:string list)
     (rules:list<string list*string*string>)
     =
     rules
-    |> List.findIndex(fun(p,_,_)->p=prod)
+    |> List.findIndex(fun(p,_,_)->p=production)
 
 /// 保持替换的位置
 let replaceRule
@@ -88,7 +88,7 @@ let findRuleByName
     |> List.find(fun(_,x,_)->x=name)
 
 ///检查rules中是否有重复的规则
-let repeatRule
+let duplicateRule
     (rules:list<string list*string*string>)
     =
     rules
@@ -105,3 +105,65 @@ let getProductionNames(rules:list<string list*string*string>) =
     |> List.filter(fun(_,nm,_) -> nm > "")
     |> List.map(fun(prod,name,_)-> prod,name)
     |> Map.ofList
+
+let removeErrorRules (robust:string Set) (rules:list<string list*string*string>) =
+    let willBeRemoved (symbol: string) =
+        robust
+        |> Set.exists(fun kw -> symbol.Contains kw)
+
+    let reserve prod =
+        prod 
+        |> List.forall(fun (symbol:string) -> not(willBeRemoved symbol))
+
+    rules
+    |> List.filter(fun(prod,nm,act)->reserve prod)
+
+let eliminateSymbolFromRules (symbol:string) (rules:list<string list*string*string>) =
+        //保存名字，和行为
+        let keeps =
+            rules
+            |> List.map(fun(a,b,c)-> a,(b,c))
+            |> Map.ofList
+                    
+        let bnf: FslexFsyacc.Yacc.BNF =
+            {
+                productions =
+                    rules
+                    |> List.map Triple.first
+            }
+
+        let b1 = bnf.eliminate(symbol)
+
+        b1.productions
+        |> List.map(fun prod -> 
+            let nm,act = 
+                if keeps.ContainsKey prod then 
+                    keeps.[prod]
+                else "",""
+            prod,nm,act)
+        
+let getChomsky (terminals:Set<string>) (rules:list<string list*string*string>) =
+    let tryChomsky prods =
+        match prods with
+        | [ prod & [_;b] ] when terminals.Contains b ->
+            Some prod
+        | _ -> None
+
+    rules
+    |> List.map Triple.first // rule -> prod
+    |> List.groupBy List.head
+    |> List.map snd
+    |> List.choose tryChomsky
+
+let eliminateChomsky (rules:list<string list*string*string>) =
+    let terminals =
+        rules 
+        |> List.map Triple.first
+        |> FslexFsyacc.Yacc.Grammar.from
+        |> (fun grammar -> grammar.terminals)
+    let chos = getChomsky terminals rules
+    let rules =
+        chos
+        |> List.map List.head
+        |> List.fold(fun rules cho -> eliminateSymbolFromRules cho rules) rules
+    rules

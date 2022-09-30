@@ -23,6 +23,7 @@
 		<Compile Include="Yacc\Example440Test.fs" />
 		<Compile Include="Yacc\Example448Test.fs" />
 		<Compile Include="Yacc\Example454Test.fs" />
+		<Compile Include="Yacc\ProductionUtilsTest.fs" />
 		<Compile Include="Yacc\LALRExpressionTest.fs" />
 		<Compile Include="Yacc\PrecedenceTest.fs" />
 		<Compile Include="Yacc\Section4_8_1Test.fs" />
@@ -39,6 +40,8 @@
 		<Compile Include="Fsyacc\FsyaccFileStartTest.fs" />
 		<Compile Include="Fsyacc\FsyaccFileNameTest.fs" />
 		<Compile Include="Fsyacc\FsyaccFileRulesTest.fs" />
+		<None Include="Fsyacc\pars.fsyacc" />
+		<Compile Include="Fsyacc\ParsPreformatTest.fs" />
 		<Compile Include="Fsyacc\ParsParseTableTest.fs" />
 		<Compile Include="Expr\ExprToken.fs" />
 		<None Include="Expr\expr.fsyacc" />
@@ -63,7 +66,7 @@
 	<ItemGroup>
 		<PackageReference Include="FSharp.Compiler.SyntaxTreeX" Version="1.0.4" />
 		<PackageReference Include="FSharp.xUnit" Version="1.2.3" />
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.0" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.2" />
 		<PackageReference Include="System.Reactive" Version="5.0.0" />
 		<PackageReference Include="xunit" Version="2.4.2" />
 		<PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">

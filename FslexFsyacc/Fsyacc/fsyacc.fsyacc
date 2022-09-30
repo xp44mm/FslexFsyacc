@@ -26,8 +26,8 @@ headBar:
     | (*empty*) {}
     | "|"       {}
 
-precedences:             precedence    {[s0]}
-           | precedences precedence    {s1::s0}
+precedences:             precedence {[s0]}
+           | precedences precedence {s1::s0}
 
 precedence : assoc symbols { s0,List.rev s1}
 

@@ -56,3 +56,65 @@ let precedenceOfProductions (terminals:Set<string>)(productions:Set<string list>
     productions
     |> List.sortBy snd
 
+let split (prodBody:'a list) (symbol:'a):'a list list =
+    let newGroups groups group =
+        match group with
+        | [] -> groups
+        | _ -> (List.rev group)::groups
+
+    let rec loop (groups:'a list list) (group:'a list) (body:'a list) =
+        match body with
+        | [] ->
+            List.rev (newGroups groups group)
+        | h::t ->
+            if h = symbol then
+                let groups = [h]::newGroups groups group
+                loop groups [] t
+            else
+                loop groups (h::group) t
+
+    loop [] [] prodBody
+
+let crosspower n (body:'a list):'a list list =
+    let rec loop n (acc:'a list list) =
+        if n > 1 then
+            let acc = 
+                List.allPairs acc body
+                |> List.map(fun (ls, a) -> ls @ [a])
+            loop (n-1) acc
+        else
+            acc
+    body
+    |> List.map(fun a -> [a])
+    |> loop n
+
+let eliminateSymbol (symbol:string) (bodiesOfSymbol:string list list) (body:string list) =
+    let splitedBody = 
+        split body symbol
+        |> List.mapi(fun i ls -> i,ls)
+
+    let holes =
+        splitedBody
+        |> List.filter(fun(i,ls)->ls=[symbol])
+
+    let indexesOfHoles =
+        holes 
+        |> List.map fst
+
+    let holeArgsRows = 
+        crosspower holes.Length bodiesOfSymbol
+        |> List.map(fun row ->
+            row
+            |> List.zip indexesOfHoles
+            |> Map.ofList)
+
+    holeArgsRows
+    |> List.map(fun holeArgs ->
+        splitedBody
+        |> List.collect(fun(i,ls)->
+            if holeArgs.ContainsKey i then
+                holeArgs.[i]
+            else
+                ls
+        )
+    )

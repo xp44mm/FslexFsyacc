@@ -41,18 +41,6 @@ type FlatFsyaccFile =
             declarations = fsyacc.declarations
         }
 
-    /// 将相同lhs的规则合并到一起
-    member this.normRules() =
-        let rules =
-            this.rules
-            |> List.groupBy (Triple.first>>List.head)
-            |> List.collect snd
-
-        {
-            this with
-                rules = rules
-        }
-
     member this.toRaw() =
         let rules =
             this.rules
@@ -67,6 +55,18 @@ type FlatFsyaccFile =
             header = this.header
             declarations = this.declarations
         }:RawFsyaccFile
+
+    /// 将相同lhs的规则合并到一起
+    member this.normRules() =
+        let rules =
+            this.rules
+            |> List.groupBy (Triple.first>>List.head)
+            |> List.collect snd
+
+        {
+            this with
+                rules = rules
+        }
 
     ///根据startSymbol提取相关规则，无用规则被无视忽略。
     member this.start(startSymbol:string, terminals:Set<string>) =
@@ -96,6 +96,15 @@ type FlatFsyaccFile =
                 rules = rules
                 precedences = precedences
                 declarations = declarations
+        }
+
+    ///消除给定的非终结符
+    member this.eliminate(noterminal:string)=
+        let re = { rules = this.rules }
+        let re = re.eliminate(noterminal)
+        {
+            this with
+                rules = re.rules
         }
 
     member this.getMainProductions() =
