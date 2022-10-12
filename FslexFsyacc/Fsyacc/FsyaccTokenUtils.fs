@@ -15,15 +15,18 @@ let getTag(pos,len,token) =
     | RIGHT        -> "%right"
     | NONASSOC     -> "%nonassoc"
     | PREC         -> "%prec"
+    | QMARK -> "?"
+    | PLUS -> "+"
+    | STAR -> "*"
 
-/// 获取token携带的语义信息
+/// 获取token携带的语义信息§
 let getLexeme(pos,len,token) =
     match token with
     | HEADER x -> box x
     | ID x -> box x
-    | LITERAL x    -> box x
+    | LITERAL x -> box x
     | SEMANTIC x -> box x
-    | _        -> null
+    | _ -> null
 
 open FSharp.Idioms
 open FslexFsyacc.FSharpSourceText
@@ -71,6 +74,18 @@ let tokenize inp =
 
             | On (tryFirst ';') rest ->
                 yield pos,1,SEMICOLON
+                yield! loop (lpos,linp) (pos+1,rest)
+
+            | On (tryFirst '?') rest ->
+                yield pos,1,QMARK
+                yield! loop (lpos,linp) (pos+1,rest)
+
+            | On (tryFirst '+') rest ->
+                yield pos,1,PLUS
+                yield! loop (lpos,linp) (pos+1,rest)
+
+            | On (tryFirst '*') rest ->
+                yield pos,1,STAR
                 yield! loop (lpos,linp) (pos+1,rest)
 
             | On(tryMatch(Regex @"^%[a-z]+")) (x, rest) ->

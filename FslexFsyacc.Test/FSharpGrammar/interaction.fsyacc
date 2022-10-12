@@ -1,0 +1,37 @@
+﻿%{%}
+interaction :
+    | interactiveItemsTerminator {}
+    | SEMICOLON {}
+    | OBLOCKSEP {}
+interactiveItemsTerminator :
+    | interactiveTerminator {}
+    | interactiveDefns interactiveTerminator {}
+    | interactiveExpr interactiveTerminator {}
+    | hashDirective interactiveTerminator {}
+    | interactiveDefns interactiveSeparators interactiveItemsTerminator {}
+    | interactiveExpr interactiveSeparators interactiveItemsTerminator {}
+    | hashDirective interactiveSeparators interactiveItemsTerminator {}
+interactiveTerminator :
+    | SEMICOLON_SEMICOLON {}
+    | EOF {}
+interactiveDefns :
+    | moduleDefn {}
+    | moduleDefn interactiveDefns {}
+interactiveExpr :
+    | opt_attributes opt_access declExpr {}
+opt_attributes :
+    | attributes {}
+    | (*empty*) {}
+opt_access :
+    | (*empty*) {}
+    | access {}
+access :
+    | PRIVATE {}
+    | PUBLIC {}
+    | INTERNAL {}
+interactiveSeparators :
+    | interactiveSeparator {}
+    | interactiveSeparator interactiveSeparators {}
+interactiveSeparator :
+    | SEMICOLON {}
+    | OBLOCKSEP {}

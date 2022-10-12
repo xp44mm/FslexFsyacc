@@ -4,19 +4,14 @@ open System
 open System.IO
 open System.Collections.Generic
 
+open FSharp.Literals.Literal
+
 open FslexFsyacc.Fsyacc
-open FSharp.Literals
 open FslexFsyacc.Yacc
 open FslexFsyacc.Runtime
 
-let hehe =
-    let mutable x = 1
-    // The subsequent token occurs on the same line. 
-    x <- 
-        printfn "hello"; 
-        2 + 2   
-
 
 let [<EntryPoint>] main _ = 
-
+    let y = 1 |> (~-)
+    Console.WriteLine(stringify y)
     0

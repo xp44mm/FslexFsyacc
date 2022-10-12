@@ -1,0 +1,18 @@
+﻿%{%}
+typedSequentialExprEOF :
+    | typedSequentialExpr EOF {}
+typedSequentialExpr :
+    | sequentialExpr COLON typeWithTypeConstraints {}
+    | sequentialExpr {}
+sequentialExpr :
+    | declExpr seps sequentialExpr {}
+    | declExpr seps {}
+    | declExpr {}
+    | declExpr THEN sequentialExpr {}
+    | declExpr OTHEN OBLOCKBEGIN typedSequentialExpr OBLOCKEND {}
+    | hardwhiteLetBindings {}
+seps :
+    | OBLOCKSEP {}
+    | SEMICOLON {}
+    | OBLOCKSEP SEMICOLON {}
+    | SEMICOLON OBLOCKSEP {}

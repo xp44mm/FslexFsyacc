@@ -1,0 +1,6 @@
+﻿%{%}
+typEOF :
+    | typ EOF {}
+typ :
+    | tupleType RARROW typ {}
+    | tupleType {}

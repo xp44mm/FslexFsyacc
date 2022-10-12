@@ -1,0 +1,67 @@
+﻿%{%}
+implementationFile :
+    | fileNamespaceImpls EOF {}
+fileNamespaceImpls :
+    | fileModuleImpl {}
+    | fileModuleImpl fileNamespaceImplList {}
+fileModuleImpl :
+    | opt_attributes opt_access moduleIntro moduleDefnsOrExprPossiblyEmptyOrBlock {}
+    | moduleDefnsOrExprPossiblyEmptyOrBlock {}
+opt_attributes :
+    | attributes {}
+    | (*empty*) {}
+opt_access :
+    | (*empty*) {}
+    | access {}
+access :
+    | PRIVATE {}
+    | PUBLIC {}
+    | INTERNAL {}
+moduleIntro :
+    | MODULE opt_attributes opt_access opt_rec path {}
+opt_rec :
+    | REC {}
+    | (*empty*) {}
+path :
+    | GLOBAL {}
+    | IDENT {}
+    | path DOT IDENT {}
+moduleDefnsOrExprPossiblyEmptyOrBlock :
+    | OBLOCKBEGIN moduleDefnsOrExprPossiblyEmpty OBLOCKEND opt_OBLOCKSEP {}
+    | moduleDefnsOrExprPossiblyEmpty {}
+moduleDefnsOrExprPossiblyEmpty :
+    | moduleDefnsOrExpr {}
+    | (*empty*) {}
+moduleDefnsOrExpr :
+    | opt_attributes opt_access declExpr topSeparators moduleDefnsOrExpr {}
+    | opt_attributes opt_access declExpr topSeparators {}
+    | opt_attributes opt_access declExpr {}
+    | moduleDefns {}
+topSeparators :
+    | topSeparator {}
+    | topSeparator topSeparators {}
+topSeparator :
+    | SEMICOLON {}
+    | SEMICOLON_SEMICOLON {}
+    | OBLOCKSEP {}
+moduleDefns :
+    | moduleDefnOrDirective moduleDefns {}
+    | moduleDefnOrDirective topSeparators moduleDefnsOrExpr {}
+    | moduleDefnOrDirective {}
+    | moduleDefnOrDirective topSeparators {}
+moduleDefnOrDirective :
+    | moduleDefn {}
+    | hashDirective {}
+opt_OBLOCKSEP :
+    | OBLOCKSEP {}
+    | (*empty*) {}
+fileNamespaceImplList :
+    | fileNamespaceImpl fileNamespaceImplList {}
+    | fileNamespaceImpl {}
+fileNamespaceImpl :
+    | namespaceIntro deprecated_opt_equals fileModuleImpl {}
+namespaceIntro :
+    | NAMESPACE opt_rec path {}
+deprecated_opt_equals :
+    | EQUALS {}
+    | (*empty*) {}

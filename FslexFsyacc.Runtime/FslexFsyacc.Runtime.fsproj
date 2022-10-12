@@ -34,12 +34,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FSharp.Idioms" Version="1.2.10" />
+    <PackageReference Include="FSharp.Idioms" Version="1.2.11" />
     <PackageReference Include="FSharp.Literals" Version="2.2.9" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="6.0.5" />
+    <PackageReference Update="FSharp.Core" Version="6.0.6" />
   </ItemGroup>
 
 </Project>

@@ -142,11 +142,14 @@ let eliminateSymbolFromRules (symbol:string) (rules:list<string list*string*stri
                 else "",""
             prod,nm,act)
         
-let getChomsky (terminals:Set<string>) (rules:list<string list*string*string>) =
+/// (terminals:Set<string>)
+let getChomsky (rules:list<string list*string*string>) =
     let tryChomsky prods =
         match prods with
-        | [ prod & [_;b] ] when terminals.Contains b ->
+        | [prod & ([_]|[_;_])] -> 
             Some prod
+        //| [prod & ] when terminals.Contains b -> //
+        //    Some prod
         | _ -> None
 
     rules
@@ -156,12 +159,13 @@ let getChomsky (terminals:Set<string>) (rules:list<string list*string*string>) =
     |> List.choose tryChomsky
 
 let eliminateChomsky (rules:list<string list*string*string>) =
-    let terminals =
-        rules 
-        |> List.map Triple.first
-        |> FslexFsyacc.Yacc.Grammar.from
-        |> (fun grammar -> grammar.terminals)
-    let chos = getChomsky terminals rules
+    //let terminals =
+    //    rules 
+    //    |> List.map Triple.first
+    //    |> FslexFsyacc.Yacc.Grammar.from
+    //    |> (fun grammar -> grammar.terminals)
+
+    let chos = getChomsky rules
     let rules =
         chos
         |> List.map List.head

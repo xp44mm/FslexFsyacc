@@ -84,7 +84,7 @@ type Parser<'tok> (
             tokens.GetEnumerator()
             |> Iterator
 
-        let rec loop(states: (int*obj) list)(maybeToken: 'tok option)=
+        let rec loop(states: (int*obj)list)(maybeToken: 'tok option)=
             let action() =
                 match maybeToken with
                 | Some token ->

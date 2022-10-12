@@ -14,7 +14,7 @@ type FsyaccToken =
     | NONASSOC
     | PREC
 
-    //| QMARK
-    //| PLUS
-    //| STAR
+    | QMARK
+    | PLUS
+    | STAR
 

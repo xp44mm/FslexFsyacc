@@ -9,6 +9,16 @@ let renderSymbol sym =
         sym
     else Literal.stringify sym
 
+let renderQuantifySymbol sym =
+    let rgx = Regex(@"^(.+)\{\\([?+*])\}$")
+    let mat = rgx.Match(sym)
+    if mat.Success then
+        let m = mat.Groups.[1].Value
+        let q = mat.Groups.[2].Value
+        $"{renderSymbol m}{q}"
+    else
+        renderSymbol sym
+
 let renderProduction (symbols:string list) =
     let symbols =
         symbols

@@ -8,6 +8,7 @@
 
 	<ItemGroup>
 		<Compile Include="Dir.fs" />
+		<Compile Include="Runtime\RenderUtilsTest.fs" />    
 		<Compile Include="Lex\NFACombineTest.fs" />
 		<Compile Include="Lex\RegularExpressionNFATest.fs" />
 		<Compile Include="Lex\LookaheadTest.fs" />
@@ -30,19 +31,21 @@
 		<Compile Include="Yacc\Section4_8_2Test.fs" />
 		
 		<Compile Include="FSharpSourceTextTest.fs" />
+    
 		<Compile Include="Fslex\FslexParseTableTest.fs" />
 		<Compile Include="Fslex\FslexDFATest.fs" />
 		<Compile Include="Fslex\AnalyzeTest.fs" />
 
 		<Compile Include="Fsyacc\SemanticGeneratorTest.fs" />
-		<Compile Include="Fsyacc\FsyaccParseTableTest.fs" />
-		<Compile Include="Fsyacc\FsyaccParseTableFileTest.fs" />
+		<Compile Include="Fsyacc\Fsyacc1ParseTableTest.fs" />
+		<Compile Include="Fsyacc\FsyaccFileRenderTest.fs" />
 		<Compile Include="Fsyacc\FsyaccFileStartTest.fs" />
 		<Compile Include="Fsyacc\FsyaccFileNameTest.fs" />
 		<Compile Include="Fsyacc\FsyaccFileRulesTest.fs" />
-		<None Include="Fsyacc\pars.fsyacc" />
-		<Compile Include="Fsyacc\ParsPreformatTest.fs" />
-		<Compile Include="Fsyacc\ParsParseTableTest.fs" />
+    
+		<None Include="FSharpGrammar\pars.fsyacc" />
+		<Compile Include="FSharpGrammar\ParsParseTableTest.fs" />
+    
 		<Compile Include="Expr\ExprToken.fs" />
 		<None Include="Expr\expr.fsyacc" />
 		<Compile Include="Expr\ExprParseTable.fs" />
@@ -61,10 +64,11 @@
 		<Compile Include="BalancedBracketCounterTest.fs" />
 
 		<Compile Include="Program.fs" />
+    
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="FSharp.Compiler.SyntaxTreeX" Version="1.0.4" />
+		<PackageReference Include="FSharp.Compiler.SyntaxTreeX" Version="1.0.5" />
 		<PackageReference Include="FSharp.xUnit" Version="1.2.3" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.2" />
 		<PackageReference Include="System.Reactive" Version="5.0.0" />
@@ -85,7 +89,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Update="FSharp.Core" Version="6.0.5" />
+	  <PackageReference Update="FSharp.Core" Version="6.0.6" />
 	</ItemGroup>
 
 </Project>
