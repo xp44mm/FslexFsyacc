@@ -7,7 +7,7 @@
     expr -> @ expr "+" expr
     expr -> @ expr "-" expr
     expr -> @ expr "/" expr
-state 1 "expr" :
+state 1 expr :
     "" -> expr @ [""]
     expr -> expr @ "*" expr
     expr -> expr @ "+" expr
@@ -22,7 +22,7 @@ state 2 "(" :
     expr -> @ expr "+" expr
     expr -> @ expr "-" expr
     expr -> @ expr "/" expr
-state 3 "expr" :
+state 3 expr :
     expr -> "(" expr @ ")"
     expr -> expr @ "*" expr
     expr -> expr @ "+" expr
@@ -39,21 +39,21 @@ state 5 "-" :
     expr -> @ expr "+" expr
     expr -> @ expr "-" expr
     expr -> @ expr "/" expr
-state 6 "expr" :
+state 6 expr :
     expr -> "-" expr @ ["";")";"*";"+";"-";"/"]
-state 7 "NUMBER" :
+state 7 NUMBER :
     expr -> NUMBER @ ["";")";"*";"+";"-";"/"]
-state 8 "expr" :
+state 8 expr :
     expr -> expr "*" expr @ ["";")";"*";"+";"-";"/"]
-state 9 "expr" :
+state 9 expr :
     expr -> expr @ "*" expr
     expr -> expr "+" expr @ ["";")";"+";"-"]
     expr -> expr @ "/" expr
-state 10 "expr" :
+state 10 expr :
     expr -> expr @ "*" expr
     expr -> expr "-" expr @ ["";")";"+";"-"]
     expr -> expr @ "/" expr
-state 11 "expr" :
+state 11 expr :
     expr -> expr "/" expr @ ["";")";"*";"+";"-";"/"]
 state 12 "*" :
     expr -> @ "(" expr ")"

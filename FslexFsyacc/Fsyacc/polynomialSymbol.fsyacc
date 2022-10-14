@@ -1,0 +1,49 @@
+%{
+open FslexFsyacc.Runtime
+open FslexFsyacc.Fsyacc
+open FslexFsyacc.Fsyacc.PolynomialSymbolUtils
+type token = FsyaccToken
+%}
+
+polynomialSymbol:
+    | atomic     { Atomic s0 }
+    | repetition { match s0 with (f,q) -> 
+                   Repetition(f,q) }
+    | brackets   { Oneof s0 }
+    | parens     { Chain s0 }
+
+atomic:
+    | ID      { s0 }
+    | LITERAL { s0 }
+
+repetition:
+    | polynomialSymbol quantifier { (s0,s1) }
+
+quantifier:
+    | "?" {"?"}
+    | "+" {"+"}
+    | "*" {"*"}
+
+brackets:
+    | "[" polynomialSymbol+ "]" { List.rev s1 }
+
+polynomialSymbol+:
+    |             polynomialSymbol {[s0]}
+    | polynomialSymbol+ polynomialSymbol {s1::s0}
+
+parens:
+    | "(" polynomialSymbol+ ")" { List.rev s1 }
+
+
+%%
+
+ID          : string
+LITERAL     : string
+atomic:string
+quantifier  : string
+polynomialSymbol: PolynomialSymbol
+polynomialSymbol+ : "PolynomialSymbol list"
+brackets : "PolynomialSymbol list"
+parens : "PolynomialSymbol list"
+repetition : "PolynomialSymbol*string"
+

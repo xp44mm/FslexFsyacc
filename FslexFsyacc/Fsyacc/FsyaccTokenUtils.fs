@@ -18,6 +18,10 @@ let getTag(pos,len,token) =
     | QMARK -> "?"
     | PLUS -> "+"
     | STAR -> "*"
+    | LBRACK -> "["
+    | RBRACK -> "]"
+    | LPAREN -> "("
+    | RPAREN -> ")"
 
 /// 获取token携带的语义信息§
 let getLexeme(pos,len,token) =
@@ -88,6 +92,18 @@ let tokenize inp =
                 yield pos,1,STAR
                 yield! loop (lpos,linp) (pos+1,rest)
 
+            | On (tryFirst '[') rest ->
+                yield pos,1,LBRACK
+                yield! loop (lpos,linp) (pos+1,rest)
+            | On (tryFirst ']') rest ->
+                yield pos,1,RBRACK
+                yield! loop (lpos,linp) (pos+1,rest)
+            | On (tryFirst '(') rest ->
+                yield pos,1,LPAREN
+                yield! loop (lpos,linp) (pos+1,rest)
+            | On (tryFirst ')') rest ->
+                yield pos,1,RPAREN
+                yield! loop (lpos,linp) (pos+1,rest)
             | On(tryMatch(Regex @"^%[a-z]+")) (x, rest) ->
                 let tok =
                     match x with

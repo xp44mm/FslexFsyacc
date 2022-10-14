@@ -13,19 +13,11 @@ type RenderUtilsTest(output:ITestOutputHelper) =
         |> output.WriteLine
     
     [<Theory>]
-    [<InlineData("mutalbe", "?", "mutalbe{\\?}")>]
-    [<InlineData("|"      , "+", "|{\\+}"      )>]
-    member _.``internal string test``(m,q,e) =
-        // fsyacc1.fsyacc
-        let y = $"{m}{{\\{q}}}"
-        Should.equal e y
-
-    [<Theory>]
-    [<InlineData("xyz"         , "xyz"     )>]
-    [<InlineData("mutalbe{\\?}", "mutalbe?")>]
-    [<InlineData("|{\\+}"      , "\"|\"+"  )>]
+    [<InlineData("xyz"       , "xyz"     )>]
+    [<InlineData("{mutalbe?}", "mutalbe?")>]
+    [<InlineData("?"         , "\"?\""  )>]
     member _.``render qua test``(x,e) =
-        let y = RenderUtils.renderQuantifySymbol x
+        let y = RenderUtils.renderSymbol x
         output.WriteLine(y)
         Should.equal e y
 

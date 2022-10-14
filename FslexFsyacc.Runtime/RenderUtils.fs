@@ -4,20 +4,12 @@ open System
 open System.Text.RegularExpressions
 open FSharp.Literals
 
-let renderSymbol sym =
-    if Regex.IsMatch(sym,@"^\w+$") then
-        sym
-    else Literal.stringify sym
-
-let renderQuantifySymbol sym =
-    let rgx = Regex(@"^(.+)\{\\([?+*])\}$")
-    let mat = rgx.Match(sym)
-    if mat.Success then
-        let m = mat.Groups.[1].Value
-        let q = mat.Groups.[2].Value
-        $"{renderSymbol m}{q}"
-    else
-        renderSymbol sym
+let renderSymbol (sym:string) =
+    if Regex.IsMatch(sym,@"^\w+$")
+    then sym
+    elif sym.Length > 1 && sym.[0] = '{' && sym.[sym.Length-1] = '}'
+    then sym.[1..sym.Length-2]
+    else sym |> Literal.stringify
 
 let renderProduction (symbols:string list) =
     let symbols =

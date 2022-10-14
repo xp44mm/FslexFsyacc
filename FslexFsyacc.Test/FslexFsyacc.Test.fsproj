@@ -38,6 +38,9 @@
 
 		<Compile Include="Fsyacc\SemanticGeneratorTest.fs" />
 		<Compile Include="Fsyacc\Fsyacc1ParseTableTest.fs" />
+		<Compile Include="Fsyacc\PolynomialSymbolParseTableTest.fs" />
+		<Compile Include="Fsyacc\PolynomialSymbolCompilerTest.fs" />
+		<Compile Include="Fsyacc\Fsyacc2ParseTableTest.fs" />
 		<Compile Include="Fsyacc\FsyaccFileRenderTest.fs" />
 		<Compile Include="Fsyacc\FsyaccFileStartTest.fs" />
 		<Compile Include="Fsyacc\FsyaccFileNameTest.fs" />

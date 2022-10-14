@@ -2,19 +2,19 @@
 
 ///3.3 正则表达式
 type RegularExpression<'c> =
-    /// a
+    /// a: atomic
     | Character of 'c
-    /// a|b      
+    /// a|b :either
     | Uion of RegularExpression<'c> * RegularExpression<'c>
-    /// ab       
+    /// ab :both
     | Concat of RegularExpression<'c> * RegularExpression<'c>
-    /// a*       
+    /// a*
     | Natural of RegularExpression<'c>
-    /// a+
+    /// a+, plural
     | Positive of RegularExpression<'c>
-    /// a?       
+    /// a? :optional
     | Maybe of RegularExpression<'c>
-    /// {id}     
+    /// <id> 
     | Hole of id:string
 
     member this.getCharacters() =

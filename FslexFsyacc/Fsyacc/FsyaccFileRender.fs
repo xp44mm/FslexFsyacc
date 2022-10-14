@@ -19,12 +19,17 @@ let renderHeader (header:string) =
         ]
         |> String.concat "\r\n"
 
+let renderSymbol (sym:string) =
+    if sym.[0] = '{' && sym.[sym.Length-1] = '}' 
+    then sym.[1..sym.Length-2]
+    else sym |> FslexFsyacc.Runtime.RenderUtils.renderSymbol
+
 let renderBody (body:string list) =
     if body.IsEmpty then
         "(*empty*)"
     else
         body
-        |> List.map renderQuantifySymbol
+        |> List.map renderSymbol
         |> String.concat " "
 
 let renderSemantic(semantic:string) =
@@ -55,7 +60,7 @@ let renderRhs(bodies:(string list*string*string)list) =
 
 let renderRule (lhs:string,rhs:(string list*string*string)list) =
     [
-        renderQuantifySymbol lhs + " :"
+        renderSymbol lhs + " :"
         renderRhs rhs |> indentCodeBlock 4
     ]
     |> String.concat "\r\n"
@@ -63,7 +68,7 @@ let renderRule (lhs:string,rhs:(string list*string*string)list) =
 let renderPrecedence (assoc:string, symbols:string list) =
     let symbols =
         symbols
-        |> List.map renderQuantifySymbol
+        |> List.map renderSymbol
         |> String.concat " "
     "%" + $"{assoc} {symbols}"
 
@@ -72,7 +77,7 @@ let renderDec (symbol:string, typeD:string) =
         symbol
         typeD
     ]
-    |> List.map renderQuantifySymbol
+    |> List.map renderSymbol
     |> String.concat " : "
 
 let renderFsyacc

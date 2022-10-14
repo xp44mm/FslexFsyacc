@@ -18,3 +18,5 @@ type FsyaccToken =
     | PLUS
     | STAR
 
+    | LBRACK | RBRACK
+    | LPAREN | RPAREN

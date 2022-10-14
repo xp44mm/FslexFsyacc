@@ -75,8 +75,7 @@ type ParserTable =
             let symbol =
                 i
                 |> this.getSymbol
-                |> Literal.stringify
-                //|> RenderUtils.renderSymbol
+                |> RenderUtils.renderSymbol
 
             let ls =
                 RenderUtils.renderClosure cls

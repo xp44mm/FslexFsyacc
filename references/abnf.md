@@ -96,12 +96,6 @@ rulename  =  %d97.98.99
 
 will match only the string that comprises only the lowercased characters, abc.
 
-### 2.4. External Encodings
-
-~~External representations of terminal value characters will vary according to constraints in the storage or transmission environment. Hence, the same ABNF-based grammar may have multiple external encodings, such as one for a 7-bit US-ASCII environment, another for a binary octet environment, and still a different one when 16-bit Unicode is used. Encoding details are beyond the scope of ABNF, although Appendix A (Core) provides definitions for a 7-bit US-ASCII environment as has been common to much of the Internet.~~
-
-By separating external encoding from the syntax, it is intended that alternate encoding environments can be used for the same syntax.
-
 ## 3. OPERATORS
 
 ### 3.1. Concatenation: `Rule1 Rule2`
