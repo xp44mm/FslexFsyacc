@@ -1,6 +1,4 @@
-﻿module FslexFsyacc.Fsyacc.PolynomialSymbolUtils
-
-open System.Text.RegularExpressions
+﻿module FslexFsyacc.Fsyacc.RegularSymbolUtils
 
 /// the tag of token
 let getTag(token) = FsyaccTokenUtils.getTag(0,0,token)

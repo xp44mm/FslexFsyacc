@@ -1,0 +1,49 @@
+%{
+open FslexFsyacc.Runtime
+open FslexFsyacc.Fsyacc
+open FslexFsyacc.Fsyacc.RegularSymbolUtils
+type token = FsyaccToken
+%}
+
+regularSymbol:
+    | atomic     { Atomic s0 }
+    | repetition { match s0 with (f,q) -> 
+                   Repetition(f,q) }
+    | brackets   { Oneof s0 }
+    | parens     { Chain s0 }
+
+atomic:
+    | ID      { s0 }
+    | LITERAL { s0 }
+
+repetition:
+    | regularSymbol quantifier { (s0,s1) }
+
+quantifier:
+    | "?" {"?"}
+    | "+" {"+"}
+    | "*" {"*"}
+
+brackets:
+    | "[" regularSymbol+ "]" { List.rev s1 }
+
+regularSymbol+:
+    |             regularSymbol {[s0]}
+    | regularSymbol+ regularSymbol {s1::s0}
+
+parens:
+    | "(" regularSymbol+ ")" { List.rev s1 }
+
+
+%%
+
+ID          : string
+LITERAL     : string
+atomic:string
+quantifier  : string
+regularSymbol: RegularSymbol
+regularSymbol+ : "RegularSymbol list"
+brackets : "RegularSymbol list"
+parens : "RegularSymbol list"
+repetition : "RegularSymbol*string"
+

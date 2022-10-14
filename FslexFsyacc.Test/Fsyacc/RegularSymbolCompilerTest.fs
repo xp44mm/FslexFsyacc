@@ -13,7 +13,7 @@ open System.Text
 open FslexFsyacc.Fsyacc
 open FslexFsyacc.Yacc
 
-type PolynomialSymbolCompilerTest(output:ITestOutputHelper) =
+type RegularSymbolCompilerTest(output:ITestOutputHelper) =
     let show res =
         res
         |> stringify
@@ -21,8 +21,8 @@ type PolynomialSymbolCompilerTest(output:ITestOutputHelper) =
 
     let compile text =
         text
-        |> PolynomialSymbolUtils.tokenize
-        |> PolynomialSymbolParseTable.parse
+        |> RegularSymbolUtils.tokenize
+        |> RegularSymbolParseTable.parse
 
     [<Fact>]
     member _.``01 - rec ? test``() =
@@ -53,7 +53,7 @@ type PolynomialSymbolCompilerTest(output:ITestOutputHelper) =
     [<Fact>]
     member _.``04 - rec ? test``() =
         let x = Repetition(Atomic "rec","?")
-        let y = PolynomialSymbol.render x
+        let y = RegularSymbol.render x
         let e = "rec?"
         Should.equal e y
         show y
@@ -62,7 +62,7 @@ type PolynomialSymbolCompilerTest(output:ITestOutputHelper) =
     [<Fact>]
     member _.``05 - oneof test``() =
         let x = Oneof [Atomic "sig";Atomic "begin"]
-        let y = PolynomialSymbol.render x
+        let y = RegularSymbol.render x
         let e = """[sig begin]"""
         Should.equal e y
         show y
@@ -71,7 +71,7 @@ type PolynomialSymbolCompilerTest(output:ITestOutputHelper) =
     [<Fact>]
     member _.``06 - chain test``() =
         let x = Chain [Atomic "sig";Atomic "begin"]
-        let y = PolynomialSymbol.render x
+        let y = RegularSymbol.render x
         let e = """(sig begin)"""
         Should.equal e y
         show y

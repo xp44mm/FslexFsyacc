@@ -13,7 +13,7 @@ rule+ :
     | rule {[s0]}
     | rule+ rule {s1::s0}
 rule :
-    | symbol ":" "|"? body+ {PolynomialSymbol.innerSymbol s0,List.rev s3}
+    | symbol ":" "|"? body+ {RegularSymbol.innerSymbol s0,List.rev s3}
 symbol :
     | atomic {Atomic s0}
     | repetition {
@@ -46,7 +46,7 @@ body+ :
     | body+ "|" body {s2::s0}
 body :
     | symbol* precToken? SEMANTIC {
-        let s0 = s0 |> List.map PolynomialSymbol.innerSymbol |> List.rev
+        let s0 = s0 |> List.map RegularSymbol.innerSymbol |> List.rev
         s0,s1,s2
     }
 symbol* :
@@ -63,7 +63,7 @@ precedence+ :
     | precedence+ precedence {s1::s0}
 precedence :
     | assoc symbol+ {
-        let s1 = s1 |> List.map PolynomialSymbol.innerSymbol |> List.rev
+        let s1 = s1 |> List.map RegularSymbol.innerSymbol |> List.rev
         s0,s1
     }
 assoc :
@@ -74,7 +74,7 @@ declaration+ :
     | declaration {[s0]}
     | declaration+ declaration {s1::s0}
 declaration :
-    | symbol ":" atomic {PolynomialSymbol.innerSymbol s0,s2.Trim()}
+    | symbol ":" atomic {RegularSymbol.innerSymbol s0,s2.Trim()}
 %%
 HEADER : string
 ID : string
@@ -93,9 +93,9 @@ rule+ : "(string*((string list*string*string)list))list"
 precToken? : string
 atomic : string
 quantifier : string
-symbol : PolynomialSymbol
-symbol+ : "PolynomialSymbol list"
-symbol* : "PolynomialSymbol list"
-brackets : "PolynomialSymbol list"
-parens : "PolynomialSymbol list"
-repetition : "PolynomialSymbol*string"
+symbol : RegularSymbol
+symbol+ : "RegularSymbol list"
+symbol* : "RegularSymbol list"
+brackets : "RegularSymbol list"
+parens : "RegularSymbol list"
+repetition : "RegularSymbol*string"

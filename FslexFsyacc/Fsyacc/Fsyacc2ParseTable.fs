@@ -46,30 +46,30 @@ let rules:(string list*(obj list->obj))list = [
             s1::s0
         box result
     ["rule";"symbol";":";"{\"|\"?}";"{body+}"],fun(ss:obj list)->
-        let s0 = unbox<PolynomialSymbol> ss.[0]
+        let s0 = unbox<RegularSymbol> ss.[0]
         let s3 = unbox<(string list*string*string)list> ss.[3]
         let result:string*((string list*string*string)list) =
-            PolynomialSymbol.innerSymbol s0,List.rev s3
+            RegularSymbol.innerSymbol s0,List.rev s3
         box result
     ["symbol";"atomic"],fun(ss:obj list)->
         let s0 = unbox<string> ss.[0]
-        let result:PolynomialSymbol =
+        let result:RegularSymbol =
             Atomic s0
         box result
     ["symbol";"repetition"],fun(ss:obj list)->
-        let s0 = unbox<PolynomialSymbol*string> ss.[0]
-        let result:PolynomialSymbol =
+        let s0 = unbox<RegularSymbol*string> ss.[0]
+        let result:RegularSymbol =
             match s0 with (f,q) ->
             Repetition(f,q)
         box result
     ["symbol";"brackets"],fun(ss:obj list)->
-        let s0 = unbox<PolynomialSymbol list> ss.[0]
-        let result:PolynomialSymbol =
+        let s0 = unbox<RegularSymbol list> ss.[0]
+        let result:RegularSymbol =
             Oneof s0
         box result
     ["symbol";"parens"],fun(ss:obj list)->
-        let s0 = unbox<PolynomialSymbol list> ss.[0]
-        let result:PolynomialSymbol =
+        let s0 = unbox<RegularSymbol list> ss.[0]
+        let result:RegularSymbol =
             Chain s0
         box result
     ["atomic";"ID"],fun(ss:obj list)->
@@ -83,9 +83,9 @@ let rules:(string list*(obj list->obj))list = [
             s0
         box result
     ["repetition";"symbol";"quantifier"],fun(ss:obj list)->
-        let s0 = unbox<PolynomialSymbol> ss.[0]
+        let s0 = unbox<RegularSymbol> ss.[0]
         let s1 = unbox<string> ss.[1]
-        let result:PolynomialSymbol*string =
+        let result:RegularSymbol*string =
             s0,s1
         box result
     ["quantifier";"?"],fun(ss:obj list)->
@@ -101,24 +101,24 @@ let rules:(string list*(obj list->obj))list = [
             "*"
         box result
     ["brackets";"[";"{symbol+}";"]"],fun(ss:obj list)->
-        let s1 = unbox<PolynomialSymbol list> ss.[1]
-        let result:PolynomialSymbol list =
+        let s1 = unbox<RegularSymbol list> ss.[1]
+        let result:RegularSymbol list =
             List.rev s1
         box result
     ["{symbol+}";"symbol"],fun(ss:obj list)->
-        let s0 = unbox<PolynomialSymbol> ss.[0]
-        let result:PolynomialSymbol list =
+        let s0 = unbox<RegularSymbol> ss.[0]
+        let result:RegularSymbol list =
             [s0]
         box result
     ["{symbol+}";"{symbol+}";"symbol"],fun(ss:obj list)->
-        let s0 = unbox<PolynomialSymbol list> ss.[0]
-        let s1 = unbox<PolynomialSymbol> ss.[1]
-        let result:PolynomialSymbol list =
+        let s0 = unbox<RegularSymbol list> ss.[0]
+        let s1 = unbox<RegularSymbol> ss.[1]
+        let result:RegularSymbol list =
             s1::s0
         box result
     ["parens";"(";"{symbol+}";")"],fun(ss:obj list)->
-        let s1 = unbox<PolynomialSymbol list> ss.[1]
-        let result:PolynomialSymbol list =
+        let s1 = unbox<RegularSymbol list> ss.[1]
+        let result:RegularSymbol list =
             List.rev s1
         box result
     ["{\"|\"?}"],fun(ss:obj list)->
@@ -137,20 +137,20 @@ let rules:(string list*(obj list->obj))list = [
             s2::s0
         box result
     ["body";"{symbol*}";"{precToken?}";"SEMANTIC"],fun(ss:obj list)->
-        let s0 = unbox<PolynomialSymbol list> ss.[0]
+        let s0 = unbox<RegularSymbol list> ss.[0]
         let s1 = unbox<string> ss.[1]
         let s2 = unbox<string> ss.[2]
         let result:string list*string*string =
-            let s0 = s0 |> List.map PolynomialSymbol.innerSymbol |> List.rev
+            let s0 = s0 |> List.map RegularSymbol.innerSymbol |> List.rev
             s0,s1,s2
         box result
     ["{symbol*}"],fun(ss:obj list)->
-        let result:PolynomialSymbol list =
+        let result:RegularSymbol list =
             []
         box result
     ["{symbol*}";"{symbol+}"],fun(ss:obj list)->
-        let s0 = unbox<PolynomialSymbol list> ss.[0]
-        let result:PolynomialSymbol list =
+        let s0 = unbox<RegularSymbol list> ss.[0]
+        let result:RegularSymbol list =
             s0
         box result
     ["{precToken?}"],fun(ss:obj list)->
@@ -179,9 +179,9 @@ let rules:(string list*(obj list->obj))list = [
         box result
     ["precedence";"assoc";"{symbol+}"],fun(ss:obj list)->
         let s0 = unbox<string> ss.[0]
-        let s1 = unbox<PolynomialSymbol list> ss.[1]
+        let s1 = unbox<RegularSymbol list> ss.[1]
         let result:string*string list =
-            let s1 = s1 |> List.map PolynomialSymbol.innerSymbol |> List.rev
+            let s1 = s1 |> List.map RegularSymbol.innerSymbol |> List.rev
             s0,s1
         box result
     ["assoc";"%left"],fun(ss:obj list)->
@@ -208,10 +208,10 @@ let rules:(string list*(obj list->obj))list = [
             s1::s0
         box result
     ["declaration";"symbol";":";"atomic"],fun(ss:obj list)->
-        let s0 = unbox<PolynomialSymbol> ss.[0]
+        let s0 = unbox<RegularSymbol> ss.[0]
         let s2 = unbox<string> ss.[2]
         let result:string*string =
-            PolynomialSymbol.innerSymbol s0,s2.Trim()
+            RegularSymbol.innerSymbol s0,s2.Trim()
         box result
 ]
 let parser = Parser<token>(rules,actions,closures,getTag,getLexeme)

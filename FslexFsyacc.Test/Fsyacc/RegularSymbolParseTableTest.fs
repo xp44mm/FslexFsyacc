@@ -14,14 +14,14 @@ open FSharp.xUnit
 open FSharp.Literals
 
 
-type PolynomialSymbolParseTableTest(output:ITestOutputHelper) =
+type RegularSymbolParseTableTest(output:ITestOutputHelper) =
     let show res =
         res
         |> Literal.stringify
         |> output.WriteLine
 
     let sourcePath = Path.Combine(solutionPath, @"FslexFsyacc\Fsyacc")
-    let filePath = Path.Combine(sourcePath, @"polynomialSymbol.fsyacc")
+    let filePath = Path.Combine(sourcePath, @"regularSymbol.fsyacc")
     let text = File.ReadAllText(filePath)
     let rawFsyacc = RawFsyaccFile.parse text
     let fsyacc = FlatFsyaccFile.fromRaw rawFsyacc
@@ -33,7 +33,7 @@ type PolynomialSymbolParseTableTest(output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``02 - extract start test``() =
-        let fsyacc = fsyacc.start("polynomialSymbol",Set.empty).toRaw().render()
+        let fsyacc = fsyacc.start("regularSymbol",Set.empty).toRaw().render()
         output.WriteLine(fsyacc)
 
     [<Fact>]
@@ -77,7 +77,7 @@ type PolynomialSymbolParseTableTest(output:ITestOutputHelper) =
     [<Fact>] // (Skip="once for all!")
     member _.``06 - generate ParseTable``() =
         // ** input **
-        let name = "PolynomialSymbolParseTable"
+        let name = "RegularSymbolParseTable"
         let moduleName = $"FslexFsyacc.Fsyacc.{name}"
 
         //解析表数据
@@ -92,14 +92,14 @@ type PolynomialSymbolParseTableTest(output:ITestOutputHelper) =
     member _.``10 - valid ParseTable``() =
         let src = fsyacc.toFsyaccParseTableFile()
 
-        Should.equal src.actions PolynomialSymbolParseTable.actions
-        Should.equal src.closures PolynomialSymbolParseTable.closures
+        Should.equal src.actions RegularSymbolParseTable.actions
+        Should.equal src.closures RegularSymbolParseTable.closures
 
         let prodsFsyacc =
             List.map fst src.rules
 
         let prodsParseTable =
-            List.map fst PolynomialSymbolParseTable.rules
+            List.map fst RegularSymbolParseTable.rules
         Should.equal prodsFsyacc prodsParseTable
 
         let headerFromFsyacc =
@@ -110,7 +110,7 @@ type PolynomialSymbolParseTableTest(output:ITestOutputHelper) =
             FSharp.Compiler.SyntaxTreeX.SourceCodeParser.semansFromMappers mappers
 
         let header,semans =
-            let filePath = Path.Combine(sourcePath, "PolynomialSymbolParseTable.fs")
+            let filePath = Path.Combine(sourcePath, "RegularSymbolParseTable.fs")
 
             File.ReadAllText(filePath, Encoding.UTF8)
             |> FSharp.Compiler.SyntaxTreeX.SourceCodeParser.getHeaderSemansFromFSharp 2

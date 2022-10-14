@@ -1,21 +1,21 @@
 ﻿namespace FslexFsyacc.Fsyacc
 
-type PolynomialSymbol =
+type RegularSymbol =
     /// a
     | Atomic of string
 
     /// a?*+ :repetition
-    | Repetition of PolynomialSymbol*string
+    | Repetition of RegularSymbol*string
 
     /// [ a b c ]
-    | Oneof of PolynomialSymbol list
+    | Oneof of RegularSymbol list
 
     /// (a b c)
-    | Chain of PolynomialSymbol list
+    | Chain of RegularSymbol list
 
 open FslexFsyacc.Runtime.RenderUtils
 
-module PolynomialSymbol =
+module RegularSymbol =
     let rec render poly =
         match poly with
         | Atomic x -> renderSymbol x

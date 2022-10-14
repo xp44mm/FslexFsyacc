@@ -74,12 +74,10 @@
 		<Compile Include="Fsyacc\SemanticGenerator.fs" />
 		<Compile Include="Fsyacc\FsyaccToken.fs" />
 		<Compile Include="Fsyacc\FsyaccTokenUtils.fs" />
-		<Compile Include="Fsyacc\PolynomialSymbol.fs" />
-		<None Include="Fsyacc\fsyacc1.fsyacc" />
-		<Compile Include="Fsyacc\Fsyacc1ParseTable.fs" />
-		<None Include="Fsyacc\polynomialSymbol.fsyacc" />
-		<Compile Include="Fsyacc\PolynomialSymbolUtils.fs" />
-		<Compile Include="Fsyacc\PolynomialSymbolParseTable.fs" />
+		<Compile Include="Fsyacc\RegularSymbol.fs" />
+		<None Include="Fsyacc\regularSymbol.fsyacc" />
+		<Compile Include="Fsyacc\RegularSymbolUtils.fs" />
+		<Compile Include="Fsyacc\RegularSymbolParseTable.fs" />
 		<None Include="Fsyacc\fsyacc2.fsyacc" />
 		<Compile Include="Fsyacc\Fsyacc2ParseTable.fs" />
 		<Compile Include="Fsyacc\FsyaccCompiler.fs" />
