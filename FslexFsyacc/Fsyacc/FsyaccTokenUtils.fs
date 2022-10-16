@@ -37,6 +37,9 @@ open FslexFsyacc.FSharpSourceText
 open System.Text.RegularExpressions
 
 let tokenize inp =
+    /// lpos:行首的索引
+    /// linp:从行首开始，到inp结束的字符串
+    /// pos: inp开始的字符串
     let rec loop (lpos:int,linp:string)(pos:int,inp:string) =
         seq {
             match inp with

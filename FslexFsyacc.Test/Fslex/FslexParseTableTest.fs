@@ -43,10 +43,11 @@ type FslexParseTableTest(output: ITestOutputHelper) =
             fsyacc.getMainProductions ()
             |> AmbiguousCollection.create
 
-        let conflicts = collection.filterConflictedClosures ()
+        let y = collection.filterConflictedClosures ()
         //show conflicts
-        let y = Map [21,Map ["&",set [{production= ["expr";"expr";"&";"expr"];dot= 1};{production= ["expr";"expr";"&";"expr"];dot= 3}];"*",set [{production= ["expr";"expr";"&";"expr"];dot= 3};{production= ["expr";"expr";"*"];dot= 1}];"+",set [{production= ["expr";"expr";"&";"expr"];dot= 3};{production= ["expr";"expr";"+"];dot= 1}];"?",set [{production= ["expr";"expr";"&";"expr"];dot= 3};{production= ["expr";"expr";"?"];dot= 1}];"|",set [{production= ["expr";"expr";"&";"expr"];dot= 3};{production= ["expr";"expr";"|";"expr"];dot= 1}]];22,Map ["&",set [{production= ["expr";"expr";"&";"expr"];dot= 1};{production= ["expr";"expr";"|";"expr"];dot= 3}];"*",set [{production= ["expr";"expr";"*"];dot= 1};{production= ["expr";"expr";"|";"expr"];dot= 3}];"+",set [{production= ["expr";"expr";"+"];dot= 1};{production= ["expr";"expr";"|";"expr"];dot= 3}];"?",set [{production= ["expr";"expr";"?"];dot= 1};{production= ["expr";"expr";"|";"expr"];dot= 3}];"|",set [{production= ["expr";"expr";"|";"expr"];dot= 1};{production= ["expr";"expr";"|";"expr"];dot= 3}]]]
-        Should.equal y conflicts
+        let e = Map [15,Map ["&",set [{production= ["expr";"expr";"&";"expr"];dot= 1};{production= ["expr";"expr";"&";"expr"];dot= 3}];"*",set [{production= ["expr";"expr";"&";"expr"];dot= 3};{production= ["expr";"expr";"*"];dot= 1}];"+",set [{production= ["expr";"expr";"&";"expr"];dot= 3};{production= ["expr";"expr";"+"];dot= 1}];"?",set [{production= ["expr";"expr";"&";"expr"];dot= 3};{production= ["expr";"expr";"?"];dot= 1}];"|",set [{production= ["expr";"expr";"&";"expr"];dot= 3};{production= ["expr";"expr";"|";"expr"];dot= 1}]];16,Map ["&",set [{production= ["expr";"expr";"&";"expr"];dot= 1};{production= ["expr";"expr";"|";"expr"];dot= 3}];"*",set [{production= ["expr";"expr";"*"];dot= 1};{production= ["expr";"expr";"|";"expr"];dot= 3}];"+",set [{production= ["expr";"expr";"+"];dot= 1};{production= ["expr";"expr";"|";"expr"];dot= 3}];"?",set [{production= ["expr";"expr";"?"];dot= 1};{production= ["expr";"expr";"|";"expr"];dot= 3}];"|",set [{production= ["expr";"expr";"|";"expr"];dot= 1};{production= ["expr";"expr";"|";"expr"];dot= 3}]]]
+
+        Should.equal e y
 
     [<Fact>]
     member _.``03 - 汇总冲突的产生式``() =
@@ -117,23 +118,13 @@ type FslexParseTableTest(output: ITestOutputHelper) =
         let name = "FslexParseTable"
         let moduleName = $"FslexFsyacc.Fslex.{name}"
         let parseTbl = fsyacc.toFsyaccParseTableFile ()
-        let fsharpCode = parseTbl.generate (moduleName)
+        let fsharpCode = parseTbl.generateModule(moduleName)
         let outputDir = Path.Combine(sourcePath, $"{name}.fs")
-        File.WriteAllText(outputDir, fsharpCode, System.Text.Encoding.UTF8)
+        File.WriteAllText(outputDir, fsharpCode, Encoding.UTF8)
         output.WriteLine("output yacc:" + outputDir)
 
     [<Fact>]
-    member _.``08 - regex first or last token test``() =
-        let grammar = fsyacc.getMainProductions () |> Grammar.from
-
-        let lastsOfExpr = grammar.lasts.["expr"]
-        let firstsOfExpr = grammar.firsts.["expr"]
-
-        show lastsOfExpr
-        show firstsOfExpr
-
-    [<Fact>]
-    member _.``10 - valid ParseTable``() =
+    member _.``07 - valid ParseTable``() =
         let src = fsyacc.toFsyaccParseTableFile()
 
         Should.equal src.actions FslexParseTable.actions
@@ -163,4 +154,19 @@ type FslexParseTableTest(output: ITestOutputHelper) =
         Should.equal headerFromFsyacc header
         Should.equal semansFsyacc semans
 
+    [<Fact>]
+    member _.``08 - regex first or last token test``() =
+        let grammar = fsyacc.getMainProductions () |> Grammar.from
+
+        let lastsOfExpr = grammar.lasts.["expr"]
+        let firstsOfExpr = grammar.firsts.["expr"]
+
+        show lastsOfExpr
+        show firstsOfExpr
+
+    [<Fact>] // (Skip="once for all!")
+    member _.``101 - format norm file test``() =
+        let startSymbol = "file"
+        let fsyacc = fsyacc.start(startSymbol,Set.empty).toRaw()
+        output.WriteLine(fsyacc.render())
 

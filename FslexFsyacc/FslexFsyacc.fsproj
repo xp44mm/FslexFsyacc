@@ -10,10 +10,10 @@
 		<PackageProjectUrl>https://github.com/xp44mm/FslexFsyacc</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/xp44mm/FslexFsyacc</RepositoryUrl>
 		<PackageTags>lex;yacc;compiler;parser;analyzer</PackageTags>
-		<PackageReleaseNotes>Fsyacc.eliminate</PackageReleaseNotes>
+		<PackageReleaseNotes>abnf</PackageReleaseNotes>
 		<Company>34696643@qq.com</Company>
 		<Authors>xp44m</Authors>
-		<Version>1.2.31</Version>
+		<Version>1.3.0</Version>
 		<IsPublishable>True</IsPublishable>
 		<PackageReadmeFile>readme.md</PackageReadmeFile>
 	</PropertyGroup>
@@ -75,12 +75,12 @@
 		<Compile Include="Fsyacc\FsyaccToken.fs" />
 		<Compile Include="Fsyacc\FsyaccTokenUtils.fs" />
 		<Compile Include="Fsyacc\RegularSymbol.fs" />
-		<None Include="Fsyacc\regularSymbol.fsyacc" />
-		<Compile Include="Fsyacc\RegularSymbolUtils.fs" />
-		<Compile Include="Fsyacc\RegularSymbolParseTable.fs" />
+		<Compile Include="Fsyacc\RegularSymbolToken.fs" />
 		<None Include="Fsyacc\fsyacc2.fsyacc" />
 		<Compile Include="Fsyacc\Fsyacc2ParseTable.fs" />
+		<Compile Include="Fsyacc\RegularSymbolParseTable.fs" />
 		<Compile Include="Fsyacc\FsyaccCompiler.fs" />
+		<Compile Include="Fsyacc\RegularSymbolCompiler.fs" />
 		<Compile Include="Fsyacc\FsyaccParseTableFile.fs" />
 		<Compile Include="Fsyacc\FsyaccFileRender.fs" />
 		<Compile Include="Fsyacc\FsyaccFileStart.fs" />

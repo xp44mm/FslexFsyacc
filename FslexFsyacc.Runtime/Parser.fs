@@ -8,8 +8,8 @@ type Parser<'tok> (
         rules: (string list*(obj list->obj))list,
         actions: (string*int)list list,
         closures: (int*int*string list)list list,
-        getTag:'tok -> string,
-        getLexeme:'tok->obj
+        getTag: 'tok -> string,
+        getLexeme: 'tok->obj
     ) =
 
     let tbl =

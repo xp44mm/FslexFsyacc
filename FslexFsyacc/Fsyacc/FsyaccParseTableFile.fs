@@ -47,6 +47,7 @@ type FsyaccParseTableFile =
 
     /// 生成ParseTable Module
     /// 输入模块带名字空间的全名
+    [<Obsolete("subs with generateModule")>]
     member this.generate(moduleName:string) =
         let types = Map.ofList this.declarations // symbol -> type of symbol
         
@@ -83,6 +84,46 @@ type FsyaccParseTableFile =
                 $"    |> unbox<{types.[startSymbol]}>"
             ] |> String.concat Environment.NewLine
         result
+
+
+    /// 生成ParseTable Module
+    /// 输入模块带名字空间的全名
+    /// 删除Parse代码
+    member this.generateModule(moduleName:string) =
+        let types = Map.ofList this.declarations // symbol -> type of symbol
+        
+        let rules =
+            this.rules
+            |> List.map(fun(prod, semantic) ->
+                let mapper = SemanticGenerator.decorateSemantic types prod semantic
+                $"{Literal.stringify prod},{mapper}"
+                )
+            |> String.concat Environment.NewLine
+
+        // 第0项是增广产生式，它是：s' -> s，其中第1项s是开始符号
+        let startSymbol = (fst this.rules.[0]).[0]
+
+        if types.ContainsKey startSymbol then
+            ()
+        else 
+            failwith $"type annot `{startSymbol}` is required."
+
+        //解析表数据
+        let result =
+            [
+                $"module {moduleName}"
+                $"let actions = {Literal.stringify this.actions}"
+                $"let closures = {Literal.stringify this.closures}"
+                this.header
+                $"let rules:(string list*(obj list->obj))list = ["
+                rules |> Line.indentCodeBlock 4
+                "]"
+                "let unboxRoot ="
+                $"    unbox<{types.[startSymbol]}>"
+            ] |> String.concat Environment.NewLine
+        result
+
+
 
     /// 单独生成action code的源代码module
     member this.generateMappers() =

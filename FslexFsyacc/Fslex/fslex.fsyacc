@@ -1,59 +1,54 @@
 ﻿%{
-open FslexFsyacc.Runtime
 open FslexFsyacc.Lex
-open FslexFsyacc.Fslex.FslexTokenUtils
-type token = int*int*FslexToken
+let clazz s = s |> List.rev |> List.reduce(fun a b -> Uion(a,b))
 %}
-
-file       : HEADER definitions "%%" rules {s0,List.rev s1,List.rev s3}
-           | HEADER rules                  {s0,[],List.rev s1}
-
-definitions: definitions definition {s1::s0}
-           | definition             {[s0]}
-
-definition : CAP "=" expr {s0,s2}
-
-rules      : rules rule   {s1::s0}
-           | rule         {[s0]}
-
-rule       : expr "/" expr  SEMANTIC {[s0;s2],s3}
-           | expr           SEMANTIC {[s0],s1}
-
-expr       : character          {s0}
-           | expr "|" expr      {Uion(s0,s2)}
-           | expr "&" expr      {Concat(s0,s2)}
-           | expr "*"           {Natural s0}
-           | expr "+"           {Positive s0}
-           | expr "?"           {Maybe s0}
-           | "(" expr ")"       {s1}
-           | HOLE               {Hole s0}
-           | "[" characters "]" {s1 |> List.rev |> List.reduce(fun a b -> Uion(a,b))}
-
-character  : ID    { Character s0 }
-           | LITERAL { Character s0 }
-
-characters : characters "&" character {s2::s0}
-           | character                {[s0]}
-
+file :
+    | HEADER definition+ "%%" rule+ {s0,List.rev s1,List.rev s3}
+    | HEADER rule+ {s0,[],List.rev s1}
+definition+ :
+    | definition+ definition {s1::s0}
+    | definition {[s0]}
+definition :
+    | CAP "=" expr {s0,s2}
+expr :
+    | character {s0}
+    | HOLE {Hole s0}
+    | expr "*" {Natural s0}
+    | expr "+" {Positive s0}
+    | expr "?" {Maybe s0}
+    | expr "|" expr {Uion(s0,s2)}
+    | expr "&" expr {Concat(s0,s2)}
+    | "(" expr ")" {s1}
+    | "[" character+ "]" {clazz s1}
+character :
+    | ID {Character s0}
+    | LITERAL {Character s0}
+character+ :
+    | character+ "&" character {s2::s0}
+    | character {[s0]}
+rule+ :
+    | rule+ rule {s1::s0}
+    | rule {[s0]}
+rule :
+    | expr "/" expr SEMANTIC {[s0;s2],s3}
+    | expr SEMANTIC {[s0],s1}
 %%
-
-%left     "|"
-%left     "&"
+%left "|"
+%left "&"
 %nonassoc "*" "+" "?"
-
 %%
-
-HEADER     : "string"
-ID         : "string"
-CAP        : "string"
-LITERAL      : "string"
-SEMANTIC   : "string"
-HOLE       : "string"
-character  : "RegularExpression<string>"
-characters : "RegularExpression<string> list"
+HEADER : string
+ID : string
+CAP : string
+LITERAL : string
+SEMANTIC : string
+HOLE : string
+character : "RegularExpression<string>"
+character+ : "RegularExpression<string> list"
 definition : "string*RegularExpression<string>"
-definitions: "(string*RegularExpression<string>)list"
-expr       : "RegularExpression<string>"
-file       : "string*(string*RegularExpression<string>)list*(RegularExpression<string>list*string)list"
-rule       : "RegularExpression<string>list*string"
-rules      : "(RegularExpression<string>list*string)list"
+definition+ : "(string*RegularExpression<string>)list"
+expr : "RegularExpression<string>"
+rule : "RegularExpression<string>list*string"
+rule+ : "(RegularExpression<string>list*string)list"
+file : "string*(string*RegularExpression<string>)list*(RegularExpression<string>list*string)list"
+

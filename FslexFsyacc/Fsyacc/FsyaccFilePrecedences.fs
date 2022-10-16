@@ -5,6 +5,7 @@ let normToRawPrecedences
     =
     precedences
     |> Map.toList
+    |> List.sortBy snd
     |> List.groupBy snd
     |> List.map(fun(i,groups)->
         let tokens =

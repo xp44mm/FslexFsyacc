@@ -83,27 +83,19 @@ type ExprParseTableTest(output:ITestOutputHelper) =
             ProductionUtils.precedenceOfProductions collection.grammar.terminals productions
         show pprods
 
-    [<Fact>] // (Skip="once for all!")
+    [<Fact(Skip="once for all!")>] // 
     member _.``07 - expr generateParseTable``() =
         let name = "ExprParseTable"
         let moduleName = $"Expr.{name}"
 
         //解析表数据
         let tbl = fsyacc.toFsyaccParseTableFile()
-        let fsharpCode = tbl.generate(moduleName)
+        let fsharpCode = tbl.generateModule(moduleName)
 
         let outputDir = Path.Combine(__SOURCE_DIRECTORY__, $"{name}.fs")
         File.WriteAllText(outputDir,fsharpCode,Encoding.UTF8)
         output.WriteLine($"output yacc:\r\n{outputDir}")
 
-    [<Fact>]
-    member _.``09 - output closures``() =
-        let tbl = ExprParseTable.parser.getParserTable()
-        let str = tbl.collection()
-        let name = "expr"
-        let outputDir = Path.Combine(__SOURCE_DIRECTORY__, $"{name}.txt")
-        File.WriteAllText(outputDir,str,Encoding.UTF8)
-        output.WriteLine($"output:\r\n{outputDir}")
 
     [<Fact>]
     member _.``10 - valid ParseTable``() =
@@ -112,27 +104,29 @@ type ExprParseTableTest(output:ITestOutputHelper) =
         Should.equal src.actions ExprParseTable.actions
         Should.equal src.closures ExprParseTable.closures
 
-        //let prodsFsyacc = 
-        //    List.map fst src.rules
+        //产生式比较
+        let prodsFsyacc = 
+            List.map fst src.rules
 
-        //let prodsParseTable = 
-        //    List.map fst ExprParseTable.rules
+        let prodsParseTable = 
+            List.map fst ExprParseTable.rules
 
-        //Should.equal prodsFsyacc prodsParseTable
+        Should.equal prodsFsyacc prodsParseTable
 
-        //let headerFromFsyacc =
-        //    FSharp.Compiler.SyntaxTreeX.Parser.getDecls("header.fsx",src.header)
+        //header,semantic代码比较
+        let headerFromFsyacc =
+            FSharp.Compiler.SyntaxTreeX.Parser.getDecls("header.fsx",src.header)
 
-        //let semansFsyacc =
-        //    let mappers = src.generateMappers()
-        //    FSharp.Compiler.SyntaxTreeX.SourceCodeParser.semansFromMappers mappers
+        let semansFsyacc =
+            let mappers = src.generateMappers()
+            FSharp.Compiler.SyntaxTreeX.SourceCodeParser.semansFromMappers mappers
 
-        //let header,semans =
-        //    let filePath = Path.Combine(__SOURCE_DIRECTORY__, "ExprParseTable.fs")
-        //    let text = File.ReadAllText(filePath, Encoding.UTF8)
-        //    FSharp.Compiler.SyntaxTreeX.SourceCodeParser.getHeaderSemansFromFSharp 2 text
+        let header,semans =
+            let filePath = Path.Combine(__SOURCE_DIRECTORY__, "ExprParseTable.fs")
+            let text = File.ReadAllText(filePath, Encoding.UTF8)
+            FSharp.Compiler.SyntaxTreeX.SourceCodeParser.getHeaderSemansFromFSharp 2 text
 
-        //Should.equal headerFromFsyacc header
-        //Should.equal semansFsyacc semans
+        Should.equal headerFromFsyacc header
+        Should.equal semansFsyacc semans
 
 

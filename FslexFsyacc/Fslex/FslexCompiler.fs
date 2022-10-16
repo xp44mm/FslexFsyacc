@@ -1,6 +1,19 @@
 ﻿module FslexFsyacc.Fslex.FslexCompiler
 
+open FslexFsyacc.Runtime
 open FslexFsyacc.Lex
+open FslexFsyacc.Fslex.FslexTokenUtils
+type token = int*int*FslexToken
+
+let parser = Parser<token>(
+    FslexParseTable.rules,
+    FslexParseTable.actions,
+    FslexParseTable.closures,getTag,getLexeme)
+
+let parse(tokens:seq<token>) =
+    tokens
+    |> parser.parse
+    |> FslexParseTable.unboxRoot
 
 /// 解析文本为结构化数据
 let parseToStructuralData (fslex:string) =
@@ -9,7 +22,7 @@ let parseToStructuralData (fslex:string) =
         |> FslexTokenUtils.tokenize
         |> FslexDFA.analyze
         |> Seq.concat
-    FslexParseTable.parse tokens
+    parse tokens
 
 ///获取被使用的正则定义名称
 let getUsedNames

@@ -68,6 +68,7 @@ type ParserTable =
         kernel
         |> Seq.map(fun(prod,dot,_)->prod.[dot])
         |> Seq.head
+
     // print state
     member this.collection() =
         this.closures

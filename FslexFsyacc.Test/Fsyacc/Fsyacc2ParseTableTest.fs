@@ -32,11 +32,6 @@ type Fsyacc2ParseTableTest(output:ITestOutputHelper) =
         show result
 
     [<Fact>]
-    member _.``02 - extract start symbol test``() =
-        let fsyacc = fsyacc.start("file",Set.empty).toRaw().render()
-        output.WriteLine(fsyacc)
-
-    [<Fact>]
     member _.``03 - 显示冲突状态的冲突项目``() =
         let collection =
             fsyacc.getMainProductions()
@@ -75,14 +70,14 @@ type Fsyacc2ParseTableTest(output:ITestOutputHelper) =
         show tokens
 
     [<Fact>] // (Skip="once for all!")
-    member _.``06 - generate ParseTable``() =
+    member _.``06 - generate Fsyacc2ParseTable ParseTable``() =
         // ** input **
         let name = "Fsyacc2ParseTable"
         let moduleName = $"FslexFsyacc.Fsyacc.{name}"
 
         //解析表数据
         let parseTbl = fsyacc.toFsyaccParseTableFile()
-        let fsharpCode = parseTbl.generate(moduleName)
+        let fsharpCode = parseTbl.generateModule(moduleName)
 
         let outputDir = Path.Combine(sourcePath, $"{name}.fs")
         File.WriteAllText(outputDir,fsharpCode,System.Text.Encoding.UTF8)
@@ -119,3 +114,19 @@ type Fsyacc2ParseTableTest(output:ITestOutputHelper) =
         Should.equal semansFsyacc semans
 
 
+    [<Fact>] // (Skip="once for all!")
+    member _.``101 - regularSymbol extract test``() =
+        let startSymbol = "regularSymbol"
+        let fsyacc = fsyacc.start(startSymbol,Set.empty)
+
+        // ** input **
+        let fname = $"{System.Char.ToUpper startSymbol.[0]}{startSymbol.[1..]}ParseTable" //Capital Case
+        let moduleName = $"FslexFsyacc.Fsyacc.{fname}"
+
+        //解析表数据
+        let parseTbl = fsyacc.toFsyaccParseTableFile()
+        let fsharpCode = parseTbl.generateModule(moduleName)
+
+        let outputDir = Path.Combine(sourcePath, $"{fname}.fs")
+        File.WriteAllText(outputDir,fsharpCode,Encoding.UTF8)
+        output.WriteLine("output fsyacc:"+outputDir)

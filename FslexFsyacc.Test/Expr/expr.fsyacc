@@ -1,7 +1,4 @@
 ﻿%{
-open FslexFsyacc.Runtime
-open Expr.ExprToken
-type token = int*int*ExprToken
 %}
 expr : 
      | expr "+" expr         { s0 + s2 }
@@ -17,5 +14,5 @@ expr :
 %left "*" "/"
 %right UMINUS
 %%
-NUMBER : "float"
-expr   : "float"
+NUMBER : float
+expr   : float
