@@ -8,12 +8,12 @@ let substitute
     =
 
     let rec loop = function
-        | Character x  -> Character x
-        | Uion (x,y)   -> Uion(loop x, loop y)
-        | Concat (x,y) -> Concat(loop x, loop y)
+        | Atomic x  -> Atomic x
+        | Either (x,y)   -> Either(loop x, loop y)
+        | Both (x,y) -> Both(loop x, loop y)
         | Natural x    -> Natural(loop x)
-        | Positive x   -> Positive(loop x)
-        | Maybe x      -> Maybe(loop x)
+        | Plural x   -> Plural(loop x)
+        | Optional x      -> Optional(loop x)
         | Hole id -> definitions.[id]
 
     loop expr
@@ -22,12 +22,12 @@ let definitionNames (expr:RegularExpression<_>) =
     let rec loop (expr:RegularExpression<_>) = 
         seq {
             match expr with
-            | Character _  -> ()
-            | Uion (x,y)
-            | Concat (x,y) -> yield! loop x; yield! loop y;
+            | Atomic _  -> ()
+            | Either (x,y)
+            | Both (x,y) -> yield! loop x; yield! loop y;
             | Natural x
-            | Positive x
-            | Maybe x      -> yield! loop x;
+            | Plural x
+            | Optional x      -> yield! loop x;
             | Hole id -> yield id
         }
 
@@ -52,9 +52,9 @@ let normRules definitions rules =
 /// 
 let characterclass (rgx:RegularExpression<_>) =
     let rec loop ls = function
-        | Character x -> 
+        | Atomic x -> 
             x::ls
-        | Uion(a,b) -> 
+        | Either(a,b) -> 
             let aa = loop [] a
             let bb = loop [] b
             ls @ aa @ bb

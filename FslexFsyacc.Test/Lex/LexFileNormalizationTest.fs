@@ -13,7 +13,7 @@ type LexFileNormalizationTest(output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``get digits``() =
-        let x = Uion(Uion(Uion(Uion(Uion(Uion(Uion(Uion(Uion(Character "0",Character "1"),Character "2"),Character "3"),Character "4"),Character "5"),Character "6"),Character "7"),Character "8"),Character "9")
+        let x = Either(Either(Either(Either(Either(Either(Either(Either(Either(Atomic "0",Atomic "1"),Atomic "2"),Atomic "3"),Atomic "4"),Atomic "5"),Atomic "6"),Atomic "7"),Atomic "8"),Atomic "9")
         let y = LexFileNormalization.characterclass x
         let z = ["0";"1";"2";"3";"4";"5";"6";"7";"8";"9"]
         Should.equal y z

@@ -16,9 +16,9 @@ type AnalyzerNFATest(output:ITestOutputHelper) =
     member _.``regex to nfa``() =
         let lookaheads = 
             [
-               [Character 'a'                                    ]
-               [Concat(Concat(Character 'a',Character 'b'),Character 'b')  ]
-               [Concat(Natural(Character 'a'),Positive(Character 'b'))]
+               [Atomic 'a'                                    ]
+               [Both(Both(Atomic 'a',Atomic 'b'),Atomic 'b')  ]
+               [Both(Natural(Atomic 'a'),Plural(Atomic 'b'))]
             ]
 
         let nfa = AnalyzerNFA.fromRgx(lookaheads)
@@ -46,9 +46,9 @@ type AnalyzerNFATest(output:ITestOutputHelper) =
         //b+
         let patterns = 
             [
-                [Uion(Character 'a',Concat(Character 'a',Character 'b'));Concat(Character 'b',Character 'a')]
-                [Positive(Character 'a')]
-                [Positive(Character 'b')]
+                [Either(Atomic 'a',Both(Atomic 'a',Atomic 'b'));Both(Atomic 'b',Atomic 'a')]
+                [Plural(Atomic 'a')]
+                [Plural(Atomic 'b')]
             ]
 
         let nfa = AnalyzerNFA.fromRgx patterns

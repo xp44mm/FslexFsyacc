@@ -14,7 +14,7 @@ type RegularExpressionNFATest(output:ITestOutputHelper) =
     
     [<Fact>]
     member _.``Leaf test``() =
-        let r1 = Character 'a'
+        let r1 = Atomic 'a'
         let nfa1 = RegularExpressionNFA.convertToNFA 0u r1
         let y = {
             transition=set [0u,Some 'a',1u];
@@ -25,7 +25,7 @@ type RegularExpressionNFATest(output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``nfa3: leaf union``() =
-        let r3 = Uion(Character 'a', Character 'b') // a | b
+        let r3 = Either(Atomic 'a', Atomic 'b') // a | b
         let nfa3 = RegularExpressionNFA.convertToNFA 0u r3
         let y = {
             transition=set [
@@ -41,7 +41,7 @@ type RegularExpressionNFATest(output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``leaf concat test``() =
-        let x = Concat(Character 'a', Character 'b') // a b
+        let x = Both(Atomic 'a', Atomic 'b') // a b
         let y = RegularExpressionNFA.convertToNFA 0u x
 
         let nfa = {
@@ -54,7 +54,7 @@ type RegularExpressionNFATest(output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``leaf natrual test``() =
-        let x = Natural(Character 'a') // a *
+        let x = Natural(Atomic 'a') // a *
         let y = RegularExpressionNFA.convertToNFA 0u x
 
         let nfa = {
@@ -70,7 +70,7 @@ type RegularExpressionNFATest(output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``leaf positive test``() =
-        let x = Positive(Character 'a') // a +
+        let x = Plural(Atomic 'a') // a +
         let y = RegularExpressionNFA.convertToNFA 0u x
 
         let nfa = {
@@ -83,7 +83,7 @@ type RegularExpressionNFATest(output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``leaf maybe test``() =
-        let x = Maybe(Character 'a') // a ?
+        let x = Optional(Atomic 'a') // a ?
         let y = RegularExpressionNFA.convertToNFA 0u x
 
         let nfa = {
@@ -98,7 +98,7 @@ type RegularExpressionNFATest(output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``nfa5:natrual``() =
-        let r5 = Natural(Uion(Character 'a',Character 'b'))
+        let r5 = Natural(Either(Atomic 'a',Atomic 'b'))
         let nfa5 = RegularExpressionNFA.convertToNFA 0u r5
         let y = {
             transition=set [
@@ -118,7 +118,7 @@ type RegularExpressionNFATest(output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``nfa7: concat``() =
-        let r7 = Concat(Natural(Uion(Character 'a',Character 'b')),Character 'a')
+        let r7 = Both(Natural(Either(Atomic 'a',Atomic 'b')),Atomic 'a')
         let nfa7 = RegularExpressionNFA.convertToNFA 0u r7
         let y = {
             transition=set [
@@ -139,7 +139,7 @@ type RegularExpressionNFATest(output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``Example 3-26: regex to nfa 2``() =
-        let n2 = RegularExpressionNFA.convertToNFA 0u (Concat(Concat(Character 'a',Character 'b'),Character 'b'))
+        let n2 = RegularExpressionNFA.convertToNFA 0u (Both(Both(Atomic 'a',Atomic 'b'),Atomic 'b'))
         let y2 = {
             transition=set [
                 0u,Some 'a',1u;
@@ -151,7 +151,7 @@ type RegularExpressionNFATest(output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``Example 3-26: regex to nfa 3``() =
-        let n3 = RegularExpressionNFA.convertToNFA 0u (Concat(Natural(Character 'a'),Positive(Character 'b')))
+        let n3 = RegularExpressionNFA.convertToNFA 0u (Both(Natural(Atomic 'a'),Plural(Atomic 'b')))
         let y3 = {
             transition=set [
                 0u,None,1u;
@@ -166,9 +166,9 @@ type RegularExpressionNFATest(output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``fig 3-34: regex to nfa``() =
-        let r1 = Uion(Character 'a',Character 'b')
-        let r2 = Concat(Concat(Character 'a',Character 'b'),Character 'b')
-        let r3 = Concat(Natural r1,r2)
+        let r1 = Either(Atomic 'a',Atomic 'b')
+        let r2 = Both(Both(Atomic 'a',Atomic 'b'),Atomic 'b')
+        let r3 = Both(Natural r1,r2)
 
         let nfa = RegularExpressionNFA.convertToNFA 0u r3
         let y = {
