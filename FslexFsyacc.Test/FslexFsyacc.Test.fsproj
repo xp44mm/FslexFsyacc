@@ -40,7 +40,7 @@
 		<Compile Include="Fsyacc\Fsyacc2ParseTableTest.fs" />
 		<Compile Include="Fsyacc\RegularSymbolCompilerTest.fs" />
 		<Compile Include="Fsyacc\FsyaccFileRenderTest.fs" />
-		<Compile Include="Fsyacc\FsyaccFileStartTest.fs" />
+		<Compile Include="Fsyacc\FsyaccFileShakingTest.fs" />
 		<Compile Include="Fsyacc\FsyaccFileNameTest.fs" />
 		<Compile Include="Fsyacc\FsyaccFileRulesTest.fs" />
     

@@ -14,62 +14,9 @@ When lightweight syntax is disabled, whitespace can include tab characters:
 *whitespace* : [ ' ' '\t' ]+
 ```
 
-general
-
-alternative
-
-```fsharp
-access :
-    | PRIVATE {}
-    | PUBLIC {}
-    | INTERNAL {}
-path :
-    | GLOBAL {}
-    | IDENT {}
-    | path DOT IDENT {}
-topSeparator :
-    | SEMICOLON {}
-    | SEMICOLON_SEMICOLON {}
-    | OBLOCKSEP {}
-
-```
-
-q
-
-```fsharp
-EQUALS? :
-    | EQUALS {}
-    | (*empty*) {}
-access? :
-    | (*empty*) {}
-    | access {}
-rec? :
-    | REC {}
-    | (*empty*) {}
-    
-topSeparator* :
-    | topSeparator+ {}
-    | (*empty*) {}
-topSeparator+ :
-    | topSeparator {}
-    | topSeparator topSeparator+ {}
-
-
-OBLOCKSEP? :
-    | OBLOCKSEP {}
-    | (*empty*) {}
-fileNamespaceSpec+ :
-    | fileNamespaceSpec fileNamespaceSpec+ {}
-    | fileNamespaceSpec {}
-moduleSpfn* :
-    | moduleSpfn+ {}
-    | (*empty*) {}
-```
-
-
-
-
 ### A.2.1 Program Format
+
+hashDirective :
 
 ```fsharp
 hashDirective :
@@ -80,78 +27,12 @@ hashDirectiveArgs :
 hashDirectiveArg :
     | STRING {}
     | KEYWORD_STRING {}
-
-```
-
-
-
-
-signatureFile:
-
-```fsharp
-signatureFile :
-    | fileSpecs EOF {}
-fileSpecs :
-    | fileModuleSpec {}
-    | fileModuleSpec fileNamespaceSpec+ {}
-fileModuleSpec :
-    | attributes? access? moduleIntro moduleSpfnsBlock {}
-    | moduleSpfnsBlock {}
-moduleSpfnsBlock :
-    | moduleSpfn* {}
-    | OBLOCKBEGIN moduleSpfn* OBLOCKEND OBLOCKSEP? {}
-moduleSpfn* :
-    | moduleSpfn+ {}
-    | (*empty*) {}
-moduleSpfn+ :
-    | moduleSpfn topSeparator* moduleSpfn+ {}
-    | moduleSpfn topSeparator* {}
-fileNamespaceSpec+ :
-    | fileNamespaceSpec fileNamespaceSpec+ {}
-    | fileNamespaceSpec {}
-fileNamespaceSpec :
-    | namespaceIntro EQUALS? fileModuleSpec {}
-
-moduleIntro :
-    | MODULE attributes? access? rec? path {}
-namespaceIntro :
-    | NAMESPACE rec? path {}
 ```
 
 implementationFile :
 
 ```fsharp
-implementationFile :
-    | fileImpls EOF {}
-fileImpls :
-    | fileModuleImpl {}
-    | fileModuleImpl fileNamespaceImpl+ {}
-fileModuleImpl :
-    | attributes? access? moduleIntro moduleDefnsOrExprPossiblyEmptyOrBlock {}
-    | moduleDefnsOrExprPossiblyEmptyOrBlock {}
-moduleIntro :
-    | MODULE attributes? access? rec? path {}
-moduleDefnsOrExprPossiblyEmptyOrBlock :
-    | OBLOCKBEGIN moduleDefnsOrExpr? OBLOCKEND OBLOCKSEP? {}
-    | moduleDefnsOrExpr? {}
-moduleDefnsOrExpr :
-    | attributes? access? declExpr topSeparator+ moduleDefnsOrExpr {}
-    | attributes? access? declExpr topSeparator* {}
-    | moduleDefns {}
-moduleDefns :
-    | moduleDefnOrDirective moduleDefns {}
-    | moduleDefnOrDirective topSeparator+ moduleDefnsOrExpr {}
-    | moduleDefnOrDirective topSeparator* {}
-moduleDefnOrDirective :
-    | moduleDefn {}
-    | hashDirective {}
-fileNamespaceImpl+ :
-    | fileNamespaceImpl fileNamespaceImpl+ {}
-    | fileNamespaceImpl {}
-fileNamespaceImpl :
-    | namespaceIntro EQUALS? fileModuleImpl {}
-namespaceIntro :
-    | NAMESPACE rec? path {}
+
 
 ```
 

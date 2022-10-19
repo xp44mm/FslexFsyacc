@@ -1,5 +1,8 @@
 ﻿namespace FslexFsyacc.FSharpGrammar
 
+open FslexFsyacc.Fsyacc
+open FslexFsyacc.Yacc
+
 open Xunit
 open Xunit.Abstractions
 open FSharp.xUnit
@@ -10,8 +13,7 @@ open FSharp.Idioms
 open System.IO
 open System.Text
 
-open FslexFsyacc.Fsyacc
-open FslexFsyacc.Yacc
+open type System.String
 
 (*
 
@@ -20,6 +22,7 @@ pars.fsyacc
 删除头部插入代码
 删除声明部分代码
 替换/**/为(**)
+
 %start 
     signatureFile 
     implementationFile 
@@ -38,6 +41,8 @@ opt_topSeparators:
 为：
 opt_topSeparators: 
   | topSeparators { }
+
+opt_staticOptimizations,同上问题
 *)
 
 (*
@@ -70,6 +75,29 @@ type ParsParseTableTest(output:ITestOutputHelper) =
             "_IS_HERE"
             ]
         FsyaccFileRules.removeErrorRules robust
+
+    [<Fact>]
+    member _.``000 - fsharp keywords replace tsv gen``() =
+        let keywords = ["yield";"with";"while";"when";"void";"val";"use";"upcast";"type";"try";"to";"then";"struct";"static";"select";"return";"rec";"public";"private";"override";"or";"open";"of";"null";"not";"new";"namespace";"mutable";"module";"member";"match";"let";"lazy";"internal";"interface";"inline";"inherit";"in";"if";"global";"function";"fun";"for";"fixed";"finally";"extern";"exception";"end";"else";"elif";"downto";"downcast";"done";"do";"delegate";"default";"const";"class";"begin";"base";"assert";"as";"and";"abstract"]
+
+        let tsvText =
+            keywords
+            |> List.map(fun kw ->
+                let fields = [
+                    "on"
+                    kw.ToUpper()
+                    kw
+                    " C  W "
+                    ""
+                ]
+                fields |> String.concat "\t"
+            )
+            |> String.concat "\r\n"
+
+        let outputDir = Path.Combine(__SOURCE_DIRECTORY__, $"fsharp keywords.tsv")
+        File.WriteAllText(outputDir,tsvText,Encoding.UTF8)
+        output.WriteLine("output:\r\n" + outputDir)
+
 
     [<Fact>]
     member _.``001 - signatureFile test``() =
@@ -109,17 +137,37 @@ type ParsParseTableTest(output:ITestOutputHelper) =
 
         let outputDir = Path.Combine(__SOURCE_DIRECTORY__, $"{s0}.fsyacc")
         File.WriteAllText(outputDir,txt,Encoding.UTF8)
-        output.WriteLine("output fsyacc:"+outputDir)
+        output.WriteLine("output:\r\n"+outputDir)
 
     [<Fact>]
     member _.``002 - implementationFile test``() =
         let s0 = "implementationFile"
         let terminals = set [
             "attributes"
-            "declExpr"
-            "moduleDefn"
             "hashDirective"
+            //"declExpr"
+            "defnBindings"
+            "hardwhiteLetBindings"
+            "doBinding"
+            "tyconDefn"
+            "tyconDefnList"
+            "exconDefn"
+            "appType"
 
+            "sequentialExpr"
+            "typ"
+            "typeConstraint"
+
+            "anonMatchingExpr"
+            "anonLambdaExpr"
+            "withClauses"
+            "ifExprCases"
+            "forLoopBinder"
+            "forLoopRange"
+            "headBindingPattern"
+            "minusExpr"
+
+            //"parenPattern"
         ]
 
         let flat = fsyacc.start(s0,terminals)
@@ -138,7 +186,7 @@ type ParsParseTableTest(output:ITestOutputHelper) =
 
         let outputDir = Path.Combine(__SOURCE_DIRECTORY__, $"{s0}.fsyacc")
         File.WriteAllText(outputDir,txt,Encoding.UTF8)
-        output.WriteLine("output fsyacc:"+outputDir)
+        output.WriteLine("output:\r\n" + outputDir)
 
     [<Fact>]
     member _.``003 - interaction test``() =
@@ -166,8 +214,7 @@ type ParsParseTableTest(output:ITestOutputHelper) =
 
         let outputDir = Path.Combine(__SOURCE_DIRECTORY__, $"{s0}.fsyacc")
         File.WriteAllText(outputDir,txt,Encoding.UTF8)
-        output.WriteLine("output fsyacc:"+outputDir)
-
+        output.WriteLine("output:\r\n"+outputDir)
 
     [<Fact>]
     member _.``004 - typedSequentialExprEOF test``() =
@@ -194,7 +241,7 @@ type ParsParseTableTest(output:ITestOutputHelper) =
 
         let outputDir = Path.Combine(__SOURCE_DIRECTORY__, $"{s0}.fsyacc")
         File.WriteAllText(outputDir,txt,Encoding.UTF8)
-        output.WriteLine("output fsyacc:"+outputDir)
+        output.WriteLine("output:\r\n"+outputDir)
 
     [<Fact>]
     member _.``005 - typEOF test``() =
@@ -219,7 +266,7 @@ type ParsParseTableTest(output:ITestOutputHelper) =
 
         let outputDir = Path.Combine(__SOURCE_DIRECTORY__, $"{s0}.fsyacc")
         File.WriteAllText(outputDir,txt,Encoding.UTF8)
-        output.WriteLine("output fsyacc:"+outputDir)
+        output.WriteLine("output:\r\n"+outputDir)
 
     [<Fact>]
     member _.``006 - moduleDefnsOrExpr test``() =
@@ -242,18 +289,6 @@ type ParsParseTableTest(output:ITestOutputHelper) =
             "exconIntro"
             "classDefnMember"
             "appType"
-
-            //"typedSequentialExpr"
-            
-            //"anonMatchingExpr"
-            //"anonLambdaExpr"
-            //"withClauses"
-            //"parenPattern"
-            //"headBindingPattern"
-            //"activePatternCaseNames"
-            //"atomicExpr"
-            //"unionCaseRepr"
-            //"classDefnBlock"
             "hashDirective"
         ]
 
@@ -273,8 +308,118 @@ type ParsParseTableTest(output:ITestOutputHelper) =
 
         let outputDir = Path.Combine(__SOURCE_DIRECTORY__, $"{s0}.fsyacc")
         File.WriteAllText(outputDir,txt,Encoding.UTF8)
-        output.WriteLine("output fsyacc:"+outputDir)
+        output.WriteLine("output:\r\n"+outputDir)
 
+
+    [<Fact>]
+    member _.``101 - declExpr test``() =
+        let s0 = "declExpr"
+        let terminals = set [
+            "attributes"
+            "cPrototype"
+            "constrPattern"
+            "tuplePatternElements"
+            "conjPatternElements"
+            "topType"
+            "typeConstraints"
+            "sequentialExpr"
+            "typ"
+            "typar"
+            "parenPattern"
+            "measureTypeExpr"
+            "appTypePrefixArguments"
+            "appTypeConPower"
+            "anonRecdType"
+            "atomType"
+            "appType"
+            "classMemberSpfn"
+            "inlineAssemblyExpr"
+            "recdExpr"
+            "objExpr"
+            "recdExprCore"
+            "interpolatedString"
+            "appExpr"
+        ]
+
+        let flat = fsyacc.start(s0, terminals)
+
+        let flat =
+            {
+                flat with
+                    rules = 
+                        flat.rules
+                        |> removeErrorRules
+                        |> FsyaccFileRules.eliminateChomsky
+                        |> List.map (fun(prod,nm,ac)->prod,"","")
+            }
+
+        let txt = flat.toRaw().render()
+
+        let outputDir = Path.Combine(__SOURCE_DIRECTORY__, $"{s0}.fsyacc")
+        File.WriteAllText(outputDir,txt,Encoding.UTF8)
+        output.WriteLine("output:\r\n"+outputDir)
+
+
+    [<Fact>]
+    member _.``102 - moduleDefn test``() =
+        let s0 = "moduleDefn"
+        let terminals = set [
+            "attributes"
+            "cPrototype"; "hashDirective"
+
+            "localBinding"
+            "sequentialExpr"
+
+            "typ";"typeConstraint"; "appType"
+
+            "tyconDefn"
+            "exconDefn"
+
+            "declExpr"
+        ]
+
+        let flat = fsyacc.start(s0,terminals)
+
+        let flat =
+            {
+                flat with
+                    rules = 
+                        flat.rules
+                        |> removeErrorRules
+                        |> FsyaccFileRules.eliminateChomsky
+                        |> List.map (fun(prod,nm,ac)->prod,"","")
+            }
+
+        let txt = flat.toRaw().render()
+
+        let outputDir = Path.Combine(__SOURCE_DIRECTORY__, $"{s0}.fsyacc")
+        File.WriteAllText(outputDir,txt,Encoding.UTF8)
+        output.WriteLine("output:\r\n" + outputDir)
+
+
+    [<Fact>]
+    member _.``103 - hashDirective test``() =
+        let s0 = "hashDirective"
+        let terminals = set [
+            ]
+
+        let flat = fsyacc.start(s0,terminals)
+
+        let flat =
+            {
+                flat with
+                    rules = 
+                        flat.rules
+                        |> removeErrorRules
+                        |> FsyaccFileRules.eliminateChomsky
+                        |> List.map (fun(prod,nm,ac)->prod,"","")
+            }
+
+        let txt = flat.toRaw().render()
+
+        let outputDir = Path.Combine(__SOURCE_DIRECTORY__, $"{s0}.fsyacc")
+        File.WriteAllText(outputDir,txt,Encoding.UTF8)
+        output.WriteLine("output:\r\n" + outputDir)
 
 
 

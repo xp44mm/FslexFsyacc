@@ -69,7 +69,7 @@ type Fsyacc2ParseTableTest(output:ITestOutputHelper) =
         let tokens = grammar.symbols - grammar.nonterminals
         show tokens
 
-    [<Fact>] // (Skip="once for all!")
+    [<Fact(Skip="once for all!")>] // 
     member _.``06 - generate Fsyacc2ParseTable ParseTable``() =
         // ** input **
         let name = "Fsyacc2ParseTable"
@@ -113,8 +113,7 @@ type Fsyacc2ParseTableTest(output:ITestOutputHelper) =
         Should.equal headerFromFsyacc header
         Should.equal semansFsyacc semans
 
-
-    [<Fact>] // (Skip="once for all!")
+    [<Fact(Skip="once for all!")>] // 
     member _.``101 - regularSymbol extract test``() =
         let startSymbol = "regularSymbol"
         let fsyacc = fsyacc.start(startSymbol,Set.empty)

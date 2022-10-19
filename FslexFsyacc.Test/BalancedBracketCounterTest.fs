@@ -67,3 +67,5 @@ type BalancedBracketCounterTest(output:ITestOutputHelper) =
         //第0个字符的反括号的位置
         let z = counter.getOpposite(0)
         Should.equal z e
+
+

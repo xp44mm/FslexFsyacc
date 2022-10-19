@@ -159,11 +159,6 @@ let getChomsky (rules:list<string list*string*string>) =
     |> List.choose tryChomsky
 
 let eliminateChomsky (rules:list<string list*string*string>) =
-    //let terminals =
-    //    rules 
-    //    |> List.map Triple.first
-    //    |> FslexFsyacc.Yacc.Grammar.from
-    //    |> (fun grammar -> grammar.terminals)
 
     let chos = getChomsky rules
     let rules =

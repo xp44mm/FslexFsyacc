@@ -1,6 +1,4 @@
-﻿on	*/	*)	      	
-on	/*	(*	      	
-on	opt_(\w+)	$1?	  CR   	
+﻿on	opt_(\w+)	$1?	  CR   	
 on	AMP	"&"	 C  W 	
 on	AMP_AMP	"&&"	 C  W 	
 on	AND_BANG	"and!"	 C  W 	

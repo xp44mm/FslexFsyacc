@@ -83,7 +83,6 @@
 		<Compile Include="Fsyacc\RegularSymbolCompiler.fs" />
 		<Compile Include="Fsyacc\FsyaccParseTableFile.fs" />
 		<Compile Include="Fsyacc\FsyaccFileRender.fs" />
-		<Compile Include="Fsyacc\FsyaccFileStart.fs" />
 		<Compile Include="Fsyacc\FsyaccFileRules.fs" />
 		<Compile Include="Fsyacc\FsyaccFileShaking.fs" />
 		<Compile Include="Fsyacc\FsyaccRules.fs" />

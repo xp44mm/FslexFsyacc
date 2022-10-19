@@ -102,13 +102,13 @@ let renderFsyacc
         |> List.map renderDec
         |> String.concat "\r\n"
 
-    let m =
+    let main =
         [
-            yield r
-            if precedences.IsEmpty then () else yield p()
-            if declarations.IsEmpty then () else yield d()
+            r
+            if precedences.IsEmpty then () else p()
+            if declarations.IsEmpty then () else d()
         ]
         |> String.concat "\r\n%%\r\n"
 
-    [h;m] 
+    [h;main;""]
     |>String.concat "\r\n"

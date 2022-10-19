@@ -1,0 +1,9 @@
+﻿%{%}
+hashDirective :
+    | HASH IDENT hashDirectiveArgs {}
+hashDirectiveArgs :
+    | (*empty*) {}
+    | hashDirectiveArgs hashDirectiveArg {}
+hashDirectiveArg :
+    | STRING {}
+    | KEYWORD_STRING {}

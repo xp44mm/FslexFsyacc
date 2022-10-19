@@ -1,13 +1,14 @@
 ﻿namespace FslexFsyacc.Fslex
 
-open System.IO
 open System
 open System.Text
 open System.Text.RegularExpressions
+open System.IO
 
 open Xunit
 open Xunit.Abstractions
 
+open FSharp.Idioms
 open FSharp.Literals
 open FSharp.xUnit
 
@@ -164,9 +165,10 @@ type FslexParseTableTest(output: ITestOutputHelper) =
         show lastsOfExpr
         show firstsOfExpr
 
-    [<Fact>] // (Skip="once for all!")
+    [<Fact>]
     member _.``101 - format norm file test``() =
-        let startSymbol = "file"
+        let startSymbol = fsyacc.rules.Head |> Triple.first |> List.head
+        show startSymbol
         let fsyacc = fsyacc.start(startSymbol,Set.empty).toRaw()
         output.WriteLine(fsyacc.render())
 

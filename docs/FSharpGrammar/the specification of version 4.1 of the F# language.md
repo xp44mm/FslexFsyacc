@@ -482,23 +482,23 @@ The `COMPILED` compilation symbol is defined for input that the F# compiler has 
 
 Processing the source code portions of these inputs consists of the following steps:
 
-1.  **Decoding**. Each file and source code fragment is decoded into a stream of Unicode characters, ~~as described in the C# specification, sections 2.3 and 2.4~~. The command-line options may specify a code page for this process.
+1. **Decoding**. Each file and source code fragment is decoded into a stream of Unicode characters, ~~as described in the C# specification, sections 2.3 and 2.4~~. The command-line options may specify a code page for this process.
 
-2.  **Tokenization**. The stream of Unicode characters is broken into a token stream by the lexical analysis ~~described in §3~~.
+2. **Tokenization**. The stream of Unicode characters is broken into a token stream by the lexical analysis ~~described in §3~~.
 
-3.  **Lexical Filtering**. The token stream is filtered by a state machine that implements the rules ~~described in §15~~. Those rules describe how additional (artificial) tokens are inserted into the token stream and how some existing tokens are replaced with others to create an augmented token stream.
+3. **Lexical Filtering**. The token stream is filtered by a state machine that implements the rules ~~described in §15~~. Those rules describe how additional (artificial) tokens are inserted into the token stream and how some existing tokens are replaced with others to create an augmented token stream.
 
-4.  **Parsing**. The augmented token stream is parsed according to the grammar specification in this document.
+4. **Parsing**. The augmented token stream is parsed according to the grammar specification in this document.
 
-5.  **Importing**. The imported assembly references are resolved to F# or CLI assembly specifications, which are then imported. From the F# perspective, this results in the pre-definition of numerous namespace declaration groups (§12.1), types and type provider instances. The namespace declaration groups are then combined to form an initial name resolution environment (§14.1).
+5. **Importing**. The imported assembly references are resolved to F# or CLI assembly specifications, which are then imported. From the F# perspective, this results in the pre-definition of numerous namespace declaration groups (§12.1), types and type provider instances. The namespace declaration groups are then combined to form an initial name resolution environment (§14.1).
 
-6.  **Checking**. The results of parsing are checked one by one. Checking involves such procedures as Name Resolution (§14.1), Constraint Solving (§14.5), and Generalization (§14.6.7), as well as the application of other rules described in this specification.
+6. **Checking**. The results of parsing are checked one by one. Checking involves such procedures as Name Resolution (§14.1), Constraint Solving (§14.5), and Generalization (§14.6.7), as well as the application of other rules described in this specification.
 
     Type inference uses variables to represent unknowns in the type inference problem. The various checking processes maintain tables of context information including a name resolution environment and a set of current inference constraints. After the processing of a file or program fragment is complete, all such variables have been either generalized or resolved and the type inference environment is discarded.
 
-7.  **Elaboration**. One result of checking is an elaborated program fragment that contains elaborated declarations, expressions, and types. For most constructs, such as constants, control flow, and data expressions, the elaborated form is simple. Elaborated forms are used for evaluation, CLI reflection, and the F# expression trees that are returned by quoted expressions (§6.8).
+7. **Elaboration**. One result of checking is an elaborated program fragment that contains elaborated declarations, expressions, and types. For most constructs, such as constants, control flow, and data expressions, the elaborated form is simple. Elaborated forms are used for evaluation, CLI reflection, and the F# expression trees that are returned by quoted expressions (§6.8).
 
-8.  **Execution**. Elaborated program fragments that are successfully checked are added to a collection of available program fragments. Each fragment has a static initializer. Static initializers are executed as ~~described in (§12.5)~~.
+8. **Execution**. Elaborated program fragments that are successfully checked are added to a collection of available program fragments. Each fragment has a static initializer. Static initializers are executed as ~~described in (§12.5)~~.
 
 # 3. Lexical Analysis
 
@@ -608,7 +608,7 @@ token *ident* =
 | `` ( [^'`' '\n' '\r' '\t'] | '`' [^ '`' '\n' '\r' '\t'] )+ ``
 ```
 
-For example, 
+For example,
 
 ```fsharp
 ``value.with odd#name``
@@ -753,7 +753,7 @@ Verbatim strings may be specified by using the `@` symbol preceding the string a
 let s = @"abc\def"
 ```
 
-String-like and character-like literals can also be specified for unsigned byte arrays (type byte[]). These tokens cannot contain Unicode characters that have surrogate-pair UTF-16 encodings or UTF-16 encodings greater than 127.
+String-like and character-like literals can also be specified for unsigned byte arrays (type `byte[]`). These tokens cannot contain Unicode characters that have surrogate-pair UTF-16 encodings or UTF-16 encodings greater than 127.
 
 A triple-quoted string is specified by using three quotation marks (`"""`) to ensure that a string that includes one or more escaped strings is interpreted verbatim. For example, a triple-quoted string can be used to embed XML blobs:
 
@@ -786,12 +786,12 @@ token symbolic-keyword =
 
 The following symbols are reserved for future use:
 
-```js
+```fsharp
 token *reserved-symbolic-sequence* =
 ~ `
 ```
 
-## Symbolic Operators 
+## Symbolic Operators
 
 User-defined and library-defined symbolic operators are sequences of characters as shown below, except where the sequence of characters is a symbolic keyword (§3.6).
 
@@ -823,42 +823,43 @@ For details about the associativity and precedence of symbolic operators in expr
 ## Numeric Literals
 
 The lexical specification of numeric literals is as follows:
+
 ```js
-regexp digit	= [0-9]
+regexp digit = [0-9]
 regexp hexdigit     = digit | [A-F] | [a-f]
-regexp octaldigit	= [0-7]
-regexp bitdigit	= [0-1]
+regexp octaldigit = [0-7]
+regexp bitdigit = [0-1]
   
 regexp int =
-       | digit+	For example, 34
+       | digit+For example, 34
 
 regexp xint = 
-       | 0 (x|X) hexdigit+	For example, 0x22
-       | 0 (o|O) octaldigit+	For example, 0o42
-       | 0 (b|B) bitdigit+	For example, 0b10010
+       | 0 (x|X) hexdigit+ For example, 0x22
+       | 0 (o|O) octaldigit+ For example, 0o42
+       | 0 (b|B) bitdigit+ For example, 0b10010
 
-token sbyte      = (int|xint) 'y'	For example, 34y
-token byte       = (int|xint) 'uy'	For example, 34uy
-token int16      = (int|xint) 's'	For example, 34s
-token uint16     = (int|xint) 'us'	For example, 34us
-token int32      = (int|xint) 'l'	For example, 34l
-token uint32     = (int|xint) 'ul'	For example, 34ul
-                 | (int|xint) 'u'	For example, 34u
-token nativeint  = (int|xint) 'n'	For example, 34n
-token unativeint = (int|xint) 'un'	For example, 34un
-token int64      = (int|xint) 'L'	For example, 34L
-token uint64     = (int|xint) 'UL'	For example, 34UL
-                 | (int|xint) 'uL'	For example, 34uL
+token sbyte      = (int|xint) 'y' For example, 34y
+token byte       = (int|xint) 'uy' For example, 34uy
+token int16      = (int|xint) 's' For example, 34s
+token uint16     = (int|xint) 'us' For example, 34us
+token int32      = (int|xint) 'l' For example, 34l
+token uint32     = (int|xint) 'ul' For example, 34ul
+                 | (int|xint) 'u' For example, 34u
+token nativeint  = (int|xint) 'n' For example, 34n
+token unativeint = (int|xint) 'un' For example, 34un
+token int64      = (int|xint) 'L' For example, 34L
+token uint64     = (int|xint) 'UL' For example, 34UL
+                 | (int|xint) 'uL' For example, 34uL
 
 token ieee32     = 
-       | float [Ff]	For example, 3.0F or 3.0f
-       | xint 'lf'	For example, 0x00000000lf
+       | float [Ff] For example, 3.0F or 3.0f
+       | xint 'lf' For example, 0x00000000lf
 token ieee64     = 
-       | float	         For example, 3.0
-       | xint 'LF'	For example, 0x0000000000000000LF
+       | float          For example, 3.0
+       | xint 'LF' For example, 0x0000000000000000LF
 
 token bignum  = int ('Q' | 'R' | 'Z' | 'I' | 'N' | 'G') 
-                                      	For example, 34742626263193832612536171N
+                    For example, 34742626263193832612536171N
       
 token decimal = (float|int) [Mm]
 
@@ -866,6 +867,7 @@ token float =
       digit+ . digit*  
       digit+ (. digit* )? (e|E) (+|-)? digit+ 
 ```
+
 ### Post-filtering of Adjacent Prefix Tokens
 
 Negative integers are specified using the `-` token; for example, `-3`. The token steam is post-filtered according to the following rules:
@@ -874,12 +876,14 @@ Negative integers are specified using the `-` token; for example, `-3`. The toke
 
   If *token* is a constant numeric literal, the pair of tokens is merged. For example, adjacent tokens `-` and `3` becomes the single token `“-3”`. Otherwise, the tokens remain separate. However the `“-”` token is marked as an `ADJACENT_PREFIX_OP` token.
 
-  This rule does not apply to the sequence `*token1* - *token2*`, if all three tokens are adjacent and *token1* is a terminating token from expression forms that have lower precedence than the grammar production expr = MINUS expr.
+  This rule does not apply to the sequence `*token1* - *token2*`, if all three tokens are adjacent and *token1* is a terminating token from expression forms that have lower precedence than the grammar production `expr = MINUS expr`.
 
-  For example, the - and b tokens in the following sequence are not merged if all three tokens are adjacent:
+  For example, the `-` and `b` tokens in the following sequence are not merged if all three tokens are adjacent:
+
 ```fsharp
 > a-b
 ```
+
 - Otherwise, the usual grammar rules apply to the uses of `-` and `+`, with an addition for `ADJACENT_PREFIX_OP`:
 
 ```js
@@ -892,7 +896,7 @@ expr = expr MINUS expr
 
 Tokens of the form
 
-```
+```js
 token *intdotdot* = int..
 ```
 
@@ -912,13 +916,16 @@ token reserved-literal-formats =
 ### Shebang
 
 A shebang (`#!`) directive may exist at the beginning of F# source files. Such a line is treated as a comment. This allows F# scripts to be compatible with the Unix convention whereby a script indicates the interpreter to use by providing the path to that interpreter on the first line, following the `#!` directive.
-```
+
+```bash
 #!/bin/usr/env fsharpi --exec
 ```
+
 ## Line Directives
 
 Line directives adjust the source code filenames and line numbers that are reported in error messages, recorded in debugging symbols, and propagated to quoted expressions. F# supports the following line directives:
-```
+
+```fsharp
 token line-directive =
     # int
     # int string
@@ -927,6 +934,7 @@ token line-directive =
     #line int string
     #line int verbatim-string
 ```
+
 A line directive applies to the line that immediately follows the directive. If no line directive is present, the first line of a file is numbered 1.
 
 ## Hidden Tokens
@@ -936,11 +944,13 @@ Some hidden tokens are inserted by lexical filtering (§15) or are used to repla
 ## Identifier Replacements
 
 The following table lists identifiers that are automatically replaced by expressions.
+
 ```fsharp
 __SOURCE_DIRECTORY__
 __SOURCE_FILE__
 __LINE__
 ```
+
 # 4. Basic Grammar Elements
 
 This section defines grammar elements that are used repeatedly in later sections.
@@ -948,6 +958,7 @@ This section defines grammar elements that are used repeatedly in later sections
 ## Operator Names
 
 Several places in the grammar refer to an *ident-or-op* rather than an *ident*:
+
 ```js
 ident-or-op := 
     | ident 
@@ -967,153 +978,173 @@ active-pattern-op-name :=
     | | ident | ... | ident |
     | | ident | ... | ident | _ |
 ```
+
 In operator definitions, the operator name is placed in parentheses. For example:
+
 ```fsharp
 let (+++) x y = (x, y)
 ```
+
 This example defines the binary operator `+++`. The text `(+++)` is an *ident-or-op* that acts as an identifier with associated text `+++`. Likewise, for active pattern definitions (§7), the active pattern case names are placed in parentheses, as in the following example:
+
 ```fsharp
 let (|A|B|C|) x = if x < 0 then A elif x = 0 then B else C
 ```
+
 Because an *ident-or-op* acts as an identifier, such names can be used in expressions. For example:
+
 ```fsharp
 List.map ((+) 1) [ 1; 2; 3 ]
 ```
+
 The three character token `(*)` defines the `*` operator:
+
 ```fsharp
 let (*) x y = (x + y)
 ```
+
 To define other operators that begin with `*`, whitespace must follow the opening parenthesis; otherwise `(*` is interpreted as the start of a comment:
+
 ```fsharp
 let ( *+* ) x y = (x + y)
 ```
+
 Symbolic operators and some symbolic keywords have a compiled name that is visible in the compiled form of F# programs. The compiled names are shown below.
+
 ```fsharp
-[] 	op_Nil
-::	op_ColonColon
-+	op_Addition
--	op_Subtraction
-*	op_Multiply
-/	op_Division
-**	op_Exponentiation
-@	op_Append	
-^	op_Concatenate	
-%	op_Modulus 
-&&&	op_BitwiseAnd
-|||	op_BitwiseOr
-^^^	op_ExclusiveOr
-<<<	op_LeftShift
-~~~	op_LogicalNot
->>>	op_RightShift
-~+	op_UnaryPlus
-~-	op_UnaryNegation
-=	op_Equality
-<>	op_Inequality
-<=	op_LessThanOrEqual
->=	op_GreaterThanOrEqual
-<	op_LessThan
->	op_GreaterThan
-?	op_Dynamic
-?<-	op_DynamicAssignment
-|>	op_PipeRight
-||>	op_PipeRight2
-|||>	op_PipeRight3
-<|	op_PipeLeft
-<||	op_PipeLeft2
-<|||	op_PipeLeft3
-!	op_Dereference
->>	op_ComposeRight
-<<	op_ComposeLeft
-<@ @>	op_Quotation
+[]  op_Nil
+:: op_ColonColon
++ op_Addition
+- op_Subtraction
+* op_Multiply
+/ op_Division
+** op_Exponentiation
+@ op_Append 
+^ op_Concatenate 
+% op_Modulus 
+&&& op_BitwiseAnd
+||| op_BitwiseOr
+^^^ op_ExclusiveOr
+<<< op_LeftShift
+~~~ op_LogicalNot
+>>> op_RightShift
+~+ op_UnaryPlus
+~- op_UnaryNegation
+= op_Equality
+<> op_Inequality
+<= op_LessThanOrEqual
+>= op_GreaterThanOrEqual
+< op_LessThan
+> op_GreaterThan
+? op_Dynamic
+?<- op_DynamicAssignment
+|> op_PipeRight
+||> op_PipeRight2
+|||> op_PipeRight3
+<| op_PipeLeft
+<|| op_PipeLeft2
+<||| op_PipeLeft3
+! op_Dereference
+>> op_ComposeRight
+<< op_ComposeLeft
+<@ @> op_Quotation
 <@@ @@> op_QuotationUntyped
-~%	op_Splice
-~%%	op_SpliceUntyped
-~&	op_AddressOf
-~&&	op_IntegerAddressOf
-||	op_BooleanOr
-&&	op_BooleanAnd
-+=	op_AdditionAssignment
--=	op_SubtractionAssignment
-*=	op_MultiplyAssignment
-/=	op_DivisionAssignment
-..	op_Range
-.. ..	op_RangeStep
+~% op_Splice
+~%% op_SpliceUntyped
+~& op_AddressOf
+~&& op_IntegerAddressOf
+|| op_BooleanOr
+&& op_BooleanAnd
++= op_AdditionAssignment
+-= op_SubtractionAssignment
+*= op_MultiplyAssignment
+/= op_DivisionAssignment
+.. op_Range
+.. .. op_RangeStep
 ```
+
 Compiled names for other symbolic operators are `op_N₁...N_(n)` where `N₁` to `N_(n)` are the names for the characters as shown in the table below. For example, the symbolic identifier `<*` has the compiled name `op_LessMultiply`:
+
 ```fsharp
->	Greater
-<	Less 
-+	Plus
--	Minus
-*	Multiply
-=	Equals
-~	Twiddle
-%	Percent
-.	Dot
-&	Amp
-|	Bar
-@	At
-#	Hash
-^	Hat
-!	Bang
-?	Qmark
-/	Divide
-.	Dot
-:	Colon
-(	LParen
-,	Comma
-)	RParen
-[	LBrack
-]	RBrack 
+> Greater
+< Less 
++ Plus
+- Minus
+* Multiply
+= Equals
+~ Twiddle
+% Percent
+. Dot
+& Amp
+| Bar
+@ At
+# Hash
+^ Hat
+! Bang
+? Qmark
+/ Divide
+. Dot
+: Colon
+( LParen
+, Comma
+) RParen
+[ LBrack
+] RBrack 
 ```
+
 ## Long Identifiers
 
 Long identifiers *long-ident* are sequences of identifiers that are separated by `‘.’` and optional whitespace. Long identifiers *long-ident-or-op* are long identifiers that may terminate with an operator name.
+
 ```js
 long-ident :=  ident '.' ... '.' ident 
 long-ident-or-op :=  
   | long-ident '.' ident-or-op
   | ident-or-op 
 ```
+
 ## Constants 
 
 The constants in the following table may be used in patterns and expressions. The individual lexical formats for the different constants are defined in §3.
+
 ```js
 const := 
       | sbyte 
       | int16 
       | int32 
-      | int64		-- 8, 16, 32 and 64-bit signed integers
+      | int64  -- 8, 16, 32 and 64-bit signed integers
       | byte 
       | uint16 
       | uint32 
-      | int		-- 32-bit signed integer
-      | uint64		-- 8, 16, 32 and 64-bit unsigned integers
-      | ieee32		-- 32-bit number of type "float32"
-      | ieee64		-- 64-bit number of type "float"
-      | bignum		-- User or library-defined integral literal type
-      | char		-- Unicode character of type "char"
-      | string		-- String of type "string" (System.String)
-      | verbatim-string	-- String of type "string" (System.String)
-      | triple-quoted-string	-- String of type "string" (System.String)
-      | bytestring		-- String of type "byte[]" 
-      | verbatim-bytearray	-- String of type "byte[]" 
-      | bytechar	-- Char of type "byte"
-      | false | true	-- Boolean constant of type "bool"
-      | '(' ')'	-- unit constant of type "unit"
+      | int  -- 32-bit signed integer
+      | uint64  -- 8, 16, 32 and 64-bit unsigned integers
+      | ieee32  -- 32-bit number of type "float32"
+      | ieee64  -- 64-bit number of type "float"
+      | bignum  -- User or library-defined integral literal type
+      | char  -- Unicode character of type "char"
+      | string  -- String of type "string" (System.String)
+      | verbatim-string -- String of type "string" (System.String)
+      | triple-quoted-string -- String of type "string" (System.String)
+      | bytestring  -- String of type "byte[]" 
+      | verbatim-bytearray -- String of type "byte[]" 
+      | bytechar -- Char of type "byte"
+      | false | true -- Boolean constant of type "bool"
+      | '(' ')' -- unit constant of type "unit"
 ```
+
 ## Operators and Precedence 
 
 ### Categorization of Symbolic Operators
 
 The following *symbolic-op* tokens can be used to form prefix and infix expressions. The marker OP represents all *symbolic-op* tokens that begin with the indicated prefix, except for tokens that appear elsewhere in the table.
+
 ```js
 infix-or-prefix-op := 
     +,  -, +., -., %, &, &&
 
 prefix-op :=
     infix-or-prefix-op 
-    ~ ~~ ~~~  	(and any repetitions of ~)
+    ~ ~~ ~~~   (and any repetitions of ~)
     !OP                  (except !=)
 
 infix-op :=
@@ -1126,7 +1157,9 @@ infix-op :=
     or
     ?
 ```
+
 The operators `+`, `-`, `+.`, `-.`, `%`, `%%`, `&`, `&&` can be used as both prefix and infix operators. When these operators are used as prefix operators, the tilde character is prepended internally to generate the operator name so that the parser can distinguish such usage from an infix use of the operator. For example, `-x` is parsed as an application of the operator `~-` to the identifier `x`. This generated name is also used in definitions for these prefix operators. Consequently, the definitions of the following prefix operators include the `~` character:
+
 ```fsharp
 // To completely redefine the prefix + operator:
 let (~+) x = x
@@ -1184,8 +1217,6 @@ as
 ```
 
 If ambiguous grammar rules (such as the rules from §6) involve tokens in the table, a construct that appears earlier in the table has higher precedence than a construct that appears later in the table. The associativity indicates whether the operator or construct applies to the item to the left or the right of the operator.
-
-
 
 The table entries marked as “High-precedence application” and “High-precedence type application” are the result of the augmentation of the lexical token stream, ~~as described in §15.2 and §15.3.~~
 
@@ -2920,7 +2951,7 @@ translates to
 
 ```fsharp
 let b = myseq
-b.For([1..10], fun i ->	
+b.For([1..10], fun i -> 
     b.Yield(i*i))
 ```
 
@@ -2951,7 +2982,7 @@ translates to
 ```fsharp
 let b = myseq
 b.Where(
-    b.For([1..10], fun i ->	
+    b.For([1..10], fun i -> 
         b.Yield (i)),
     fun x -> x > 5)
 ```
@@ -2984,7 +3015,7 @@ translates to
 ```fsharp
 let b = myseq
 b.Where(
-b.For([1..10], fun i ->	
+b.For([1..10], fun i -> 
 b.Yield (i)),
 fun i -> i > 5)
 ```
@@ -3005,7 +3036,7 @@ translates to
 let b = myseq
 b.Where(
 b.For([1..10], fun i ->
-	let j = i * i	
+ let j = i * i 
 b.Yield (i,j)),
 fun (i,j) -> i > 5 && j < 49)
 ```
@@ -3021,8 +3052,8 @@ where (i > 5 && j < 49)
 ” in the following syntax:
 
 ```fsharp
-	where (i > 5)
-	where (j < 49)
+ where (i > 5)
+ where (j < 49)
 ```
 
 To support this style, the where custom operator should produce a computation that has the same variable space as the input computation. That is, j should be available in the second where. The following example uses the `MaintainsVariableSpace` property on the custom operator to specify this behavior:
@@ -3057,7 +3088,7 @@ let b = myseq
 b.Where(
 b.Where(
 b.For([1..10], fun i ->
-	let j = i * i	
+ let j = i * i 
 b.Yield (i,j)),
 fun (i,j) -> i > 5),
 fun (i,j) -> j < 49)
@@ -3103,12 +3134,12 @@ translates to
 ```fsharp
 let b = myseq
 b.Where(
-	b.For(
-		b.Where(
-			b.For([1..10], fun i -> b.Yield (i))
-			fun i -> i>5),
-		fun j -> b.Yield (j)),
-	fun j -> j*j < 49)
+ b.For(
+  b.Where(
+   b.For([1..10], fun i -> b.Yield (i))
+   fun i -> i>5),
+  fun j -> b.Yield (j)),
+ fun j -> j*j < 49)
 ```
 
 Note that the `into` keyword is not customizable, unlike `join` and `on`.
@@ -3146,9 +3177,9 @@ translates to
 ```fsharp
 let b = myseq
 b.Bind(
-	b.Where(B.For([1..10], fun i -> b.Return (i)),
-		fun i -> i > 5 && i*i < 49),
-	fun j -> b.Return (j))
+ b.Where(B.For([1..10], fun i -> b.Return (i)),
+  fun i -> i > 5 && i*i < 49),
+ fun j -> b.Return (j))
 ```
 
 where `Bind` is called to capture the pattern variable `j`. Note that `For` and `Yield` are called to capture the pattern variable when `MaintainsVariableSpace` is used.
@@ -3188,10 +3219,10 @@ translates to
 ```fsharp
 let b = myseq
 b.For(
-	b.Merge([1..10], [5..15], 
+ b.Merge([1..10], [5..15], 
             fun i -> i, fun j -> j,
             fun i -> fun j -> (i,j)),
-	fun j -> b.Yield (j))
+ fun j -> b.Yield (j))
 ```
 
 This translation implicitly places type constraints on the expected form of the builder methods. For example, for the async builder found in the `FSharp.Control` library, the translation phase corresponds to implementing a builder of a type that has the following member signatures:
@@ -3384,24 +3415,24 @@ type SeqBuilder() =
 However, this builder type is not actually defined in the F# library. Instead, sequence expressions are elaborated directly as follows:
 
 ```fsharp
-{| yield expr |}			 Seq.singleton expr
-{| yield! expr |}			 expr
-{| expr1 ; expr2 |}		 Seq.append {| expr1 |} {| expr2 |}
-{| for pat in expr1 -> expr2 |}	 Seq.map (fun pat -> {| expr2 |}) expr1
-{| for pat in expr1 do expr2 |}	 Seq.collect (fun pat -> {| expr2 |}) expr1
-{| while expr1 do expr2 |}		 RuntimeHelpers.EnumerateWhile 
+{| yield expr |}    Seq.singleton expr
+{| yield! expr |}    expr
+{| expr1 ; expr2 |}   Seq.append {| expr1 |} {| expr2 |}
+{| for pat in expr1 -> expr2 |}  Seq.map (fun pat -> {| expr2 |}) expr1
+{| for pat in expr1 do expr2 |}  Seq.collect (fun pat -> {| expr2 |}) expr1
+{| while expr1 do expr2 |}   RuntimeHelpers.EnumerateWhile 
                                        (fun () -> expr1) 
                                        {| expr2 |})  
-{| try expr1 finally expr2 |}	 RuntimeHelpers.EnumerateThenFinally 
+{| try expr1 finally expr2 |}  RuntimeHelpers.EnumerateThenFinally 
                                           (| expr1 |})  
                                           (fun () -> expr2)
-{| use v = expr1 in expr2 |}	 let v = expr1 in 
+{| use v = expr1 in expr2 |}  let v = expr1 in 
                                 RuntimeHelpers.EnumerateUsing v {| expr2 |}
-{| let v = expr1 in expr2 |}	 let v = expr1 in {| expr2 |}
-{| match expr with pati -> expri |}	.match expr with pati -> {| cexpri |}
-{| expr1 |}			 expr1 ; Seq.empty 
-{| if expr then expr0 |}C		 if expr then {| expr0 |}C else Seq.empty
-{| if expr then expr0 else expr1 |}	 if expr then {| expr0 |}C else {| expr1 |}C
+{| let v = expr1 in expr2 |}  let v = expr1 in {| expr2 |}
+{| match expr with pati -> expri |} .match expr with pati -> {| cexpri |}
+{| expr1 |}    expr1 ; Seq.empty 
+{| if expr then expr0 |}C   if expr then {| expr0 |}C else Seq.empty
+{| if expr then expr0 else expr1 |}  if expr then {| expr0 |}C else {| expr1 |}C
 ```
 
 Here the use of `Seq` and `RuntimeHelpers` refers to the corresponding functions in `FSharp.Collections.Seq` and `FSharp.Core.CompilerServices.RuntimeHelpers` respectively. This means that a sequence expression generates an object of type `System.Collections.Generic.IEnumerable<*ty*>` for some type *ty*. Such an object has a `GetEnumerator` method that returns a `System.Collections.Generic.IEnumerator<*ty*>` whose `MoveNext`, `Current` and `Dispose` methods implement an on-demand evaluation of the sequence expressions.
@@ -3975,35 +4006,35 @@ A modified version of *Unqualified Lookup* (§14.2.1) is applied to the expressi
 Note: Because assignments have the preceding interpretations, local values must be mutable so that primitive field assignments and array lookups can mutate their immediate contents. In this context, “immediate” contents means the contents of a mutable value type. For example, given
 
 ```fsharp
-	[<Struct>]
-	type SA = 
-	    new(v) = { x = v }
-	    val mutable x : int
+ [<Struct>]
+ type SA = 
+     new(v) = { x = v }
+     val mutable x : int
 
-	[<Struct>]
-	type SB = 
-	    new(v) = { sa = v }
-	    val mutable sa : SA
-	
-	let s1 = SA(0)
-	let mutable s2 = SA(0)
-	let s3 = SB(0)
-	let mutable s4 = SB(0)
+ [<Struct>]
+ type SB = 
+     new(v) = { sa = v }
+     val mutable sa : SA
+ 
+ let s1 = SA(0)
+ let mutable s2 = SA(0)
+ let s3 = SB(0)
+ let mutable s4 = SB(0)
 ```
 
 Then these are not permitted:
 
 ```fsharp
-	s1.x <- 3
-	s3.sa.x <- 3
+ s1.x <- 3
+ s3.sa.x <- 3
 ```
 
 and these are:
 
 ```fsharp
-	s2.x <- 3
-	s4.sa.x <- 3
-	s4.sa <- SA(2)
+ s2.x <- 3
+ s4.sa.x <- 3
+ s4.sa <- SA(2)
 ```
 
 ## Control Flow Expressions
@@ -5149,7 +5180,7 @@ f (&a.[0])
 
 let bb = ((b :> obj) :?> obj[])
 // The next line raises a System.ArrayTypeMismatchException exception.
-F (&bb.[1])	
+F (&bb.[1]) 
 ```
 
 ### Values with Underspecified Object Identity and Type Identity 
