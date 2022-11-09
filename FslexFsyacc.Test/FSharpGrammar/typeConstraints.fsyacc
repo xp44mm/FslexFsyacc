@@ -25,30 +25,36 @@ open FSharp.Compiler.Xml
 let parse_error_rich = Some (fun (ctxt: ParseErrorContext<_>) ->
     errorR(SyntaxError(box ctxt, ctxt.ParseState.LexBuffer.LexemeRange)))
 %}
-typedSequentialExprEOF :
-    | typedSequentialExpr EOF {}
-typedSequentialExpr :
-    | sequentialExpr COLON typeWithTypeConstraints {}
-    | sequentialExpr {}
-sequentialExpr :
-    | declExpr seps sequentialExpr {}
-    | declExpr seps {}
-    | declExpr {}
-    | declExpr THEN sequentialExpr {}
-    | declExpr OTHEN OBLOCKBEGIN typedSequentialExpr OBLOCKEND {}
-    | hardwhiteLetBindings {}
-seps :
-    | OBLOCKSEP {}
-    | SEMICOLON {}
-    | OBLOCKSEP SEMICOLON {}
-    | SEMICOLON OBLOCKSEP {}
+typeConstraints :
+    | typeConstraints AND typeConstraint {}
+    | typeConstraint {}
+typeConstraint :
+    | DEFAULT typar COLON typ {}
+    | typar COLON_GREATER typ {}
+    | typar COLON STRUCT {}
+    | typar COLON IDENT STRUCT {}
+    | typar COLON NULL {}
+    | typar COLON LPAREN classMemberSpfn RPAREN {}
+    | LPAREN typeAlts RPAREN COLON LPAREN classMemberSpfn RPAREN {}
+    | typar COLON DELEGATE typeArgsNoHpaDeprecated {}
+    | typar COLON IDENT typeArgsNoHpaDeprecated {}
+    | typar COLON IDENT {}
+    | appType {}
+typeAlts :
+    | typeAlts OR appType {}
+    | appType {}
 %%
-%left THEN
+%left DELEGATE
 %left COLON
-%left OTHEN
-%left OBLOCKBEGIN
-%left OBLOCKEND OBLOCKEND_COMING_SOON OBLOCKEND_IS_HERE
-%left EOF
-%left typedSequentialExprEOF
-%left declExpr
-%right OBLOCKSEP SEMICOLON
+%left STRUCT
+%left DEFAULT
+%left typ
+%left typeArgsNoHpaDeprecated
+%left typar
+%nonassoc RPAREN RPAREN_COMING_SOON RPAREN_IS_HERE
+%nonassoc LPAREN
+%nonassoc NULL
+%nonassoc IDENT
+%left OR
+%left AND
+%left COLON_GREATER

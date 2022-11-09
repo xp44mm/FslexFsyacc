@@ -70,16 +70,19 @@ type FlatFsyaccFile =
 
     ///根据startSymbol提取相关规则，无用规则被无视忽略。
     member this.start(startSymbol:string, terminals:Set<string>) =
-        let rules, symbols =
-            let o =
-                // 有些左手边符号不展开，当作终止符
-                this.rules
-                |> List.filter(fun (prod,_,_) ->
-                    prod.Head
-                    |> terminals.Contains
-                    |> not)
-                |> FsyaccFileShaking.extractRules <| startSymbol
-            o.rules, o.symbols
+        let rules =
+            this.rules
+            |> List.filter(fun (prod,_,_) ->
+                // 左手边符号当作终止符，不展开，删除产生式
+                prod.Head
+                |> terminals.Contains
+                |> not)
+            |> FsyaccFileShaking.extractRules startSymbol
+
+        let symbols =
+            rules
+            |> List.collect Triple.first
+            |> Set.ofList
 
         let precedences =
             this.precedences

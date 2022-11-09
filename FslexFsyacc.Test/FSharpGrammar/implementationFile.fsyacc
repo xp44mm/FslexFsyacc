@@ -1,9 +1,265 @@
-﻿%{%}
+﻿%{
+#nowarn "1182"  // generated code has lots of unused "parseState"
+open System
+open Internal.Utilities
+open Internal.Utilities.Text.Parsing
+open Internal.Utilities.Library
+open Internal.Utilities.Library.Extras
+open FSharp.Compiler
+open FSharp.Compiler.AbstractIL
+open FSharp.Compiler.AbstractIL
+open FSharp.Compiler.DiagnosticsLogger
+open FSharp.Compiler.Features
+open FSharp.Compiler.ParseHelpers
+open FSharp.Compiler.Syntax
+open FSharp.Compiler.SyntaxTrivia
+open FSharp.Compiler.Syntax.PrettyNaming
+open FSharp.Compiler.SyntaxTreeOps
+open FSharp.Compiler.SyntaxTreeOps
+open FSharp.Compiler.Text
+open FSharp.Compiler.Text.Position
+open FSharp.Compiler.Text.Range
+open FSharp.Compiler.Xml
+// This function is called by the generated parser code. Returning initiates error recovery
+// It must be called precisely "parse_error_rich"
+let parse_error_rich = Some (fun (ctxt: ParseErrorContext<_>) ->
+    errorR(SyntaxError(box ctxt, ctxt.ParseState.LexBuffer.LexemeRange)))
+%}
 implementationFile :
     | fileNamespaceImpls EOF {}
 fileNamespaceImpls :
     | fileModuleImpl {}
     | fileModuleImpl fileNamespaceImplList {}
+fileModuleImpl :
+    | opt_attributes opt_access moduleIntro moduleDefnsOrExprPossiblyEmptyOrBlock {}
+    | moduleDefnsOrExprPossiblyEmptyOrBlock {}
+opt_attributes :
+    | attributes {}
+    | (*empty*) {}
+opt_access :
+    | (*empty*) {}
+    | access {}
+access :
+    | PRIVATE {}
+    | PUBLIC {}
+    | INTERNAL {}
+moduleIntro :
+    | MODULE opt_attributes opt_access opt_rec path {}
+opt_rec :
+    | REC {}
+    | (*empty*) {}
+path :
+    | GLOBAL {}
+    | IDENT {}
+    | path DOT IDENT {}
+moduleDefnsOrExprPossiblyEmptyOrBlock :
+    | OBLOCKBEGIN moduleDefnsOrExprPossiblyEmpty OBLOCKEND opt_OBLOCKSEP {}
+    | moduleDefnsOrExprPossiblyEmpty {}
+moduleDefnsOrExprPossiblyEmpty :
+    | moduleDefnsOrExpr {}
+    | (*empty*) {}
+moduleDefnsOrExpr :
+    | opt_attributes opt_access declExpr topSeparators moduleDefnsOrExpr {}
+    | opt_attributes opt_access declExpr topSeparators {}
+    | opt_attributes opt_access declExpr {}
+    | moduleDefns {}
+declExpr :
+    | defnBindings IN typedSequentialExpr {}
+    | hardwhiteLetBindings typedSequentialExprBlock {}
+    | hardwhiteLetBindings OBLOCKSEP typedSequentialExprBlock {}
+    | hardwhiteDoBinding {}
+    | anonMatchingExpr {}
+    | anonLambdaExpr {}
+    | MATCH typedSequentialExpr withClauses {}
+    | MATCH_BANG typedSequentialExpr withClauses {}
+    | TRY typedSequentialExprBlockR withClauses {}
+    | TRY typedSequentialExprBlockR FINALLY typedSequentialExprBlock {}
+    | IF declExpr ifExprCases {}
+    | LAZY declExpr {}
+    | ASSERT declExpr {}
+    | ASSERT {}
+    | OLAZY declExprBlock {}
+    | OASSERT declExprBlock {}
+    | OASSERT {}
+    | WHILE declExpr doToken typedSequentialExprBlock doneDeclEnd {}
+    | FOR forLoopBinder doToken typedSequentialExprBlock doneDeclEnd {}
+    | FOR forLoopBinder opt_OBLOCKSEP arrowThenExprR {}
+    | FOR forLoopRange doToken typedSequentialExprBlock doneDeclEnd {}
+    | YIELD declExpr {}
+    | YIELD_BANG declExpr {}
+    | BINDER headBindingPattern EQUALS typedSequentialExprBlock IN opt_OBLOCKSEP moreBinders typedSequentialExprBlock {}
+    | OBINDER headBindingPattern EQUALS typedSequentialExprBlock ODECLEND opt_OBLOCKSEP moreBinders typedSequentialExprBlock {}
+    | DO_BANG typedSequentialExpr IN opt_OBLOCKSEP typedSequentialExprBlock {}
+    | ODO_BANG typedSequentialExprBlock ODECLEND {}
+    | FIXED declExpr {}
+    | RARROW typedSequentialExprBlockR {}
+    | declExpr COLON_QMARK typ {}
+    | declExpr COLON_GREATER typ {}
+    | declExpr COLON_QMARK_GREATER typ {}
+    | declExpr COLON_EQUALS declExpr {}
+    | minusExpr LARROW declExprBlock {}
+    | tupleExpr {}
+    | declExpr JOIN_IN declExpr {}
+    | declExpr BAR_BAR declExpr {}
+    | declExpr INFIX_BAR_OP declExpr {}
+    | declExpr OR declExpr {}
+    | declExpr AMP declExpr {}
+    | declExpr AMP_AMP declExpr {}
+    | declExpr INFIX_AMP_OP declExpr {}
+    | declExpr EQUALS declExpr {}
+    | declExpr INFIX_COMPARE_OP declExpr {}
+    | declExpr DOLLAR declExpr {}
+    | declExpr LESS declExpr {}
+    | declExpr GREATER declExpr {}
+    | declExpr INFIX_AT_HAT_OP declExpr {}
+    | declExpr PERCENT_OP declExpr {}
+    | declExpr COLON_COLON declExpr {}
+    | declExpr PLUS_MINUS_OP declExpr {}
+    | declExpr MINUS declExpr {}
+    | declExpr STAR declExpr {}
+    | declExpr INFIX_STAR_DIV_MOD_OP declExpr {}
+    | declExpr INFIX_STAR_STAR_OP declExpr {}
+    | declExpr DOT_DOT declExpr {}
+    | declExpr DOT_DOT {}
+    | DOT_DOT declExpr {}
+    | STAR {}
+    | minusExpr {}
+defnBindings :
+    | LET opt_rec localBindings {}
+    | cPrototype {}
+typedSequentialExpr :
+    | sequentialExpr COLON typeWithTypeConstraints {}
+    | sequentialExpr {}
+hardwhiteLetBindings :
+    | OLET opt_rec localBindings ODECLEND {}
+typedSequentialExprBlock :
+    | OBLOCKBEGIN typedSequentialExpr OBLOCKEND {}
+    | typedSequentialExpr {}
+hardwhiteDoBinding :
+    | ODO typedSequentialExprBlock ODECLEND {}
+anonMatchingExpr :
+    | FUNCTION withPatternClauses {}
+    | OFUNCTION withPatternClauses OEND {}
+anonLambdaExpr :
+    | FUN atomicPatterns RARROW typedSequentialExprBlock {}
+    | OFUN atomicPatterns RARROW typedSequentialExprBlockR OEND {}
+    | OFUN atomicPatterns RARROW ORIGHT_BLOCK_END OEND {}
+typedSequentialExprBlockR :
+    | typedSequentialExpr ORIGHT_BLOCK_END {}
+    | typedSequentialExpr {}
+declExprBlock :
+    | OBLOCKBEGIN typedSequentialExpr OBLOCKEND {}
+    | declExpr {}
+doToken :
+    | DO {}
+    | ODO {}
+doneDeclEnd :
+    | DONE {}
+    | ODECLEND {}
+forLoopBinder :
+    | parenPattern IN declExpr {}
+opt_OBLOCKSEP :
+    | OBLOCKSEP {}
+    | (*empty*) {}
+arrowThenExprR :
+    | RARROW typedSequentialExprBlockR {}
+forLoopRange :
+    | parenPattern EQUALS declExpr forLoopDirection declExpr {}
+forLoopDirection :
+    | TO {}
+    | DOWNTO {}
+moreBinders :
+    | AND_BANG headBindingPattern EQUALS typedSequentialExprBlock IN moreBinders {}
+    | OAND_BANG headBindingPattern EQUALS typedSequentialExprBlock ODECLEND opt_OBLOCKSEP moreBinders {}
+    | (*empty*) {}
+minusExpr :
+    | INFIX_AT_HAT_OP minusExpr {}
+    | MINUS minusExpr {}
+    | PLUS_MINUS_OP minusExpr {}
+    | ADJACENT_PREFIX_OP minusExpr {}
+    | PERCENT_OP minusExpr {}
+    | AMP minusExpr {}
+    | AMP_AMP minusExpr {}
+    | NEW atomTypeNonAtomicDeprecated opt_HIGH_PRECEDENCE_APP atomicExprAfterType DOT atomicExprQualification {}
+    | NEW atomTypeNonAtomicDeprecated opt_HIGH_PRECEDENCE_APP atomicExprAfterType {}
+    | UPCAST minusExpr {}
+    | DOWNCAST minusExpr {}
+    | appExpr {}
+opt_HIGH_PRECEDENCE_APP :
+    | HIGH_PRECEDENCE_BRACK_APP {}
+    | HIGH_PRECEDENCE_PAREN_APP {}
+    | (*empty*) {}
+atomicExprQualification :
+    | identOrOp {}
+    | GLOBAL {}
+    | (*empty*) {}
+    | LPAREN COLON_COLON RPAREN DOT INT32 {}
+    | LPAREN typedSequentialExpr RPAREN {}
+    | LBRACK typedSequentialExpr RBRACK {}
+appExpr :
+    | appExpr argExpr {}
+    | atomicExpr {}
+argExpr :
+    | ADJACENT_PREFIX_OP atomicExpr {}
+    | atomicExpr {}
+topSeparators :
+    | topSeparator {}
+    | topSeparator topSeparators {}
+topSeparator :
+    | SEMICOLON {}
+    | SEMICOLON_SEMICOLON {}
+    | OBLOCKSEP {}
+moduleDefns :
+    | moduleDefnOrDirective moduleDefns {}
+    | moduleDefnOrDirective topSeparators moduleDefnsOrExpr {}
+    | moduleDefnOrDirective {}
+    | moduleDefnOrDirective topSeparators {}
+moduleDefnOrDirective :
+    | moduleDefn {}
+    | hashDirective {}
+moduleDefn :
+    | opt_attributes opt_access defnBindings {}
+    | opt_attributes opt_access hardwhiteLetBindings {}
+    | opt_attributes opt_access doBinding {}
+    | opt_attributes opt_access TYPE tyconDefn tyconDefnList {}
+    | opt_attributes opt_access exconDefn {}
+    | opt_attributes opt_access moduleIntro EQUALS namedModuleDefnBlock {}
+    | openDecl {}
+doBinding :
+    | DO typedSequentialExprBlock {}
+tyconDefnList :
+    | AND tyconDefn tyconDefnList {}
+    | (*empty*) {}
+exconDefn :
+    | exconCore opt_classDefn {}
+exconCore :
+    | EXCEPTION opt_attributes opt_access exconIntro exconRepr {}
+exconIntro :
+    | IDENT {}
+    | IDENT OF unionCaseRepr {}
+exconRepr :
+    | (*empty*) {}
+    | EQUALS path {}
+opt_classDefn :
+    | WITH classDefnBlock declEnd {}
+    | (*empty*) {}
+declEnd :
+    | ODECLEND {}
+    | OEND {}
+    | END {}
+namedModuleDefnBlock :
+    | OBLOCKBEGIN wrappedNamedModuleDefn OBLOCKEND {}
+    | OBLOCKBEGIN moduleDefnsOrExpr OBLOCKEND {}
+    | wrappedNamedModuleDefn {}
+    | path {}
+wrappedNamedModuleDefn :
+    | structOrBegin moduleDefnsOrExprPossiblyEmpty END {}
+structOrBegin :
+    | STRUCT {}
+    | BEGIN {}
+openDecl :
+    | OPEN path {}
+    | OPEN TYPE appType {}
 fileNamespaceImplList :
     | fileNamespaceImpl fileNamespaceImplList {}
     | fileNamespaceImpl {}
@@ -14,6 +270,76 @@ namespaceIntro :
 deprecated_opt_equals :
     | EQUALS {}
     | (*empty*) {}
-fileModuleImpl :
-    | opt_attributes opt_access moduleIntro moduleDefnsOrExprPossiblyEmptyOrBlock {}
-    | moduleDefnsOrExprPossiblyEmptyOrBlock {}
+%%
+%left YIELD YIELD_BANG
+%left BINDER
+%left DOWNCAST MODULE NAMESPACE UPCAST
+%left BEGIN DO DONE DOWNTO END OASSERT
+%left DO_BANG EXCEPTION FINALLY FOR FUN FUNCTION IF IN
+%left MATCH MATCH_BANG OF OLAZY
+%left REC TO TRY TYPE
+%left WHILE WITH
+%left COLON
+%left SEMICOLON_SEMICOLON
+%left RBRACE_COMING_SOON RBRACK
+%left STRUCT
+%left GLOBAL INTERNAL PRIVATE PUBLIC
+%left MODULE_COMING_SOON MODULE_IS_HERE TYPE_COMING_SOON TYPE_IS_HERE
+%left OLET
+%left OBINDER
+%left OAND_BANG
+%left ODO
+%left ODO_BANG
+%left OFUNCTION
+%left OFUN
+%left OBLOCKBEGIN
+%left OEND
+%left ODECLEND
+%left ORIGHT_BLOCK_END
+%left OBLOCKEND OBLOCKEND_COMING_SOON OBLOCKEND_IS_HERE
+%left FIXED
+%left EOF
+%left implementationFile
+%left ident
+%left typ
+%left atomicPatterns
+%left declExpr
+%left minusExpr
+%left appExpr
+%left argExpr
+%left declExprBlock
+%left headBindingPattern
+%left atomicExprAfterType
+%left typedSequentialExprBlock
+%left atomicExpr
+%left exconDefn
+%left exconCore
+%left moduleDefnsOrExprPossiblyEmptyOrBlock
+%left path
+%nonassoc RPAREN RPAREN_COMING_SOON RPAREN_IS_HERE
+%right OBLOCKSEP SEMICOLON
+%nonassoc INT32
+%nonassoc LPAREN
+%right RARROW
+%nonassoc IDENT LBRACK
+%nonassoc LET NEW
+%nonassoc OPEN
+%right LARROW
+%right COLON_EQUALS
+%left DOT_DOT
+%left BAR_BAR JOIN_IN OR
+%left AND
+%left AND_BANG
+%left AMP AMP_AMP
+%left COLON_GREATER COLON_QMARK_GREATER
+%left DOLLAR EQUALS GREATER INFIX_AMP_OP INFIX_BAR_OP INFIX_COMPARE_OP LESS
+%right INFIX_AT_HAT_OP
+%right COLON_COLON
+%left COLON_QMARK
+%left ADJACENT_PREFIX_OP MINUS PLUS_MINUS_OP
+%left INFIX_STAR_DIV_MOD_OP PERCENT_OP STAR
+%right INFIX_STAR_STAR_OP
+%left ASSERT LAZY
+%left DOT
+%left HIGH_PRECEDENCE_BRACK_APP
+%left HIGH_PRECEDENCE_PAREN_APP

@@ -16,155 +16,273 @@ When lightweight syntax is disabled, whitespace can include tab characters:
 
 ### A.2.1 Program Format
 
-hashDirective :
-
-```fsharp
-hashDirective :
-    | HASH IDENT hashDirectiveArgs {}
-hashDirectiveArgs :
-    | (*empty*) {}
-    | hashDirectiveArgs hashDirectiveArg {}
-hashDirectiveArg :
-    | STRING {}
-    | KEYWORD_STRING {}
-```
-
-implementationFile :
-
-```fsharp
-
-
-```
-
-interaction :
-
-```fsharp
-interaction :
-    | interactiveItemsTerminator {}
-    | SEMICOLON {}
-    | OBLOCKSEP {}
-interactiveItemsTerminator :
-    | interactiveTerminator {}
-    | moduleDefn+ interactiveSeparator* interactiveItemsTerminator {}
-    | aaDeclExpr interactiveSeparator* interactiveItemsTerminator {}
-    | hashDirective interactiveSeparator* interactiveItemsTerminator {}
-moduleDefn+ :
-    | moduleDefn {}
-    | moduleDefn moduleDefn+ {}
-aaDeclExpr :
-    | attributes? access? declExpr {}
-interactiveSeparator+ :
-    | interactiveSeparator {}
-    | interactiveSeparator interactiveSeparator+ {}
-interactiveSeparator :
-    | SEMICOLON {}
-    | OBLOCKSEP {}
-interactiveTerminator :
-    | SEMICOLON_SEMICOLON {}
-    | EOF {}
-
-```
-
-typedSequentialExprEOF :
-
-```fsharp
-typedSequentialExprEOF :
-    | typedSequentialExpr EOF {}
-typedSequentialExpr :
-    | sequentialExpr COLON typeWithTypeConstraints {}
-    | sequentialExpr {}
-sequentialExpr :
-    | declExpr seps sequentialExpr {}
-    | declExpr seps? {}
-    | declExpr THEN sequentialExpr {}
-    | declExpr OTHEN OBLOCKBEGIN typedSequentialExpr OBLOCKEND {}
-    | hardwhiteLetBindings {}
-seps :
-    | OBLOCKSEP {}
-    | SEMICOLON {}
-    | OBLOCKSEP SEMICOLON {}
-    | SEMICOLON OBLOCKSEP {}
-```
-
-typEOF :
-
-```fsharp
-typEOF :
-    | typ EOF {}
-typ :
-    | tupleType RARROW typ {}
-    | tupleType {}
-```
-
-```fsharp
-*implementation-file* :
-*namespace-decl-group* ... *namespace-decl-group*
-*named-module*
-*anonynmous-module*
-
-
-*signature-file*:
-*namespace-decl-group-signature* ... *namespace-decl-group-signature*
-*anonynmous-module-signature*
-*named-module-signature*
-
-*named-module* : **module** *long-ident* *module-elems*
-
-*anonymous-module* : *module-elems*
-
-*named-module-signature* : **module** *long-ident* *module-signature-elements*
-
-*anonymous-module-signature* : *module-signature-elements*
-
-*script-fragment* : *module-elems*
-
-```
-
 #### A.2.1.1 Namespaces and Modules
 
 ```fsharp
-*namespace-decl-group* :
-namespace *long-ident* *module-elems*
-namespace **global** *module-elems*
-
-*module-defn* : 
-*attributes_opt* module *access_opt* *ident* = **begin_opt** *module-defn-body* **end_opt**
-
-*module-defn-body* : **begin** *module-elems_opt* **end**
-
-*module-elem* :
-*module-function-or-value-defn*
-*type-defns*
-*exception-defn*
-*module-defn*
-*module-abbrev*
-*import-decl*
-*compiler-directive-decl*
-
-*module-function-or-value-defn* :
-*attributes_opt* **let** *function-defn*
-*attributes_opt* **let** *value-defn*
-*attributes_opt* **let** **rec***_opt* *function-or-value-defns*
-*attributes_opt* **do** *expr*
-
-*import-decl* : **open** *long-ident*
-
-*module-abbrev* : *module ident* = *long-ident*
-
-*compiler-directive-decl* : **#** *ident* *string* ... *string*
-
-*module-elems* : *module-elem* ... *module-elem*
-
-*access* :
-private
-internal
-public
+implementationFile :
+    | fileNamespaceImpls EOF {}
+fileNamespaceImpls :
+    | fileModuleImpl {}
+    | fileModuleImpl fileNamespaceImplList {}
+fileModuleImpl :
+    | attributes? access? moduleIntro moduleDefnsOrExprPossiblyEmptyOrBlock {}
+    | moduleDefnsOrExprPossiblyEmptyOrBlock {}
+attributes? :
+    | attributes {}
+    | (*empty*) {}
+access? :
+    | (*empty*) {}
+    | access {}
+access :
+    | private {}
+    | public {}
+    | internal {}
+moduleIntro :
+    | module attributes? access? rec? path {}
+rec? :
+    | rec {}
+    | (*empty*) {}
+path :
+    | global {}
+    | IDENT {}
+    | path "." IDENT {}
+moduleDefnsOrExprPossiblyEmptyOrBlock :
+    | OBLOCKBEGIN moduleDefnsOrExprPossiblyEmpty OBLOCKEND OBLOCKSEP? {}
+    | moduleDefnsOrExprPossiblyEmpty {}
+moduleDefnsOrExprPossiblyEmpty :
+    | moduleDefnsOrExpr {}
+    | (*empty*) {}
+moduleDefnsOrExpr :
+    | attributes? access? declExpr topSeparator+ moduleDefnsOrExpr {}
+    | attributes? access? declExpr topSeparator+ {}
+    | attributes? access? declExpr {}
+    | moduleDefns {}
+declExpr :
+    | defnBindings in typedSequentialExpr {}
+    | hardwhiteLetBindings typedSequentialExprBlock {}
+    | hardwhiteLetBindings OBLOCKSEP typedSequentialExprBlock {}
+    | hardwhiteDoBinding {}
+    | anonMatchingExpr {}
+    | anonLambdaExpr {}
+    | match typedSequentialExpr withClauses {}
+    | "match!" typedSequentialExpr withClauses {}
+    | try typedSequentialExprBlockR withClauses {}
+    | try typedSequentialExprBlockR finally typedSequentialExprBlock {}
+    | if declExpr ifExprCases {}
+    | lazy declExpr {}
+    | assert declExpr {}
+    | assert {}
+    | OLAZY declExprBlock {}
+    | OASSERT declExprBlock {}
+    | OASSERT {}
+    | while declExpr doToken typedSequentialExprBlock doneDeclEnd {}
+    | for forLoopBinder doToken typedSequentialExprBlock doneDeclEnd {}
+    | for forLoopBinder OBLOCKSEP? arrowThenExprR {}
+    | for forLoopRange doToken typedSequentialExprBlock doneDeclEnd {}
+    | yield declExpr {}
+    | "yield!" declExpr {}
+    | BINDER headBindingPattern "=" typedSequentialExprBlock in OBLOCKSEP? moreBinders typedSequentialExprBlock {}
+    | OBINDER headBindingPattern "=" typedSequentialExprBlock ODECLEND OBLOCKSEP? moreBinders typedSequentialExprBlock {}
+    | "do!" typedSequentialExpr in OBLOCKSEP? typedSequentialExprBlock {}
+    | ODO_BANG typedSequentialExprBlock ODECLEND {}
+    | fixed declExpr {}
+    | "->" typedSequentialExprBlockR {}
+    | declExpr ":?" typ {}
+    | declExpr ":>" typ {}
+    | declExpr ":?>" typ {}
+    | declExpr ":=" declExpr {}
+    | minusExpr "<-" declExprBlock {}
+    | tupleExpr {}
+    | declExpr JOIN_IN declExpr {}
+    | declExpr "||" declExpr {}
+    | declExpr ["|"] declExpr {}
+    | declExpr or declExpr {}
+    | declExpr "&" declExpr {}
+    | declExpr "&&" declExpr {}
+    | declExpr ["&"] declExpr {}
+    | declExpr "=" declExpr {}
+    | declExpr INFIX_COMPARE_OP declExpr {}
+    | declExpr "$" declExpr {}
+    | declExpr "<" declExpr {}
+    | declExpr ">" declExpr {}
+    | declExpr ["@""^"] declExpr {}
+    | declExpr ["%" "%%"] declExpr {}
+    | declExpr "::" declExpr {}
+    | declExpr ["-" "+"] declExpr {}
+    | declExpr "-" declExpr {}
+    | declExpr "*" declExpr {}
+    | declExpr ["*" "/" "%"] declExpr {}
+    | declExpr ["**"] declExpr {}
+    | declExpr ".." declExpr {}
+    | declExpr ".." {}
+    | ".." declExpr {}
+    | "*" {}
+    | minusExpr {}
+defnBindings :
+    | let rec? localBindings {}
+    | cPrototype {}
+typedSequentialExpr :
+    | sequentialExpr ":" typeWithTypeConstraints {}
+    | sequentialExpr {}
+hardwhiteLetBindings :
+    | OLET rec? localBindings ODECLEND {}
+typedSequentialExprBlock :
+    | OBLOCKBEGIN typedSequentialExpr OBLOCKEND {}
+    | typedSequentialExpr {}
+hardwhiteDoBinding :
+    | ODO typedSequentialExprBlock ODECLEND {}
+anonMatchingExpr :
+    | function withPatternClauses {}
+    | OFUNCTION withPatternClauses OEND {}
+anonLambdaExpr :
+    | fun atomicPatterns "->" typedSequentialExprBlock {}
+    | OFUN atomicPatterns "->" typedSequentialExprBlockR OEND {}
+    | OFUN atomicPatterns "->" ORIGHT_BLOCK_END OEND {}
+typedSequentialExprBlockR :
+    | typedSequentialExpr ORIGHT_BLOCK_END {}
+    | typedSequentialExpr {}
+declExprBlock :
+    | OBLOCKBEGIN typedSequentialExpr OBLOCKEND {}
+    | declExpr {}
+doToken :
+    | do {}
+    | ODO {}
+doneDeclEnd :
+    | done {}
+    | ODECLEND {}
+forLoopBinder :
+    | parenPattern in declExpr {}
+OBLOCKSEP? :
+    | OBLOCKSEP {}
+    | (*empty*) {}
+arrowThenExprR :
+    | "->" typedSequentialExprBlockR {}
+forLoopRange :
+    | parenPattern "=" declExpr forLoopDirection declExpr {}
+forLoopDirection :
+    | to {}
+    | downto {}
+moreBinders :
+    | "and!" headBindingPattern "=" typedSequentialExprBlock in moreBinders {}
+    | OAND_BANG headBindingPattern "=" typedSequentialExprBlock ODECLEND OBLOCKSEP? moreBinders {}
+    | (*empty*) {}
+minusExpr :
+    | ["@" "^"] minusExpr {}
+    | "-" minusExpr {}
+    | ["-" "+"] minusExpr {}
+    | ADJACENT_PREFIX_OP minusExpr {}
+    | ["%" "%%"] minusExpr {}
+    | "&" minusExpr {}
+    | "&&" minusExpr {}
+    | new atomTypeNonAtomicDeprecated HIGH_PRECEDENCE_APP? atomicExprAfterType "." atomicExprQualification {}
+    | new atomTypeNonAtomicDeprecated HIGH_PRECEDENCE_APP? atomicExprAfterType {}
+    | upcast minusExpr {}
+    | downcast minusExpr {}
+    | appExpr {}
+HIGH_PRECEDENCE_APP? :
+    | HIGH_PRECEDENCE_BRACK_APP {}
+    | HIGH_PRECEDENCE_PAREN_APP {}
+    | (*empty*) {}
+atomicExprQualification :
+    | identOrOp {}
+    | global {}
+    | (*empty*) {}
+    | "(" "::" ")" "." INT32 {}
+    | "(" typedSequentialExpr ")" {}
+    | "[" typedSequentialExpr "]" {}
+appExpr :
+    | appExpr argExpr {}
+    | atomicExpr {}
+argExpr :
+    | ADJACENT_PREFIX_OP atomicExpr {}
+    | atomicExpr {}
+topSeparator+ :
+    | topSeparator {}
+    | topSeparator topSeparator+ {}
+topSeparator :
+    | ";" {}
+    | ";;" {}
+    | OBLOCKSEP {}
+moduleDefns :
+    | moduleDefnOrDirective moduleDefns {}
+    | moduleDefnOrDirective topSeparator+ moduleDefnsOrExpr {}
+    | moduleDefnOrDirective {}
+    | moduleDefnOrDirective topSeparator+ {}
+moduleDefnOrDirective :
+    | moduleDefn {}
+    | hashDirective {}
+moduleDefn :
+    | attributes? access? defnBindings {}
+    | attributes? access? hardwhiteLetBindings {}
+    | attributes? access? doBinding {}
+    | attributes? access? type tyconDefn tyconDefnList {}
+    | attributes? access? exconDefn {}
+    | attributes? access? moduleIntro "=" namedModuleDefnBlock {}
+    | openDecl {}
+doBinding :
+    | do typedSequentialExprBlock {}
+tyconDefnList :
+    | and tyconDefn tyconDefnList {}
+    | (*empty*) {}
+exconDefn :
+    | exconCore classDefn? {}
+exconCore :
+    | exception attributes? access? exconIntro exconRepr {}
+exconIntro :
+    | IDENT {}
+    | IDENT of unionCaseRepr {}
+exconRepr :
+    | (*empty*) {}
+    | "=" path {}
+classDefn? :
+    | with classDefnBlock declEnd {}
+    | (*empty*) {}
+classDefnBlock :
+    | OBLOCKBEGIN classDefnMembers OBLOCKEND {}
+    | classDefnMembers {}
+classDefnMembers :
+    | classDefnMembersAtLeastOne {}
+    | (*empty*) {}
+classDefnMembersAtLeastOne :
+    | classDefnMember seps? classDefnMembers {}
+seps? :
+    | seps {}
+    | (*empty*) {}
+seps :
+    | OBLOCKSEP {}
+    | ";" {}
+    | OBLOCKSEP ";" {}
+    | ";" OBLOCKSEP {}
+declEnd :
+    | ODECLEND {}
+    | OEND {}
+    | end {}
+namedModuleDefnBlock :
+    | OBLOCKBEGIN wrappedNamedModuleDefn OBLOCKEND {}
+    | OBLOCKBEGIN moduleDefnsOrExpr OBLOCKEND {}
+    | wrappedNamedModuleDefn {}
+    | path {}
+wrappedNamedModuleDefn :
+    | structOrBegin moduleDefnsOrExprPossiblyEmpty end {}
+structOrBegin :
+    | struct {}
+    | begin {}
+openDecl :
+    | open path {}
+    | open type appType {}
+fileNamespaceImplList :
+    | fileNamespaceImpl fileNamespaceImplList {}
+    | fileNamespaceImpl {}
+fileNamespaceImpl :
+    | namespaceIntro "="? fileModuleImpl {}
+namespaceIntro :
+    | namespace rec? path {}
+"="? :
+    | "=" {}
+    | (*empty*) {}
 ```
 
 #### A.2.1.2 Namespace and Module Signatures
-
-
-
 
 ```fsharp
 *namespace-decl-group-signature* : 
@@ -240,66 +358,168 @@ public
 ### A.2.2 Types and Type Constraints
 
 ```fsharp
-*type* :
-( *type* )
-*type* -> *type*
-*type* * ... * *type*
-*typar*
-*long-ident*
-*long-ident* < *type-args* >
-*long-ident*< >
-*type* *long-ident*
-*type*[ , ... , ]
-*type* *typar-defns*
-*typar* :> *type*
-#*type*
+typ :
+    | tupleType "->" typ {}
+    | tupleType {}
+tupleType :
+    | appType "*" tupleOrQuotTypeElements {}
+    | ["*" "/" "%"] tupleOrQuotTypeElements {}
+    | appType ["*" "/" "%"] tupleOrQuotTypeElements {}
+    | appType {}
+appType :
+    | appType arrayTypeSuffix {}
+    | appType HIGH_PRECEDENCE_BRACK_APP arrayTypeSuffix {}
+    | appType appTypeConPower {}
+    | "(" appTypePrefixArguments ")" appTypeConPower {}
+    | powerType {}
+    | typar ":>" typ {}
+    | "_" ":>" typ {}
+arrayTypeSuffix :
+    | "[" "]" {}
+    | "[" "," "]" {}
+    | "[" "," "," "]" {}
+    | "[" "," "," "," "]" {}
+appTypeConPower :
+    | appTypeCon ["@" "^"] atomicRationalConstant {}
+    | appTypeCon {}
+appTypeCon :
+    | path {}
+    | typar {}
+path :
+    | global {}
+    | IDENT {}
+    | path "." IDENT {}
+typar :
+    | "'" IDENT {}
+    | ["@" "^"] IDENT {}
+atomicRationalConstant :
+    | atomicUnsignedRationalConstant {}
+    | "-" atomicUnsignedRationalConstant {}
+atomicUnsignedRationalConstant :
+    | INT32 {}
+    | "(" rationalConstant ")" {}
+rationalConstant :
+    | INT32 ["*" "/" "%"] INT32 {}
+    | "-" INT32 ["*" "/" "%"] INT32 {}
+    | INT32 {}
+    | "-" INT32 {}
+appTypePrefixArguments :
+    | typeArgActual "," typeArgActual typeArgListElements {}
+typeArgActual :
+    | typ {}
+    | typ "=" typ {}
+    | typ "=" {}
+typeArgListElements :
+    | typeArgListElements "," typeArgActual {}
+    | typeArgListElements "," {}
+    | (*empty*) {}
+powerType :
+    | atomTypeOrAnonRecdType {}
+    | atomTypeOrAnonRecdType ["@" "^"] atomicRationalConstant {}
+atomTypeOrAnonRecdType :
+    | atomType {}
+    | anonRecdType {}
+atomType :
+    | "#" atomType {}
+    | appTypeConPower {}
+    | "_" {}
+    | "(" typ ")" {}
+    | struct "(" appType "*" tupleOrQuotTypeElements ")" {}
+    | rawConstant {}
+    | null {}
+    | const atomicExpr {}
+    | FALSE {}
+    | TRUE {}
+    | appTypeCon typeArgsNoHpaDeprecated {}
+    | atomType "." path {}
+    | atomType "." path typeArgsNoHpaDeprecated {}
+tupleOrQuotTypeElements :
+    | appType "*" tupleOrQuotTypeElements {}
+    | appType ["*" "/" "%"] tupleOrQuotTypeElements {}
+    | appType {}
+rawConstant :
+    | INT8 {}
+    | UINT8 {}
+    | INT16 {}
+    | UINT16 {}
+    | INT32 {}
+    | UINT32 {}
+    | INT64 {}
+    | UINT64 {}
+    | NATIVEINT {}
+    | UNATIVEINT {}
+    | IEEE32 {}
+    | IEEE64 {}
+    | CHAR {}
+    | DECIMAL {}
+    | BIGNUM {}
+    | STRING {}
+    | KEYWORD_STRING {}
+    | BYTEARRAY {}
+typeArgsNoHpaDeprecated :
+    | typeArgsActual {}
+    | HIGH_PRECEDENCE_TYAPP typeArgsActual {}
+typeArgsActual :
+    | "<" typeArgActualOrDummyIfEmpty "," typeArgActualOrDummyIfEmpty typeArgListElements ">" {}
+    | "<" typeArgActual ">" {}
+    | "<" ">" {}
+typeArgActualOrDummyIfEmpty :
+    | typeArgActual {}
+    | (*empty*) {}
+anonRecdType :
+    | struct braceBarFieldDeclListCore {}
+    | braceBarFieldDeclListCore {}
+braceBarFieldDeclListCore :
+    | "{|" recdFieldDeclList "|}" {}
+recdFieldDeclList :
+    | recdFieldDecl seps recdFieldDeclList {}
+    | recdFieldDecl seps? {}
+recdFieldDecl :
+    | attributes? fieldDecl {}
+attributes? :
+    | attributes {}
+    | (*empty*) {}
+fieldDecl :
+    | mutable? access? IDENT ":" typ {}
+mutable? :
+    | mutable {}
+    | (*empty*) {}
+access? :
+    | (*empty*) {}
+    | access {}
+access :
+    | private {}
+    | public {}
+    | internal {}
+seps :
+    | OBLOCKSEP {}
+    | ";" {}
+    | OBLOCKSEP ";" {}
+    | ";" OBLOCKSEP {}
+seps? :
+    | seps {}
+    | (*empty*) {}
+```
 
-*type-args* := *type-arg* , ..., *type-arg*
-
-*type-arg* :=
-*type*
-*measure*
-*static-parameter*
-
-*atomic-type* :
-
-*type* : one of
-#*type* *typar* ( *type* ) *long-ident* *long-ident* < *types* > )
-
-*typar* :
-*_*
-'*ident*
-^*ident*
-
-*constraint* :
-*typar* :> *type*
-*typar* : **null**
-
-*static-typars* : ( *member-sig* )
-
-*typar* : ( **new** : **unit** -> 'T)
-
-*typar* : **struct**
-
-*typar* : **not** **struct**
-
-*typar* : **enum** < *type* >
-
-*typar* : **unmanaged**
-
-*typar* : **delegate** < *type*, *type* >
-
-*typar-defn* : *attributes*_opt *typar*
-
-*typar-defns* : < *typar-defn* , ..., *typar-defn* *typar-constraints*_opt >
-
-*typar-constraints* : **when** *constraint* **and** ... **and** *constraint*
-
-*static-typars* :
-
-^*ident*
-
-(^*ident* **or** ... **or** ^*ident* )
+```fsharp
+typeConstraints :
+    | typeConstraints and typeConstraint {}
+    | typeConstraint {}
+typeConstraint :
+    | default typar ":" typ {}
+    | typar ":>" typ {}
+    | typar ":" struct {}
+    | typar ":" IDENT struct {}
+    | typar ":" null {}
+    | typar ":" "(" classMemberSpfn ")" {}
+    | "(" typeAlts ")" ":" "(" classMemberSpfn ")" {}
+    | typar ":" delegate typeArgsNoHpaDeprecated {}
+    | typar ":" IDENT typeArgsNoHpaDeprecated {}
+    | typar ":" IDENT {}
+    | appType {}
+typeAlts :
+    | typeAlts or appType {}
+    | appType {}
 ```
 
 #### A.2.2.1 Equality and Comparison Constraints
@@ -360,7 +580,7 @@ const *expr*
 **downcast** *expr*
 ```
 
-In the following four expression forms, the in token is optional if `expr` appears on a subsequent line and is aligned with the `let` token.
+In the following four expression forms, the `in` token is optional if `expr` appears on a subsequent line and is aligned with the `let` token.
 
 ```fsharp
 let *function-defn* in *expr*
@@ -1096,6 +1316,7 @@ _
 ```
 
 ### A.2.7 Custom Attributes and Reflection
+
 ```fsharp
 *attribute* : *attribute-target*:*_opt* *object-construction*
 

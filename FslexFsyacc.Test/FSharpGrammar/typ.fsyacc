@@ -1,0 +1,232 @@
+﻿%{
+#nowarn "1182"  // generated code has lots of unused "parseState"
+open System
+open Internal.Utilities
+open Internal.Utilities.Text.Parsing
+open Internal.Utilities.Library
+open Internal.Utilities.Library.Extras
+open FSharp.Compiler
+open FSharp.Compiler.AbstractIL
+open FSharp.Compiler.AbstractIL
+open FSharp.Compiler.DiagnosticsLogger
+open FSharp.Compiler.Features
+open FSharp.Compiler.ParseHelpers
+open FSharp.Compiler.Syntax
+open FSharp.Compiler.SyntaxTrivia
+open FSharp.Compiler.Syntax.PrettyNaming
+open FSharp.Compiler.SyntaxTreeOps
+open FSharp.Compiler.SyntaxTreeOps
+open FSharp.Compiler.Text
+open FSharp.Compiler.Text.Position
+open FSharp.Compiler.Text.Range
+open FSharp.Compiler.Xml
+// This function is called by the generated parser code. Returning initiates error recovery
+// It must be called precisely "parse_error_rich"
+let parse_error_rich = Some (fun (ctxt: ParseErrorContext<_>) ->
+    errorR(SyntaxError(box ctxt, ctxt.ParseState.LexBuffer.LexemeRange)))
+%}
+typ :
+    | tupleType RARROW typ {}
+    | tupleType {}
+tupleType :
+    | appType STAR tupleOrQuotTypeElements {}
+    | INFIX_STAR_DIV_MOD_OP tupleOrQuotTypeElements {}
+    | appType INFIX_STAR_DIV_MOD_OP tupleOrQuotTypeElements {}
+    | appType {}
+appType :
+    | appType arrayTypeSuffix {}
+    | appType HIGH_PRECEDENCE_BRACK_APP arrayTypeSuffix {}
+    | appType appTypeConPower {}
+    | LPAREN appTypePrefixArguments RPAREN appTypeConPower {}
+    | powerType {}
+    | typar COLON_GREATER typ {}
+    | UNDERSCORE COLON_GREATER typ {}
+arrayTypeSuffix :
+    | LBRACK RBRACK {}
+    | LBRACK COMMA RBRACK {}
+    | LBRACK COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA RBRACK {}
+appTypeConPower :
+    | appTypeCon INFIX_AT_HAT_OP atomicRationalConstant {}
+    | appTypeCon {}
+appTypeCon :
+    | path {}
+    | typar {}
+path :
+    | GLOBAL {}
+    | IDENT {}
+    | path DOT IDENT {}
+typar :
+    | QUOTE IDENT {}
+    | INFIX_AT_HAT_OP IDENT {}
+atomicRationalConstant :
+    | atomicUnsignedRationalConstant {}
+    | MINUS atomicUnsignedRationalConstant {}
+atomicUnsignedRationalConstant :
+    | INT32 {}
+    | LPAREN rationalConstant RPAREN {}
+rationalConstant :
+    | INT32 INFIX_STAR_DIV_MOD_OP INT32 {}
+    | MINUS INT32 INFIX_STAR_DIV_MOD_OP INT32 {}
+    | INT32 {}
+    | MINUS INT32 {}
+appTypePrefixArguments :
+    | typeArgActual COMMA typeArgActual typeArgListElements {}
+typeArgActual :
+    | typ {}
+    | typ EQUALS typ {}
+    | typ EQUALS {}
+typeArgListElements :
+    | typeArgListElements COMMA typeArgActual {}
+    | typeArgListElements COMMA {}
+    | (*empty*) {}
+powerType :
+    | atomTypeOrAnonRecdType {}
+    | atomTypeOrAnonRecdType INFIX_AT_HAT_OP atomicRationalConstant {}
+atomTypeOrAnonRecdType :
+    | atomType {}
+    | anonRecdType {}
+atomType :
+    | HASH atomType {}
+    | appTypeConPower {}
+    | UNDERSCORE {}
+    | LPAREN typ RPAREN {}
+    | STRUCT LPAREN appType STAR tupleOrQuotTypeElements RPAREN {}
+    | rawConstant {}
+    | NULL {}
+    | CONST atomicExpr {}
+    | FALSE {}
+    | TRUE {}
+    | appTypeCon typeArgsNoHpaDeprecated {}
+    | atomType DOT path {}
+    | atomType DOT path typeArgsNoHpaDeprecated {}
+tupleOrQuotTypeElements :
+    | appType STAR tupleOrQuotTypeElements {}
+    | appType INFIX_STAR_DIV_MOD_OP tupleOrQuotTypeElements {}
+    | appType {}
+rawConstant :
+    | INT8 {}
+    | UINT8 {}
+    | INT16 {}
+    | UINT16 {}
+    | INT32 {}
+    | UINT32 {}
+    | INT64 {}
+    | UINT64 {}
+    | NATIVEINT {}
+    | UNATIVEINT {}
+    | IEEE32 {}
+    | IEEE64 {}
+    | CHAR {}
+    | DECIMAL {}
+    | BIGNUM {}
+    | STRING {}
+    | KEYWORD_STRING {}
+    | BYTEARRAY {}
+typeArgsNoHpaDeprecated :
+    | typeArgsActual {}
+    | HIGH_PRECEDENCE_TYAPP typeArgsActual {}
+typeArgsActual :
+    | LESS typeArgActualOrDummyIfEmpty COMMA typeArgActualOrDummyIfEmpty typeArgListElements GREATER {}
+    | LESS typeArgActual GREATER {}
+    | LESS GREATER {}
+typeArgActualOrDummyIfEmpty :
+    | typeArgActual {}
+    | (*empty*) {}
+anonRecdType :
+    | STRUCT braceBarFieldDeclListCore {}
+    | braceBarFieldDeclListCore {}
+braceBarFieldDeclListCore :
+    | LBRACE_BAR recdFieldDeclList BAR_RBRACE {}
+recdFieldDeclList :
+    | recdFieldDecl seps recdFieldDeclList {}
+    | recdFieldDecl opt_seps {}
+recdFieldDecl :
+    | opt_attributes fieldDecl {}
+opt_attributes :
+    | attributes {}
+    | (*empty*) {}
+fieldDecl :
+    | opt_mutable opt_access IDENT COLON typ {}
+opt_mutable :
+    | MUTABLE {}
+    | (*empty*) {}
+opt_access :
+    | (*empty*) {}
+    | access {}
+access :
+    | PRIVATE {}
+    | PUBLIC {}
+    | INTERNAL {}
+seps :
+    | OBLOCKSEP {}
+    | SEMICOLON {}
+    | OBLOCKSEP SEMICOLON {}
+    | SEMICOLON OBLOCKSEP {}
+opt_seps :
+    | seps {}
+    | (*empty*) {}
+%%
+%left MUTABLE
+%left CONST
+%left HASH QUOTE
+%left COLON
+%left LBRACE_BAR
+%left BAR_RBRACE
+%left RBRACE_COMING_SOON RBRACK
+%left STRUCT
+%left GLOBAL INTERNAL PRIVATE PUBLIC
+%left MODULE_COMING_SOON TYPE_COMING_SOON
+%left OBLOCKEND_COMING_SOON
+%left EOF
+%left ident
+%left typ
+%left atomicExpr
+%left path
+%left typeArgsActual
+%left typeArgsNoHpaDeprecated
+%left typar
+%nonassoc RPAREN RPAREN_COMING_SOON RPAREN_IS_HERE
+%right OBLOCKSEP SEMICOLON
+%nonassoc BIGNUM BYTEARRAY CHAR DECIMAL IEEE32 IEEE64 INT16 INT32 INT64 INT8 KEYWORD_STRING NATIVEINT STRING UINT16 UINT32 UINT64 UINT8 UNATIVEINT
+%nonassoc LPAREN
+%nonassoc FALSE NULL TRUE UNDERSCORE
+%right RARROW
+%nonassoc IDENT LBRACK
+%left COMMA
+%left COLON_GREATER
+%left EQUALS GREATER LESS
+%right INFIX_AT_HAT_OP
+%left MINUS
+%left INFIX_STAR_DIV_MOD_OP STAR
+%left DOT
+%left HIGH_PRECEDENCE_BRACK_APP
+%left HIGH_PRECEDENCE_TYAPP

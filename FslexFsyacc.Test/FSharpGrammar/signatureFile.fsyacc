@@ -1,4 +1,30 @@
-﻿%{%}
+﻿%{
+#nowarn "1182"  // generated code has lots of unused "parseState"
+open System
+open Internal.Utilities
+open Internal.Utilities.Text.Parsing
+open Internal.Utilities.Library
+open Internal.Utilities.Library.Extras
+open FSharp.Compiler
+open FSharp.Compiler.AbstractIL
+open FSharp.Compiler.AbstractIL
+open FSharp.Compiler.DiagnosticsLogger
+open FSharp.Compiler.Features
+open FSharp.Compiler.ParseHelpers
+open FSharp.Compiler.Syntax
+open FSharp.Compiler.SyntaxTrivia
+open FSharp.Compiler.Syntax.PrettyNaming
+open FSharp.Compiler.SyntaxTreeOps
+open FSharp.Compiler.SyntaxTreeOps
+open FSharp.Compiler.Text
+open FSharp.Compiler.Text.Position
+open FSharp.Compiler.Text.Range
+open FSharp.Compiler.Xml
+// This function is called by the generated parser code. Returning initiates error recovery
+// It must be called precisely "parse_error_rich"
+let parse_error_rich = Some (fun (ctxt: ParseErrorContext<_>) ->
+    errorR(SyntaxError(box ctxt, ctxt.ParseState.LexBuffer.LexemeRange)))
+%}
 signatureFile :
     | fileNamespaceSpecs EOF {}
 fileNamespaceSpecs :
@@ -220,3 +246,56 @@ namespaceIntro :
 deprecated_opt_equals :
     | EQUALS {}
     | (*empty*) {}
+%%
+%left FUNKY_OPERATOR_NAME
+%left LQUOTE RQUOTE
+%left DELEGATE MODULE NAMESPACE
+%left BEGIN END
+%left EXCEPTION
+%left MUTABLE OF
+%left INLINE REC TYPE VAL
+%left HASH LPAREN_STAR_RPAREN WITH
+%left COLON
+%left SEMICOLON_SEMICOLON
+%left RBRACE_COMING_SOON
+%left SIG
+%left GLOBAL INTERNAL PRIVATE PUBLIC
+%left MODULE_COMING_SOON MODULE_IS_HERE TYPE_COMING_SOON TYPE_IS_HERE
+%left OBLOCKBEGIN
+%left OEND
+%left ODECLEND
+%left OBLOCKEND OBLOCKEND_COMING_SOON OBLOCKEND_IS_HERE
+%left EOF
+%left signatureFile
+%left ident
+%left typ
+%left tyconSpfnList
+%left declExpr
+%left tyconDefnOrSpfnSimpleRepr
+%left unionTypeRepr
+%left exconCore
+%left path
+%left typar
+%nonassoc RPAREN RPAREN_COMING_SOON RPAREN_IS_HERE
+%right WHEN
+%left BAR
+%right OBLOCKSEP SEMICOLON
+%nonassoc STRING
+%nonassoc LPAREN
+%nonassoc UNDERSCORE
+%nonassoc IDENT
+%nonassoc OPEN
+%right COLON_EQUALS
+%left COMMA
+%left DOT_DOT
+%left BAR_BAR OR
+%left AND
+%left AMP AMP_AMP
+%left DOLLAR EQUALS GREATER INFIX_AMP_OP INFIX_BAR_OP INFIX_COMPARE_OP LESS
+%right INFIX_AT_HAT_OP
+%left ADJACENT_PREFIX_OP MINUS PLUS_MINUS_OP
+%left INFIX_STAR_DIV_MOD_OP PERCENT_OP STAR
+%right INFIX_STAR_STAR_OP
+%left PREFIX_OP
+%left DOT QMARK
+%left HIGH_PRECEDENCE_TYAPP

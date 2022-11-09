@@ -118,3 +118,17 @@ let eliminateSymbol (symbol:string) (bodiesOfSymbol:string list list) (body:stri
                 ls
         )
     )
+
+/// 符号的孩子符号
+let getNodes (productions:list<string list>) =
+    productions
+    |> List.groupBy List.head
+    |> List.map(fun (lhs,rules) ->
+        let children =
+            rules
+            |> List.collect List.tail // prod's body
+            |> List.filter( (<>) lhs)
+            |> List.distinct
+        lhs,children
+    )
+    |> Map.ofList

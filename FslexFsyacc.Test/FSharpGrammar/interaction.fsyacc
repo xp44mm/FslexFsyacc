@@ -1,4 +1,30 @@
-﻿%{%}
+﻿%{
+#nowarn "1182"  // generated code has lots of unused "parseState"
+open System
+open Internal.Utilities
+open Internal.Utilities.Text.Parsing
+open Internal.Utilities.Library
+open Internal.Utilities.Library.Extras
+open FSharp.Compiler
+open FSharp.Compiler.AbstractIL
+open FSharp.Compiler.AbstractIL
+open FSharp.Compiler.DiagnosticsLogger
+open FSharp.Compiler.Features
+open FSharp.Compiler.ParseHelpers
+open FSharp.Compiler.Syntax
+open FSharp.Compiler.SyntaxTrivia
+open FSharp.Compiler.Syntax.PrettyNaming
+open FSharp.Compiler.SyntaxTreeOps
+open FSharp.Compiler.SyntaxTreeOps
+open FSharp.Compiler.Text
+open FSharp.Compiler.Text.Position
+open FSharp.Compiler.Text.Range
+open FSharp.Compiler.Xml
+// This function is called by the generated parser code. Returning initiates error recovery
+// It must be called precisely "parse_error_rich"
+let parse_error_rich = Some (fun (ctxt: ParseErrorContext<_>) ->
+    errorR(SyntaxError(box ctxt, ctxt.ParseState.LexBuffer.LexemeRange)))
+%}
 interaction :
     | interactiveItemsTerminator {}
     | SEMICOLON {}
@@ -35,3 +61,10 @@ interactiveSeparators :
 interactiveSeparator :
     | SEMICOLON {}
     | OBLOCKSEP {}
+%%
+%left SEMICOLON_SEMICOLON
+%left INTERNAL PRIVATE PUBLIC
+%left EOF
+%left interaction
+%left declExpr
+%right OBLOCKSEP SEMICOLON
