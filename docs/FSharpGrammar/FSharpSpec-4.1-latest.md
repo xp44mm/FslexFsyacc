@@ -1818,42 +1818,53 @@ The following table lists identifiers that are automatically replaced by express
 
 [TABLE]
 
-# Basic Grammar Elements
+# 4 Basic Grammar Elements
 
 This section defines grammar elements that are used repeatedly in later sections.
 
-## Operator Names
+## 4.1 Operator Names
 
-Several places in the grammar refer to an *ident-or-op* rather than an *ident*:
+Several places in the grammar refer to an `identOrOp` rather than an `IDENT`:
 
-```abnf
-*ident-or-op* :=
-
-| *ident*
-
-| ( *op-name* )
-
-| (*)
-
-*op-name* :=
-
-| *symbolic-op*
-
-| *range-op-name*
-
-| *active-pattern-op-name*
-
-*range-op-name* :=
-
-| ..
-
-| .. ..
-
-active-pattern-op-name* :=
-
-| | *ident* | ... | *ident* |
-
-| | *ident* | ... | *ident* | _ |
+```fsharp
+identOrOp :
+    | IDENT {}
+    | opName {}
+opName :
+    | "(" operatorName ")" {}
+    | "(*)" {}
+    | "(" activePatternCaseNames "|" ")" {}
+    | "(" activePatternCaseNames "|" "_" "|" ")" {}
+operatorName :
+    | ["!" "~"] {}
+    | ["**"] {}
+    | INFIX_COMPARE_OP {}
+    | ["@" "^"] {}
+    | ["|"] {}
+    | ["&"] {}
+    | ["-" "+"] {}
+    | ["*" "/" "%"] {}
+    | "$" {}
+    | ADJACENT_PREFIX_OP {}
+    | "-" {}
+    | "*" {}
+    | "=" {}
+    | or {}
+    | "<" {}
+    | ">" {}
+    | "?" {}
+    | "&" {}
+    | "&&" {}
+    | "||" {}
+    | ":=" {}
+    | FUNKY_OPERATOR_NAME {}
+    | ["%" "%%"] {}
+    | ".." {}
+    | ".." ".." {}
+    | ["<@" "<@@"] ["@>" "@@>"] {}
+activePatternCaseNames :
+    | "|" IDENT {}
+    | activePatternCaseNames "|" IDENT {}
 ```
 
 In operator definitions, the operator name is placed in parentheses. For example:
@@ -1862,13 +1873,13 @@ In operator definitions, the operator name is placed in parentheses. For example
 let (+++) x y = (x, y)
 ```
 
-This example defines the binary operator `+++`. The text `(+++)` is an *ident-or-op* that acts as an identifier with associated text `+++`. Likewise, for active pattern definitions (§7), the active pattern case names are placed in parentheses, as in the following example:
+This example defines the binary operator `+++`. The text `(+++)` is an `identOrOp` that acts as an identifier with associated text `+++`. Likewise, for active pattern definitions (§7), the active pattern case names are placed in parentheses, as in the following example:
 
 ```fsharp
 let (|A|B|C|) x = if x < 0 then A elif x = 0 then B else C
 ```
 
-Because an *ident-or-op* acts as an identifier, such names can be used in expressions. For example:
+Because an `identOrOp` acts as an identifier, such names can be used in expressions. For example:
 
 ```fsharp
 List.map ((+) 1) [ 1; 2; 3 ]
@@ -1940,7 +1951,7 @@ Symbolic operators and some symbolic keywords have a compiled name that is visib
 .. ..   op_RangeStep
 ```
 
-Compiled names for other symbolic operators are `op_N₁...N_(n)` where `N₁` to `N_(n)` are the names for the characters as shown in the table below. For example, the symbolic identifier `<*` has the compiled name `op_LessMultiply`:
+Compiled names for other symbolic operators are `op_N₁...N_n` where `N₁` to `N_n` are the names for the characters as shown in the table below. For example, the symbolic identifier `<*` has the compiled name `op_LessMultiply`:
 
 ```fsharp
 > Greater
@@ -1969,145 +1980,133 @@ Compiled names for other symbolic operators are `op_N₁...N_(n)` where `N₁` t
 ] RBrack
 ```
 
-## Long Identifiers
+## 4.2 Long Identifiers
 
-Long identifiers *long-ident* are sequences of identifiers that are separated by ‘.’ and optional whitespace. Long identifiers *long-ident-or-op* are long identifiers that may terminate with an operator name.
+Long identifiers `path` (`long-ident`) are sequences of identifiers that are separated by `.` and optional whitespace. Long identifiers `pathOp` (`long-ident-or-op`) are long identifiers that may terminate with an operator name.
 
-```abnf
-*long-ident* := *ident* '.' ... '.' *ident*
-
-*long-ident-or-op* :=
-
-| *long-ident* '.' *ident-or-op*
-
-| *ident-or-op*
+```fsharp
+// long-ident
+path :
+    | global {}
+    | IDENT {}
+    | path "." IDENT {}
+// long-ident-or-op
+pathOp :
+    | IDENT {}
+    | opName {}
+    | IDENT "." pathOp {}
 ```
 
-## Constants
+## 4.3 Constants
 
 The constants in the following table may be used in patterns and expressions. The individual lexical formats for the different constants are defined in §3.
 
-```abnf
-*const* :=
-
-| *sbyte*
-
-| *int16*
-
-| *int32*
-
-| *int64* -- 8, 16, 32 and 64-bit signed integers
-
-| *byte*
-
-| *uint16*
-
-| *uint32*
-
-| *int* -- 32-bit signed integer
-
-| *uint64* -- 8, 16, 32 and 64-bit unsigned integers
-
-| *ieee32* -- 32-bit number of type "float32"
-
-| *ieee64* -- 64-bit number of type "float"
-
-| *bignum* -- User or library-defined integral literal type
-
-| *char* -- Unicode character of type "char"
-
-| *string* -- String of type "string" (System.String)
-
-| *verbatim-string* -- String of type "string" (System.String)
-
-| *triple-quoted-string* -- String of type "string" (System.String)
-
-| *bytestring* -- String of type "byte[]"
-
-| *verbatim-bytearray* *--* String of type "byte[]"
-
-| *bytechar* -- Char of type "byte"
-
-| false | true -- Boolean constant of type "bool"
-
-| '(' ')' -- unit constant of type "unit"
+```fsharp
+// const :=
+rawConstant :
+    | INT8 {}
+    | UINT8 {}
+    | INT16 {}
+    | UINT16 {}
+    | INT32 {}
+    | UINT32 {}
+    | INT64 {}
+    | UINT64 {}
+    | NATIVEINT {}
+    | UNATIVEINT {}
+    | IEEE32 {}
+    | IEEE64 {}
+    | CHAR {}
+    | DECIMAL {}
+    | BIGNUM {}
+    | STRING {}
+    | KEYWORD_STRING {}
+    | BYTEARRAY {}
 ```
 
-## Operators and Precedence
+## 4.4 Operators and Precedence
 
-### Categorization of Symbolic Operators
+### 4.4.1 Categorization of Symbolic Operators
 
-The following *symbolic-op* tokens can be used to form prefix and infix expressions. The marker OP represents all *symbolic-op* tokens that begin with the indicated prefix, except for tokens that appear elsewhere in the table.
+The following `symbolic-op` tokens can be used to form prefix and infix expressions. The marker `OP` represents all `symbolic-op` tokens that begin with the indicated prefix, except for tokens that appear elsewhere in the table.
 
-```abnf
-*infix-or-prefix-op* :=
+```fsharp
+infix-or-prefix-op :
+    | [ "+" "-" "+." "-." "%" "%%" "&" "&&" ] {}
 
-+, -, +., -., %, &, &&
+prefix-op :
+    | infix-or-prefix-op {}
+    | "~"+ {}
+    | "!" OP (* except != *) {}
 
-*prefix-op* :=
-
-*infix-or-prefix-op*
-
-~ ~~ ~~~ (and any repetitions of ~)
-
-!OP (except !=)
-
-*infix-op* :=
-
-*infix-or-prefix-op*
-
--OP +OP || <OP >OP = |OP &OP ^OP *OP /OP %OP !=
-
-(or any of these preceded by one or more ‘.’)
-
-:=
-
-::
-
-$
-
-or
-
-?
+infix-op :=
+    | infix-or-prefix-op {}
+    | "."* ["||" "=" "!="] {}
+    | "."* ["-" "+" "<" ">"  "|" "&" "^" "*" "/" "%"] OP {}
+    | ":=" {}
+    | "::" {}
+    | "$" {}
+    | "or" {}
+    | "?" {}
 ```
 
-The operators +, -, +., -., %, %%, &, && can be used as both prefix and infix operators. When these operators are used as prefix operators, the tilde character is prepended internally to generate the operator name so that the parser can distinguish such usage from an infix use of the operator. For example, -x is parsed as an application of the operator ~- to the identifier x. This generated name is also used in definitions for these prefix operators. Consequently, the definitions of the following prefix operators include the ~ character:
+The operators `+`, `-`, `+.`, `-.`, `%`, `%%`, `&`, `&&` can be used as both prefix and infix operators. When these operators are used as prefix operators, the tilde character is prepended internally to generate the operator name so that the parser can distinguish such usage from an infix use of the operator. For example, `-x` is parsed as an application of the operator `~-` to the identifier `x`. This generated name is also used in definitions for these prefix operators. Consequently, the definitions of the following prefix operators include the `~` character:
 
 ```fsharp
 // To completely redefine the prefix + operator:
-
 let (~+) x = x
 
-// To completely redefine the infix + operator to be addition modulo-7
-
+// To completely redefine the infix + operator to be addition modulo-7 
 let (+) a b = (a + b) % 7
 
 // To define the operator on a type:
-
 type C(n:int) =
+    let n = n % 7
+    member x.N = n
+    static member (~+) (x:C) = x
+    static member (~-) (x:C) = C(-n)
+    static member (+) (x1:C,x2:C) = C(x1.N+x2.N)
+    static member (-) (x1:C,x2:C) = C(x1.N-x2.N)
 
-let n = n % 7
-
-member x.N = n
-
-static member (~+) (x:C) = x
-
-static member (~-) (x:C) = C(-n)
-
-static member (+) (x1:C,x2:C) = C(x1.N+x2.N)
-
-static member (-) (x1:C,x2:C) = C(x1.N-x2.N)
 ```
 
 The `::` operator is special. It represents the union case for the addition of an element to the head of an immutable linked list, and cannot be redefined, although it may be used to form infix expressions. It always accepts arguments in tupled form—as do all union cases—rather than in curried form.
 
-### Precedence of Symbolic Operators and Pattern/Expression Constructs
+### 4.4.2 Precedence of Symbolic Operators and Pattern/Expression Constructs
 
 Rules of precedence control the order of evaluation for ambiguous expression and pattern constructs. Higher precedence items are evaluated before lower precedence items.
 
-The following table shows the order of precedence, from highest to lowest, and indicates whether the operator or expression is associated with the token to its left or right. The OP marker represents the *symbolic-op* tokens that begin with the specified prefix, except those listed elsewhere in the table. For example, +OP represents any token that begins with a plus sign, unless the token appears elsewhere in the table.
+The following table shows the order of precedence, from highest to lowest, and indicates whether the operator or expression is associated with the token to its left or right. The `OP` marker represents the `symbolic-op` tokens that begin with the specified prefix, except those listed elsewhere in the table. For example, `+OP` represents any token that begins with a plus sign, unless the token appears elsewhere in the table.
 
-[TABLE]
+```fsharp
+// Associativity    Operator or expression    Comments
+Left    f<types>    //High-precedence type application; see §15.3
+Left    f(x)    //High-precedence application; see §15.2
+Left    .    
+Left    prefix-op    //Applies to prefix uses of these symbols
+Right   | rule    //Pattern matching rules
+Left    f x;lazy x;assert x    
+Right   **OP    
+Left    *OP /OP %OP    
+Left    -OP +OP    //Applies to infix uses of these symbols
+nonassoc    :?    
+Right    ::    
+Right    ^OP    
+Left    !=OP <OP >OP = |OP &OP $    
+Right    :> :?>    
+Left    & &&    
+Left    or ||    
+nonassoc    ,    
+Right    :=    
+Right    ->    
+nonassoc    if    
+nonassoc    "function", "fun", match, try    
+nonassoc    "let"    
+Right    ;    
+Left    |    
+Right    when    
+Right    as    
+```
 
 If ambiguous grammar rules (such as the rules from §6) involve tokens in the table, a construct that appears earlier in the table has higher precedence than a construct that appears later in the table. The associativity indicates whether the operator or construct applies to the item to the left or the right of the operator.
 
@@ -2117,7 +2116,7 @@ For example, consider the following token stream:
 a + b * c
 ```
 
-In this expression, the `*expr* *infix-op* *expr*` rule for `b * c` takes precedence over the `*expr* *infix-op* *expr*` rule for `a + b`, because the `*` operator has higher precedence than the `+` operator. Thus, this expression can be pictured as follows:
+In this expression, the `expr infix-op expr` rule for `b * c` takes precedence over the `expr infix-op expr` rule for `a + b`, because the `*` operator has higher precedence than the `+` operator. Thus, this expression can be pictured as follows:
 
 ```fsharp
 a + (b * c)
@@ -2145,117 +2144,161 @@ In the preceding table, leading `.` characters are ignored when determining prec
 
 The table entries marked as “High-precedence application” and “High-precedence type application” are the result of the augmentation of the lexical token stream, as described in §15.2 and §15.3.
 
-# Types and Type Constraints
+# 5. Types and Type Constraints
 
-The notion of *type* is central to both the static checking of F# programs and to dynamic type tests and reflection at runtime. The word is used with four distinct but related meanings:
+The notion of `type` is central to both the static checking of F# programs and to dynamic type tests and reflection at runtime. The word is used with four distinct but related meanings:
 
-- **Type definitions,** such as the actual CLI or F# definitions of System.String or FSharp.Collections.Map<_,_>.
+- **Type definitions**, such as the actual CLI or F# definitions of `System.String` or `FSharp.Collections.Map<_,_>`.
 
-- **Syntactic types,** such as the text option<_> that might occur in a program text. Syntactic types are converted to static types during the process of type checking and inference.
+- **Syntactic types**, such as the text `option<_>` that might occur in a program text. Syntactic types are converted to static types during the process of type checking and inference.
 
-- **Static types**, which result from type checking and inference, either by the translation of syntactic types that appear in the source text, or by the application of constraints that are related to particular language constructs. For example, option<int> is the fully processed static type that is inferred for an expression Some(1+1). Static types may contain *type variables* as described later in this section.
+- **Static types**, which result from type checking and inference, either by the translation of syntactic types that appear in the source text, or by the application of constraints that are related to particular language constructs. For example, `option<int>` is the fully processed static type that is inferred for an expression `Some(1+1)`. Static types may contain *type variables* as described later in this section.
 
-- **Runtime types**, which are objects of type System.Type and represent some or all of the information that type definitions and static types convey at runtime. The obj.GetType() method, which is available on all F# values, provides access to the runtime type of an object. An object’s runtime type is related to the static type of the identifiers and expressions that correspond to the object. Runtime types may be tested by built-in language operators such as :? and :?>, the expression form downcast *expr*, and pattern matching type tests. Runtime types of objects do not contain type variables. Runtime types that System.Reflection reports may contain type variables that are represented by System.Type values.
+- **Runtime types**, which are objects of type `System.Type` and represent some or all of the information that type definitions and static types convey at runtime. The `obj.GetType()` method, which is available on all F# values, provides access to the runtime type of an object. An object’s runtime type is related to the static type of the identifiers and expressions that correspond to the object. Runtime types may be tested by built-in language operators such as `:?` and `:?>`, the expression form `downcast expr`, and pattern matching type tests. Runtime types of objects do not contain type variables. Runtime types that System.Reflection reports may contain type variables that are represented by `System.Type` values.
 
 The following describes the syntactic forms of types as they appear in programs:
 
-*type* :=
+```fsharp
+topTypeWithTypeConstraints :
+    | topType {}
+    | topType when typeConstraints {}
+topType :
+    | topTupleType "->" topType {}
+    | topTupleType {}
+topTupleType :
+    | topAppType "*" topTupleType {}
+    | topAppType {}
+topAppType :
+    | attributes? appType ":" appType {}
+    | attributes? "?" IDENT ":" appType {}
+    | attributes? appType {}
+appType :
+    | appType HIGH_PRECEDENCE_BRACK_APP? "[" ","* "]" {}
+    | appType appTypeConPower {}
+    | "(" appTypePrefixArguments ")" appTypeConPower {}
+    | powerType {}
+    | typar ":>" typ {}
+    | "_" ":>" typ {}
+appTypeConPower :
+    | appTypeCon ["^" "^-"] atomicRationalConstant {}
+    | appTypeCon {}
+appTypeCon :
+    | path {}
+    | typar {}
+typar :
+    | "'" IDENT {}
+    | "^" IDENT {}
+appTypePrefixArguments :
+    | typeArgActual "," typeArgActual typeArgListElements {}
+typeArgActual :
+    | typ {}
+    | typ "=" typ {}
+typ :
+    | tupleType "->" typ {}
+    | tupleType {}
+tupleType :
+    | appType "*" tupleOrQuotTypeElements {}
+    | "/" tupleOrQuotTypeElements {}
+    | appType "/" tupleOrQuotTypeElements {}
+    | appType {}
+tupleOrQuotTypeElements :
+    | appType "*" tupleOrQuotTypeElements {}
+    | appType "/" tupleOrQuotTypeElements {}
+    | appType {}
+typeArgListElements :
+    | typeArgListElements "," typeArgActual {}
+    | (*empty*) {}
+powerType :
+    | atomTypeOrAnonRecdType {}
+    | atomTypeOrAnonRecdType ["^" "^-"] atomicRationalConstant {}
+atomTypeOrAnonRecdType :
+    | atomType {}
+    | anonRecdType {}
+atomType :
+    | "#" atomType {}
+    | appTypeConPower {}
+    | "_" {}
+    | "(" typ ")" {}
+    | struct "(" appType "*" tupleOrQuotTypeElements ")" {}
+    | rawConstant {}
+    | null {}
+    | const atomicExpr {}
+    | FALSE {}
+    | TRUE {}
+    | appTypeCon typeArgsNoHpaDeprecated {}
+    | atomType "." path {}
+    | atomType "." path typeArgsNoHpaDeprecated {}
+typeArgsNoHpaDeprecated :
+    | HIGH_PRECEDENCE_TYAPP? typeArgsActual {}
+typeArgsActual :
+    | "<" typeArgActual "," typeArgActual typeArgListElements ">" {}
+    | "<" typeArgActual ">" {}
+    | "<" ">" {}
+anonRecdType :
+    | struct? braceBarFieldDeclListCore {}
+braceBarFieldDeclListCore :
+    | "{|" recdFieldDeclList "|}" {}
+recdFieldDeclList :
+    | recdFieldDecl seps recdFieldDeclList {}
+    | recdFieldDecl seps? {}
+recdFieldDecl :
+    | attributes? fieldDecl {}
+fieldDecl :
+    | mutable? access? IDENT ":" typ {}
 
-( *type* )
+typeConstraints :
+    | typeConstraints and typeConstraint {}
+    | typeConstraint {}
+typeConstraint :
+    | "default" typar ":" typ {}
+    | typar ":>" typ {}
+    | typar ":" struct {}
+    | typar ":" IDENT struct {}
+    | typar ":" null {}
+    | typar ":" "(" classMemberSpfn ")" {}
+    | "(" typeAlts ")" ":" "(" classMemberSpfn ")" {}
+    | typar ":" delegate typeArgsNoHpaDeprecated {}
+    | typar ":" IDENT typeArgsNoHpaDeprecated {}
+    | typar ":" IDENT {}
+    | appType {}
+typeAlts :
+    | typeAlts or appType {}
+    | appType {}
 
-*type* -> *type* -- function type
+attributes? :
+    | attributes {}
+    | (*empty*) {}
+access? :
+    | (*empty*) {}
+    | access {}
+access :
+    | private {}
+    | public {}
+    | internal {}
+seps? :
+    | seps {}
+    | (*empty*) {}
+seps :
+    | OBLOCKSEP {}
+    | ";" {}
+    | OBLOCKSEP ";" {}
+    | ";" OBLOCKSEP {}
 
-*type* * ... * *type* -- tuple type
-
-*typar* -- variable type
-
-*long-ident* -- named type, such as int
-
-*long-ident*<*type-args*> -- named type, such as list<int>
-
-*long-ident*< > -- named type, such as IEnumerable< >
-
-*type* *long-ident --* named type, such as int list
-
-*type*[ , ... , ] -- array type
-
-*type* *typar-defns --* type with constraints
-
-*typar* :> *type* -- variable type with subtype constraint
-
-#*type* -- anonymous type with subtype constraint
-
-*type-args* := *type-arg*, ..., *type-arg*
-
-*type-arg* :=
-
-*type* -- type argument
-
-*measure* -- unit of measure argument
-
-*static-parameter* -- static parameter
-
-*atomic-type* :=
-
-*type* : one of
-
-*#type typar* ( *type* ) *long-ident long-ident*<*type-args*>
-
-*typar* :=
-
-*_* -- anonymous variable type
-
-'*ident* -- type variable
-
-^*ident --* static head-type type variable
-
-*constraint* :=
-
-*typar* :> *type* -- coercion constraint
-
-*typar* : null -- nullness constraint
-
-*static-typars* : (*member-sig* ) -- member "trait" constraint
-
-*typar* : (new : unit -> 'T) -- CLI default constructor constraint
-
-*typar* : struct -- CLI non-Nullable struct
-
-*typar* : not struct -- CLI reference type
-
-*typar* : enum<*type*> -- enum decomposition constraint
-
-*typar* : unmanaged -- unmanaged constraint
-
-*typar* : delegate<*type, type*> -- delegate decomposition constraint
-
-*typar* : equality
-
-*typar* : comparison
-
-*typar-defn := attributes*_(opt) *typar*
-
-*typar-defns* := < *typar-defn, ..., typar-defn* *typar-constraints*_(opt) >
-
-*typar-constraints* := when *constraint* and ... and *constraint*
-
-*static-typars :=*
-
-^*ident*
-
-(^*ident* or ... or ^*ident*)
-
-*member-sig* := <see Section 10>
+```
 
 In a type instantiation, the type name and the opening angle bracket must be syntactically adjacent with no intervening whitespace, as determined by lexical filtering (§15). Specifically:
 
+```fsharp
 array<int>
+```
 
 and not
 
+```fsharp
 array < int >
+```
 
-## Checking Syntactic Types 
+## 5.1 Checking Syntactic Types
 
 Syntactic types are checked and converted to *static types* as they are encountered. Static types are a specification device used to describe
 
@@ -2265,33 +2308,48 @@ Syntactic types are checked and converted to *static types* as they are encounte
 
 Every expression in an F# program is given a unique inferred static type, possibly involving one or more explicit or implicit generic parameters.
 
-For the remainder of this specification we use the same syntax to represent syntactic types and static types. For example int32 * int32 is used to represent the syntactic type that appears in source code and the static type that is used during checking and type inference.
+For the remainder of this specification we use the same syntax to represent syntactic types and static types. For example `int32 * int32` is used to represent the syntactic type that appears in source code and the static type that is used during checking and type inference.
 
-The conversion from syntactic types to static types happens in the context of a *name resolution environment* (§14.1), a *floating type variable environment*, which is a mapping from names to type variables, and a *type* *inference environment* (§14.5).
+The conversion from syntactic types to static types happens in the context of a ‘name resolution environment’ (§14.1), a ‘floating type variable environment’, which is a mapping from names to type variables, and a ‘type inference environment’ (§14.5).
 
-The phrase “fresh type” means a static type that is formed from a *fresh type inference variable*. Type inference variables are either solved or generalized by *type inference* (§14.5). During conversion and throughout the checking of types, expressions, declarations, and entire files, a set of *current inference constraints* is maintained. That is, each static type is processed under input constraints *Χ*, and results in output constraints *Χ’*. Type inference variables and constraints are progressively *simplified* and *eliminated* based on these equations through *constraint solving* (§14.5).
+The phrase “fresh type” means a static type that is formed from a ‘fresh type inference variable’. Type inference variables are either solved or generalized by ‘type inference’ (§14.5). During conversion and throughout the checking of types, expressions, declarations, and entire files, a set of ‘current inference constraints’ is maintained. That is, each static type is processed under input constraints `Χ`, and results in output constraints `Χ'`. Type inference variables and constraints are progressively *simplified* and *eliminated* based on these equations through ‘constraint solving’ (§14.5).
 
-### Named Types
+### 5.1.1 Named Types
 
 *Named types* have several forms, as listed in the following table.
 
-[TABLE]
+`long-ident<ty1,…,tyn>`
+Named type with one or more suffixed type arguments.
+
+`long-ident`
+Named type with no type arguments.
+
+`type long-ident`
+Named type with one type argument; processed the same as `long-ident<type>`.
+
+`ty1 -> ty2`
+A function type, where:
+
+- `ty1` is the **domain** of the function values associated with the type.
+- `ty2` is the **range**.
+
+In compiled code it is represented by the named type `FSharp.Core.FSharpFunc<ty1,ty2>`.
 
 Named types are converted to static types as follows:
 
-- *Name Resolution for Types* (§14.1) resolves *long-ident* to a type definition with formal generic parameters <*typar₁*,…, *typar_(n)*> and formal constraints *C*. The number of type arguments *n* is used during the name resolution process to distinguish between similarly named types that take different numbers of type arguments.
+- *Name Resolution for Types* (§14.1) resolves *long-ident* to a type definition with formal generic parameters `<typar₁,…, typar_n>` and formal constraints `C`. The number of type arguments `n` is used during the name resolution process to distinguish between similarly named types that take different numbers of type arguments.
 
-- Fresh type inference variables <*ty'₁,…,ty'_(n)*> are generated for each formal type parameter. The formal constraints *C* are added to the current inference constraints for the new type inference variables; and constraints *ty_(i)*= *ty'_(i)* are added to the current inference constraints.
+- Fresh type inference variables `<ty'₁,…,ty'_n>` are generated for each formal type parameter. The formal constraints `C` are added to the current inference constraints for the new type inference variables; and constraints `ty_i = *ty'_i` are added to the current inference constraints.
 
-### Variable Types
+### 5.1.2 Variable Types
 
 A type of the form *'ident* is a *variable type*. For example, the following are all variable types:
 
+```fsharp
 'a
-
 'T
-
 'Key
+```
 
 During checking, *Name Resolution* (§14.1) is applied to the identifier.
 
@@ -2299,51 +2357,66 @@ During checking, *Name Resolution* (§14.1) is applied to the identifier.
 
 - If name resolution fails, the current *floating type variable environment* is consulted, although only in the context of a syntactic type that is embedded in an expression or pattern. If the type variable name is assigned a type in that environment, F# uses that mapping. Otherwise, a fresh type inference variable is created (see §14.5) and added to both the type inference environment and the floating type variable environment.
 
-A type of the form _ is an *anonymous* *variable type*. A fresh type inference variable is created and added to the type inference environment (see §14.5) for such a type.
+A type of the form `_` is an *anonymous variable type*. A fresh type inference variable is created and added to the type inference environment (see §14.5) for such a type.
 
-A type of the form ^ident is a *statically resolved type variable*. A fresh type inference variable is created and added to the type inference environment (see §14.5). This type variable is tagged with an attribute that indicates that it can be generalized only at inline definitions (see §14.6.7). The same restriction on generalization applies to any type variables that are contained in any type that is equated with the ^ident type in a type inference equation.
+A type of the form `^ident` is a *statically resolved type variable*. A fresh type inference variable is created and added to the type inference environment (see §14.5). This type variable is tagged with an attribute that indicates that it can be generalized only at `inline` definitions (see §14.6.7). The same restriction on generalization applies to any type variables that are contained in any type that is equated with the `^ident` type in a type inference equation.
 
-Note: this specification generally uses uppercase identifiers such as 'T or 'Key for user-declared generic type parameters, and uses lowercase identifiers such as 'a or 'b for compiler-inferred generic parameters.
+Note: this specification generally uses uppercase identifiers such as `'T` or `'Key` for user-declared generic type parameters, and uses lowercase identifiers such as `'a` or `'b` for compiler-inferred generic parameters.
 
-### Tuple Types
+### 5.1.3 Tuple Types
 
 A *tuple type* has the following form:
 
-*ty₁* * ... * *ty_(n)*
+```fsharp
+ty₁ * ... * ty_n
+```
 
-The elaborated form of a tuple type is shorthand for a use of the family of F# library types System.Tuple<_,...,_>. See §6.3.2 for the details of this encoding.
+The elaborated form of a tuple type is shorthand for a use of the family of F# library types `System.Tuple<_,...,_>`. See §6.3.2 for the details of this encoding.
 
-When considered as static types, tuple types are distinct from their encoded form. However, the encoded form of tuple types is visible in the F# type system through runtime types. For example, typeof<int * int> is equivalent to typeof<System.Tuple<int,int>>.
+When considered as static types, tuple types are distinct from their encoded form. However, the encoded form of tuple types is visible in the F# type system through runtime types. For example, `typeof<int * int>` is equivalent to `typeof<System.Tuple<int,int>>`.
 
-### Array Types
+### 5.1.4 Array Types
 
 Array types have the following forms:
 
-*ty*[]
+```fsharp
+ty[]
+ty[ , ... , ]
+```
 
-*ty*[ , ... , ]
+A type of the form `ty[]` is a *single-dimensional array type*, and a type of the form `ty[ , ... , ]` is a *multidimensional array type*. For example, `int[,,]` is an array of integers of rank 3.
 
-A type of the form *ty*[] is a *single-dimensional array type*, and a type of the form *ty*[ , ... , ] is a *multidimensional array type*. For example, int[,,] is an array of integers of rank 3.
+Except where specified otherwise in this document, these array types are treated as named types, as if they are an instantiation of a fictitious type definition `System.Array_n<ty>` where `n` corresponds to the rank of the array type.
 
-Except where specified otherwise in this document, these array types are treated as named types, as if they are an instantiation of a fictitious type definition System.Array*_(n)*<*ty*> where *n* corresponds to the rank of the array type.
+Note: The type `int[][,]` in F# is the same as the type `int[,][]` in C# although the dimensions are swapped. This ensures consistency with other postfix type names in F# such as `int list list`.
 
-Note: The type int[][,] in F# is the same as the type int[,][] in C# although the dimensions are swapped. This ensures consistency with other postfix type names in F# such as int list list.
+F# supports multidimensional array types only up to rank 32.
 
-F# supports multidimensional array types only up to rank 4.
-
-### Constrained Types
+### 5.1.5 Constrained Types
 
 A *type with constraints* has the following form:
 
-*type* when *constraints*
+```fsharp
+type when constraints
+```
 
-During checking, *type* is first checked and converted to a static type, then *constraints* are checked and added to the current inference constraints. The various forms of constraints are described in§5.2.
+During checking, `type` is first checked and converted to a static type, then `constraints` are checked and added to the current inference constraints. The various forms of constraints are described in §5.2.
 
-A type of the form *typar* :> *type* is a *type variable with a subtype constraint* and is equivalent to *typar* when *typar* :> *type*.
+A type of the form `typar :> type` is a *type variable with a subtype constraint* and is equivalent to
 
-A type of the form #*type* is an *anonymous type with a subtype constraint* and is equivalent to 'a when 'a :> *type*, where 'a is a fresh type inference variable.
+```fsharp
+typar when typar :> type
+```
 
-## Type Constraints
+A type of the form `#type` is an *anonymous type with a subtype constraint* and is equivalent to
+
+```fsharp
+'a when 'a :> type
+```
+
+, where `'a` is a fresh type inference variable.
+
+## 5.2 Type Constraints
 
 A *type constraint* limits the types that can be used to create an instance of a type parameter or type variable. F# supports the following type constraints:
 
@@ -2367,171 +2440,205 @@ A *type constraint* limits the types that can be used to create an instance of a
 
 - Equality and comparison constraints
 
-### Subtype Constraints
+### 5.2.1 Subtype Constraints
 
 An *explicit subtype constraint* has the following form:
 
-*typar* :> *type*
+```fsharp
+typar :> type
+```
 
-During checking, *typar* is first checked as a variable type, *type* is checked as a type, and the constraint is added to the current inference constraints. Subtype constraints affect type coercion as specified in §5.4.7.
+During checking, `*typar*` is first checked as a variable type, `*type*` is checked as a type, and the constraint is added to the current inference constraints. Subtype constraints affect type coercion as specified in §5.4.7.
 
 Note that subtype constraints also result implicitly from:
 
-- Expressions of the form expr :> type.
+- Expressions of the form `expr :> type`.
 
-- Patterns of the form pattern :> type.
+- Patterns of the form `pattern :> type`.
 
 - The use of generic values, types, and members with constraints.
 
 - The implicit use of subsumption when using values and members (§14.4.3).
 
-A type variable cannot be constrained by two distinct instantiations of the same named type. If two such constraints arise during constraint solving, the type instantiations are constrained to be equal. For example, during type inference, if a type variable is constrained by both IA<int> and IA<string>, an error occurs when the type instantiations are constrained to be equal. This limitation is specifically necessary to simplify type inference, reduce the size of types shown to users, and help ensure the reporting of useful error messages.
+A type variable cannot be constrained by two distinct instantiations of the same named type. If two such constraints arise during constraint solving, the type instantiations are constrained to be equal. For example, during type inference, if a type variable is constrained by both `IA<int>` and `IA<string>`, an error occurs when the type instantiations are constrained to be equal. This limitation is specifically necessary to simplify type inference, reduce the size of types shown to users, and help ensure the reporting of useful error messages.
 
-### Nullness Constraints
+### 5.2.2 Nullness Constraints
 
-An *explicit* *nullness constraint* has the following form:
+An *explicit nullness constraint* has the following form:
 
-*typar*: null
+```fsharp
+typar: null
+```
 
-During checking, *typar* is checked as a variable type and the constraint is added to the current inference constraints. The conditions that govern when a type satisfies a nullness constraint are specified in §5.4.8.
+During checking, `*typar*` is checked as a variable type and the constraint is added to the current inference constraints. The conditions that govern when a type satisfies a nullness constraint are specified in §5.4.8.
 
 In addition:
 
-- The *typar* must be a statically resolved type variable of the form *^ident*. This limitation ensures that the constraint is resolved at compile time, and means that generic code may not use this constraint unless that code is marked inline (§14.6.7).
+- The `typar` must be a statically resolved type variable of the form `^ident`. This limitation ensures that the constraint is resolved at compile time, and means that generic code may not use this constraint unless that code is marked `inline` (§14.6.7).
 
 Note: Nullness constraints are primarily for use during type checking and are used relatively rarely in F# code.
 
 Nullness constraints also arise from expressions of the form null.
 
-### Member Constraints
+### 5.2.3 Member Constraints
 
-An *explicit* *member constraint* has the following form:
+An *explicit member constraint* has the following form:
 
-(*typar* or ... or *typar*) : (*member-sig*)
+```fsharp
+( typar or ... or typar ) : ( member-sig )
+```
 
-For example, the F# library defines the + operator with the following signature:
+For example, the F# library defines the `+` operator with the following signature:
 
+```fsharp
 val inline (+) : ^a -> ^b -> ^c
-
 when (^a or ^b) : (static member (+) : ^a * ^b -> ^c)
+```
 
-This definition indicates that each use of the + operator results in a constraint on the types that correspond to parameters ^a, ^b, and ^c. If these are named types, then either the named type for ^a or the named type for ^b must support a static member called + that has the given signature.
+This definition indicates that each use of the `+` operator results in a constraint on the types that correspond to parameters `^a`, `^b`, and `^c`. If these are named types, then either the named type for `^a` or the named type for `^b` must support a static member called `+` that has the given signature.
 
 In addition:
 
-- Each *typar* must be a statically resolved type variable (§5.1.2) in the form *^ident*. This ensures that the constraint is resolved at compile time against a corresponding named type. It also means that generic code cannot use this constraint unless that code is marked inline (§14.6.7).
+- Each `typar` must be a statically resolved type variable (§5.1.2) in the form `^ident`. This ensures that the constraint is resolved at compile time against a corresponding named type. It also means that generic code cannot use this constraint unless that code is marked `inline` (§14.6.7).
 
-- The *member-sig* cannot be generic; that is, it cannot include explicit type parameter definitions.
+- The `member-sig` cannot be generic; that is, it cannot include explicit type parameter definitions.
 
 - The conditions that govern when a type satisfies a member constraint are specified in §14.5.4 .
 
 Note: Member constraints are primarily used to define overloaded functions in the F# library and are used relatively rarely in F# code.
 
-Uses of overloaded operators do not result in generalized code unless definitions are marked as inline. For example, the function
+Uses of overloaded operators do not result in generalized code unless definitions are marked as `inline`. For example, the function
 
+```fsharp
 let f x = x + x
+```
 
-results in a function f that can be used only to add one type of value, such as int or float. The exact type is determined by later constraints.
+results in a function `f` that can be used only to add one type of value, such as `int` or `float`. The exact type is determined by later constraints.
 
 A type variable may not be involved in the support set of more than one member constraint that has the same name, staticness, argument arity, and support set (§14.5.4). If it is, the argument and return types in the two member constraints are themselves constrained to be equal. This limitation is specifically necessary to simplify type inference, reduce the size of types shown to users, and ensure the reporting of useful error messages.
 
-### Default Constructor Constraints
+### 5.2.4 Default Constructor Constraints
 
-An *explicit* *default constructor constraint* has the following form:
+An *explicit default constructor constraint* has the following form:
 
-*typar* : (new : unit -> 'T)
+```fsharp
+typar : (new : unit -> 'T)
+```
 
-During constraint solving (§14.5), the constraint *type* : (new : unit -> 'T) is met if *type* has a parameterless object constructor.
+During constraint solving (§14.5), the constraint `typar : (new : unit -> 'T)` is met if `typar` has a parameterless object constructor.
 
-**Note:** This constraint form exists primarily to provide the full set of constraints that CLI implementations allow. It is rarely used in F# programming.
+Note: This constraint form exists primarily to provide the full set of constraints that CLI implementations allow. It is rarely used in F# programming.
 
-### Value Type Constraints
+### 5.2.5 Value Type Constraints
 
-An *explicit* *value type constraint* has the following form:
+An *explicit value type constraint* has the following form:
 
-*typar* : struct
+```fsharp
+typar : struct
+```
 
-During constraint solving (§14.5), the constraint *type* : struct is met if *type* is a value type other than the CLI type System.Nullable<_>.
+During constraint solving (§14.5), the constraint `typar : struct` is met if `typar` is a value type other than the CLI type `System.Nullable<_>`.
 
-**Note:** This constraint form exists primarily to provide the full set of constraints that CLI implementations allow. It is rarely used in F# programming.
+Note: This constraint form exists primarily to provide the full set of constraints that CLI implementations allow. It is rarely used in F# programming.
 
-The restriction on System.Nullable is inherited from C# and other CLI languages, which give this type a special syntactic status. In F#, the type option<_> is similar to some uses of System.Nullable<_>. For various technical reasons the two types cannot be equated, notably because types such as System.Nullable<System.Nullable<_>> and System.Nullable<string> are not valid CLI types.
+The restriction on `System.Nullable` is inherited from C# and other CLI languages, which give this type a special syntactic status. In F#, the type `option<_>` is similar to some uses of `System.Nullable<_>`. For various technical reasons the two types cannot be equated, notably because types such as `System.Nullable<System.Nullable<_>>` and `System.Nullable<string>` are not valid CLI types.
 
-### Reference Type Constraints
+### 5.2.6 Reference Type Constraints
 
-An *explicit* *reference type constraint* has the following form:
+An *explicit reference type constraint* has the following form:
 
-*typar* : not struct
+```fsharp
+typar : not struct
+```
 
-During constraint solving (§14.5), the constraint *type* : not struct is met if *type* is a reference type.
+During constraint solving (§14.5), the constraint `typar : not struct` is met if `typar` is a reference type.
 
-**Note:** This constraint form exists primarily to provide the full set of constraints that CLI implementations allow. It is rarely used in F# programming.
+Note: This constraint form exists primarily to provide the full set of constraints that CLI implementations allow. It is rarely used in F# programming.
 
-### Enumeration Constraints
+### 5.2.7 Enumeration Constraints
 
-An *explicit* *enumeration constraint* has the following form:
+An *explicit enumeration constraint* has the following form:
 
-*typar* : enum<*underlying-type*>
+```fsharp
+typar : enum<underlying-type>
+```
 
-During constraint solving (§14.5), the constraint *type* : enum<*underlying-type*> is met if type is a CLI or F# enumeration type that has constant literal values of type *underlying-type*.
+During constraint solving (§14.5), the constraint `typar : enum<underlying-type>` is met if `typar` is a CLI or F# enumeration type that has constant literal values of type `underlying-type`.
 
-Note: This constraint form exists primarily to allow the definition of library functions such as enum. It is rarely used directly in F# programming.
+Note: This constraint form exists primarily to allow the definition of library functions such as `enum`. It is rarely used directly in F# programming.
 
-The enum constraint does not imply anything about subtypes. For example, an enum constraint does not imply that the type is a subtype of System.Enum.
+The `enum` constraint does not imply anything about subtypes. For example, an `enum` constraint does not imply that the type is a subtype of `System.Enum`.
 
-### Delegate Constraints
+### 5.2.8 Delegate Constraints
 
 An *explicit delegate constraint* has the following form:
 
-*typar* : delegate<*tupled-arg-type*, *return-type*>
+```fsharp
+typar : delegate< tupled-arg-type, return-type >
+```
 
-During constraint solving (§14.5), the constraint *type* : delegate<*tupled-arg-type*, *return-types*> is met if *type* is a delegate type *D* with declaration type *D* = delegate of object * arg1 * ... * argN and *tupled-arg-type* = *arg1* * ... * *argN*. That is, the delegate must match the CLI design pattern where the sender object is the first argument to the event.
+During constraint solving (§14.5), the constraint `typar : delegate< tupled-arg-type, return-type >` is met if `typar` is a delegate type `*D*` with declaration
 
-**Note**: This constraint form exists primarily to allow the definition of certain F# library functions that are related to event programming. It is rarely used directly in F# programming.
+```fsharp
+type D = delegate of sender:object * arg1 * ... * argN
+```
 
-The delegate constraint does not imply anything about subtypes. In particular, a ‘delegate’ constraint does not imply that the type is a subtype of System.Delegate.
+and
 
-The delegate constraint applies only to delegate types that follow the usual form for CLI event handlers, where the first argument is a “sender” object. The reason is that the purpose of the constraint is to simplify the presentation of CLI event handlers to the F# programmer.
+```fsharp
+tupled-arg-type = arg1 * ... * argN
+```
 
-### Unmanaged Constraints
+. That is, the delegate must match the CLI design pattern where the `sender` object is the first argument to the event.
+
+Note: This constraint form exists primarily to allow the definition of certain F# library functions that are related to event programming. It is rarely used directly in F# programming.
+
+The delegate constraint does not imply anything about subtypes. In particular, a ‘delegate’ constraint does not imply that the type is a subtype of `System.Delegate`.
+
+The delegate constraint applies only to delegate types that follow the usual form for CLI event handlers, where the first argument is a `sender` object. The reason is that the purpose of the constraint is to simplify the presentation of CLI event handlers to the F# programmer.
+
+### 5.2.9 Unmanaged Constraints
 
 An *unmanaged constraint* has the following form:
 
-*typar* : unmanaged
+```fsharp
+typar : unmanaged
+```
 
-During constraint solving (§14.5), the constraint *type* : unmanaged is met if *type* is unmanaged as specified below:
+During constraint solving (§14.5), the constraint `typar : unmanaged` is met if `typar` is unmanaged as specified below:
 
-- Types sbyte, byte, char, nativeint, unativeint, float32, float, int16, uint16, int32, uint32, int64, uint64, decimal are unmanaged*.*
+- Types sbyte, byte, char, nativeint, unativeint, float32, float, int16, uint16, int32, uint32, int64, uint64, decimal are unmanaged.
 
-- Type nativeptr<*type*> is unmanaged*.*
+- Type `nativeptr<*type*>` is unmanaged.
 
-- A non-generic struct type whose fields are all unmanaged types is unmanaged*.*
+- A non-generic struct type whose fields are all unmanaged types is unmanaged.
 
-### Equality and Comparison Constraints
+### 5.2.10 Equality and Comparison Constraints
 
 *Equality constraints* and *comparison constraints* have the following forms, respectively:
 
-*typar* : equality
+```fsharp
+typar : equality
+typar : comparison
+```
 
-*typar* : comparison
+During constraint solving (§14.5), the constraint `*type* : equality` is met if both of the following conditions are true:
 
-During constraint solving (§14.5), the constraint *type* : equality is met if both of the following conditions are true:
+- The `type` is a named type, and the type definition does not have, and is not inferred to have, the `NoEquality` attribute.
 
-- The type is a named type, and the type definition does not have, and is not inferred to have, the NoEquality attribute.
+- The type has *equality dependencies* `*ty₁*, ..., *ty_n*`, each of which satisfies `*ty_(i)* : equality`.
 
-- The type has *equality dependencies* *ty₁*, ..., *ty_(n)*, each of which satisfies *ty_(i)* : equality.
+The constraint `*type* : comparison` is a *comparison constraint*. Such a constraint is met if all the following conditions hold:
 
-The constraint *type* : comparison is a *comparison constraint*. Such a constraint is met if all the following conditions hold:
+- If the type is a named type, then the type definition does not have, and is not inferred to have, the `NoComparison` attribute, and the type definition implements `System.IComparable` or is an array type or is `System.IntPtr` or is `System.UIntPtr`.
 
-- If the type is a named type, then the type definition does not have, and is not inferred to have, the NoComparison attribute, and the type definition implements System.IComparable or is an array type or is System.IntPtr or is System.UIntPtr.
+- If the type has *comparison dependencies* `*ty₁*, ..., *ty_n*`, then each of these must satisfy `*ty_(i)* : comparison`
 
-- If the type has *comparison dependencies* *ty₁*, ..., *ty_(n)*, then each of these must satisfy *ty_(i)* : comparison
+An equality constraint is a relatively weak constraint, because with two exceptions, all CLI types satisfy this constraint. The exceptions are F# types that are annotated with the `NoEquality` attribute and structural types that are inferred to have the `NoEquality` attribute. The reason is that in other CLI languages, such as C#, it possible to use reference equality on all reference types.
 
-An equality constraint is a relatively weak constraint, because with two exceptions, all CLI types satisfy this constraint. The exceptions are F# types that are annotated with the NoEquality attribute and structural types that are inferred to have the NoEquality attribute. The reason is that in other CLI languages, such as C#, it possible to use reference equality on all reference types.
+A comparison constraint is a stronger constraint, because it usually implies that a type must implement `System.IComparable`.
 
-A comparison constraint is a stronger constraint, because it usually implies that a type must implement System.IComparable.
-
-## Type Parameter Definitions 
+## 5.3 Type Parameter Definitions
 
 Type parameter definitions can occur in the following locations:
 
@@ -2543,59 +2650,65 @@ Type parameter definitions can occur in the following locations:
 
 - Corresponding specifications in signatures
 
-For example, the following defines the type parameter ‘T in a function definition:
+For example, the following defines the type parameter `'T` in a function definition:
 
+```fsharp
 let id<'T> (x:'T) = x
+```
 
 Likewise, in a type definition:
 
-type Funcs<'T1,'T2> =
-
-{ Forward: 'T1 -> 'T2;
-
-Backward : 'T2 -> 'T2 }
+```fsharp
+type Funcs<'T1,'T2> = 
+    { Forward: 'T1 -> 'T2;
+      Backward : 'T2 -> 'T2 }
+```
 
 Likewise, in a signature file:
 
+```fsharp
 val id<'T> : 'T -> 'T
+```
 
-Explicit type parameter definitions can include *explicit* *constraint declarations*. For example:
+Explicit type parameter definitions can include *explicit constraint declarations*. For example:
 
-let dispose2<'T when 'T :> System.IDisposable> (x: 'T, y: 'T) =
+```fsharp
+let dispose2<'T when 'T :> System.IDisposable> (x: 'T, y: 'T) = 
+    x.Dispose() 
+    y.Dispose()
+```
 
-x.Dispose()
-
-y.Dispose()
-
-The constraint in this example requires that 'T be a type that supports the IDisposable interface.
+The constraint in this example requires that `'T` be a type that supports the `IDisposable` interface.
 
 However, in most circumstances, declarations that imply subtype constraints on arguments can be written more concisely:
 
+```fsharp
 let throw (x: Exception) = raise x
+```
 
-Multiple explicit constraint declarations use and:
+Multiple explicit constraint declarations use `and`:
 
-let multipleConstraints<'T when 'T :> System.IDisposable and
-
-'T :> System.IComparable > (x: 'T, y: 'T) =
-
-if x.CompareTo(y) < 0 then x.Dispose() else y.Dispose()
+```fsharp
+let multipleConstraints<'T when 'T :> System.IDisposable and 
+                                'T :> System.IComparable > (x: 'T, y: 'T) = 
+    if x.CompareTo(y) < 0 then x.Dispose() else y.Dispose()
+```
 
 Explicit type parameter definitions can declare custom attributes on type parameter definitions (§13.1).
 
-## Logical Properties of Types 
+## 5.4 Logical Properties of Types
 
 During type checking and elaboration, syntactic types and constraints are processed into a reduced form composed of:
 
-- Named types *op*<*types*>, where each *op* consists of a specific type definition, an operator to form function types, an operator to form array types of a specific rank, or an operator to form specific *n-*tuple types.
+- Named types `op<types>`, where each `op` consists of a specific type definition, an operator to form function types, an operator to form array types of a specific rank, or an operator to form specific n-tuple types.
 
-- Type variables '*ident*.
+- Type variables `'ident`.
 
-### Characteristics of Type Definitions 
+### 5.4.1 Characteristics of Type Definitions
 
-Type definitions include CLI type definitions such as System.String and types that are defined in F# code (§8). The following terms are used to describe type definitions:
+Type definitions include CLI type definitions such as `System.String` and types that are defined in F# code (§8). The following terms are used to describe type definitions:
 
-- Type definitions may be *generic*, with one or more type parameters; for example, System.Collections.Generic.Dictionary<'Key,'Value>.
+- Type definitions may be *generic*, with one or more type parameters; for example, `System.Collections.Generic.Dictionary<'Key,'Value>`.
 
 - The generic parameters of type definitions may have associated *formal type constraints*.
 
@@ -2605,31 +2718,27 @@ Type definitions include CLI type definitions such as System.String and types th
 
 - Type definitions have a *kind* which is one of the following:
 
-&nbsp;
+  - *Class*
+  
+  - *Interface*
+  
+  - *Delegate*
+  
+  - *Struct*
+  
+  - *Record*
+  
+  - *Union*
+  
+  - *Enum*
+  
+  - *Measure*
+  
+  - *Abstract*
 
-- *Class*
+  The kind is determined at the point of declaration by Type Kind Inference (§8.2) if it is not specified explicitly as part of the type definition. The *kind* of a type refers to the kind of its outermost named type definition, after expanding abbreviations. For example, a type is a *class* type if it is a named type `C<types>` where `C` is of kind class. Thus, `System.Collections.Generic.List<int>` is a class type.
 
-- *Interface*
-
-- *Delegate*
-
-- *Struct*
-
-- *Record*
-
-- *Union*
-
-- *Enum*
-
-- *Measure*
-
-- *Abstract*
-
-  The kind is determined at the point of declaration by Type Kind Inference (§8.2) if it is not specified explicitly as part of the type definition. The *kind* of a type refers to the kind of its outermost named type definition, after expanding abbreviations. For example, a type is a *class* type if it is a named type C<*types*> where C is of kind *class*. Thus, System.Collections.Generic.List<int> is a class type.
-
-&nbsp;
-
-- Type definitions may be *sealed.* Record, union, function, tuple, struct, delegate, enum, and array types are all sealed, as are class types that are marked with the SealedAttribute attribute.
+- Type definitions may be *sealed*. Record, union, function, tuple, struct, delegate, enum, and array types are all sealed, as are class types that are marked with the `SealedAttribute` attribute.
 
 - Type definitions may have zero or one *base type declarations*. Each base type declaration represents an additional type that is supported by any values that are formed using the type definition. Furthermore, some aspects of the base type are used to form the implementation of the type definition.
 
@@ -2639,7 +2748,7 @@ Class, interface, delegate, function, tuple, record, and union types are all *re
 
 Struct types are *value types*.
 
-### Expanding Abbreviations and Inference Equations
+### 5.4.2 Expanding Abbreviations and Inference Equations
 
 Two static types are considered equivalent and indistinguishable if they are equivalent after taking into account both of the following:
 
@@ -2647,153 +2756,171 @@ Two static types are considered equivalent and indistinguishable if they are equ
 
 - The expansion of type abbreviations (§8.3).
 
-For example, static types may refer to type abbreviations such as int, which is an abbreviation for System.Int32and is declared by the F# library:
+For example, static types may refer to type abbreviations such as `int`, which is an abbreviation for `System.Int32` and is declared by the F# library:
 
+```fsharp
 type int = System.Int32
+```
 
-This means that the types int32 and System.Int32 are considered equivalent, as are System.Int32 -> int and int -> System.Int32.
+This means that the types `int32` and `System.Int32` are considered equivalent, as are `System.Int32 -> int` and `int -> System.Int32`.
 
 Likewise, consider the process of checking this function:
 
+```fsharp
 let checkString (x:string) y =
+    (x = y), y.Contains("Hello")
+```
 
-(x = y), y.Contains("Hello")
+During checking, fresh type inference variables are created for values `x` and `y`; let’s call them `ty₁` and `ty₂`. Checking imposes the constraints `ty₁ = string` and `ty₁ = ty₂`. The second constraint results from the use of the generic `=` operator. As a result of constraint solving, `ty₂ = string` is inferred, and thus the type of `y` is `string`.
 
-During checking, fresh type inference variables are created for values x and y; let’s call them *ty*₁ and *ty*₂. Checking imposes the constraints *ty*₁ = string and *ty*₁ = *ty*₂. The second constraint results from the use of the generic = operator. As a result of constraint solving, *ty*₂ = string is inferred, and thus the type of y is string.
-
-All relations on static types are considered after the elimination of all equational inference constraints and type abbreviations. For example, we say int is a struct type because System.Int32 is a struct type.
+All relations on static types are considered after the elimination of all equational inference constraints and type abbreviations. For example, we say `int` is a struct type because `System.Int32` is a `struct` type.
 
 Note: Implementations of F# should attempt to preserve type abbreviations when reporting types and errors to users. This typically means that type abbreviations should be preserved in the logical structure of types throughout the checking process.
 
-### Type Variables and Definition Sites 
+### 5.4.3 Type Variables and Definition Sites
 
 Static types may be type variables. During type inference, static types may be *partial*, in that they contain type inference variables that have not been solved or generalized. Type variables may also refer to explicit type parameter definitions, in which case the type variable is said to be *rigid* and have a *definition site*.
 
-For example, in the following, the definition site of the type parameter 'T is the type definition of C:
+For example, in the following, the definition site of the type parameter `'T` is the type definition of `C`:
 
+```fsharp
 type C<'T> = 'T * 'T
+```
 
 Type variables that do not have a binding site are *inference variables*. If an expression is composed of multiple sub-expressions, the resulting constraint set is normally the union of the constraints that result from checking all the sub-expressions. However, for some constructs (notably function, value and member definitions), the checking process applies *generalization* (§14.6.7). Consequently, some intermediate inference variables and constraints are factored out of the intermediate constraint sets and new implicit definition site(s) are assigned for these variables.
 
-For example, given the following declaration, the type inference variable that is associated with the value x is generalized and has an implicit definition site at the definition of function id:
+For example, given the following declaration, the type inference variable that is associated with the value `x` is generalized and has an implicit definition site at the definition of function id:
 
+```fsharp
 let id x = x
+```
 
 Occasionally in this specification we use a more fully annotated representation of inferred and generalized type information. For example:
 
-let id*_(<'a>)* x*_('a)* = x*_('a)*
+```fsharp
+let id_(<'a>) x_('a) = x_('a)
+```
 
-Here, 'a represents a generic type parameter that is inferred by applying type inference and generalization to the original source code (§14.6.7), and the annotation represents the definition site of the type variable.
+Here, `'a` represents a generic type parameter that is inferred by applying type inference and generalization to the original source code (§14.6.7), and the annotation represents the definition site of the type variable.
 
-### Base Type of a Type
+### 5.4.4 Base Type of a Type
 
 The *base type* for the static types is shown in the table. These types are defined in the CLI specifications and corresponding implementation documentation.
 
-| Static Type     | Base Type                                                                                                                                                                                       |
-|-----------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Abstract types  | System.Object                                                                                                                                                                                   |
-| All array types | System.Array                                                                                                                                                                                    |
-| Class types     | The declared base type of the type definition if the type has one; otherwise, System.Object. For generic types C<*type-inst*>, substitute the formal generic parameters of C for *type-inst*. |
-| Delegate types  | System.MulticastDelegate                                                                                                                                                                        |
-| Enum types      | System.Enum                                                                                                                                                                                     |
-| Exception types | System.Exception                                                                                                                                                                                |
-| Interface types | System.Object                                                                                                                                                                                   |
-| Record types    | System.Object                                                                                                                                                                                   |
-| Struct types    | System.ValueType                                                                                                                                                                                |
-| Union types     | System.Object                                                                                                                                                                                   |
-| Variable types  | System.Object                                                                                                                                                                                   |
+Abstract types
+System.Object
 
-### Interfaces Types of a Type
+All array types
+System.Array
 
-The *interface types* of a named type C<*type-inst*> are defined by the transitive closure of the interface declarations of C and the interface types of the base type of C, where formal generic parameters are substituted for the actual type instantiation *type-inst*.
+Class types
+The declared base type of the type definition if the type has one; otherwise, `System.Object`. For generic types `C<type-inst>`, substitute the formal generic parameters of `C` for `type-inst`.
 
-The interface types for single dimensional array types *ty*[] include the transitive closure that starts from the interface System.Collections.Generic.IList<*ty*>, which includes System.Collections.Generic.ICollection<*ty*> and System.Collections.Generic.IEnumerable<*ty*>.
+Delegate types
+System.MulticastDelegate
 
-### Type Equivalence 
+Enum types
+System.Enum
 
-Two static types *ty*₁ and *ty*₂ are *definitely equivalent* (with respect to a set of current inference constraints) if either of the following is true:
+Exception types
+System.Exception
 
-- *ty*₁ has form *op*<*ty*₁₁*, ..., ty*_(1n)>, *ty*₂ has form *op*<*ty*₂₁*, ..., ty*_(2n)> and each *ty_(1i)* is definitely equivalent to *ty_(2i)* for all *1* <= *i* <= *n*.
+Interface types
+System.Object
+
+Record types
+System.Object
+
+Struct types
+System.ValueType
+
+Union types
+System.Object
+
+Variable types
+System.Object
+
+### 5.4.5 Interfaces Types of a Type
+
+The *interface types* of a named type `C<type-inst>` are defined by the transitive closure of the interface declarations of `C` and the interface types of the base type of `C`, where formal generic parameters are substituted for the actual type instantiation `type-inst`.
+
+The interface types for single dimensional array types `ty[]` include the transitive closure that starts from the interface `System.Collections.Generic.IList<ty>`, which includes `System.Collections.Generic.ICollection<ty>` and `System.Collections.Generic.IEnumerable<ty>`.
+
+### 5.4.6 Type Equivalence
+
+Two static types `ty₁` and `ty₂` are *definitely equivalent* (with respect to a set of current inference constraints) if either of the following is true:
+
+- `ty₁` has form `op<ty₁₁, ..., ty_1n>`, `ty₂` has form `op<ty₂₁, ..., ty_2n>` and each `ty_1i` is definitely equivalent to `ty_2i` for all 1 <= i <= n.
 
 —OR—
 
-- *ty*₁ and *ty*₂ are both variable types, and they both refer to the same definition site or are the same type inference variable.
+- `ty₁` and `ty₂` are both variable types, and they both refer to the same definition site or are the same type inference variable.
 
-This means that the addition of new constraints may make types definitely equivalent where previously they were not. For example, given Χ = { 'a = int }, we have list<int> = list<'a>.
+This means that the addition of new constraints may make types definitely equivalent where previously they were not. For example, given `Χ = { 'a = int }`, we have `list<int> = list<'a>`.
 
-Two static types *ty*₁ and *ty*₂ are *feasibly equivalent* if *ty*₁ and *ty*₂ may become definitely equivalent if further constraints are added to the current inference constraints. Thus list<int> and list<'a> are feasibly equivalent for the empty constraint set.
+Two static types `ty₁` and `ty₂` are *feasibly equivalent* if `ty₁` and `ty₂` may become definitely equivalent if further constraints are added to the current inference constraints. Thus `list<int>` and `list<'a>` are feasibly equivalent for the empty constraint set.
 
-### Subtyping and Coercion
+### 5.4.7 Subtyping and Coercion
 
-A static type *ty*₂ *coerces to* static type *ty*₁ (with respect to a set of current inference constraints X), if *ty*₁ is in the transitive closure of the base types and interface types of *ty*₂. Static coercion is written with the :> symbol:
+A static type `ty₂` *coerces to* static type `ty₁` (with respect to a set of current inference constraints `X`), if `ty₁` is in the transitive closure of the base types and interface types of `ty₂`. Static coercion is written with the `:>` symbol:
 
-*ty*₂ :> *ty*₁,
+```fsharp
+ty₂ :> ty₁
+```
 
-Variable types 'T coerce to all types *ty* if the current inference constraints include a constraint of the form 'T :> *ty*₂, and *ty* is in the inclusive transitive closure of the base and interface types of *ty*₂.
+, Variable types `'T` coerce to all types `ty` if the current inference constraints include a constraint of the form `'T :> ty₂`, and `ty` is in the inclusive transitive closure of the base types and interface types of `ty₂`.
 
-A static type *ty*₂ *feasibly coerces to* static type *ty*₁ if *ty*₂ *coerces to* *ty₁* may hold through the addition of further constraints to the current inference constraints. The result of adding constraints is defined in *Constraint Solving* (§14.5).
+A static type `ty₂` *feasibly coerces to* static type `ty₁` if `ty₂` *coerces to* `*ty₁*` may hold through the addition of further constraints to the current inference constraints. The result of adding constraints is defined in *Constraint Solving* (§14.5).
 
-### Nullness
+### 5.4.8 Nullness
 
-The design of F# aims to greatly reduce the use of null literals in common programming tasks, because they generally result in error-prone code. However:
+The design of F# aims to greatly reduce the use of `null` literals in common programming tasks, because they generally result in error-prone code. However:
 
-- The use of some null literals is required for interoperation with CLI libraries.
+- The use of some `null` literals is required for interoperation with CLI libraries.
 
-- The appearance of null values during execution cannot be completely precluded for technical reasons related to the CLI and CLI libraries.
+- The appearance of `null` values during execution cannot be completely precluded for technical reasons related to the CLI and CLI libraries.
 
 As a result, F# types differ in their treatment of the null literal and null values. All named types and type definitions fall into one of the following categories:
 
 - **Types with the null literal.** These types have null as an “extra” value. The following types are in this category:
 
-&nbsp;
+  - All CLI reference types that are defined in other CLI languages.
 
-- All CLI reference types that are defined in other CLI languages.
+  - All types that are defined in F# and annotated with the `AllowNullLiteral` attribute.
 
-- All types that are defined in F# and annotated with the AllowNullLiteral attribute.
-
-  For example, System.String and other CLI reference types satisfy this constraint, and these types permit the direct use of the null literal.
-
-&nbsp;
+    For example, `System.String` and other CLI reference types satisfy this constraint, and these types permit the direct use of the null literal.
 
 - **Types with null as an abnormal value.** These types do not permit the null literal, but do have null as an abnormal value. The following types are in this category:
 
-&nbsp;
-
-- All F# list, record, tuple, function, class, and interface types.
-
-- All F# union types except those that have null as a normal value, as discussed in the next bullet point.
-
-  For types in this category, the use of the null literal is not directly allowed. However, strictly speaking, it is possible to generate a null value for these types by using certain functions such as Unchecked.defaultof<*type*>. For these types, null is considered an abnormal value. Operations differ in their use and treatment of null values; for details about evaluation of expressions that might include null values, see §6.9.
-
-&nbsp;
-
+  - All F# list, record, tuple, function, class, and interface types.
+  
+  - All F# union types except those that have null as a normal value, as discussed in the next bullet point.
+  
+    For types in this category, the use of the null literal is not directly allowed. However, strictly speaking, it is   possible to generate a null value for these types by using certain functions such as `Unchecked.defaultof<*type*>`. For these types, null is considered an abnormal value. Operations differ in their use and treatment of null values; for details about evaluation of expressions that might include null values, see §6.9.
+  
 - **Types with null as a representation value.** These types do not permit the null literal but use the null value as a representation.
 
   For these types, the use of the null literal is not directly permitted. However, one or all of the “normal” values of the type is represented by the null value. The following types are in this category:
+  
+  - The `unit` type. The null value is used to represent all values of this type.
+  
+  - Any union type that has the `FSharp.Core.CompilationRepresentation(CompilationRepresentationFlags.UseNullAsTrueValue)` attribute flag and a single null union case. The null value represents this case. In particular, null represents `None` in the F# `option<_>` type.
+  
+- **Types without null.** These types do not permit the null literal and do not have the null value. All value types are in this category, including primitive integers, floating-point numbers, and any value of a CLI or F# `struct` type.
 
-&nbsp;
-
-- The unit type. The null value is used to represent all values of this type.
-
-- Any union type that has the FSharp.Core.CompilationRepresentation(CompilationRepresentationFlags.UseNullAsTrueValue) attribute flag and a single null union case. The null value represents this case. In particular, null represents None in the F# option<_> type.
-
-&nbsp;
-
-- **Types without null.** These types do not permit the null literal and do not have the null value. All value types are in this category, including primitive integers, floating-point numbers, and any value of a CLI or F# struct type.
-
-A static type *ty satisfies a nullness constraint* *ty* : null if it:
+A static type `ty` satisfies a nullness constraint `ty : null` if it:
 
 - Has an outermost named type that has the null literal.
 
-- Is a variable type with a *typar* : null constraint.
+- Is a variable type with a `typar : null` constraint.
 
-### Default Initialization
+### 5.4.9 Default Initialization
 
 Related to nullness is the *default initialization* of values of some types to *zero values*. This technique is common in some programming languages, but the design of F# deliberately de-emphasizes it. However, default initialization is allowed in some circumstances:
 
-- Checked default initialization may be used when a type is known to have a valid and “safe” default zero value. For example, the types of fields that are labeled with DefaultValue(true) are checked to ensure that they allow default initialization.
+- Checked default initialization may be used when a type is known to have a valid and “safe” default zero value. For example, the types of fields that are labeled with `DefaultValue(true)` are checked to ensure that they allow default initialization.
 
-- CLI libraries sometimes perform unchecked default initialization, as do the F# library primitives Unchecked.defaultof<_> and Array.zeroCreate.
+- CLI libraries sometimes perform unchecked default initialization, as do the F# library primitives `Unchecked.defaultof<_>` and `Array.zeroCreate`.
 
 The following types *permit default initialization*:
 
@@ -2803,47 +2930,55 @@ The following types *permit default initialization*:
 
 - Struct types whose field types all permit default initialization.
 
-### Dynamic Conversion Between Types
+### 5.4.10 Dynamic Conversion Between Types
 
-A runtime type *vty* *dynamically converts to* a static type *ty* if any of the following are true:
+A runtime type `vty` *dynamically converts to* a static type `ty` if any of the following are true:
 
-- *vty* coerces to *ty*.
+- `vty` coerces to `ty`.
 
-- *vty* is int32[]and *ty* is uint32[](or conversely). Likewise for sbyte[]/byte[], int16[]/uint16[], int64[]/uint64[], and nativeint[]/unativeint[].
+- `vty` is `int32[]` and `ty` is `uint32[]`(or conversely). Likewise for `sbyte[]`/`byte[]`, `int16[]`/`uint16[]`, `int64[]`/`uint64[]`, and `nativeint[]`/`unativeint[]`.
 
-- *vty* is *enum*[] where *enum* has underlying type *underlying*, and *ty* is *underlying*[] (or conversely), or the (un)signed equivalent of *underlying*[] by the immediately preceding rule.
+- `vty` is `enum[]` where `enum` has underlying type `underlying`, and `ty` is `underlying[]`(or conversely), or the (un)signed equivalent of `underlying[]` by the immediately preceding rule.
 
-- *vty* is *elemty₁*[], *ty* is *elemty₂*[], *elemty₁* is a reference type, and *elemty₁* converts to *elemty₂*.
+- `vty` is `elemty₁[]`, `ty` is `elemty₂[]`, `elemty₁` is a reference type, and `elemty₁` converts to `elemty₂`.
 
-- *ty* is System.Nullable<*vty*>.
+- `ty` is `System.Nullable<vty>`.
 
 Note that this specification does not define the full algebra of the conversions of runtime types to static types because the information that is available in runtime types is implementation dependent. However, the specification does state the conditions under which objects are guaranteed to have a runtime type that is compatible with a particular static type.
 
-**Note**: This specification covers the additional rules of CLI dynamic conversions, all of which apply to F# types. For example:
+Note: This specification covers the additional rules of CLI dynamic conversions, all of which apply to F# types. For example:
 
+```fsharp
 let x = box [| System.DayOfWeek.Monday |]  
-let y = x :? int32[]  
+let y = x :? int32[]
 printf "%b" y // true
+```
 
-In the previous code, the type System.DayOfWeek.Monday[] does not statically coerce to int32[], but the expression x :? int32[] evaluates to true.
+In the previous code, the type `System.DayOfWeek[]` does not statically coerce to `int32[]`, but the expression `x :? int32[]` evaluates to true.
 
+```fsharp
 let x = box [| 1 |]  
 let y = x :? uint32 []  
 printf "%b" y // true
+```
 
-In the previous code, the type int32[] does not statically coerce to uint32[], but the expression x :? uint32 [] evaluates to true.
+In the previous code, the type `int32[]` does not statically coerce to `uint32[]`, but the expression `x :? uint32[]` evaluates to true.
 
+```fsharp
 let x = box [| "" |]  
 let y = x :? obj []  
 printf "%b" y // true
+```
 
-In the previous code, the type string[] does not statically coerce to obj[], but the expression x :? obj []evaluates to true.
+In the previous code, the type `string[]` does not statically coerce to `obj[]`, but the expression `x :? obj []` evaluates to true.
 
+```fsharp
 let x = box 1  
 let y = x :? System.Nullable<int32>  
 printf "%b" y // true
+```
 
-In the previous code, the type int32 does not coerce to System.Nullable<int32>, but the expression x :? System.Nullable<int32> evaluates to true.
+In the previous code, the type `int32` does not coerce to `System.Nullable<int32>`, but the expression `x :? System.Nullable<int32>` evaluates to true.
 
 # Expressions
 
@@ -3269,32 +3404,32 @@ F# compilers may optimize on the assumption that calls to numeric literal functi
 
 ### Tuple Expressions
 
-An expression of the form *expr*₁, ..., *expr*_(n) is a *tuple expression*. For example:
+An expression of the form *expr*₁, ..., *expr*_n is a *tuple expression*. For example:
 
 let three = (1,2,"3")
 
 let blastoff = (10,9,8,7,6,5,4,3,2,1,0)
 
-The expression has the type (*ty₁* * ... * *ty_(n)*) for fresh types *ty₁* … *ty_(n)*, and each individual expression *e*_(i) is checked using initial type *ty*_(i).
+The expression has the type (*ty₁* * ... * *ty_n*) for fresh types *ty₁* … *ty_n*, and each individual expression *e*_(i) is checked using initial type *ty*_(i).
 
-Tuple types and expressions are translated into applications of a family of F# library types named System.Tuple. Tuple types *ty₁* * ... * *ty_(n)* are translated as follows:
+Tuple types and expressions are translated into applications of a family of F# library types named System.Tuple. Tuple types *ty₁* * ... * *ty_n* are translated as follows:
 
-- For *n* <= 7 the elaborated form is Tuple<*ty₁*,...,*ty_(n)*>.
+- For *n* <= 7 the elaborated form is Tuple<*ty₁*,...,*ty_n*>.
 
 - For larger *n*, tuple types are shorthand for applications of the additional F# library type System.Tuple<_> as follows:
 
 - For *n* = 8 the elaborated form is Tuple<*ty₁*,...,*ty₇*,Tuple<*ty₈*>>.
 
-- For 9 <= *n* the elaborated form is Tuple<*ty₁*,...,*ty₇*,*ty_(B)*> where *ty_(B)* is the converted form of the type (*ty₈ **...* *ty_(n)*).
+- For 9 <= *n* the elaborated form is Tuple<*ty₁*,...,*ty₇*,*ty_(B)*> where *ty_(B)* is the converted form of the type (*ty₈ **...* *ty_n*).
 
-Tuple expressions (*expr*₁,...,*expr_(n)*) are translated as follows:
+Tuple expressions (*expr*₁,...,*expr_n*) are translated as follows:
 
-- For *n* <= 7 the elaborated form new Tuple<*ty₁*,…,*ty_(n)*>(*expr*₁,...,*expr_(n)*).
+- For *n* <= 7 the elaborated form new Tuple<*ty₁*,…,*ty_n*>(*expr*₁,...,*expr_n*).
 
 - For *n* = 8 the elaborated form new Tuple<*ty₁*,…,*ty₇*,Tuple<*ty₈*>>(*expr*₁,...,*expr*₇, new Tuple<ty₈>(*expr*₈).
 
-- For 9 <= *n* the elaborated form new Tuple<*ty₁*,...*ty₇*,*ty**_(8n)***>(*expr*₁,..., *expr*₇, new *ty***_(8n)**(*e*_(8n)) where *ty*_(8n) is the type (*ty*₈*...* *ty*_(n)) and *expr*_(8n) is the elaborated form of the expression  
-   *expr*₈,...,* expr*_(n).
+- For 9 <= *n* the elaborated form new Tuple<*ty₁*,...*ty₇*,*ty**_(8n)***>(*expr*₁,..., *expr*₇, new *ty***_(8n)**(*e*_(8n)) where *ty*_(8n) is the type (*ty*₈*...* *ty*_n) and *expr*_(8n) is the elaborated form of the expression  
+   *expr*₈,...,* expr*_n.
 
 When considered as static types, tuple types are distinct from their encoded form. However, the encoded form of tuple values and types is visible in the F# type system through runtime types. For example, typeof<int * int> is equivalent to typeof<System.Tuple<int,int>>, and (1,2) has the runtime type System.Tuple<int,int>. Likewise, (1,2,3,4,5,6,7,8,9) has the runtime type Tuple<int,int,int,int,int,int,int,Tuple<int,int>>.
 
@@ -3310,15 +3445,15 @@ Runtime types of other forms do not have a corresponding tuple type. In particul
 
 ### List Expressions
 
-An expression of the form [*expr₁*;...; *expr_(n)*] is a *list expression*. The initial type of the expression is asserted to be FSharp.Collections.List<*ty*> for a fresh type *ty*.
+An expression of the form [*expr₁*;...; *expr_n*] is a *list expression*. The initial type of the expression is asserted to be FSharp.Collections.List<*ty*> for a fresh type *ty*.
 
 If *ty* is a named type, each expression *expr_(i)* is checked using a fresh type *ty'* as its initial type, with the constraint *ty'* :> *ty*. Otherwise, each expression *expr_(i)* is checked using *ty* as its initial type.
 
-List expressions elaborate to uses of FSharp.Collections.List<_> as op_Cons(*expr₁*,(op_Cons(*expr₂*... op_Cons (*expr_(n)*, op_Nil)...) where op_Cons and op_Nil are the union cases with symbolic names :: and [] respectively.
+List expressions elaborate to uses of FSharp.Collections.List<_> as op_Cons(*expr₁*,(op_Cons(*expr₂*... op_Cons (*expr_n*, op_Nil)...) where op_Cons and op_Nil are the union cases with symbolic names :: and [] respectively.
 
 ### Array Expressions
 
-An expression of the form [|*expr₁*;...; *expr_(n)* |] is an *array expression*. The initial type of the expression is asserted to be *ty*[] for a fresh type *ty*.
+An expression of the form [|*expr₁*;...; *expr_n* |] is an *array expression*. The initial type of the expression is asserted to be *ty*[] for a fresh type *ty*.
 
 If this assertion determines that *ty* is a named type, each expression *expr_(i)* is checked using a fresh type *ty'* as its initial type, with the constraint *ty'* :> *ty*. Otherwise, each expression *expr_(i)* is checked using *ty* as its initial type.
 
@@ -3328,7 +3463,7 @@ Note: The F# implementation ensures that large arrays of constants of type bool,
 
 ### Record Expressions
 
-An expression of the form { *field-initializer₁* ; … ; *field-initializer_(n)* } is a *record construction expression*. For example:
+An expression of the form { *field-initializer₁* ; … ; *field-initializer_n* } is a *record construction expression*. For example:
 
 type Data = { Count : int; Name : string }
 
@@ -3398,7 +3533,7 @@ new() = { x = 1; y = 2 }
 
 Note: The following record initialization form is deprecated:
 
-{ new *type* with *Field₁* = *expr₁* and … and *Field_(n)* = *expr_(n)* }
+{ new *type* with *Field₁* = *expr₁* and … and *Field_n* = *expr_n* }
 
 The F# implementation allows the use of this form only with uppercase identifiers.
 
@@ -3412,7 +3547,7 @@ A *copy-and-update record expression* has the following form:
 
 where *field-initializers* is of the following form:
 
-*field-label₁* = *expr₁* ; … ; *field-label_(n)* = *expr_(n)*
+*field-label₁* = *expr₁* ; … ; *field-label_n* = *expr_n*
 
 Each *field-label_(i)* is a *long-ident*. In the following example, data2 is defined by using such an expression:
 
@@ -3432,12 +3567,12 @@ The expression *expr* is first checked with the same initial type as the overall
 
 A copy-and-update record expression elaborates as if it were a record expression written as follows:
 
-let *v* = *expr* in { *field-label₁* = *expr₁* ; … ; *field-label_(n)* = *expr_(n); F₁ = v.F₁; ... ; F_(M) = v.F_(M)* }  
+let *v* = *expr* in { *field-label₁* = *expr₁* ; … ; *field-label_n* = *expr_n; F₁ = v.F₁; ... ; F_(M) = v.F_(M)* }  
 where *F*₁ ... *F*_(M) are the fields of R that are not defined in *field-initializers* and *v* is a fresh variable.
 
 ### Function Expressions
 
-An expression of the form fun *pat₁* ... *pat_(n)* -> *expr* is a *function expression*. For example:
+An expression of the form fun *pat₁* ... *pat_n* -> *expr* is a *function expression*. For example:
 
 (fun x -> x + 1)
 
@@ -3449,13 +3584,13 @@ An expression of the form fun *pat₁* ... *pat_(n)* -> *expr* is a *function ex
 
 Function expressions that involve only variable patterns are a primitive elaborated form. Function expressions that involve non-variable patterns elaborate as if they had been written as follows:
 
-fun *v₁* ... *v_(n)* ->
+fun *v₁* ... *v_n* ->
 
 let *pat₁ = v₁*
 
 ...
 
-let *pat_(n) = v_(n)*
+let *pat_n = v_n*
 
 *expr*
 
@@ -3479,7 +3614,7 @@ interface *ty₁* *object-members₁*
 
 …
 
-interface *ty_(n)* *object-members_(n)* }
+interface *ty_n* *object-members_n* }
 
 In the case of the interface declarations, the *object-members* are optional and are considered empty if absent. Each set of *object-members* has the form:
 
@@ -3518,7 +3653,7 @@ An object expression can specify additional interfaces beyond those required to 
 
 Object expressions are statically checked as follows.
 
-1. First, *ty₀* to *ty_(n)* are checked to verify that they are named types. The overall type of the expression is *ty₀* and is asserted to be equal to the initial type of the expression. However, if *ty₀* is type equivalent to System.Object and *ty₁* exists, then the overall type is instead *ty₁*.
+1. First, *ty₀* to *ty_n* are checked to verify that they are named types. The overall type of the expression is *ty₀* and is asserted to be equal to the initial type of the expression. However, if *ty₀* is type equivalent to System.Object and *ty₁* exists, then the overall type is instead *ty₁*.
 
 2. The type *ty₀* must be a class or interface type. The base construction argument *args-expr* must appear if and only if *ty₀* is a class type. The type must have one or more accessible constructors; the call to these constructors is resolved and elaborated using *Method Application Resolution* (see §14.4). Except for *ty₀*, each *ty_(i)* must be an interface type.
 
@@ -4568,7 +4703,7 @@ Additional constructs may be inserted when resolving method calls into simpler p
 
 An expression of the following form is an *object construction expression*:
 
-new *ty*(*e₁* ... *e_(n)*)
+new *ty*(*e₁* ... *e_n*)
 
 An object construction expression constructs a new instance of a type, usually by calling a constructor method on the type. For example:
 
@@ -4591,15 +4726,15 @@ The initial type of the expression is first asserted to be equal to *ty*. The ty
 If *ty* is a delegate type the expression is a *delegate implementation expression*.
 
 - If the delegate type has an Invoke method that has the following signature  
-  Invoke(*ty₁*,...,*ty_(n)*) -> *rty_(A)*,
+  Invoke(*ty₁*,...,*ty_n*) -> *rty_(A)*,
 
   then the overall expression must be in this form:
 
-  new *ty*(*expr*) where *expr* has type *ty₁* -> ... -> *ty_(n)* -> *rty_(B)*
+  new *ty*(*expr*) where *expr* has type *ty₁* -> ... -> *ty_n* -> *rty_(B)*
 
   If type *rty_(A)* is a CLI void type, then *rty_(B)* is unit, otherwise it is *rty_(A)*.
 
-- If any of the types *ty_(i)* is a byref-type then an explicit function expression must be specified. That is, the overall expression must be of the form new *ty*(fun *pat_(1 ...) pat_(n)* -> *expr_(body)*).
+- If any of the types *ty_(i)* is a byref-type then an explicit function expression must be specified. That is, the overall expression must be of the form new *ty*(fun *pat_(1 ...) pat_n* -> *expr_(body)*).
 
 If *ty* is a type variable:
 
@@ -5331,13 +5466,13 @@ where *ident₁*, *typars₁* and *expr₁* are defined in §14.6.
 
 - Otherwise, the resulting elaborated form of the entire expression is
 
-let *tmp* <*typars*_(1…) *typars*_(n)> = *expr* in
+let *tmp* <*typars*_(1…) *typars*_n> = *expr* in
 
 let *ident₁* <*typars*₁> = *expr₁* in
 
 …
 
-let *ident_(n)* <*typars*_(n)> = *expr_(n)* in
+let *ident_n* <*typars*_n> = *expr_n* in
 
 *body-expr*
 
@@ -5363,7 +5498,7 @@ let *function-defn* in *expr*
 
 where *function-defn* has the form:
 
-inline*_(opt)* *access_(opt)* *ident-or-op typar-defns_(opt)* *pat₁* ... *pat_(n)* *return-type_(opt)* = *rhs-expr*
+inline*_(opt)* *access_(opt)* *ident-or-op typar-defns_(opt)* *pat₁* ... *pat_n* *return-type_(opt)* = *rhs-expr*
 
 Checking proceeds as follows:
 
@@ -5811,9 +5946,9 @@ At runtime, an elaborated value reference v is evaluated by looking up the value
 
 ### Evaluating Function Applications
 
-At runtime, an elaborated application of a function *f e₁* ... *e_(n)* is evaluated as follows:
+At runtime, an elaborated application of a function *f e₁* ... *e_n* is evaluated as follows:
 
-- The expressions *f* and *e₁* ... *e_(n)*, are evaluated.
+- The expressions *f* and *e₁* ... *e_n*, are evaluated.
 
 - If *f* evaluates to a function value with closure environment **E**, arguments *v₁* ... *v_(m)*, and body *expr*, where *m* <= *n*, then **E** is extended by mapping *v₁* ... *v_(m)* to the argument values for *e₁* ... *e_(m)*. The expression *expr* is then evaluated in this extended environment and any remaining arguments applied.
 
@@ -5825,9 +5960,9 @@ The result of calling the obj.GetType() method on the resulting object is under-
 
 At runtime an elaborated application of a method is evaluated as follows:
 
-- The elaborated form is *e₀*.M(*e₁*,…,*e_(n)*) for an instance method or M(*e₁*,…,*e_(n)*) for a static method.
+- The elaborated form is *e₀*.M(*e₁*,…,*e_n*) for an instance method or M(*e₁*,…,*e_n*) for a static method.
 
-- The (optional) *e₀* and *e₁*,…,*e_(n)* are evaluated in order.
+- The (optional) *e₀* and *e₁*,…,*e_n* are evaluated in order.
 
 - If *e₀* evaluates to null, a NullReferenceException is raised.
 
@@ -5837,11 +5972,11 @@ At runtime an elaborated application of a method is evaluated as follows:
 
 ### Evaluating Union Cases
 
-At runtime, an elaborated use of a union case *Case*(*e₁*,…,*e_(n)*) for a union type *ty* is evaluated as follows:
+At runtime, an elaborated use of a union case *Case*(*e₁*,…,*e_n*) for a union type *ty* is evaluated as follows:
 
-- The expressions *e₁*,…,*e_(n)* are evaluated in order.
+- The expressions *e₁*,…,*e_n* are evaluated in order.
 
-- The result of evaluation is an object value with union case label *Case* and fields given by the values of *e₁*,…,*e_(n)*.
+- The result of evaluation is an object value with union case label *Case* and fields given by the values of *e₁*,…,*e_n*.
 
 - If the type *ty* uses null as a representation (§5.4.8) and *Case* is the single union case without arguments, the generated value is null.
 
@@ -5861,23 +5996,23 @@ At runtime, an elaborated lookup of a CLI or F# fields is evaluated as follows:
 
 ### Evaluating Array Expressions
 
-At runtime, an elaborated array expression [| *e₁; …* ; *e_(n)* |]*_(ty)* is evaluated as follows:
+At runtime, an elaborated array expression [| *e₁; …* ; *e_n* |]*_(ty)* is evaluated as follows:
 
-- Each expression *e₁ … e_(n)* is evaluated in order.
+- Each expression *e₁ … e_n* is evaluated in order.
 
 - The result of evaluation is a new array of runtime type *ty*[] that contains the resulting values in order.
 
 ### Evaluating Record Expressions
 
-At runtime, an elaborated record construction { *field*₁ = *e₁; …* ; *field*_(n) = *e_(n)* }*_(ty)* is evaluated as follows:
+At runtime, an elaborated record construction { *field*₁ = *e₁; …* ; *field*_n = *e_n* }*_(ty)* is evaluated as follows:
 
-- Each expression *e₁ … e_(n)* is evaluated in order.
+- Each expression *e₁ … e_n* is evaluated in order.
 
 - The result of evaluation is an object of type *ty* with the given field values
 
 ### Evaluating Function Expressions
 
-At runtime, an elaborated function expression (fun *v₁* … *v_(n)*-> *expr*) is evaluated as follows:
+At runtime, an elaborated function expression (fun *v₁* … *v_n*-> *expr*) is evaluated as follows:
 
 - The expression evaluates to a function object with a closure that assigns values to all variables that are referenced in *expr* and a function body that is *expr*.
 
@@ -5895,7 +6030,7 @@ interface ty₁ object-members₁
 
 …
 
-interface ty_(n) object-members_(n) }
+interface ty_n object-members_n }
 
 is evaluated as follows:
 
@@ -6337,15 +6472,15 @@ If *long-ident* from §7.2 resolves to an *active pattern case name* *CaseName_(
 
   Partial. The function accepts one argument (the value being matched) and must return a value of type FSharp.Core.option<_>
 
-- (|*CaseName₁*| ...|*CaseName_(n)*|) *inp*
+- (|*CaseName₁*| ...|*CaseName_n*|) *inp*
 
   Multi-case. The function accepts one argument (the value being matched), and must return a value of type FSharp.Core.Choice<_,...,_> based on the number of case names. In F#, the limitation *n* ≤ 7 applies.
 
-- (|*CaseName*|) *arg₁* ... *arg_(n)* *inp*
+- (|*CaseName*|) *arg₁* ... *arg_n* *inp*
 
   Single case with parameters. The function accepts *n*+1 arguments, where the last argument (*inp*) is the value to match, and can return any type.
 
-- (|*CaseName*|_|) *arg₁* ... *arg_(n)* *inp*
+- (|*CaseName*|_|) *arg₁* ... *arg_n* *inp*
 
   Partial with parameters. The function accepts *n*+1 arguments, where the last argument (*inp*) is the value to match, and must return a value of type FSharp.Core.option<_>.
 
@@ -6517,8 +6652,8 @@ The pattern *pat* :: *pat* is a union case pattern that matches the “cons” u
 
 The pattern [] is a union case pattern that matches the “nil” union case of F# list values.
 
-The pattern [*pat₁* ; ... ; *pat_(n)*] is shorthand for a series of :: and empty list patterns  
-*pat₁ *:: … :: *pat_(n)* :: [].
+The pattern [*pat₁* ; ... ; *pat_n*] is shorthand for a series of :: and empty list patterns  
+*pat₁ *:: … :: *pat_n* :: [].
 
 For example:
 
@@ -6619,7 +6754,7 @@ At runtime, a dynamic type-test pattern succeeds if and only if the correspondin
 
 The following is a *record pattern*:
 
-{ *long-ident₁* = *pat₁*; ... ; *long-ident_(n)* = *pat_(n)*}
+{ *long-ident₁* = *pat₁*; ... ; *long-ident_n* = *pat_n*}
 
 For example:
 
@@ -8076,7 +8211,7 @@ extern void SetConsoleCtrlHandler(ControlEventHandler callback, bool add)
 
 An *exception definition* defines a new way of constructing values of type exn (a type abbreviation for System.Exception). Exception definitions have the form:
 
-exception *ident* of *type₁* * … * *type_(n)*
+exception *ident* of *type₁* * … * *type_n*
 
 An exception definition has the following effect:
 
@@ -8224,9 +8359,9 @@ Extensions are checked as follows:
 
 - Extension members are compiled as CLI static members with encoded names.
 
-- The elaborated form of an application of a static extension member *C*.*M*(arg₁,…,*arg_(n)*) is a call to this static member with arguments arg₁,…,*arg_(n)*..
+- The elaborated form of an application of a static extension member *C*.*M*(arg₁,…,*arg_n*) is a call to this static member with arguments arg₁,…,*arg_n*..
 
-- The elaborated form of an application of an instance extension member *obj*.*M*(arg₁,…,*arg_(n)*) is an invocation of the static instance member where the object parameter is supplied as the first argument to the extension member followed by arguments arg₁ … *arg_(n)*.
+- The elaborated form of an application of an instance extension member *obj*.*M*(arg₁,…,*arg_n*) is an invocation of the static instance member where the object parameter is supplied as the first argument to the extension member followed by arguments arg₁ … *arg_n*.
 
 ### Imported CLI C# Extensions Members
 
@@ -8503,7 +8638,7 @@ member val Property = "implemented" with get, set
 
 A *method member* is of the form:
 
-static*_(opt)* member *ident*.*_(opt)* *ident* *pat₁* ... *pat_(n)* = *expr*
+static*_(opt)* member *ident*.*_(opt)* *ident* *pat₁* ... *pat_n* = *expr*
 
 The *ident*.*_(opt)* can be present if and only if the property member is an instance member. In this case, the identifier *ident* corresponds to the “this” (or “self”) variable associated with the object on which the member is being invoked.
 
@@ -8687,7 +8822,7 @@ The first type-directed conversion converts anonymous function expressions and o
 
 - A formal parameter of delegate type *D*
 
-- An actual argument *farg* of known type *ty₁* -> ... -> *ty_(n)* -> *rty*
+- An actual argument *farg* of known type *ty₁* -> ... -> *ty_n* -> *rty*
 
 - Precisely *n* arguments to the Invoke method of delegate type *D*
 
@@ -8695,7 +8830,7 @@ Then:
 
 - The parameter is interpreted as if it were written:
 
-new *D*(fun *arg₁* ... *arg_(n)* -> *farg* *arg₁* ... *arg_(n)*)
+new *D*(fun *arg₁* ... *arg_n* -> *farg* *arg₁* ... *arg_n*)
 
 If the type of the formal parameter is a variable type, then F# uses the known inferred type of the argument including instantiations to determine whether a formal parameter has delegate type. For example, if an explicit type instantiation is given that instantiates a generic type parameter to a delegate type, the following conversion can apply:
 
@@ -8998,9 +9133,9 @@ where a member signature has one of the following forms
 
 and the curried signature has the form
 
-*args-spec₁* -> *...* -> *args-spec_(n) -> type*
+*args-spec₁* -> *...* -> *args-spec_n -> type*
 
-If *n* ≥ 2, then *args-spec₂* … *args-spec_(n)* must all be patterns without attribute or optional argument specifications.
+If *n* ≥ 2, then *args-spec₂* … *args-spec_n* must all be patterns without attribute or optional argument specifications.
 
 If get or set is specified, the abstract member is a *property member*. If both get and set are specified, the abstract member is equivalent to two abstract members, one with get and one with set.
 
@@ -9008,9 +9143,9 @@ If get or set is specified, the abstract member is a *property member*. If both 
 
 An *implementation member* has the form:
 
-override *ident*.*ident* *pat₁* ... *pat_(n)* = *expr*
+override *ident*.*ident* *pat₁* ... *pat_n* = *expr*
 
-default *ident*.*ident* *pat₁* ... *pat_(n)* = *expr*
+default *ident*.*ident* *pat₁* ... *pat_n* = *expr*
 
 Implementation members implement dispatch slots. For example:
 
@@ -10166,7 +10301,7 @@ Cat.tabby |> Cat.purr |> Cat.purrTwice
 
 Function and value definitionsin modules introduce named values and functions.
 
-let rec*_(opt)* *function-or-value-defn₁* and *...* and *function-or-value-defn_(n)*
+let rec*_(opt)* *function-or-value-defn₁* and *...* and *function-or-value-defn_n*
 
 The following example defines value x and functions id and fib:
 
@@ -10386,7 +10521,7 @@ Import declarations can be used in:
 
 - Namespace declaration groups and their signatures.
 
-An import declaration is processed by first resolving the *long-ident* to one or more namespace declaration groups and/or modules [*F₁*, ..., *F_(n)*] by *Name Resolution in Module and Namespace Paths* (§14.1.2). For example, System.Collections.Generic may resolve to one or more namespace declaration groups—one for each assembly that contributes a namespace declaration group in the current environment. Next, each *F_(i)* is added to the environment successively by using the technique specified in §14.1.3. An error occurs if any *F_(i)* is a module that has the RequireQualifiedAccess attribute.
+An import declaration is processed by first resolving the *long-ident* to one or more namespace declaration groups and/or modules [*F₁*, ..., *F_n*] by *Name Resolution in Module and Namespace Paths* (§14.1.2). For example, System.Collections.Generic may resolve to one or more namespace declaration groups—one for each assembly that contributes a namespace declaration group in the current environment. Next, each *F_(i)* is added to the environment successively by using the technique specified in §14.1.3. An error occurs if any *F_(i)* is a module that has the RequireQualifiedAccess attribute.
 
 ## Module Abbreviations
 
@@ -10648,7 +10783,7 @@ If both a signature and an implementation contain a function or value definition
 
 #### Arity Conformance for Functions and Values
 
-Arities of functions and values must conform between implementation and signature. Arities of values are implicit in module signatures. A signature that contains the following results in the arity [*A₁*...*A_(n)*] for F:
+Arities of functions and values must conform between implementation and signature. Arities of values are implicit in module signatures. A signature that contains the following results in the arity [*A₁*...*A_n*] for F:
 
 val F : *ty_(1,1)* * ... * *ty_(1,A1)* -> ... -> *ty_(n,1)* * ... * *ty_(n,An)* -> *rty*
 
@@ -11753,7 +11888,7 @@ List.map System.Environment.GetEnvironmentVariable ["PATH"; "USERNAME"]
 
 - If the argument has the syntactic form of an address-of expression &*expr* after ignoring parentheses around the argument, equate this type with a type byref<*ty*> for a fresh type *ty*.
 
-- If the argument has the syntactic form of a function expression fun *pat₁* … *pat_(n)* -> *expr* after ignoring parentheses around the argument, equate this type with a type *ty₁ *-> … *ty_(n)*-> *rty* for fresh types *ty₁* … *ty_(n)*.
+- If the argument has the syntactic form of a function expression fun *pat₁* … *pat_n* -> *expr* after ignoring parentheses around the argument, equate this type with a type *ty₁ *-> … *ty_n*-> *rty* for fresh types *ty₁* … *ty_n*.
 
 &nbsp;
 
@@ -11912,9 +12047,9 @@ List.map System.Environment.GetEnvironmentVariable ["PATH"; "USERNAME"]
 Two additional rules apply when checking arguments (see §8.13.7 for examples):
 
 - If a formal parameter has delegate type *D*, an actual argument *farg* has known type  
-  *ty₁* -> ... -> *ty_(n)* -> *rty*, and the number of arguments of the Invoke method of delegate type *D* is precisely *n*, interpret the formal parameter in the same way as the following:
+  *ty₁* -> ... -> *ty_n* -> *rty*, and the number of arguments of the Invoke method of delegate type *D* is precisely *n*, interpret the formal parameter in the same way as the following:
 
-new *D*(fun *arg₁* ... *arg_(n)* -> *farg* *arg₁* ... *arg_(n)*).
+new *D*(fun *arg₁* ... *arg_n* -> *farg* *arg₁* ... *arg_n*).
 
 For more information on the conversions that are automatically applied to arguments, see §8.13.6.
 
@@ -12145,13 +12280,13 @@ New constraints in the following form ) are solved as *member constraints* (§5.
 
 (type1 or ... or typen) : (member-sig)
 
-A member constraint is satisfied if one of the types in the *support set type₁ *... *type_(n)* satisfies the member constraint. A static type *type* satisfies a member constraint in the form  
-(static_(opt) member *ident* : *arg-type*₁ * ... * *arg-type*_(n) *-> ret-type*)  
+A member constraint is satisfied if one of the types in the *support set type₁ *... *type_n* satisfies the member constraint. A static type *type* satisfies a member constraint in the form  
+(static_(opt) member *ident* : *arg-type*₁ * ... * *arg-type*_n *-> ret-type*)  
 if all of the following are true:
 
 - *type* is a named type whose type definition contains the following member, which takes *n* arguments:
 
-  static_(opt) member *ident* : *formal-arg-type*₁ * ... * *formal-arg-type*_(n) *-> ret-type*
+  static_(opt) member *ident* : *formal-arg-type*₁ * ... * *formal-arg-type*_n *-> ret-type*
 
 - The *type* and the constraint are both marked static or neither is marked static .
 
@@ -12191,7 +12326,7 @@ Each definition is one of the following:
 
 - A function definition :
 
-inline*_(opt)* *ident₁ pat₁* ... *pat_(n)* :*_(opt)* *return-type_(opt)* = *rhs-expr*
+inline*_(opt)* *ident₁ pat₁* ... *pat_n* :*_(opt)* *return-type_(opt)* = *rhs-expr*
 
 - A value definition, which defines one or more values by matching a pattern against an expression:
 
@@ -12199,7 +12334,7 @@ mutable*_(opt)* *pat* :*_(opt)* *type_(opt)* = *rhs-expr*
 
 - A member definition:
 
-static*_(opt)* member *ident_(opt)* *ident* *pat₁* ... *pat_(n)* = *expr*
+static*_(opt)* member *ident_(opt)* *ident* *pat₁* ... *pat_n* = *expr*
 
 For a function, value, or member definition in a class:
 
@@ -12263,21 +12398,21 @@ A value definition *pat* = *rhs-expr* with optional pattern type *type* is proce
 
 6. Otherwise, the resulting elaborated definitions are the following, where *tmp* is a fresh identifier and each *expr_(i)* results from the compilation of the pattern *pat* (§7) against input *tmp*.
 
-*tmp* <*typars*_(1…) *typars*_(n)> = *expr*
+*tmp* <*typars*_(1…) *typars*_n> = *expr*
 
 *ident₁* <*typars*₁> = *expr₁*
 
 …
 
-*ident_(n)* <*typars*_(n)> = *expr_(n)*
+*ident_n* <*typars*_n> = *expr_n*
 
 ### Processing Function Definitions
 
-A function definition *ident₁ pat₁* ... *pat_(n)* = *rhs-expr* is processed as follows:
+A function definition *ident₁ pat₁* ... *pat_n* = *rhs-expr* is processed as follows:
 
 1. If *ident₁* is an active pattern identifier then active pattern result tags are added to the environment (§10.2.4).
 
-2. The expression (*fun pat₁* ... *pat_(n)* : *return-type* -> *rhs-expr*) is checked against a fresh initial type *ty₁* and reduced to an elaborated form *expr*₁. The return type is omitted if the definition does not specify it.
+2. The expression (*fun pat₁* ... *pat_n* : *return-type* -> *rhs-expr*) is checked against a fresh initial type *ty₁* and reduced to an elaborated form *expr*₁. The return type is omitted if the definition does not specify it.
 
 3. The *ident₁* (of type *ty₁*) is then generalized (§14.6.7) and yields generic parameters <*typars₁*>.
 
@@ -12621,7 +12756,7 @@ The F# compiler applies *Dispatch Slot Inference* to object expressions and type
 
 Dispatch slot inference associates each member with a unique abstract member or interface member that the collected types *ty_(i)* define or inherit.
 
-The types *ty₀* ... *ty_(n)* together imply a collection of *required types* R, each of which has a set of *required dispatch slots* Slots_(R) of the form abstract M : *aty₁*...*aty_(N)* -> *aty_(rty)*. Each dispatch slot is placed under the *most-specific* *ty_(i)* relevant to that dispatch slot. If there is no most-specific type for a dispatch slot, an error occurs.
+The types *ty₀* ... *ty_n* together imply a collection of *required types* R, each of which has a set of *required dispatch slots* Slots_(R) of the form abstract M : *aty₁*...*aty_(N)* -> *aty_(rty)*. Each dispatch slot is placed under the *most-specific* *ty_(i)* relevant to that dispatch slot. If there is no most-specific type for a dispatch slot, an error occurs.
 
 For example, assume the following definitions:
 
@@ -12774,11 +12909,11 @@ During checking, members within types and function definitions within modules ar
 
 - The number of iterated (curried) arguments n
 
-- A tuple length for these arguments [*A₁*;...;*A_(n)*]. A tuple length of zero indicates that the corresponding argument is of type unit.
+- A tuple length for these arguments [*A₁*;...;*A_n*]. A tuple length of zero indicates that the corresponding argument is of type unit.
 
-Arities are inferred as follows. A function definition of the following form is given arity [*A₁*;...;*A_(n)*], where each *A_(i)* is derived from the tuple length for the final inferred types of the patterns:
+Arities are inferred as follows. A function definition of the following form is given arity [*A₁*;...;*A_n*], where each *A_(i)* is derived from the tuple length for the final inferred types of the patterns:
 
-let *ident* *pat₁* ... *pat_(n)* = ...
+let *ident* *pat₁* ... *pat_n* = ...
 
 For example, the following is given arity [1; 2]:
 
@@ -12794,12 +12929,12 @@ let f x = fun y -> x + y
 
 Arity inference is applied partly to help define the elaborated form of a function definition. This is the form that other CLI languages see. In particular:
 
-- A function value F in a module that has arity [A₁;...;A_(n)] and the type  
+- A function value F in a module that has arity [A₁;...;A_n] and the type  
   *ty_(1,1)* * ... * *ty_(1,A1)* -> ... -> *ty_(n,1)* * ... * *ty_(n,An)* -> *rty*  
   elaborates to a CLI static method definition with signature  
   *rty* F(*ty_(1,1)*, ..., *ty_(1,A1)*, ..., *ty_(n,1)*, ..., *ty_(n,An)*).
 
-- F# instance (respectively static) methods that have arity [A₁;...;A_(n)] and type  
+- F# instance (respectively static) methods that have arity [A₁;...;A_n] and type  
   *ty_(1,1)* * ... * *ty_(1,A1)* -> ... -> *ty_(n,1)* * ... * *ty_(n,An)* -> *rty*  
   elaborate to a CLI instance (respectively static) method definition with signature  
   *rty* F(*ty_(1,1)*, ..., *ty_(1,A1)*), subject to the syntactic restrictions that result from the patterns that define the member, as described later in this section.
@@ -15132,7 +15267,7 @@ seq { *short-comp-expr* }
 
 5.  Copy and Update Record Expression
 
-{ *expr* **with** *field-label₁* = *expr₁* ; … ; *field-label_(n)* = *expr_(n)* }
+{ *expr* **with** *field-label₁* = *expr₁* ; … ; *field-label_n* = *expr_n* }
 
 6.  Dynamic Operator Expressions
 
@@ -15510,7 +15645,7 @@ static*_(opt)* **member** *ident*.*_(opt)* *ident* **with set** *pat_(opt) pat* 
 
 *ident typar-defns_(opt) : curried-sig* **with set, get**
 
-*curried-sig :* *args-spec₁* -> *...* -> *args-spec_(n) -> type*
+*curried-sig :* *args-spec₁* -> *...* -> *args-spec_n -> type*
 
 4.  Implementation Members
 
@@ -15763,7 +15898,7 @@ The number of arguments to a method or function.
 
 array expression
 
-An expression in the form [|*expr*₁;...; *expr*_(n) |].
+An expression in the form [|*expr*₁;...; *expr*_n |].
 
 array pattern
 
@@ -15847,7 +15982,7 @@ copy-and-update record expression
 
 An expression in the following form:
 
-{ *expr* with *field-label*₁ = *expr*₁ ; … ; *field-label*_(n) = *expr*_(n) }
+{ *expr* with *field-label*₁ = *expr*₁ ; … ; *field-label*_n = *expr*_n }
 
 current inference constraints
 
@@ -15941,7 +16076,7 @@ A variable that is created during type inference and has a unique identity.
 
 function expression
 
-An expression of the form fun *pat₁* ... *pat_(n)* -> *expr*.
+An expression of the form fun *pat₁* ... *pat_n* -> *expr*.
 
 function value
 
@@ -15955,7 +16090,7 @@ A type definition that has one or more generic type parameters. For example: Sys
 
 guarded pattern matching rule
 
-A rule of the form *pat* when *expr* that occurs as part of a pattern matching expression such as match *expr₀* with *rule₁* -> *expr₁* | *…* | *rule_(n)* -> *expr_(n)*. The guard expression *expr* is executed only if the value of *expr₀* successfully matches the pattern *pat*.
+A rule of the form *pat* when *expr* that occurs as part of a pattern matching expression such as match *expr₀* with *rule₁* -> *expr₁* | *…* | *rule_n* -> *expr_n*. The guard expression *expr* is executed only if the value of *expr₀* successfully matches the pattern *pat*.
 
 ## I
 
@@ -16017,7 +16152,7 @@ An F# data structure that consists of a sequence of items. Each item contains a 
 
 list expression
 
-An expression of the form [*expr₁*;...; *expr_(n)*].
+An expression of the form [*expr₁*;...; *expr_n*].
 
 list pattern
 
@@ -16075,7 +16210,7 @@ The collection of names that have been defined at the current point, which F# ca
 
 named type
 
-A type that has a name, in the form *long-ident*<*ty₁,…,ty_(n)*>, where *long-ident* resolves to a a type definition that has formal generic parameters and formal constraints.
+A type that has a name, in the form *long-ident*<*ty₁,…,ty_n*>, where *long-ident* resolves to a a type definition that has formal generic parameters and formal constraints.
 
 namespace
 
@@ -16159,11 +16294,11 @@ An expression that generates a sequence over a given range of values.
 
 record construction expression
 
-An expression that builds a record, in the form { *field-initializer₁* ; … ; *field-initializer_(n)* }.
+An expression that builds a record, in the form { *field-initializer₁* ; … ; *field-initializer_n* }.
 
 record pattern
 
-The pattern { *long-ident₁* = *pat₁*; ... ; *long-ident_(n)* = *pat_(n)*}.
+The pattern { *long-ident₁* = *pat₁*; ... ; *long-ident_n* = *pat_n*}.
 
 recursive definition
 
@@ -16283,11 +16418,11 @@ An ordered collection of values that is treated as an atomic unit. A tuple allow
 
 tuple expression
 
-An expression in the form *expr*₁, ..., *expr*_(n), which describes a tuple value.
+An expression in the form *expr*₁, ..., *expr*_n, which describes a tuple value.
 
 tuple type
 
-A type in the form *ty₁* * ... * *ty_(n)*, which defines a tuple. The elaborated form of a tuple type is shorthand for a use of the family of F# library types System.Tuple<_,...,_>.
+A type in the form *ty₁* * ... * *ty_n*, which defines a tuple. The elaborated form of a tuple type is shorthand for a use of the family of F# library types System.Tuple<_,...,_>.
 
 type abbreviation
 

@@ -1,0 +1,187 @@
+﻿%{%}
+classMemberSpfn :
+    | attributes? access? memberSpecFlags inline? access? identOrOp explicitValTyparDecls? ":" topTypeWithTypeConstraints classMemberSpfnGetSet optLiteralValueSpfn {}
+    | attributes? access? interfaceMember appType {}
+    | attributes? access? inherit appType {}
+    | attributes? access? val fieldDecl {}
+    | attributes? access? static val fieldDecl {}
+    | attributes? access? static type tyconSpfn {}
+    | attributes? access? new ":" topTypeWithTypeConstraints {}
+attributes? :
+    | attributes {}
+    | (*empty*) {}
+access? :
+    | (*empty*) {}
+    | access {}
+access :
+    | private {}
+    | public {}
+    | internal {}
+memberSpecFlags :
+    | memberFlags {}
+    | abstractMemberFlags {}
+memberFlags :
+    | static member {}
+    | member {}
+    | override {}
+    | default {}
+abstractMemberFlags :
+    | abstract {}
+    | abstract member {}
+    | static abstract {}
+    | static abstract member {}
+inline? :
+    | inline {}
+    | (*empty*) {}
+explicitValTyparDecls? :
+    | explicitValTyparDecls {}
+    | (*empty*) {}
+explicitValTyparDecls :
+    | HIGH_PRECEDENCE_TYAPP? "<" explicitValTyparDeclsCore typeConstraints? ">" {}
+HIGH_PRECEDENCE_TYAPP? :
+    | HIGH_PRECEDENCE_TYAPP {}
+    | (*empty*) {}
+explicitValTyparDeclsCore :
+    | typarDeclList "," ".." {}
+    | typarDeclList {}
+    | (*empty*) {}
+typarDeclList :
+    | typarDeclList "," typarDecl {}
+    | typarDecl {}
+typarDecl :
+    | attributes? typar {}
+typar :
+    | "'" IDENT {}
+    | ["@" "^"] IDENT {}
+typeConstraints? :
+    | (*empty*) {}
+    | when typeConstraints {}
+topTypeWithTypeConstraints :
+    | topType {}
+    | topType when typeConstraints {}
+classMemberSpfnGetSet :
+    | (*empty*) {}
+    | with classMemberSpfnGetSetElements {}
+    | OWITH classMemberSpfnGetSetElements OEND {}
+classMemberSpfnGetSetElements :
+    | identOrOp {}
+    | identOrOp "," identOrOp {}
+optLiteralValueSpfn :
+    | (*empty*) {}
+    | "=" declExpr {}
+    | "=" OBLOCKBEGIN declExpr OBLOCKEND ODECLEND? {}
+ODECLEND? :
+    | ODECLEND {}
+    | (*empty*) {}
+interfaceMember :
+    | interface {}
+    | OINTERFACE_MEMBER {}
+fieldDecl :
+    | mutable? access? IDENT ":" typ {}
+mutable? :
+    | mutable {}
+    | (*empty*) {}
+tyconSpfn :
+    | typeNameInfo "=" tyconSpfnRhsBlock {}
+    | typeNameInfo classSpfn? {}
+typeNameInfo :
+    | attributes? tyconNameAndTyparDecls typeConstraints? {}
+tyconNameAndTyparDecls :
+    | access? path {}
+    | access? prefixTyparDecls path {}
+    | access? path postfixTyparDecls {}
+prefixTyparDecls :
+    | typar {}
+    | "(" typarDeclList ")" {}
+postfixTyparDecls :
+    | HIGH_PRECEDENCE_TYAPP? "<" typarDeclList typeConstraints? ">" {}
+tyconSpfnRhsBlock :
+    | OBLOCKBEGIN tyconSpfnRhs OBLOCKSEP? classSpfnMembers classSpfn? OBLOCKEND classSpfn? {}
+    | tyconSpfnRhs classSpfn? {}
+tyconSpfnRhs :
+    | tyconDefnOrSpfnSimpleRepr {}
+    | tyconClassSpfn {}
+    | delegate of topType {}
+tyconDefnOrSpfnSimpleRepr :
+    | attributes? access? typ {}
+    | attributes? access? unionTypeRepr {}
+    | attributes? access? braceFieldDeclList {}
+    | attributes? access? "(" "#" STRING "#" ")" {}
+unionTypeRepr :
+    | "|" attrUnionCaseDecls {}
+    | firstUnionCaseDeclOfMany "|" attrUnionCaseDecls {}
+    | firstUnionCaseDecl {}
+attrUnionCaseDecls :
+    | attrUnionCaseDecl "|" attrUnionCaseDecls {}
+    | attrUnionCaseDecl {}
+attrUnionCaseDecl :
+    | attributes? access? unionCaseName {}
+    | attributes? access? unionCaseName of unionCaseRepr {}
+    | attributes? access? unionCaseName ":" topType {}
+    | attributes? access? unionCaseName "=" constant {}
+unionCaseName :
+    | identOrOp {}
+    | "(" "::" ")" {}
+    | "(" "[" "]" ")" {}
+unionCaseRepr :
+    | braceFieldDeclList {}
+    | unionCaseReprElements {}
+braceFieldDeclList :
+    | "{" recdFieldDeclList "}" {}
+recdFieldDeclList :
+    | recdFieldDecl seps recdFieldDeclList {}
+    | recdFieldDecl seps? {}
+recdFieldDecl :
+    | attributes? fieldDecl {}
+seps :
+    | OBLOCKSEP {}
+    | ";" {}
+    | OBLOCKSEP ";" {}
+    | ";" OBLOCKSEP {}
+seps? :
+    | seps {}
+    | (*empty*) {}
+unionCaseReprElements :
+    | unionCaseReprElement "*" unionCaseReprElements {}
+    | unionCaseReprElement {}
+unionCaseReprElement :
+    | IDENT ":" appType {}
+    | appType {}
+constant :
+    | rawConstant {}
+    | rawConstant HIGH_PRECEDENCE_TYAPP measureTypeArg {}
+firstUnionCaseDeclOfMany :
+    | IDENT OBLOCKSEP? {}
+    | IDENT "=" constant OBLOCKSEP? {}
+    | firstUnionCaseDecl OBLOCKSEP? {}
+OBLOCKSEP? :
+    | OBLOCKSEP {}
+    | (*empty*) {}
+firstUnionCaseDecl :
+    | IDENT of unionCaseRepr {}
+    | IDENT "=" constant OBLOCKSEP? {}
+tyconClassSpfn :
+    | classSpfnBlockKindUnspecified {}
+    | classOrInterfaceOrStruct classSpfnBlock end {}
+classSpfnBlockKindUnspecified :
+    | OBLOCKBEGIN classSpfnMembers OBLOCKEND {}
+    | begin classSpfnBlock end {}
+classSpfnMembers :
+    | classSpfnMembersAtLeastOne {}
+    | (*empty*) {}
+classSpfnMembersAtLeastOne :
+    | classMemberSpfn seps? classSpfnMembers {}
+classSpfnBlock :
+    | OBLOCKBEGIN classSpfnMembers OBLOCKEND {}
+    | classSpfnMembers {}
+classOrInterfaceOrStruct :
+    | class {}
+    | interface {}
+    | struct {}
+classSpfn? :
+    | with classSpfnBlock declEnd {}
+    | (*empty*) {}
+declEnd :
+    | ODECLEND {}
+    | OEND {}
+    | end {}

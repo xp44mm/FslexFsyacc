@@ -1,0 +1,39 @@
+﻿%{%}
+identOrOp :
+    | IDENT {}
+    | opName {}
+opName :
+    | LPAREN operatorName RPAREN {}
+    | LPAREN_STAR_RPAREN {}
+    | LPAREN activePatternCaseNames BAR RPAREN {}
+    | LPAREN activePatternCaseNames BAR UNDERSCORE BAR RPAREN {}
+operatorName :
+    | PREFIX_OP {}
+    | INFIX_STAR_STAR_OP {}
+    | INFIX_COMPARE_OP {}
+    | INFIX_AT_HAT_OP {}
+    | INFIX_BAR_OP {}
+    | INFIX_AMP_OP {}
+    | PLUS_MINUS_OP {}
+    | INFIX_STAR_DIV_MOD_OP {}
+    | DOLLAR {}
+    | ADJACENT_PREFIX_OP {}
+    | MINUS {}
+    | STAR {}
+    | EQUALS {}
+    | OR {}
+    | LESS {}
+    | GREATER {}
+    | QMARK {}
+    | AMP {}
+    | AMP_AMP {}
+    | BAR_BAR {}
+    | COLON_EQUALS {}
+    | FUNKY_OPERATOR_NAME {}
+    | PERCENT_OP {}
+    | DOT_DOT {}
+    | DOT_DOT DOT_DOT {}
+    | LQUOTE RQUOTE {}
+activePatternCaseNames :
+    | BAR IDENT {}
+    | activePatternCaseNames BAR IDENT {}
