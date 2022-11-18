@@ -1,0 +1,45 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Authors>cuishengli</Authors>
+    <Description>`FSharp.Compiler.SyntaxTreeX` is a subtree of `FSharp.Compiler.SyntaxTree`.</Description>
+    <PackageReadmeFile>readme.md</PackageReadmeFile>
+    <PackageReleaseNotes>update FSharp.Compiler.Service for 42.7.100</PackageReleaseNotes>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+    <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
+
+    <PackageProjectUrl>https://github.com/xp44mm/FSharp.Compiler.SyntaxTreeX</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/xp44mm/FSharp.Compiler.SyntaxTreeX</RepositoryUrl>
+    <PackageTags>FSharp;Compiler;SyntaxTree</PackageTags>
+    <Company>34696643@qq.com</Company>
+    <IsPublishable>True</IsPublishable>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Copyright>xp44mm</Copyright>
+    <Version>1.0.6</Version>
+
+
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="SyntaxTreeX.fs" />
+    <Compile Include="Transformation.fs" />
+    <Compile Include="Readers.fs" />
+    <Compile Include="Parser.fs" />
+    <Compile Include="SourceCodeParser.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="readme.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FSharp.Compiler.Service" Version="42.7.101" />
+    <PackageReference Include="FSharp.Literals" Version="2.2.11" />
+  </ItemGroup>
+
+</Project>

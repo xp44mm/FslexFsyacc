@@ -69,7 +69,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="FSharp.Compiler.SyntaxTreeX" Version="1.0.6" />
 		<PackageReference Include="FSharp.xUnit" Version="1.2.3" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.0" />
 		<PackageReference Include="System.Reactive" Version="5.0.0" />
@@ -85,6 +84,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\FSharp.Compiler.SyntaxTreeX\FSharp.Compiler.SyntaxTreeX.fsproj" />
 	  <ProjectReference Include="..\FslexFsyacc.Runtime\FslexFsyacc.Runtime.fsproj" />
 	  <ProjectReference Include="..\FslexFsyacc\FslexFsyacc.fsproj" />
 	</ItemGroup>

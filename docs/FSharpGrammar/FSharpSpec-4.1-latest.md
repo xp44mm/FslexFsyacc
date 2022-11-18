@@ -1838,14 +1838,14 @@ opName :
 operatorName :
     | ["!" "~"] {}
     | ["**"] {}
-    | INFIX_COMPARE_OP {}
+    | ["=" "!=" "<" ">" "$"] {} // INFIX_COMPARE_OP
     | ["@" "^"] {}
     | ["|"] {}
     | ["&"] {}
     | ["-" "+"] {}
     | ["*" "/" "%"] {}
     | "$" {}
-    | ADJACENT_PREFIX_OP {}
+    | ADJACENT_PREFIX_OP {} // 
     | "-" {}
     | "*" {}
     | "=" {}
@@ -1857,11 +1857,13 @@ operatorName :
     | "&&" {}
     | "||" {}
     | ":=" {}
-    | FUNKY_OPERATOR_NAME {}
+    | [".[]" ".()" ".()<-"] {} // FUNKY_OPERATOR_NAME
     | ["%" "%%"] {}
     | ".." {}
     | ".." ".." {}
-    | ["<@" "<@@"] ["@>" "@@>"] {}
+    | "<@" "@>" {}
+    | "<@@" "@@>" {}
+
 activePatternCaseNames :
     | "|" IDENT {}
     | activePatternCaseNames "|" IDENT {}
@@ -1992,8 +1994,7 @@ path :
     | path "." IDENT {}
 // long-ident-or-op
 pathOp :
-    | IDENT {}
-    | opName {}
+    | identOrOp {}
     | IDENT "." pathOp {}
 ```
 
