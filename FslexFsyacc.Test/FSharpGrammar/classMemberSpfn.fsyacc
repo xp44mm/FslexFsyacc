@@ -1,187 +1,187 @@
 ﻿%{%}
 classMemberSpfn :
-    | attributes? access? memberSpecFlags inline? access? identOrOp explicitValTyparDecls? ":" topTypeWithTypeConstraints classMemberSpfnGetSet optLiteralValueSpfn {}
-    | attributes? access? interfaceMember appType {}
-    | attributes? access? inherit appType {}
-    | attributes? access? val fieldDecl {}
-    | attributes? access? static val fieldDecl {}
-    | attributes? access? static type tyconSpfn {}
-    | attributes? access? new ":" topTypeWithTypeConstraints {}
-attributes? :
+    | opt_attributes opt_access memberSpecFlags opt_inline opt_access identOrOp opt_explicitValTyparDecls COLON topTypeWithTypeConstraints classMemberSpfnGetSet optLiteralValueSpfn {}
+    | opt_attributes opt_access interfaceMember appType {}
+    | opt_attributes opt_access INHERIT appType {}
+    | opt_attributes opt_access VAL fieldDecl {}
+    | opt_attributes opt_access STATIC VAL fieldDecl {}
+    | opt_attributes opt_access STATIC TYPE tyconSpfn {}
+    | opt_attributes opt_access NEW COLON topTypeWithTypeConstraints {}
+opt_attributes :
     | attributes {}
     | (*empty*) {}
-access? :
+opt_access :
     | (*empty*) {}
     | access {}
 access :
-    | private {}
-    | public {}
-    | internal {}
+    | PRIVATE {}
+    | PUBLIC {}
+    | INTERNAL {}
 memberSpecFlags :
     | memberFlags {}
     | abstractMemberFlags {}
 memberFlags :
-    | static member {}
-    | member {}
-    | override {}
-    | default {}
+    | STATIC MEMBER {}
+    | MEMBER {}
+    | OVERRIDE {}
+    | DEFAULT {}
 abstractMemberFlags :
-    | abstract {}
-    | abstract member {}
-    | static abstract {}
-    | static abstract member {}
-inline? :
-    | inline {}
+    | ABSTRACT {}
+    | ABSTRACT MEMBER {}
+    | STATIC ABSTRACT {}
+    | STATIC ABSTRACT MEMBER {}
+opt_inline :
+    | INLINE {}
     | (*empty*) {}
-explicitValTyparDecls? :
+opt_explicitValTyparDecls :
     | explicitValTyparDecls {}
     | (*empty*) {}
 explicitValTyparDecls :
-    | HIGH_PRECEDENCE_TYAPP? "<" explicitValTyparDeclsCore typeConstraints? ">" {}
-HIGH_PRECEDENCE_TYAPP? :
+    | opt_HIGH_PRECEDENCE_TYAPP LESS explicitValTyparDeclsCore opt_typeConstraints GREATER {}
+opt_HIGH_PRECEDENCE_TYAPP :
     | HIGH_PRECEDENCE_TYAPP {}
     | (*empty*) {}
 explicitValTyparDeclsCore :
-    | typarDeclList "," ".." {}
+    | typarDeclList COMMA DOT_DOT {}
     | typarDeclList {}
     | (*empty*) {}
 typarDeclList :
-    | typarDeclList "," typarDecl {}
+    | typarDeclList COMMA typarDecl {}
     | typarDecl {}
 typarDecl :
-    | attributes? typar {}
+    | opt_attributes typar {}
 typar :
-    | "'" IDENT {}
-    | ["@" "^"] IDENT {}
-typeConstraints? :
+    | QUOTE IDENT {}
+    | INFIX_AT_HAT_OP IDENT {}
+opt_typeConstraints :
     | (*empty*) {}
-    | when typeConstraints {}
+    | WHEN typeConstraints {}
 topTypeWithTypeConstraints :
     | topType {}
-    | topType when typeConstraints {}
+    | topType WHEN typeConstraints {}
 classMemberSpfnGetSet :
     | (*empty*) {}
-    | with classMemberSpfnGetSetElements {}
+    | WITH classMemberSpfnGetSetElements {}
     | OWITH classMemberSpfnGetSetElements OEND {}
 classMemberSpfnGetSetElements :
     | identOrOp {}
-    | identOrOp "," identOrOp {}
+    | identOrOp COMMA identOrOp {}
 optLiteralValueSpfn :
     | (*empty*) {}
-    | "=" declExpr {}
-    | "=" OBLOCKBEGIN declExpr OBLOCKEND ODECLEND? {}
-ODECLEND? :
+    | EQUALS declExpr {}
+    | EQUALS OBLOCKBEGIN declExpr OBLOCKEND opt_ODECLEND {}
+opt_ODECLEND :
     | ODECLEND {}
     | (*empty*) {}
 interfaceMember :
-    | interface {}
+    | INTERFACE {}
     | OINTERFACE_MEMBER {}
 fieldDecl :
-    | mutable? access? IDENT ":" typ {}
-mutable? :
-    | mutable {}
+    | opt_mutable opt_access IDENT COLON typ {}
+opt_mutable :
+    | MUTABLE {}
     | (*empty*) {}
 tyconSpfn :
-    | typeNameInfo "=" tyconSpfnRhsBlock {}
-    | typeNameInfo classSpfn? {}
+    | typeNameInfo EQUALS tyconSpfnRhsBlock {}
+    | typeNameInfo opt_classSpfn {}
 typeNameInfo :
-    | attributes? tyconNameAndTyparDecls typeConstraints? {}
+    | opt_attributes tyconNameAndTyparDecls opt_typeConstraints {}
 tyconNameAndTyparDecls :
-    | access? path {}
-    | access? prefixTyparDecls path {}
-    | access? path postfixTyparDecls {}
+    | opt_access path {}
+    | opt_access prefixTyparDecls path {}
+    | opt_access path postfixTyparDecls {}
 prefixTyparDecls :
     | typar {}
-    | "(" typarDeclList ")" {}
+    | LPAREN typarDeclList RPAREN {}
 postfixTyparDecls :
-    | HIGH_PRECEDENCE_TYAPP? "<" typarDeclList typeConstraints? ">" {}
+    | opt_HIGH_PRECEDENCE_TYAPP LESS typarDeclList opt_typeConstraints GREATER {}
 tyconSpfnRhsBlock :
-    | OBLOCKBEGIN tyconSpfnRhs OBLOCKSEP? classSpfnMembers classSpfn? OBLOCKEND classSpfn? {}
-    | tyconSpfnRhs classSpfn? {}
+    | OBLOCKBEGIN tyconSpfnRhs opt_OBLOCKSEP classSpfnMembers opt_classSpfn OBLOCKEND opt_classSpfn {}
+    | tyconSpfnRhs opt_classSpfn {}
 tyconSpfnRhs :
     | tyconDefnOrSpfnSimpleRepr {}
     | tyconClassSpfn {}
-    | delegate of topType {}
+    | DELEGATE OF topType {}
 tyconDefnOrSpfnSimpleRepr :
-    | attributes? access? typ {}
-    | attributes? access? unionTypeRepr {}
-    | attributes? access? braceFieldDeclList {}
-    | attributes? access? "(" "#" STRING "#" ")" {}
+    | opt_attributes opt_access typ {}
+    | opt_attributes opt_access unionTypeRepr {}
+    | opt_attributes opt_access braceFieldDeclList {}
+    | opt_attributes opt_access LPAREN HASH STRING HASH RPAREN {}
 unionTypeRepr :
-    | "|" attrUnionCaseDecls {}
-    | firstUnionCaseDeclOfMany "|" attrUnionCaseDecls {}
+    | BAR attrUnionCaseDecls {}
+    | firstUnionCaseDeclOfMany BAR attrUnionCaseDecls {}
     | firstUnionCaseDecl {}
 attrUnionCaseDecls :
-    | attrUnionCaseDecl "|" attrUnionCaseDecls {}
+    | attrUnionCaseDecl BAR attrUnionCaseDecls {}
     | attrUnionCaseDecl {}
 attrUnionCaseDecl :
-    | attributes? access? unionCaseName {}
-    | attributes? access? unionCaseName of unionCaseRepr {}
-    | attributes? access? unionCaseName ":" topType {}
-    | attributes? access? unionCaseName "=" constant {}
+    | opt_attributes opt_access unionCaseName {}
+    | opt_attributes opt_access unionCaseName OF unionCaseRepr {}
+    | opt_attributes opt_access unionCaseName COLON topType {}
+    | opt_attributes opt_access unionCaseName EQUALS constant {}
 unionCaseName :
     | identOrOp {}
-    | "(" "::" ")" {}
-    | "(" "[" "]" ")" {}
+    | LPAREN COLON_COLON RPAREN {}
+    | LPAREN LBRACK RBRACK RPAREN {}
 unionCaseRepr :
     | braceFieldDeclList {}
     | unionCaseReprElements {}
 braceFieldDeclList :
-    | "{" recdFieldDeclList "}" {}
+    | LBRACE recdFieldDeclList RBRACE {}
 recdFieldDeclList :
     | recdFieldDecl seps recdFieldDeclList {}
-    | recdFieldDecl seps? {}
+    | recdFieldDecl opt_seps {}
 recdFieldDecl :
-    | attributes? fieldDecl {}
+    | opt_attributes fieldDecl {}
 seps :
     | OBLOCKSEP {}
-    | ";" {}
-    | OBLOCKSEP ";" {}
-    | ";" OBLOCKSEP {}
-seps? :
+    | SEMICOLON {}
+    | OBLOCKSEP SEMICOLON {}
+    | SEMICOLON OBLOCKSEP {}
+opt_seps :
     | seps {}
     | (*empty*) {}
 unionCaseReprElements :
-    | unionCaseReprElement "*" unionCaseReprElements {}
+    | unionCaseReprElement STAR unionCaseReprElements {}
     | unionCaseReprElement {}
 unionCaseReprElement :
-    | IDENT ":" appType {}
+    | IDENT COLON appType {}
     | appType {}
 constant :
     | rawConstant {}
     | rawConstant HIGH_PRECEDENCE_TYAPP measureTypeArg {}
 firstUnionCaseDeclOfMany :
-    | IDENT OBLOCKSEP? {}
-    | IDENT "=" constant OBLOCKSEP? {}
-    | firstUnionCaseDecl OBLOCKSEP? {}
-OBLOCKSEP? :
+    | IDENT opt_OBLOCKSEP {}
+    | IDENT EQUALS constant opt_OBLOCKSEP {}
+    | firstUnionCaseDecl opt_OBLOCKSEP {}
+opt_OBLOCKSEP :
     | OBLOCKSEP {}
     | (*empty*) {}
 firstUnionCaseDecl :
-    | IDENT of unionCaseRepr {}
-    | IDENT "=" constant OBLOCKSEP? {}
+    | IDENT OF unionCaseRepr {}
+    | IDENT EQUALS constant opt_OBLOCKSEP {}
 tyconClassSpfn :
     | classSpfnBlockKindUnspecified {}
-    | classOrInterfaceOrStruct classSpfnBlock end {}
+    | classOrInterfaceOrStruct classSpfnBlock END {}
 classSpfnBlockKindUnspecified :
     | OBLOCKBEGIN classSpfnMembers OBLOCKEND {}
-    | begin classSpfnBlock end {}
+    | BEGIN classSpfnBlock END {}
 classSpfnMembers :
     | classSpfnMembersAtLeastOne {}
     | (*empty*) {}
 classSpfnMembersAtLeastOne :
-    | classMemberSpfn seps? classSpfnMembers {}
+    | classMemberSpfn opt_seps classSpfnMembers {}
 classSpfnBlock :
     | OBLOCKBEGIN classSpfnMembers OBLOCKEND {}
     | classSpfnMembers {}
 classOrInterfaceOrStruct :
-    | class {}
-    | interface {}
-    | struct {}
-classSpfn? :
-    | with classSpfnBlock declEnd {}
+    | CLASS {}
+    | INTERFACE {}
+    | STRUCT {}
+opt_classSpfn :
+    | WITH classSpfnBlock declEnd {}
     | (*empty*) {}
 declEnd :
     | ODECLEND {}
     | OEND {}
-    | end {}
+    | END {}

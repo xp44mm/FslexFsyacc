@@ -70,8 +70,6 @@ topTupleTypeElements
 
 *)
 
-
-
 type ParsParseTableTest(output:ITestOutputHelper) =
     let show res =
         res
@@ -227,11 +225,6 @@ type ParsParseTableTest(output:ITestOutputHelper) =
         let s0 = "topTypeWithTypeConstraints"
         let terminals = set [
             "attributes"
-            "path"
-            "atomicRationalConstant"
-            "rawConstant"
-            "atomicExpr"
-            "classMemberSpfn"
             ]
 
         let flat = fsyacc.start(s0, terminals)

@@ -1,0 +1,78 @@
+﻿%{%}
+typeAnnotWhenConstraints :
+    | typeAnnot {}
+    | typeAnnot when typeAnnotConstraints {}
+typeAnnot :
+    | tupleTypeAnnot "->" typeAnnot {}
+    | tupleTypeAnnot {}
+tupleTypeAnnot :
+    | appTypeAnnot "*" tupleTypeAnnot {}
+    | appTypeAnnot {}
+appTypeAnnot :
+    | appTypeAnnot "[" ","* "]" {}
+    | appTypeAnnot appTypeCon {}
+    | atomTypeAnnot {}
+    | anonRecdTypeAnnot {}
+    | typar ":>" typeAnnot {}
+    | _ ":>" typeAnnot {}
+atomTypeAnnot :
+    | "#" atomTypeAnnot {}
+    | appTypeCon {}
+    | _ {}
+    | "(" typeAnnot ")" {}
+    | struct "(" tupleTypeAnnot ")" {}
+    | appTypeCon typeAnnotArgsActual {}
+    | atomTypeAnnot "." path {}
+    | atomTypeAnnot "." path typeAnnotArgsActual {}
+typeAnnotArgsActual :
+    | "<" typeAnnotArguments ">" {}
+    | "<" ">" {}
+typeAnnotArguments :
+    | typeAnnotArguments "," typeAnnot {}
+    | typeAnnot {}
+anonRecdTypeAnnot :
+    | struct braceBarFieldDeclListCoreAnnot {}
+    | braceBarFieldDeclListCoreAnnot {}
+braceBarFieldDeclListCoreAnnot :
+    | "{|" recdFieldDeclAnnotList "|}" {}
+recdFieldDeclAnnotList :
+    | recdFieldDeclAnnot seps recdFieldDeclAnnotList {}
+    | recdFieldDeclAnnot seps? {}
+recdFieldDeclAnnot :
+    | attributes? fieldDeclAnnot {}
+fieldDeclAnnot :
+    | mutable? access? IDENT ":" typeAnnot {}
+typeAnnotConstraints :
+    | typeAnnotConstraints and typeAnnotConstraint {}
+    | typeAnnotConstraint {}
+typeAnnotConstraint :
+    | typar ":>" typeAnnot {}
+    | typar ":" null {}
+
+    | typar ":" "(" memberSignatureConstraint ")" {}
+    | "(" appTypeAnnotAlts ")" ":" "(" memberSignatureConstraint ")" {}
+
+    | typar ":" struct {}
+    | typar ":" not struct {}
+    | default typar ":" typeAnnot {}
+    //| typar ":" enum typeAnnotArgsActual {}
+    | typar ":" delegate typeAnnotArgsActual {}
+    | typar ":" IDENT typeAnnotArgsActual {}
+
+
+    | typar ":" IDENT {}
+    //| typar ":" unmanaged {}
+    //| typar ":" equality {}
+    //| typar ":" comparison {}
+
+
+
+    | appTypeAnnot {}
+
+memberSignatureConstraint :
+    | static? member identOrOp COLON typeAnnot {}
+    | NEW COLON typeAnnot {}
+
+appTypeAnnotAlts :
+    | appTypeAnnotAlts or appTypeAnnot {}
+    | appTypeAnnot {}

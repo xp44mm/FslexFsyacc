@@ -1,0 +1,118 @@
+﻿%{%}
+typeAnnotWhenConstraints :
+    | typeAnnot {}
+    | typeAnnot when typeAnnotConstraints {}
+typeAnnot :
+    | tupleTypeAnnot "->" typeAnnot {}
+    | tupleTypeAnnot {}
+tupleTypeAnnot :
+    | appTypeAnnot "*" tupleTypeAnnot {}
+    | appTypeAnnot {}
+appTypeAnnot :
+    | appTypeAnnot "[" ","* "]" {}
+    | appTypeAnnot appTypeCon {}
+    | atomTypeAnnot {}
+    | anonRecdTypeAnnot {}
+    | typar ":>" typeAnnot {}
+    | "_" ":>" typeAnnot {}
+appTypeCon :
+    | path {}
+    | typar {}
+path :
+    | GLOBAL {}
+    | IDENT {}
+    | path DOT IDENT {}
+typar :
+    | QUOTE IDENT {}
+    | INFIX_AT_HAT_OP IDENT {}
+atomTypeAnnot :
+    | "#" atomTypeAnnot {}
+    | appTypeCon {}
+    | "_" {}
+    | "(" typeAnnot ")" {}
+    | struct "(" tupleTypeAnnot ")" {}
+    | appTypeCon typeAnnotArgsActual {}
+    | atomTypeAnnot "." path {}
+    | atomTypeAnnot "." path typeAnnotArgsActual {}
+typeAnnotArgsActual :
+    | "<" typeAnnotArguments ">" {}
+    | "<" ">" {}
+typeAnnotArguments :
+    | typeAnnotArguments "," typeAnnot {}
+    | typeAnnot {}
+anonRecdTypeAnnot :
+    | struct braceBarFieldDeclListCoreAnnot {}
+    | braceBarFieldDeclListCoreAnnot {}
+braceBarFieldDeclListCoreAnnot :
+    | "{|" recdFieldDeclAnnotList "|}" {}
+recdFieldDeclAnnotList :
+    | recdFieldDeclAnnot seps recdFieldDeclAnnotList {}
+    | recdFieldDeclAnnot seps? {}
+recdFieldDeclAnnot :
+    | attributes? fieldDeclAnnot {}
+fieldDeclAnnot :
+    | mutable? access? IDENT ":" typeAnnot {}
+seps :
+    | OBLOCKSEP {}
+    | SEMICOLON {}
+    | OBLOCKSEP SEMICOLON {}
+    | SEMICOLON OBLOCKSEP {}
+typeAnnotConstraints :
+    | typeAnnotConstraints and typeAnnotConstraint {}
+    | typeAnnotConstraint {}
+typeAnnotConstraint :
+    | typar ":>" typeAnnot {}
+    | typar ":" null {}
+    | typar ":" "(" memberSignatureConstraint ")" {}
+    | "(" appTypeAnnotAlts ")" ":" "(" memberSignatureConstraint ")" {}
+    | typar ":" struct {}
+    | typar ":" not struct {}
+    | default typar ":" typeAnnot {}
+    | typar ":" delegate typeAnnotArgsActual {}
+    | typar ":" IDENT typeAnnotArgsActual {}
+    | typar ":" IDENT {}
+    | appTypeAnnot {}
+memberSignatureConstraint :
+    | static? member identOrOp COLON typeAnnot {}
+    | NEW COLON typeAnnot {}
+identOrOp :
+    | IDENT {}
+    | opName {}
+opName :
+    | LPAREN operatorName RPAREN {}
+    | LPAREN_STAR_RPAREN {}
+    | LPAREN activePatternCaseNames BAR RPAREN {}
+    | LPAREN activePatternCaseNames BAR UNDERSCORE BAR RPAREN {}
+operatorName :
+    | PREFIX_OP {}
+    | INFIX_STAR_STAR_OP {}
+    | INFIX_COMPARE_OP {}
+    | INFIX_AT_HAT_OP {}
+    | INFIX_BAR_OP {}
+    | INFIX_AMP_OP {}
+    | PLUS_MINUS_OP {}
+    | INFIX_STAR_DIV_MOD_OP {}
+    | DOLLAR {}
+    | ADJACENT_PREFIX_OP {}
+    | MINUS {}
+    | STAR {}
+    | EQUALS {}
+    | OR {}
+    | LESS {}
+    | GREATER {}
+    | QMARK {}
+    | AMP {}
+    | AMP_AMP {}
+    | BAR_BAR {}
+    | COLON_EQUALS {}
+    | FUNKY_OPERATOR_NAME {}
+    | PERCENT_OP {}
+    | DOT_DOT {}
+    | DOT_DOT DOT_DOT {}
+    | LQUOTE RQUOTE {}
+activePatternCaseNames :
+    | BAR IDENT {}
+    | activePatternCaseNames BAR IDENT {}
+appTypeAnnotAlts :
+    | appTypeAnnotAlts or appTypeAnnot {}
+    | appTypeAnnot {}

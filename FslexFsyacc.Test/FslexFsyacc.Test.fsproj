@@ -46,6 +46,7 @@
     
 		<None Include="FSharpGrammar\pars.fsyacc" />
 		<Compile Include="FSharpGrammar\ParsParseTableTest.fs" />
+		<Compile Include="FSharpGrammar\ManyYaccFilesParseTableTest.fs" />
     
 		<Compile Include="Expr\ExprToken.fs" />
 		<None Include="Expr\expr.fsyacc" />

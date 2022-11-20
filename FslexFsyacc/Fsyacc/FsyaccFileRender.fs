@@ -20,7 +20,7 @@ let renderHeader (header:string) =
         |> String.concat "\r\n"
 
 let renderSymbol (sym:string) =
-    if sym.[0] = '{' && sym.[sym.Length-1] = '}' 
+    if sym.[0] = '{' && sym.[sym.Length-1] = '}'
     then sym.[1..sym.Length-2]
     else sym |> FslexFsyacc.Runtime.RenderUtils.renderSymbol
 
@@ -33,7 +33,7 @@ let renderBody (body:string list) =
         |> String.concat " "
 
 let renderSemantic(semantic:string) =
-    if Regex.IsMatch(semantic,@"[\r\n]") then 
+    if Regex.IsMatch(semantic,@"[\r\n]") then
         [
             "{"
             indentCodeBlock 4 semantic
@@ -87,7 +87,7 @@ let renderFsyacc
     (declarations:(string*string)list                    )
     =
     let h = renderHeader header
-    let r = 
+    let r =
         rules
         |> List.map renderRule
         |> String.concat "\r\n"

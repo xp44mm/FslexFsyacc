@@ -5,11 +5,14 @@ open System.Text.RegularExpressions
 open FSharp.Literals
 
 let renderSymbol (sym:string) =
-    if Regex.IsMatch(sym,@"^\w+$")
-    then sym
-    elif sym.Length > 1 && sym.[0] = '{' && sym.[sym.Length-1] = '}'
-    then sym.[1..sym.Length-2]
-    else sym |> Literal.stringify
+    if Regex.IsMatch(sym,@"^_+$") then 
+        $"\"{sym}\""
+    elif Regex.IsMatch(sym,@"^\w+$") then 
+        sym
+    elif sym.Length > 1 && sym.[0] = '{' && sym.[sym.Length-1] = '}' then
+        sym.[1..sym.Length-2]
+    else 
+        sym |> Literal.stringify
 
 let renderProduction (symbols:string list) =
     let symbols =
