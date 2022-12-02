@@ -1,6 +1,7 @@
 ﻿namespace FslexFsyacc.Yacc
 
 open FSharp.Idioms
+open FSharp.Literals.Literal
 
 type ParseTableEncoder =
     {

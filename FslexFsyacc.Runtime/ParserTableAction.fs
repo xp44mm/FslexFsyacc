@@ -22,7 +22,8 @@ let reduce(
     let leftside = symbols.[0]
     // 产生式右侧的长度
     let len = symbols.Length-1
-    let children, popedStates = List.advance len states
+    // 弹出产生式体符号对应的状态
+    let children, restStates = List.advance len states
 
     let tree =
         children
@@ -30,12 +31,12 @@ let reduce(
         |> mapper
 
     let pushedStates =
-        //弹出状态，产生式体
-        //let popedStates = List.skip len states
-        let smr,_ = popedStates.Head // = s_{m-r}
-        //压入状态，产生式的头
+        // 剩下状态栈最顶部的状态编号
+        let smr,_ = restStates.Head // = s_{m-r}
+        // 根据顶部状态，产生式左侧，得到新状态
         let newstate = actions.[smr].[leftside] // GOTO
-        (newstate,tree) :: popedStates
+        // 压入新状态
+        (newstate,tree) :: restStates
 
     pushedStates
 

@@ -65,6 +65,7 @@ type ParserTable =
         let kernel =
             this.closures.[state]
             |> List.filter(fun(prod,dot,_)-> List.head prod = "" || dot > 0)
+
         kernel
         |> Seq.map(fun(prod,dot,_)->prod.[dot])
         |> Seq.head
@@ -105,7 +106,7 @@ type ParserTable =
         let rules = this.rules
         let actions = this.actions
 
-        this.tryNextAction(states,getTag token)
+        this.tryNextAction(states, getTag token)
         |> Option.map(fun i ->
             match i with
             | _ when isStateOfShift i ->

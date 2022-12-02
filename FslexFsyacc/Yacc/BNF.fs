@@ -14,6 +14,7 @@ type BNF =
             productions =
                 this.productions @ [production]
         }
+
     member this.removeProduction(production:string list) =
         let ({productions=prods}:BNF) = this
         {

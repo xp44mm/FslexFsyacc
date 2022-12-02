@@ -5,27 +5,28 @@ open System.Text.RegularExpressions
 open FSharp.Literals
 
 let renderSymbol (sym:string) =
-    if Regex.IsMatch(sym,@"^_+$") then 
+    if Regex.IsMatch(sym,@"^_*$") then
         $"\"{sym}\""
-    elif Regex.IsMatch(sym,@"^\w+$") then 
+    elif Regex.IsMatch(sym,@"^\w+$") then
         sym
     elif sym.Length > 1 && sym.[0] = '{' && sym.[sym.Length-1] = '}' then
         sym.[1..sym.Length-2]
-    else 
+    else
         sym |> Literal.stringify
 
 let renderProduction (symbols:string list) =
     let symbols =
         symbols
         |> List.map renderSymbol
-    sprintf "%s -> %s" symbols.Head (symbols.Tail |> String.concat " ")
+    let body = symbols.Tail |> String.concat " "
+    $"{symbols.Head} : {body}"
 
-let renderItemCore (prod:string list) dot =
+let renderItemCore (prod:string list) (dot:int) =
     let symbols =
         prod
         |> List.map(renderSymbol)
 
-    let body = 
+    let body =
         let ls1,ls2 =
             symbols.Tail
             |> List.splitAt dot
@@ -35,17 +36,21 @@ let renderItemCore (prod:string list) dot =
             yield! ls2
         ] |> String.concat " "
 
-    sprintf "%s -> %s" symbols.Head body
+    sprintf "%s : %s" symbols.Head body
 
-let renderEntry (prod:string list) (dot:int) (lookaheads:string list) = 
-    if lookaheads.Length = 0 then
+let renderEntry (prod:string list) (dot:int) (lookaheads:seq<string>) =
+    if lookaheads |> Seq.isEmpty then
         renderItemCore prod dot
     else
+        let lookaheadsPart =
+            lookaheads
+            |> Seq.map renderSymbol
+            |> String.concat " "
         [
             renderItemCore prod dot
-            Literal.stringify lookaheads
+            lookaheadsPart
         ]
-        |> String.concat " "
+        |> String.concat " / "
 
 let renderClosure (closure: (string list*int*string list)list) =
     [

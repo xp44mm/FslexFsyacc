@@ -9,9 +9,9 @@ In this chapter we’ll finish the desk calculator we started in Chapter 1, star
 Bison takes a grammar that you specify and writes a parser that recognizes valid “sentences” in that grammar. We use the term sentence here in a fairly general way—for a C language grammar, the sentences are syntactically valid C programs. Programs can be syntactically valid but semantically invalid, for example, a C program that assigns a string to an int variable. Bison handles only the syntax; other validation is up to you. As we saw in Chapter 1, a grammar is a series of rules that the parser uses to recognize syntactically valid input. For example, here is a version of the grammar we’ll use later in this chapter in a calculator:
 
 ```c
-statement:   NAME '=' expression
-expression:  NUMBER '+' NUMBER
-           | NUMBER '−' NUMBER
+statement:  NAME '=' expression
+expression: NUMBER '+' NUMBER
+          | NUMBER '−' NUMBER
 ```
 
 The vertical bar, `|`, means there are two possibilities for the same symbol; that is, an expression can be either an addition or a subtraction. The symbol to the left of the `:` is known as the left-hand side of the rule, often abbreviated LHS, and the symbols to the right are the right-hand side, usually abbreviated RHS. Several rules may have the same left-hand side; the vertical bar is just shorthand for this. Symbols that actually appear in the input and are returned by the lexer are terminal symbols or tokens, while those that appear on the left-hand side of each rule are nonterminal symbols or nonterminals.
@@ -69,8 +69,8 @@ Although LALR parsing is quite powerful, you can write grammars that it cannot h
 Consider this extremely contrived example:
 
 ```c
-phrase:  cart_animal AND CART
-       | work_animal AND PLOW
+phrase: cart_animal AND CART
+      | work_animal AND PLOW
 cart_animal: HORSE | GOAT
 work_animal: HORSE | OX
 ```
@@ -176,7 +176,7 @@ Keep in mind that any rule without explicit action code gets the default action 
 ```c
 %%
 calclist: /* nothing */
-| calclist exp EOL {
+ | calclist exp EOL {
      printf("= %4.4g\n", eval($2)); // evaluate and print the AST
      treefree($2); // free up the AST
      printf("> ");
@@ -321,8 +321,6 @@ treefree(struct ast *a)
 ```
 
 Next we have the two tree-walking routines. They each make what’s known as a depth-first traversal of the tree, recursively visiting the subtrees of each node and then the node itself. The `eval` routine returns the value of the tree or subtree from each call, and the `treefree` doesn’t have to return anything.
-
-
 
 ```c
 void
@@ -1022,8 +1020,6 @@ void
     }
 }
 ```
-
-
 
 The heart of the calculator is `eval`, which evaluates an AST built up in the parser. Following the practice in C, comparisons return `1` or `0` depending on whether the comparison succeeds, and tests in if/then/else and while/do treat any nonzero as true. For expressions, we do the familiar depth-first tree walk to compute the value. An AST makes it straightforward to implement if/then/else: Evaluate the condition AST to decide which branch to take, and then evaluate the AST for the path to be taken. To evaluate while/do loops, a loop in `eval` evaluates the condition AST, then the body AST, repeating as long as the condition AST remains true. Any AST that references variables that are changed by an assignment will have a new value each time it’s evaluated.
 

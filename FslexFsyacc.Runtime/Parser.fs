@@ -25,15 +25,17 @@ type Parser<'tok> (
         let ai = getTag token
         let rec loop states =
             match tbl.tryNextAction(states,ai) with
-            | None ->
-                failwith $"next state is dead state."
-            | Some i when isRuleOfReduce i ->
-                let states = reduce(tbl.rules,tbl.actions,states,i)
-                loop states
             | Some i when isStateOfShift i ->
                 let states = shift(getLexeme,states,token,i)
                 states
-            | Some i -> failwith $"unexpected action:{i}."
+            | Some i when isRuleOfReduce i ->
+                let states = reduce(tbl.rules,tbl.actions,states,i)
+                loop states
+            | Some i -> 
+                failwith $"unexpected action:{i}."
+            | None ->
+                failwith $"next state is dead state."
+
         loop states
 
     ///对状态栈连续执行reduce，直到非reduce动作:shift,accept（不执行）
@@ -84,25 +86,27 @@ type Parser<'tok> (
             tokens.GetEnumerator()
             |> Iterator
 
-        let rec loop(states: (int*obj)list)(maybeToken: 'tok option)=
-            let action() =
+        let rec loop (states:(int*obj)list) (maybeToken:'tok option) =
+            let act() =
                 match maybeToken with
                 | Some token ->
                     tbl.next(getTag,getLexeme,states,token)
                 | None ->
                     tbl.complete(states)
 
-            match action() with
+            match act() with
             | Some(i,nextStates) ->
                 if isStateOfShift i then
-                    iterator.tryNext()
-                    |> loop nextStates
+                    loop nextStates (iterator.tryNext())
+
                 elif isRuleOfReduce i then
                     loop nextStates maybeToken
+
                 elif i = 0 then
                     nextStates
+
                 else failwith ""
-            | None ->
+            | None -> // fail
                 let sm,_ = states.Head
                 let closure =
                     tbl.closures.[sm]

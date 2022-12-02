@@ -1,4 +1,5 @@
 ﻿namespace FslexFsyacc.Yacc
+open FslexFsyacc.Runtime
 
 open System.Collections.Concurrent
 open System
@@ -13,10 +14,18 @@ type ItemCore =
         dot: int
     }
 
-    member this.leftside = this.production |> List.head
-    member this.body = this.production |> List.tail
+    member this.leftside = 
+        this.production 
+        |> List.head
+
+    member this.body = 
+        this.production 
+        |> List.tail
+
     /// 产生式体的长度
-    member this.length = this.body |> List.length
+    member this.length = 
+        this.body 
+        |> List.length
 
     ///前进一半，留一半
     member this.status =
@@ -63,3 +72,9 @@ type ItemCore =
             production = this.production
             dot = this.dot+1
         }
+
+    member this.isKernel() =
+        List.head this.production = "" || this.dot > 0
+
+    member this.render() =
+        RenderUtils.renderItemCore this.production this.dot

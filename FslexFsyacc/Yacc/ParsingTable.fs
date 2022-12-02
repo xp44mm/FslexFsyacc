@@ -1,6 +1,8 @@
 ﻿namespace FslexFsyacc.Yacc
 
 open FSharp.Idioms
+open FslexFsyacc.Runtime
+open FSharp.Literals.Literal
 
 /// 原始解析表
 type ParsingTable =
@@ -24,58 +26,26 @@ type ParsingTable =
 
         let actions =
             uc.closures
-            |> Map.map(fun i closure ->
-                let reduceMp,gotoMp =
+            |> Map.map(fun i closure -> 
+                let actions =
                     closure
-                    |> Map.partition(fun la icores -> icores.MinimumElement.dotmax)
-
-                // la -> Action.reduce
-                let reduces =
-                    reduceMp
                     |> Map.map(fun la icores ->
-                        let item = Seq.exactlyOne icores
-                        Reduce item.production
+                        match 
+                            icores
+                            |> Action.from
+                            |> Set.toList
+                        with
+                        | [] -> failwith $"nonassoc error."
+                        | [x] -> x
+                        | acts -> failwith $"this is a conflict: {stringify acts}"
                     )
-                // la -> Action.shift
-                let shifts =
-                    let gotos = uc.GOTOs.[i]
-                    gotoMp
-                    |> Map.map(fun la icores ->
-                        Shift gotos.[la]
-                    )
-                Map.append shifts reduces
-                |> Map.map(fun la sq -> Seq.exactlyOne sq)
+                actions
             )
 
         let closures =
             uc.closures
-            |> Map.map(fun i closure ->
-                let reduceMp,gotoMp =
-                    closure
-                    |> Map.partition(fun la icores -> icores.MinimumElement.dotmax)
-
-                let reduces =
-                    reduceMp
-                    |> Map.toList
-                    |> List.map(fun(la, icores) -> Seq.exactlyOne icores, la)
-                    |> List.groupBy fst
-                    |> List.map(fun(icore,las)-> // 合并lookaheads
-                        let las =
-                            las
-                            |> Seq.map snd
-                            |> Set.ofSeq
-                        icore, las
-                        )
-                    |> Set.ofList
-
-                let shifts =
-                    gotoMp
-                    |> Map.values
-                    |> Set.unionMany
-                    |> Set.map(fun icore -> icore, Set.empty)
-
-                shifts+reduces
-                |> Map.ofSeq
+            |> Map.map(fun i conflicts ->
+                AmbiguousCollectionUtils.getItems conflicts
             )
 
         //简化数据的表达为数组

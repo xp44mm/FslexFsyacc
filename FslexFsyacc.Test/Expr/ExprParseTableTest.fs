@@ -53,8 +53,8 @@ type ExprParseTableTest(output:ITestOutputHelper) =
         let states = 
             fsyacc.getMainProductions() 
             |> AmbiguousCollection.create
-        show states
-
+        //show states
+        output.WriteLine(states.render())
     [<Fact>]
     member _.``05 - conflicted items``() =
         let collection = 

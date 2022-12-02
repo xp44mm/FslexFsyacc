@@ -175,7 +175,7 @@ Within the scanner, when the action code has a token ready, it just returns it a
 ```c
 "+"    { return ADD; }
 [0-9]+ { return NUMBER; }
-[ \t] { /* ignore whitespace */ }
+[ \t]  { /* ignore whitespace */ }
 ```
 
 This apparent casualness about whether action code returns often confuses new flex users, but the rule is actually quite simple: If action code returns, scanning resumes on the next call to `yylex()`; if it doesn’t return, scanning resumes immediately.
@@ -413,7 +413,7 @@ exp: exp ADD exp
    | factor
    ;
 
- similarly for factor and term
+// similarly for factor and term
 ```
 
 One of bison’s greatest strengths, and simultaneously one of its most annoying aspects, is that it will not parse an ambiguous grammar. That is, any parser that bison creates has exactly one way to parse any input that it parses, and the parser will accept exactly that grammar. The previous grammar is ambiguous, because input such as `1 - 2 + 3` could be parsed either as `(1-2) + 3` or as `1 - (2+3)`, two different expressions with different values. Although there are some cases where **ambiguity** doesn’t matter (e.g., `1+2+3`), in most cases the ambiguity really is an error, and the grammar needs to be fixed.

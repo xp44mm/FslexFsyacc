@@ -1,12 +1,12 @@
 # CHAPTER 7 Ambiguities and Conflicts
 
-This chapter focuses on finding and correcting conflicts within a bison grammar. Conflicts occur when bison reports shift/reduce and reduce/reduce errors. Bison lists any errors in the listing file `name.output`, which we will describe in this chapter, but it can still be a challenge to figure out what’s wrong with the grammar and how to fix it. 
+This chapter focuses on finding and correcting conflicts within a bison grammar. Conflicts occur when bison reports shift/reduce and reduce/reduce errors. Bison lists any errors in the listing file `name.output`, which we will describe in this chapter, but it can still be a challenge to figure out what’s wrong with the grammar and how to fix it.
 
 Before reading this chapter, you should understand the general way that bison parsers work, described in Chapter 3.
 
 ## The Pointer Model and Conflicts
 
-To describe what a conflict is in terms of the bison grammar, we introduce a model of bison’s operation. In this model, a pointer moves through the bison grammar as each individual token is read. When you start, there is one pointer (represented here as an ~~up arrow~~, `@` at the beginning of the start rule:
+To describe what a conflict is in terms of the bison grammar, we introduce a model of bison’s operation. In this model, a pointer moves through the bison grammar as each individual token is read. When you start, there is one pointer (represented here as an ‘at’ symbol `@` at the beginning of the start rule:
 
 ```js
 %token A B C
@@ -28,7 +28,8 @@ At times, there may be more than one pointer because of the alternatives in your
 %token A B C D E F
 %%
 start: x
-     | y;
+     | y
+;
 x:    A B @ C D;
 y:    A B @ E F;
 ```
@@ -39,7 +40,8 @@ There are two ways for pointers to disappear. One happens when a subsequent toke
 
 ```js
 start: x
-     | y;
+     | y
+;
 x: A B C @ D;
 y: A B E F;
 ```
@@ -48,7 +50,8 @@ The other way for pointers to disappear is for them to merge in a common subrule
 
 ```js
 start: x
-     | y ;
+     | y
+;
 x: A B z R ;
 y: A B z S ;
 z: C D ;
@@ -58,7 +61,8 @@ After reading `A`, there are two pointers:
 
 ```js
 start: x
-     | y ;
+     | y
+;
 x: A @ B z R ;
 y: A @ B z S ;
 z: C D ;
@@ -68,7 +72,8 @@ After `A B C`, there is only one pointer, in rule `z`:
 
 ```js
 start: x
-     | y ;
+     | y
+;
 x: A B z R ;
 y: A B z S ;
 z: C @ D ;
@@ -78,7 +83,8 @@ And after `A B C D`, the parser has completed rule `z`, and there again are two:
 
 ```js
 start: x
-     | y ;
+     | y
+;
 x: A B z @ R ;
 y: A B z @ S ;
 z: C D ;
@@ -92,7 +98,8 @@ There is a conflict if a rule is reduced when there is more than one pointer. He
 
 ```js
 start: x
-     | y ;
+     | y
+;
 x: A @ ;
 y: B ;
 ```
@@ -103,7 +110,8 @@ Here is an example of a conflict:
 
 ```js
 start: x
-     | y ;
+     | y
+;
 x: A @ ;
 y: A @ ;
 ```
@@ -114,7 +122,8 @@ There is no conflict if there is only one pointer, even if it is the result of m
 
 ```js
 start: x
-     | y ;
+     | y
+;
 x: z R ;
 y: z S ;
 z: A B @ ;
@@ -124,7 +133,8 @@ After `A B`, there is one pointer, at the end of rule `z`, and that rule is redu
 
 ```js
 start: x
-     | y ;
+     | y
+;
 x: z @ R ;
 y: z @ S ;
 z: A B ;
@@ -138,7 +148,8 @@ There are two kinds of conflicts, reduce/reduce and shift/reduce. Conflicts are 
 
 ```js
 start: x
-     | y ;
+     | y 
+;
 x: A @ ;
 y: A @ ;
 ```
@@ -159,7 +170,8 @@ If there are more than two pointers at the time of a reduce, bison lists the con
 ```js
 start: x
      | y
-     | z ;
+     | z
+;
 x: A @ ;
 y: A @ ;
 z: A @ ;
@@ -217,14 +229,14 @@ When a given stream of input tokens can correspond to more than one possible poi
 ```js
 start: a
      | b ;
-a:    X /*<state 1>*/ Y /*<state 2>*/ Z ;
-b:    X /*<state 1>*/ Y /*<state 2>*/ Q ;
+a    : X /*<state 1>*/ Y /*<state 2>*/ Z ;
+b    : X /*<state 1>*/ Y /*<state 2>*/ Q ;
 ```
 
 Different input streams can correspond to the same state when they correspond to the same pointer:
 
 ```js
-start:   threeAs ;
+start  : threeAs ;
 threeAs: /* empty */
        | threeAs A /*<state 1>*/ A /*<state 2>*/ A /*<state 3>*/ ;
 ```
@@ -234,7 +246,8 @@ The previous grammar accepts some multiple of three `A`s. State 1 corresponds to
 We rewrite this as a right-recursive grammar to illustrate the next point.
 
 ```js
-start:         threeAs ;
+start  :       threeAs 
+;
 threeAs: A A A threeAs
        | /* empty */
        ;
@@ -243,12 +256,15 @@ threeAs: A A A threeAs
 A pointer position in a rule does not necessarily correspond to only one state. A given pointer in one rule can correspond to different pointers in another rule, making several states:
 
 ```js
-start: threeAs X
-     | twoAs Y ;
+start  : threeAs X
+       | twoAs Y
+       ;
 threeAs: /* empty */
-       | A A A threeAs ;
-twoAs: /* empty */
-     | A A twoAs ;
+       | A A A threeAs
+       ;
+twoAs  : /* empty */
+       | A A twoAs
+       ;
 ```
 
 The grammar above accepts multiples of 2 or 3 `A`s, followed by an `X` for multiples of 3, or a `Y` for multiples of 2. Without the `X` or `Y`, the grammar would have a conflict, not knowing whether a multiple of 6 As satisfied `threeAs` or `twoAs`. It would also have a conflict if we’d used left recursion, since it would have to reduce `twoAs` or `threeAs` before it saw a final `X` or `Y`. If we number the states as follows:
@@ -265,12 +281,15 @@ state 6: 6, 12, ... A's accepted
 then the corresponding pointer positions are as follows:
 
 ```js
-start: threeAs X
-     | twoAs Y ;
+start  : threeAs X
+       | twoAs Y
+       ;
 threeAs: /* empty */
-       | A /*<1,4>*/ A /*<2,5>*/ A /*<3,6>*/ threeAs ;
-twoAs: /* empty */
-     |  A /*<1,3,5>*/ A /*<2,4,6>*/ twoAs ;
+       | A /*<1,4>*/ A /*<2,5>*/ A /*<3,6>*/ threeAs
+       ;
+twoAs  : /* empty */
+       | A /*<1,3,5>*/ A /*<2,4,6>*/ twoAs
+       ;
 ```
 
 That is, after the first `A` in `threeAs`, the parser could have accepted `6i+1` or `6i+4` `A`s, where `i` is `0`, `1`, etc. Similarly, after the first `A` in `twoAs`, the parser could have accepted `6i+1`, `6i+3`, or `6i+5` `A`s.
@@ -279,7 +298,7 @@ That is, after the first `A` in `threeAs`, the parser could have accepted `6i+1`
 
 Now that we have defined states, we can look at the conflicts described in `name.output`. The format of the file has varied among versions of bison, but it always includes a listing of all the rules in the grammar and all the parser states. It usually has a summary of conflicts and other errors at the beginning, including rules that are never used, typically because of conflicts. For each state, it lists the rules and positions that correspond to the state, the shifts and reductions the parser will do when it reads various tokens in that state, and what state it will switch to after a reduction produces a nonterminal in that state. We’ll show some ambiguous grammars and the `name.output` reports that identify the ambiguities.
 
-> The files that bison produces show the cursor as a dot, but we’ll show it as an ~~up arrow~~ (`@`) to make it easier to read and to be consistent with the examples so far.
+> The files that bison produces show the cursor as a dot, but we’ll show it as an ‘at’ symbol (`@`) to make it easier to read and to be consistent with the examples so far.
 
 ## Reduce/Reduce Conflicts
 
@@ -287,9 +306,10 @@ Consider the following ambiguous grammar:
 
 ```js
 start: a Y
-     | b Y ;
-a: X ;
-b: X ;
+     | b Y
+     ;
+a    : X;
+b    : X;
 ```
 
 When we run it through bison, a typical state description is as follows:
@@ -321,10 +341,11 @@ The rules may have tokens or nonterminals in them. The following ambiguous gramm
 
 ```js
 start: a Z
-     | b Z ;
-a: X y ;
-b: X y ;
-y: Y ;
+     | b Z
+     ;
+a    : X y;
+b    : X y;
+y    : Y;
 ```
 
 produces a parser with this state:
@@ -346,7 +367,9 @@ The rules that conflict do not have to be identical. This grammar:
 
 ```js
 start: A B x Z
-     |     y Z ;
+     |     y Z
+     ;
+
 x:     C ;
 y: A B C ;
 ```
@@ -378,9 +401,10 @@ This grammar contains a shift/reduce conflict:
 
 ```js
 start: x
-     | y R ;
-x: A R ;
-y: A ;
+     | y R 
+     ;
+x    : A R ;
+y    : A   ;
 ```
 
 Bison produces this complaint:
@@ -414,11 +438,12 @@ The next thing showing may be a rule instead of a token:
 ```js
 start: x1
      | x2
-     | y R ;
-x1: A R ;
-x2: A z ;
-y:  A ;
-z:  R ;
+     | y R 
+     ;
+x1   : A R ;
+x2   : A z ;
+y    : A   ;
+z    : R   ;
 ```
 
 Bison reports several conflicts, including this one:
@@ -456,13 +481,14 @@ There could be more rules in a conflicting state, and they may not all accept an
 start: x1
      | x2
      | x3
-     | y R ;
-x1: A R ;
-x2: A z1 ;
-x3: A z2 ;
-y:  A ;
-z1: R ;
-z2: S ;
+     | y R 
+     ;
+x1   : A R  ;
+x2   : A z1 ;
+x3   : A z2 ;
+y    : A    ;
+z1   : R    ;
+z2   : S    ;
 ```
 
 Bison produces a listing with this state:
@@ -489,9 +515,10 @@ We’ll review the relationship among our pointer model, conflicts, and `name.ou
 
 ```js
 start: A B x Z
-     | y Z ;
-x: C ;
-y: A B C ;
+     | y Z
+     ;
+x: C      ;
+y: A B C  ;
 ```
 
 The bison listing contains the following:
@@ -509,9 +536,10 @@ There is a conflict because if the next token is `Z`, bison wants to reduce rule
 
 ```js
 start: A B x z
-     | y Z ;
-x: c @ ;
-y: A B C @ ;
+     | y Z
+     ;
+x: c @      ;
+y: A B C @  ;
 ```
 
 
@@ -520,7 +548,8 @@ Here is a shift/reduce conflict example:
 
 ```js
 start: x
-     | y R ;
+     | y R
+     ;
 x: A R ;
 y: A ;
 ```
@@ -539,9 +568,10 @@ If the next token is `R`, bison wants both to reduce the rule for `y` and to shi
 
 ```js
 start: x
-     | y R ;
+     | y R
+     ;
 x: A @ R ;
-y: A @ ;
+y: A @   ;
 ```
 
 ## Common Examples of Conflicts
@@ -554,7 +584,8 @@ Our first example is adapted from the original 1975 Unix yacc manual.
 
 ```js
 expr: TERMINAL
-    | expr '-' expr ;
+    | expr '-' expr
+    ;
 ```
 
 The state with a conflict is as follows:

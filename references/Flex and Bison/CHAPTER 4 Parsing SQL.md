@@ -1150,6 +1150,8 @@ This form uses same optional `ON DUPLICATE` syntax at the end of the statement, 
    INSERT into a(b,c) SELECT x,y FROM z where x < 12
 ```
 
+c
+
 ```c
 insert_stmt: INSERT insert_opts opt_into NAME opt_col_names
     select_stmt
@@ -1281,8 +1283,6 @@ opt_temporary: /* nil */ { $$ = 0; }
    | TEMPORARY { $$ = 1;}
    ;
 ```
-
-
 
 The heart of a CREATE DATABASE statement is the list of columns, or more precisely the list of `create_definitions`, which includes both columns and indexes. The indexes can be the `PRIMARY KEY`, which means that it’s unique for each record; a regular `INDEX` (also called `KEY`); or a `FULLTEXT` index, which indexes individual words in the data. Each of those takes a list of column names, for which we once again reuse the `column_list` rule we defined for SELECT.
 

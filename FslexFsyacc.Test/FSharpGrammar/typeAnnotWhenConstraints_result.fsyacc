@@ -10,79 +10,67 @@ tupleTypeAnnot :
     | appTypeAnnot {}
 appTypeAnnot :
     | appTypeAnnot "[" ","* "]" {}
-    | appTypeAnnot appTypeCon {}
+    | appTypeAnnot appTypeAnnotContainer {}
     | atomTypeAnnot {}
-    | anonRecdTypeAnnot {}
-    | typar ":>" typeAnnot {}
+    | typeParam ":>" typeAnnot {}
     | "_" ":>" typeAnnot {}
-appTypeCon :
-    | path {}
-    | typar {}
-path :
-    | GLOBAL {}
+appTypeAnnotContainer :
+    | longIdent {}
+    | typeParam {}
+longIdent :
     | IDENT {}
-    | path DOT IDENT {}
-typar :
-    | QUOTE IDENT {}
-    | INFIX_AT_HAT_OP IDENT {}
+    | longIdent "." IDENT {}
+typeParam :
+    | "'" IDENT {}
+    | "^" IDENT {}
 atomTypeAnnot :
     | "#" atomTypeAnnot {}
-    | appTypeCon {}
+    | appTypeAnnotContainer {}
     | "_" {}
     | "(" typeAnnot ")" {}
     | struct "(" tupleTypeAnnot ")" {}
-    | appTypeCon typeAnnotArgsActual {}
-    | atomTypeAnnot "." path {}
-    | atomTypeAnnot "." path typeAnnotArgsActual {}
+    | appTypeAnnotContainer typeAnnotArgsActual {}
+    | atomTypeAnnot "." longIdent {}
+    | atomTypeAnnot "." longIdent typeAnnotArgsActual {}
+    | braceBarFieldDeclListCoreAnnot {}
+    | struct braceBarFieldDeclListCoreAnnot {}
 typeAnnotArgsActual :
     | "<" typeAnnotArguments ">" {}
     | "<" ">" {}
 typeAnnotArguments :
     | typeAnnotArguments "," typeAnnot {}
     | typeAnnot {}
-anonRecdTypeAnnot :
-    | struct braceBarFieldDeclListCoreAnnot {}
-    | braceBarFieldDeclListCoreAnnot {}
 braceBarFieldDeclListCoreAnnot :
     | "{|" recdFieldDeclAnnotList "|}" {}
 recdFieldDeclAnnotList :
-    | recdFieldDeclAnnot seps recdFieldDeclAnnotList {}
-    | recdFieldDeclAnnot seps? {}
-recdFieldDeclAnnot :
-    | attributes? fieldDeclAnnot {}
+    | fieldDeclAnnot ";" recdFieldDeclAnnotList {}
+    | fieldDeclAnnot ";"? {}
 fieldDeclAnnot :
-    | mutable? access? IDENT ":" typeAnnot {}
-seps :
-    | OBLOCKSEP {}
-    | SEMICOLON {}
-    | OBLOCKSEP SEMICOLON {}
-    | SEMICOLON OBLOCKSEP {}
+    | IDENT ":" typeAnnot {}
 typeAnnotConstraints :
     | typeAnnotConstraints and typeAnnotConstraint {}
     | typeAnnotConstraint {}
 typeAnnotConstraint :
-    | typar ":>" typeAnnot {}
-    | typar ":" null {}
-    | typar ":" "(" memberSignatureConstraint ")" {}
+    | typeParam ":>" typeAnnot {}
+    | typeParam ":" null {}
+    | typeParam ":" "(" memberSignatureConstraint ")" {}
     | "(" appTypeAnnotAlts ")" ":" "(" memberSignatureConstraint ")" {}
-    | typar ":" struct {}
-    | typar ":" not struct {}
-    | default typar ":" typeAnnot {}
-    | typar ":" delegate typeAnnotArgsActual {}
-    | typar ":" IDENT typeAnnotArgsActual {}
-    | typar ":" IDENT {}
+    | typeParam ":" struct {}
+    | typeParam ":" not struct {}
+    | default typeParam ":" typeAnnot {}
+    | typeParam ":" delegate typeAnnotArgsActual {}
+    | typeParam ":" IDENT typeAnnotArgsActual {}
+    | typeParam ":" IDENT {}
     | appTypeAnnot {}
 memberSignatureConstraint :
-    | static? member identOrOp COLON typeAnnot {}
-    | NEW COLON typeAnnot {}
-identOrOp :
+    | static? member memberSigName ":" typeAnnot {}
+    | new ":" typeAnnot {}
+memberSigName :
     | IDENT {}
-    | opName {}
-opName :
-    | LPAREN operatorName RPAREN {}
-    | LPAREN_STAR_RPAREN {}
-    | LPAREN activePatternCaseNames BAR RPAREN {}
-    | LPAREN activePatternCaseNames BAR UNDERSCORE BAR RPAREN {}
+    | memberSigOpName {}
+memberSigOpName :
+    | "(" operatorName ")" {}
+    | "(*)" {}
 operatorName :
     | PREFIX_OP {}
     | INFIX_STAR_STAR_OP {}
@@ -110,9 +98,6 @@ operatorName :
     | DOT_DOT {}
     | DOT_DOT DOT_DOT {}
     | LQUOTE RQUOTE {}
-activePatternCaseNames :
-    | BAR IDENT {}
-    | activePatternCaseNames BAR IDENT {}
 appTypeAnnotAlts :
     | appTypeAnnotAlts or appTypeAnnot {}
     | appTypeAnnot {}

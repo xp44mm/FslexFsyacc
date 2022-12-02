@@ -3,7 +3,11 @@ module FslexFsyacc.Yacc.ClosureFactory
 
 open FSharp.Idioms
 
-let make (itemCoreAttributes:Map<ItemCore, bool*Set<string>>)(productions:Set<string list>) =
+let make 
+    (itemCoreAttributes:Map<ItemCore, bool*Set<string>>)
+    (productions:Set<string list>)
+    =
+
     /// ItemCore*Set<lookahead:string> 返回Items
     let rec loop (acc:Set<ItemCore*Set<string>>)(items: Set<ItemCore*Set<string>>) =
         let newAcc =

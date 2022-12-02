@@ -49,9 +49,9 @@
 		<Compile Include="Yacc\LALRCollection.fs" />
 		<Compile Include="Yacc\ProductionUtils.fs" />
 		<Compile Include="Yacc\AmbiguityEliminator.fs" />
-		<Compile Include="Yacc\SmartAmbiguityEliminator.fs" />
-		<Compile Include="Yacc\AmbiguousCollection.fs" />
 		<Compile Include="Yacc\Action.fs" />
+		<Compile Include="Yacc\AmbiguousCollectionUtils.fs" />
+		<Compile Include="Yacc\AmbiguousCollection.fs" />
 		<Compile Include="Yacc\ParsingTable.fs" />
 		<Compile Include="Yacc\ParseTableEncoder.fs" />
 		<Compile Include="Yacc\ParseTable.fs" />

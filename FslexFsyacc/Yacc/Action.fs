@@ -2,33 +2,29 @@
 
 /// SLR && LALR
 type Action = 
+    /// 这个shift包括龙书中的 *shift* lookahead and *goto* nonterminal
     | Shift of kernel: Set<ItemCore>
     | Reduce of production: string list
 
-    static member from(closure:Map<string,ItemCore>) =
-        let rItems,gItems =
-            closure
-            |> Map.toList
-            |> List.partition(fun(la,item)-> item.dotmax)
-    
-        let reduces =
-            rItems
-            |> List.map(fun(la,i) ->
-                la, Reduce i.production
-            )
-    
-        let shifts =
-            gItems
-            |> List.groupBy(fun (la,_) -> la)
-            |> List.map(fun(la,pairs)->
-                let items = 
-                    pairs 
-                    |> List.map(fun(la,itemcore) ->
-                        itemcore.dotIncr()
-                    )
-                    |> Set.ofList
-                la, Shift items
-            )
+    static member from (conflicts:Set<ItemCore>) =
+        let reduces,shifts =
+            conflicts
+            |> Set.partition(fun ic->ic.dotmax)
 
-        seq { yield! reduces; yield! shifts}
-        |> Map.ofSeq
+        let reduces =
+            reduces
+            |> Set.map(fun icore -> // 1 to 1
+                Reduce icore.production
+            )
+        let shifts =
+            if shifts.IsEmpty then
+                Set.empty
+            else
+                let nextKernel =
+                    shifts
+                    |> Set.map(fun ic -> ic.dotIncr())
+                Set.singleton (Shift nextKernel) // all to 1
+
+        let actions = reduces + shifts
+        actions
+

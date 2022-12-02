@@ -142,7 +142,7 @@ A shift/reduce conflict occurs when there are two possible parses for an input s
 %%
 e: 'X'
  | e '+' e
-     ;
+ ;
 ```
 
 For the input string `X+X+X` there are two possible parses, `(X+X)+X` or `X+(X+X)`. Taking the reduce option makes the parser use the first parse, and taking the shift option makes the parser take the second. Bison chooses the shift unless the user puts in operator precedence declarations.
@@ -244,7 +244,7 @@ The lexer must return a zero token to indicate the end of input.
 
 Bison parsers will always detect syntax errors as early as possible, that is, as soon as they read a token for which there is no potential parse. When bison detects a syntax error, that is, when it receives an input token that it cannot parse, it attempts to recover from the error using this procedure:
 
-1. It calls `yyerror(“syntax error”)`. This usually reports the error to the user.
+1. It calls `yyerror("syntax error")`. This usually reports the error to the user.
 
 2. It discards any partially parsed rules until it returns to a state in which it could shift the special `error` symbol.
 
