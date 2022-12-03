@@ -1,8 +1,13 @@
 ﻿module FslexFsyacc.Yacc.AmbiguousCollectionUtils
+open FslexFsyacc.Runtime
+
+open System
+
+open FSharp.Idioms
 open FSharp.Literals.Literal
 
 /// from ambiguous collection to (itemcore,lookahead)
-let getItems (conflicts:Map<string,Set<ItemCore>>) =
+let getItemcores (conflicts:Map<string,Set<ItemCore>>) =
     let flat =
         conflicts
         |> Map.toList
@@ -13,19 +18,11 @@ let getItems (conflicts:Map<string,Set<ItemCore>>) =
         )
 
     let fReduces,fGotos =
-        //conflicts
-        //|> Map.partition(fun la (icores:Set<ItemCore>) -> icores.MinimumElement.dotmax)
         flat
         |> List.partition(fun(item,sym)->item.dotmax)
 
     let reduces =
         fReduces
-        //|> Map.toList
-        //|> List.collect(fun(icores,la) -> 
-        //    icores 
-        //    |> Set.map(fun item -> item, la)
-        //    |> Set.toList
-        //)
         |> List.groupBy fst
         |> List.map(fun(icore,group)-> // 合并lookaheads
             let lookaheads =
@@ -38,20 +35,35 @@ let getItems (conflicts:Map<string,Set<ItemCore>>) =
 
     let shifts =
         fGotos
-        //|> Map.values
-        //|> Set.unionMany
         |> List.map(fun(icore,_)-> icore, Set.empty)
         |> Set.ofList
 
-    // itemcore -> lookaheads
+    // itemcore with lookaheads
     let result:Map<ItemCore,Set<string>> =
         shifts+reduces
         |> Map.ofSeq
     result
 
-let sortItemsByKernel (items:list<ItemCore*Set<string>>) =
+/// 从冲突汇总产生式
+[<Obsolete("AmbiguousCollection.render")>]
+let gatherProductions (conflicts:Map<int,Map<string,Set<ItemCore>>>) =
+    conflicts
+    |> Map.toSeq
+    |> Seq.map (fun(i,closure)->
+        closure
+        |> Map.toSeq
+        |> Seq.map (fun(s,ls)->
+            ls |> Set.map(fun icore -> icore.production)
+        )
+        |> Seq.concat
+        |> Set.ofSeq
+    )
+    |> Set.unionMany
+
+let sortItemsByKernel (items:Map<ItemCore,Set<string>>) =
     let kernel,ext =
         items
+        |> Map.toList
         |> List.partition(fun(ic,_)->
             ic.isKernel()
         )
@@ -60,7 +72,18 @@ let sortItemsByKernel (items:list<ItemCore*Set<string>>) =
         yield! ext
     ]
 
-open FslexFsyacc.Runtime
+/// shift/reduce
+let isSRConflict(itemcores:Set<ItemCore>) =
+    let reduces =
+        itemcores
+        |> Set.filter(fun i -> i.dotmax)
+    itemcores.Count > 1 && reduces.Count = 1
+
+let isConflict (itemcores:Set<ItemCore>) =
+    // 无需限定冲突符号必须是终结符号，
+    // 冲突一定存在reduce，reduce的lookahead一定是终结符号
+    itemcores.Count > 1 && 
+    itemcores |> Set.exists(fun i -> i.dotmax)
 
 // map<item,lookaheads>
 let renderItems (itemcores:list<int*(ItemCore*Set<string>)>) =
@@ -77,22 +100,6 @@ let renderItems (itemcores:list<int*(ItemCore*Set<string>)>) =
             $"{i} {itemcore}"
     )
     |> String.concat "\r\n"
-
-/// shift/reduce
-let isSRConflict(itemcores:Set<ItemCore>) =
-    let reduces =
-        itemcores
-        |> Set.filter(fun i -> i.dotmax)
-    itemcores.Count > 1 && reduces.Count = 1
-
-let isConflict (itemcores:Set<ItemCore>) =
-    // 无需限定冲突符号必须是终结符号，
-    // 冲突一定存在reduce，reduce的lookahead一定是终结符号
-    itemcores.Count > 1 && 
-    itemcores |> Set.exists(fun i -> i.dotmax)
-
-
-open FSharp.Idioms
 
 let renderConflict 
     (kernels: Map<Set<ItemCore>,int>)
@@ -119,3 +126,8 @@ let renderConflict
     ]
     |> String.concat "\r\n"
 
+//let parsingTableClosures (conflicts: Map<int,Map<string,Set<ItemCore>>>) =
+//    conflicts
+//    |> Map.map(fun state cnflcts ->
+//        getItemcores cnflcts
+//    )

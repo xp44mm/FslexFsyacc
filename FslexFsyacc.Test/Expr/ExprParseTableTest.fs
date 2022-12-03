@@ -74,10 +74,10 @@ type ExprParseTableTest(output:ITestOutputHelper) =
             |> AmbiguousCollection.create
 
         let conflictedClosures =
-            collection.filterConflictedClosures() 
+            collection.filterConflictedClosures()
 
         let productions =
-            AmbiguousCollection.gatherProductions conflictedClosures
+            AmbiguousCollectionUtils.gatherProductions conflictedClosures
 
         let pprods = 
             ProductionUtils.precedenceOfProductions collection.grammar.terminals productions
@@ -100,6 +100,7 @@ type ExprParseTableTest(output:ITestOutputHelper) =
     [<Fact>]
     member _.``10 - valid ParseTable``() =
         let src = fsyacc.toFsyaccParseTableFile()
+        //show src.closures
 
         Should.equal src.actions ExprParseTable.actions
         Should.equal src.closures ExprParseTable.closures

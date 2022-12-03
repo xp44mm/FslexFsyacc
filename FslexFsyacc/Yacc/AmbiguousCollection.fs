@@ -1,42 +1,46 @@
 ﻿namespace FslexFsyacc.Yacc
 open FslexFsyacc.Runtime
 open FSharp.Idioms
+open System
 
 type AmbiguousCollection =
     {
         grammar : Grammar
-        kernels : Map<Set<ItemCore>,int> // kernel -> state
-        closures: Map<int,Map<string,Set<ItemCore>>> // state -> (lookahead/leftside) -> conflicts
-        GOTOs   : Map<int,Map<string,Set<ItemCore>>> // state -> (lookahead/leftside) -> kernel
+        /// kernel -> state
+        kernels : Map<Set<ItemCore>,int>
+        /// state -> (lookahead/leftside) -> kernel
+        GOTOs   : Map<int,Map<string,Set<ItemCore>>>
+        /// state -> (lookahead/leftside) -> conflicts
+        conflicts: Map<int,Map<string,Set<ItemCore>>>
     }
 
     ///此函数的结果数据是焦点，交通要道。
     static member create(mainProductions:string list list) =
         let x = LALRCollection.create mainProductions
-        let closures =
+        let conflicts =
             x.closures
             |> Map.map(fun i closure ->
                 closure
-                |> Seq.groupBy(fun (la,_) -> la)
+                |> Seq.groupBy fst
                 |> Map.ofSeq
-                |> Map.map(fun la ls ->
-                    ls
+                |> Map.map(fun _ sq ->
+                    sq
                     |> Seq.map snd // itemcore
                     |> Set.ofSeq
                 )
             )
-        let GOTOs = x.getGOTOs()
 
         {
             grammar = x.grammar
             kernels = x.kernels
-            closures = closures
-            GOTOs = GOTOs
+            GOTOs = x.getGOTOs()
+            conflicts = conflicts
         }
 
     /// 显示冲突状态的冲突项目
+    [<Obsolete("this.render")>]
     member this.filterConflictedClosures() =
-        this.closures
+        this.conflicts
         |> Map.map(fun i closure ->
             closure
             |> Map.filter(fun la st ->
@@ -47,22 +51,7 @@ type AmbiguousCollection =
         )
         |> Map.filter(fun i closure -> not closure.IsEmpty)
 
-    /// 汇总整个Augment Grammar的产生式
-    static member gatherProductions (closures:Map<int,Map<string,Set<ItemCore>>>) =
-        closures
-        |> Map.toSeq
-        |> Seq.map (fun(i,closure)->
-            closure
-            |> Map.toSeq
-            |> Seq.map (fun(s,ls)->
-                ls |> Set.map(fun icore -> icore.production)
-            )
-            |> Seq.concat
-            |> Set.ofSeq
-        )
-        |> Set.unionMany
-
-    /// 去重
+    /// 去重，即冲突项目仅保留一个，但是grammar,kernels,gotos仍然保持去重前的数值
     member this.toUnambiguousCollection(
         dummyTokens:Map<string list,string>,
         precedences:Map<string,int>
@@ -76,7 +65,7 @@ type AmbiguousCollection =
             }:AmbiguityEliminator
 
         let unambiguousClosures =
-            this.closures
+            this.conflicts
             |> Map.map(fun i closure ->
                 closure
                 |> Map.map(fun sym itemcores ->
@@ -89,66 +78,59 @@ type AmbiguousCollection =
             )
         {
             this with
-                closures = unambiguousClosures
+                conflicts = unambiguousClosures
         }
 
-    /// convert real kernel to int state
-    member this.getGotos() =
-        this.GOTOs
-        |> Map.map(fun state mp ->
-            mp
-            |> Map.map(fun symbol items ->
-                this.kernels.[items] // convert to int state
-            )
-        )
-
     member this.render() =
+        ///变换为(itemcore,lookaheads)list
+        let getItemcores (conflicts:Map<string,Set<ItemCore>>) = 
+            conflicts
+            |> AmbiguousCollectionUtils.getItemcores
+            |> AmbiguousCollectionUtils.sortItemsByKernel
+            |> List.mapi(fun i x -> i+1,x)
 
-        let gotos = this.getGotos()
+        //过滤出点号在最后的产生式
+        let getReducedProductions (itemlist:list<int*(ItemCore*_)>) =
+            itemlist
+            |> List.choose(fun(i,(ic,_))->
+                if ic.dotmax then
+                    Some(ic.production,i)
+                else None
+            )
+            |> Map.ofList
 
-        let itemBlock = 
-            this.closures
+        ///过滤出真正的冲突
+        let getProperConflicts (conflicts:Map<string,Set<ItemCore>>) =
+            conflicts
+            |> Map.filter(fun la items ->
+                AmbiguousCollectionUtils.isConflict items
+            )
             |> Map.toList
-            |> List.map(fun(state,conflicts) ->
-                let gotos1 = gotos.[state]
-                let itemslist = 
-                    conflicts
-                    |> AmbiguousCollectionUtils.getItems
-                    |> Map.toList
-                    |> AmbiguousCollectionUtils.sortItemsByKernel
-                    |> List.mapi(fun i x -> i+1,x)
+        //偏应用
+        let renderConflict = AmbiguousCollectionUtils.renderConflict this.kernels
+
+        let itemsBlock =
+            this.conflicts
+            |> Map.toList
+            |> List.map(fun (state,conflicts) ->
+                let itemlist = getItemcores conflicts
+
+                let productions = getReducedProductions itemlist
+                let properConflicts = getProperConflicts conflicts
+
+                let renderConflict = renderConflict productions
 
                 let itemsBlock =
-                    itemslist
+                    itemlist
                     |> AmbiguousCollectionUtils.renderItems
 
-                // for reduce
-                let productions =
-                    itemslist
-                    |> List.choose(fun(i,(ic,_))->
-                        if ic.dotmax then
-                            Some(ic.production,i)
-                        else None
-                    )
-                    |> Map.ofList
-                    
-                let properConflicts =
-                    conflicts
-                    |> Map.filter(fun la items -> 
-                        //this.grammar.terminals.Contains la && 
-                        AmbiguousCollectionUtils.isConflict items
-                    )
-                    |> Map.toList
-
-                let renderConflict = AmbiguousCollectionUtils.renderConflict this.kernels productions
                 let conflictsBlock =
                     if properConflicts.IsEmpty then
                         ""
                     else
                         properConflicts
-                        |> List.map(fun(la,items)-> 
+                        |> List.map(fun(la,items)->
                             renderConflict la items
-                            //AmbiguousCollectionUtils.renderConflict la items gotos1.[la] itemsMap
                         )
                         |> String.concat "\r\n"
 
@@ -160,4 +142,4 @@ type AmbiguousCollection =
             )
             |> String.concat "\r\n"
 
-        itemBlock
+        itemsBlock

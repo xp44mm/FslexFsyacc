@@ -58,7 +58,7 @@ type FslexParseTableTest(output: ITestOutputHelper) =
 
         let conflicts = collection.filterConflictedClosures ()
 
-        let productions = AmbiguousCollection.gatherProductions conflicts
+        let productions = AmbiguousCollectionUtils.gatherProductions conflicts
         // production -> %prec
         let pprods =
             ProductionUtils.precedenceOfProductions collection.grammar.terminals productions

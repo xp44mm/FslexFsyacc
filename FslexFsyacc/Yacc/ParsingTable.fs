@@ -1,7 +1,7 @@
 ﻿namespace FslexFsyacc.Yacc
+open FslexFsyacc.Runtime
 
 open FSharp.Idioms
-open FslexFsyacc.Runtime
 open FSharp.Literals.Literal
 
 /// 原始解析表
@@ -25,10 +25,10 @@ type ParsingTable =
                 .toUnambiguousCollection(productionNames,precedences)
 
         let actions =
-            uc.closures
-            |> Map.map(fun i closure -> 
+            uc.conflicts
+            |> Map.map(fun i cnflcts -> 
                 let actions =
-                    closure
+                    cnflcts
                     |> Map.map(fun la icores ->
                         match 
                             icores
@@ -42,16 +42,13 @@ type ParsingTable =
                 actions
             )
 
-        let closures =
-            uc.closures
-            |> Map.map(fun i conflicts ->
-                AmbiguousCollectionUtils.getItems conflicts
-            )
-
-        //简化数据的表达为数组
         {
             grammar = uc.grammar
             kernels = uc.kernels
             actions = actions
-            closures = closures
+            closures = 
+                uc.conflicts
+                |> Map.map(fun state cnflcts ->
+                    AmbiguousCollectionUtils.getItemcores cnflcts
+                )
         }

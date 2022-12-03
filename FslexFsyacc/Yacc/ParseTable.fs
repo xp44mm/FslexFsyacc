@@ -3,9 +3,9 @@
 /// BNF不带优先级
 type ParseTable =
     {
+        encoder:ParseTableEncoder
         actions:(string*int)list list
         closures:(int*int*string list)list list
-        encoder:ParseTableEncoder
     }
 
     static member create(
@@ -30,7 +30,7 @@ type ParseTable =
             }:ParseTableEncoder
 
         {
+            encoder  = encoder
             actions  = encoder.encodeActions  tbl.actions
             closures = encoder.encodeClosures tbl.closures
-            encoder  = encoder
         }

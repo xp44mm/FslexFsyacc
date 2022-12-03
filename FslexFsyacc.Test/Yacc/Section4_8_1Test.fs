@@ -32,7 +32,7 @@ type Section4_8_1Test(output:ITestOutputHelper) =
 
         // 提取冲突的产生式
         let productions =
-            AmbiguousCollection.gatherProductions conflictedClosures
+            AmbiguousCollectionUtils.gatherProductions conflictedClosures
 
         //show productions
         let y =set[
@@ -53,7 +53,7 @@ type Section4_8_1Test(output:ITestOutputHelper) =
 
         // 提取冲突的产生式
         let productions =
-            AmbiguousCollection.gatherProductions conflictedClosures
+            AmbiguousCollectionUtils.gatherProductions conflictedClosures
 
         //产生式的优先级操作符
         let operators = 
