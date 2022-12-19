@@ -28,9 +28,6 @@ ctortype :
 suffixType:
     | ctortype {LongIdent s0}
     | ARRAY_TYPE_SUFFIX {ArrayTypeSuffix s0}
-longIdent :
-    | IDENT "." longIdent {s0::s2}
-    | IDENT {[s0]}
 typeArguments :
     | typeArgument "," typeArguments {s0::s2}
     | typeArgument {[s0]}
@@ -56,7 +53,9 @@ variabletype :
 typeParam:
     | TYPAR {NamedTypar(false,s0)}
     | INLINE_TYPAR {NamedTypar(true,s0)}
-
+longIdent :
+    | IDENT "." longIdent {s0::s2}
+    | IDENT {[s0]}
 ";"? :
     | ";" {}
     | (*empty*) {}

@@ -47,13 +47,9 @@ module TypeArgument =
         | NamedTypar (isInline, id) -> TypeParam(isInline,id)
         | AnonTypar -> failwith ""
 
-    let toFlexibleCtor () = ()
-
     let toBaseOrInterfaceType (apptype:TypeArgument) = 
         match apptype with
         | Anon -> FlexibleAnon
         | App(ty,suffixes) -> FlexibleApp(ty,suffixes)
         | Ctor(id,args) -> FlexibleCtor(id,args)
         | _ -> failwith ""
-
-    //let toBaseOrInterfaceType() = ()
