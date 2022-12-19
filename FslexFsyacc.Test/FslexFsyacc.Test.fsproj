@@ -8,6 +8,7 @@
 
 	<ItemGroup>
 		<Compile Include="Dir.fs" />
+		<Compile Include="Runtime\PositionTest.fs" />
 		<Compile Include="Runtime\RenderUtilsTest.fs" />    
 		<Compile Include="Lex\NFACombineTest.fs" />
 		<Compile Include="Lex\RegularExpressionNFATest.fs" />
@@ -44,10 +45,9 @@
 		<Compile Include="Fsyacc\FsyaccFileNameTest.fs" />
 		<Compile Include="Fsyacc\FsyaccFileRulesTest.fs" />
     
-		<None Include="FSharpGrammar\pars.fsyacc" />
+		<None Include="FSharpGrammar\fsyacc\pars.fsyacc" />
 		<Compile Include="FSharpGrammar\ParsParseTableTest.fs" />
 		<Compile Include="FSharpGrammar\ManyYaccFilesParseTableTest.fs" />
-		<Compile Include="FSharpGrammar\TypeAnnotParseTableTest.fs" />
     
 		<Compile Include="Expr\ExprToken.fs" />
 		<None Include="Expr\expr.fsyacc" />
@@ -71,8 +71,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="FSharp.xUnit" Version="1.2.3" />
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.0" />
+		<PackageReference Include="FSharp.xUnit" Version="1.2.4" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.1" />
 		<PackageReference Include="System.Reactive" Version="5.0.0" />
 		<PackageReference Include="xunit" Version="2.4.2" />
 		<PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">

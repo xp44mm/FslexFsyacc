@@ -110,5 +110,5 @@ let renderFsyacc
         ]
         |> String.concat "\r\n%%\r\n"
 
-    [h;main;""]
+    [h;main]
     |>String.concat "\r\n"

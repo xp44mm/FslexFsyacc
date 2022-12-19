@@ -76,7 +76,9 @@ type ParsParseTableTest(output:ITestOutputHelper) =
         |> stringify
         |> output.WriteLine
 
-    let filePath = Path.Combine(__SOURCE_DIRECTORY__, "pars.fsyacc")
+    let sourcePath = Path.Combine(__SOURCE_DIRECTORY__, "fsyacc")
+    let filePath = Path.Combine(sourcePath, "pars.fsyacc")
+
     let text = File.ReadAllText(filePath)
     let rawFsyacc = RawFsyaccFile.parse text
     let fsyacc = FlatFsyaccFile.fromRaw rawFsyacc
@@ -139,10 +141,9 @@ type ParsParseTableTest(output:ITestOutputHelper) =
 
         let txt = flat.toRaw().render()
 
-        let outputDir = Path.Combine(__SOURCE_DIRECTORY__, $"{s0}.fsyacc")
+        let outputDir = Path.Combine(sourcePath, $"{s0}.fsyacc")
         File.WriteAllText(outputDir,txt,Encoding.UTF8)
         output.WriteLine("output:\r\n" + outputDir)
-
 
     [<Fact>]
     member _.``002 - path test``() =
@@ -165,7 +166,7 @@ type ParsParseTableTest(output:ITestOutputHelper) =
 
         let txt = flat.toRaw().render()
 
-        let outputDir = Path.Combine(__SOURCE_DIRECTORY__, $"{s0}.fsyacc")
+        let outputDir = Path.Combine(sourcePath, $"{s0}.fsyacc")
         File.WriteAllText(outputDir,txt,Encoding.UTF8)
         output.WriteLine("output:\r\n" + outputDir)
 
@@ -190,10 +191,9 @@ type ParsParseTableTest(output:ITestOutputHelper) =
 
         let txt = flat.toRaw().render()
 
-        let outputDir = Path.Combine(__SOURCE_DIRECTORY__, $"{s0}.fsyacc")
+        let outputDir = Path.Combine(sourcePath, $"{s0}.fsyacc")
         File.WriteAllText(outputDir,txt,Encoding.UTF8)
         output.WriteLine("output:\r\n" + outputDir)
-
 
     [<Fact>]
     member _.``004 - rawConstant test``() =
@@ -216,7 +216,7 @@ type ParsParseTableTest(output:ITestOutputHelper) =
 
         let txt = flat.toRaw().render()
 
-        let outputDir = Path.Combine(__SOURCE_DIRECTORY__, $"{s0}.fsyacc")
+        let outputDir = Path.Combine(sourcePath, $"{s0}.fsyacc")
         File.WriteAllText(outputDir,txt,Encoding.UTF8)
         output.WriteLine("output:\r\n" + outputDir)
 
@@ -241,10 +241,9 @@ type ParsParseTableTest(output:ITestOutputHelper) =
 
         let txt = flat.toRaw().render()
 
-        let outputDir = Path.Combine(__SOURCE_DIRECTORY__, $"{s0}.fsyacc")
+        let outputDir = Path.Combine(sourcePath, $"{s0}.fsyacc")
         File.WriteAllText(outputDir,txt,Encoding.UTF8)
         output.WriteLine("output:\r\n"+outputDir)
-
 
     [<Fact>]
     member _.``006 - classMemberSpfn test``() =
@@ -277,207 +276,11 @@ type ParsParseTableTest(output:ITestOutputHelper) =
 
         let txt = flat.toRaw().render()
 
-        let outputDir = Path.Combine(__SOURCE_DIRECTORY__, $"{s0}.fsyacc")
+        let outputDir = Path.Combine(sourcePath, $"{s0}.fsyacc")
         File.WriteAllText(outputDir,txt,Encoding.UTF8)
         output.WriteLine("output:\r\n"+outputDir)
 
 
-    //[<Fact>]
-    //member _.``001 - implementationFile test``() =
-    //    let s0 = "implementationFile"
-
-    //    //分解到关键字表达式（含）
-    //    let terminals = set [
-    //        "attributes"
-    //        "hashDirective"
-    //        "cPrototype"
-    //        "localBindings"
-    //        "sequentialExpr"
-    //        "typeWithTypeConstraints"
-    //        "withPatternClauses"
-    //        "atomicPatterns"
-    //        "withClauses"
-    //        "ifExprCases"
-    //        "parenPattern"
-    //        "headBindingPattern"
-    //        "typ" // :? typ
-    //        "appType" // open type
-    //        "atomTypeNonAtomicDeprecated"
-    //        "atomicExprAfterType"
-    //        "identOrOp"
-    //        "atomicExpr"
-    //        "tupleExpr"
-    //        "tyconDefn"
-    //        "unionCaseRepr"
-    //        "classDefnBlock"
-    //    ]
-
-    //    let flat = fsyacc.start(s0,terminals)
-
-    //    let flat =
-    //        {
-    //            flat with
-    //                rules = 
-    //                    flat.rules
-    //                    |> removeErrorRules
-    //                    |> FsyaccFileRules.eliminateChomsky
-    //                    |> List.map (fun(prod,nm,ac)->prod,"","")
-    //        }
-
-    //    let txt = flat.toRaw().render()
-
-    //    let outputDir = Path.Combine(__SOURCE_DIRECTORY__, $"{s0}.fsyacc")
-    //    File.WriteAllText(outputDir,txt,Encoding.UTF8)
-    //    output.WriteLine("output:\r\n" + outputDir)
-
-    //[<Fact>]
-    //member _.``003 - typeConstraints test``() =
-    //    let s0 = "typeConstraints"
-    //    let terminals = set [
-    //        "attributes"
-    //        "typ"
-    //        "typar"
-    //        "appType"
-    //        "classMemberSpfn"
-    //        "typeArgsNoHpaDeprecated"
-    //        ]
-
-    //    let flat = fsyacc.start(s0, terminals)
-
-    //    let flat =
-    //        {
-    //            flat with
-    //                rules = 
-    //                    flat.rules
-    //                    |> removeErrorRules
-    //                    |> FsyaccFileRules.eliminateChomsky
-    //                    |> List.map (fun(prod,nm,ac)->prod,"","")
-    //        }
-
-    //    let txt = flat.toRaw().render()
-
-    //    let outputDir = Path.Combine(__SOURCE_DIRECTORY__, $"{s0}.fsyacc")
-    //    File.WriteAllText(outputDir,txt,Encoding.UTF8)
-    //    output.WriteLine("output:\r\n"+outputDir)
-
-    //[<Fact>]
-    //member _.``003 - interaction test``() =
-    //    let s0 = "interaction"
-    //    let terminals = set [
-    //        "attributes"
-    //        "moduleDefn"
-    //        "hashDirective"
-    //        "declExpr"
-    //    ]
-
-    //    let flat = fsyacc.start(s0,terminals)
-
-    //    let flat =
-    //        {
-    //            flat with
-    //                rules = 
-    //                    flat.rules
-    //                    |> removeErrorRules
-    //                    |> FsyaccFileRules.eliminateChomsky
-    //                    |> List.map (fun(prod,nm,ac)->prod,"","")
-    //        }
-
-    //    let txt = flat.toRaw().render()
-
-    //    let outputDir = Path.Combine(__SOURCE_DIRECTORY__, $"{s0}.fsyacc")
-    //    File.WriteAllText(outputDir,txt,Encoding.UTF8)
-    //    output.WriteLine("output:\r\n"+outputDir)
-
-    //[<Fact>]
-    //member _.``004 - typedSequentialExprEOF test``() =
-    //    let s0 = "typedSequentialExprEOF"
-    //    let terminals = set [
-    //        "declExpr"
-    //        "hardwhiteLetBindings"
-    //        "typeWithTypeConstraints"
-    //    ]
-
-    //    let flat = fsyacc.start(s0, terminals)
-
-    //    let flat =
-    //        {
-    //            flat with
-    //                rules = 
-    //                    flat.rules
-    //                    |> removeErrorRules
-    //                    |> FsyaccFileRules.eliminateChomsky
-    //                    |> List.map (fun(prod,nm,ac)->prod,"","")
-    //        }
-
-    //    let txt = flat.toRaw().render()
-
-    //    let outputDir = Path.Combine(__SOURCE_DIRECTORY__, $"{s0}.fsyacc")
-    //    File.WriteAllText(outputDir,txt,Encoding.UTF8)
-    //    output.WriteLine("output:\r\n"+outputDir)
-
-    //[<Fact>]
-    //member _.``005 - hashDirective test``() =
-    //    let s0 = "hashDirective"
-    //    let terminals = set [
-    //        ]
-
-    //    let flat = fsyacc.start(s0,terminals)
-
-    //    let flat =
-    //        {
-    //            flat with
-    //                rules = 
-    //                    flat.rules
-    //                    |> removeErrorRules
-    //                    |> FsyaccFileRules.eliminateChomsky
-    //                    |> List.map (fun(prod,nm,ac)->prod,"","")
-    //        }
-
-    //    let txt = flat.toRaw().render()
-
-    //    let outputDir = Path.Combine(__SOURCE_DIRECTORY__, $"{s0}.fsyacc")
-    //    File.WriteAllText(outputDir,txt,Encoding.UTF8)
-    //    output.WriteLine("output:\r\n" + outputDir)
-
-    //[<Fact>]
-    //member _.``006 - signatureFile test``() =
-    //    let s0 = "signatureFile"
-    //    let terminals = set [
-    //        "attributes"
-    //        "hashDirective"
-    //        "activePatternCaseNames"
-    //        "typar"
-    //        "typeConstraint"
-    //        "topType"
-    //        "declExpr"
-    //        "typ"
-    //        "unionTypeRepr"
-    //        "braceFieldDeclList"
-    //        "tyconClassSpfn"
-    //        "classMemberSpfn"
-    //        "unionCaseRepr"
-    //        "appType"
-    //        //"moduleSpfn"
-    //        //"hashDirective"
-    //    ]
-
-    //    let flat = fsyacc.start(s0,terminals)
-
-    //    let flat =
-    //        {
-    //            flat with
-    //                rules = 
-    //                    flat.rules
-    //                    |> removeErrorRules
-    //                    |> FsyaccFileRules.eliminateChomsky
-    //                    |> List.map (fun(prod,nm,ac)->prod,"","")
-    //        }
-
-    //    let txt = flat.toRaw().render()
-
-    //    let outputDir = Path.Combine(__SOURCE_DIRECTORY__, $"{s0}.fsyacc")
-    //    File.WriteAllText(outputDir,txt,Encoding.UTF8)
-    //    output.WriteLine("output:\r\n"+outputDir)
 
 
 

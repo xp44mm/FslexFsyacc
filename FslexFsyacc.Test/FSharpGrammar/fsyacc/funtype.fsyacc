@@ -1,0 +1,73 @@
+﻿%{%}
+
+funtype :
+    | tupletype funtypeTail {}
+funtypeTail :
+    | "->" tupletype funtypeTail {}
+    | {}
+
+tupletype :
+    | apptype tupletypeTail {}
+tupletypeTail :
+    | "*" apptype tupletypeTail {}
+    | {}
+
+apptype :
+    | atomtype ctortypes {}
+
+ctortypes:
+    | ctortypes ctortype {}
+    | {}
+
+longIdent :
+    | IDENT longIdentTail {}
+longIdentTail:
+    | "." IDENT longIdentTail {}
+    | {}
+
+atomtype :
+    | "_" {}
+    | ctortype {}
+    | ctortype typeArgsActual {}
+    | braceBarFieldDeclListCore {}
+    | "(" typeArgument ")" {}
+    | struct "(" tupletype ")" {}
+    | struct braceBarFieldDeclListCore {}
+
+ctortype:
+    | longIdent {}
+
+typeArgsActual :
+    | "<" typeArguments ">" {}
+typeArguments :
+    | typeArguments "," typeArgument {}
+    | typeArgument {}
+typeArgument:
+    | funtype {}
+    | flexibletype {}
+
+
+flexibletype :
+    | "#" baseOrInterfaceType {}
+    | typeParam ":>" baseOrInterfaceType {}
+    | "_" ":>" baseOrInterfaceType {}
+
+baseOrInterfaceType:
+    | "_" {}
+    | "(" apptype ")" {}
+    | ctortype {}
+    | ctortype typeArgsActual {}
+
+braceBarFieldDeclListCore :
+    | "{|" recdFieldDeclList "|}" {}
+recdFieldDeclList :
+    | fieldDecl ";" recdFieldDeclList {}
+    | fieldDecl ";"? {}
+
+fieldDecl :
+    | IDENT ":" typeArgument {}
+
+";"? :
+    | ";" {}
+    | {}
+

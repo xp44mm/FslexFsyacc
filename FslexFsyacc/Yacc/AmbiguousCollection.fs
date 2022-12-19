@@ -37,30 +37,43 @@ type AmbiguousCollection =
             conflicts = conflicts
         }
 
-    /// 显示冲突状态的冲突项目
-    [<Obsolete("this.render")>]
-    member this.filterConflictedClosures() =
+    /// 过滤掉假冲突，保留真冲突
+    member this.filterProperConflicts() =
         this.conflicts
-        |> Map.map(fun i closure ->
-            closure
-            |> Map.filter(fun la st ->
-                this.grammar.terminals.Contains la
-                && st.Count > 1
-                && st |> Set.exists(fun ic -> ic.dotmax)
+        |> Map.map(fun state conflicts ->
+            conflicts
+            |> Map.filter(fun la items ->
+                AmbiguousCollectionUtils.isConflict items
             )
         )
-        |> Map.filter(fun i closure -> not closure.IsEmpty)
+        |> Map.filter(fun state conflicts ->
+            //内层空，外层也排除
+            not conflicts.IsEmpty
+        )
+
+    [<Obsolete("this.filterProperConflicts")>]
+    member this.filterConflictedClosures() = 
+        this.filterProperConflicts()
+
+    /// 从冲突汇总产生式，以此得知哪些产生式必须指定优先级，以排除歧义。
+    member this.collectConflictedProductions() =
+        set [
+            for KeyValue(state,cnflcts) in this.filterProperConflicts() do
+            for KeyValue(sym,st) in cnflcts do
+            for icore in st do
+            icore.production
+        ]
 
     /// 去重，即冲突项目仅保留一个，但是grammar,kernels,gotos仍然保持去重前的数值
     member this.toUnambiguousCollection(
-        dummyTokens:Map<string list,string>,
+        prodTokens:Map<string list,string>,
         precedences:Map<string,int>
         ) =
 
         let eliminator =
             {
                 terminals = this.grammar.terminals
-                dummyTokens = dummyTokens
+                prodTokens = prodTokens
                 precedences = precedences
             }:AmbiguityEliminator
 
@@ -74,15 +87,19 @@ type AmbiguousCollection =
                     else
                         itemcores
                 )
-                |> Map.filter(fun sym itemcores -> not itemcores.IsEmpty)
+                |> Map.filter(fun sym itemcores -> 
+                    // empty is nonassoc, will be error
+                    not itemcores.IsEmpty
+                    )
             )
         {
             this with
                 conflicts = unambiguousClosures
         }
 
+
     member this.render() =
-        ///变换为(itemcore,lookaheads)list
+        ///变换为(itemcore,lookaheads) list
         let getItemcores (conflicts:Map<string,Set<ItemCore>>) = 
             conflicts
             |> AmbiguousCollectionUtils.getItemcores
@@ -99,13 +116,8 @@ type AmbiguousCollection =
             )
             |> Map.ofList
 
-        ///过滤出真正的冲突
-        let getProperConflicts (conflicts:Map<string,Set<ItemCore>>) =
-            conflicts
-            |> Map.filter(fun la items ->
-                AmbiguousCollectionUtils.isConflict items
-            )
-            |> Map.toList
+        let properConflicts = this.filterProperConflicts()
+
         //偏应用
         let renderConflict = AmbiguousCollectionUtils.renderConflict this.kernels
 
@@ -113,10 +125,14 @@ type AmbiguousCollection =
             this.conflicts
             |> Map.toList
             |> List.map(fun (state,conflicts) ->
+                let properConflicts = 
+                    if properConflicts.ContainsKey state then
+                        properConflicts.[state]
+                    else Map.empty
+
                 let itemlist = getItemcores conflicts
 
                 let productions = getReducedProductions itemlist
-                let properConflicts = getProperConflicts conflicts
 
                 let renderConflict = renderConflict productions
 
@@ -129,6 +145,7 @@ type AmbiguousCollection =
                         ""
                     else
                         properConflicts
+                        |> Map.toList
                         |> List.map(fun(la,items)->
                             renderConflict la items
                         )
@@ -142,4 +159,13 @@ type AmbiguousCollection =
             )
             |> String.concat "\r\n"
 
-        itemsBlock
+        let hh =
+            if properConflicts.IsEmpty then
+                ""
+            else
+                let ls = 
+                    properConflicts.Keys 
+                    |> Seq.map (fun i -> i.ToString())
+                    |> String.concat ","
+                $"conflicted states: {ls}\r\n"
+        hh + itemsBlock

@@ -14,10 +14,19 @@ type Position<'value> =
             value  = value
         }
 
+    static member totalLength(ls:list<Position<'value>>) =
+        let index = ls.Head.index
+        let nextIndex =
+            ls
+            |> List.last
+            |> (fun p -> p.nextIndex)
+        let length = nextIndex - index
+        length
+
     member this.nextIndex = 
         this.index + this.length
 
-    member this.raw(source:string)=
+    member this.raw(source:string) =
         source.Substring(this.index,this.length)
 
     member this.rest(source:string) = 

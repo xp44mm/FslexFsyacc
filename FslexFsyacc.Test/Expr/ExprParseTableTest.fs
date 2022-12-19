@@ -24,12 +24,6 @@ type ExprParseTableTest(output:ITestOutputHelper) =
     let fsyacc = FlatFsyaccFile.fromRaw rawFsyacc
 
     [<Fact>]
-    member _.``00 - compiler test``() =
-        show rawFsyacc.rules
-        show rawFsyacc.precedences
-        show rawFsyacc.declarations
-
-    [<Fact>]
     member _.``01 - render FsyaccFile test``() =
         let fsyacc = rawFsyacc.render()
         output.WriteLine(fsyacc)
@@ -37,10 +31,11 @@ type ExprParseTableTest(output:ITestOutputHelper) =
     [<Fact>]
     member _.``02 - extract FsyaccFile test``() =
         let fsyacc = fsyacc.start("expr",Set.empty)
-        output.WriteLine(Literal.stringify fsyacc)
+        let outp = fsyacc.toRaw().render()
+        output.WriteLine(outp)
 
     [<Fact>]
-    member _.``03 - all tokens``() =
+    member _.``03 - list tokens``() =
         let grammar = 
             fsyacc.getMainProductions() 
             |> Grammar.from
@@ -49,39 +44,40 @@ type ExprParseTableTest(output:ITestOutputHelper) =
         Should.equal y grammar.terminals
 
     [<Fact>]
-    member _.``04 - ambiguous state details``() =
-        let states = 
-            fsyacc.getMainProductions() 
-            |> AmbiguousCollection.create
-        //show states
-        output.WriteLine(states.render())
-    [<Fact>]
-    member _.``05 - conflicted items``() =
+    member _.``04 - precedence Of Productions``() =
         let collection = 
             fsyacc.getMainProductions() 
             |> AmbiguousCollection.create
 
-        // 显示冲突状态的冲突项目
-        let conflictedClosures =
-            collection.filterConflictedClosures()
-
-        show conflictedClosures
-
-    [<Fact>]
-    member _.``06 - %prec of productions``() =
-        let collection = 
-            fsyacc.getMainProductions() 
-            |> AmbiguousCollection.create
-
-        let conflictedClosures =
-            collection.filterConflictedClosures()
+        let terminals = 
+            collection.grammar.terminals
 
         let productions =
-            AmbiguousCollectionUtils.gatherProductions conflictedClosures
+            collection.collectConflictedProductions()
 
         let pprods = 
-            ProductionUtils.precedenceOfProductions collection.grammar.terminals productions
-        show pprods
+            ProductionUtils.precedenceOfProductions terminals productions
+
+        //show pprods
+
+        //( production, dummy token)
+        let expected =
+            [
+                ["expr";"-";"expr"]," - (0 of 2)";
+                ["expr";"expr";"-";"expr"]," - (1 of 2)";
+                ["expr";"expr";"*";"expr"],"*";
+                ["expr";"expr";"+";"expr"],"+";
+                ["expr";"expr";"/";"expr"],"/"
+                ]
+
+        Should.equal expected pprods
+
+    [<Fact>]
+    member _.``05 - ambiguous state details``() =
+        let col = 
+            fsyacc.getMainProductions()
+            |> AmbiguousCollection.create
+        output.WriteLine(col.render())
 
     [<Fact(Skip="once for all!")>] // 
     member _.``07 - expr generateParseTable``() =
@@ -100,7 +96,6 @@ type ExprParseTableTest(output:ITestOutputHelper) =
     [<Fact>]
     member _.``10 - valid ParseTable``() =
         let src = fsyacc.toFsyaccParseTableFile()
-        //show src.closures
 
         Should.equal src.actions ExprParseTable.actions
         Should.equal src.closures ExprParseTable.closures

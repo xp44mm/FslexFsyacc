@@ -89,6 +89,7 @@
 		<Compile Include="Fsyacc\RawFsyaccFile.fs" />
 		<Compile Include="Fsyacc\FsyaccFilePrecedences.fs" />
 		<Compile Include="Fsyacc\FlatFsyaccFile.fs" />
+		<Compile Include="Fsyacc\FlatFsyaccFileRule.fs" />
 		
 		<None Include="..\readme.md">
 		  <Pack>True</Pack>

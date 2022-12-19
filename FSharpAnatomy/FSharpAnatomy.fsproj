@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="FSharpToken.fs" />
+    <Compile Include="FSharpTokenScratch.fs" />
+    <Compile Include="FSharpTokenUtils.fs" />
+    <Compile Include="TypeArgument.fs" />
+    <None Include="typeArgument.fsyacc" />
+    <Compile Include="TypeArgumentParseTable.fs" />
+    <None Include="typeArgument.fslex" />
+    <Compile Include="TypeArgumentDFA.fs" />
+    <Compile Include="TypeArgumentCompiler.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FSharp.Compiler.SyntaxTreeX\FSharp.Compiler.SyntaxTreeX.fsproj" />
+    <ProjectReference Include="..\FslexFsyacc.Runtime\FslexFsyacc.Runtime.fsproj" />
+    <ProjectReference Include="..\FslexFsyacc\FslexFsyacc.fsproj" />
+  </ItemGroup>
+
+</Project>

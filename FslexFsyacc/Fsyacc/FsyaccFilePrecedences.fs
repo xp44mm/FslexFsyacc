@@ -1,8 +1,6 @@
 ﻿module FslexFsyacc.Fsyacc.FsyaccFilePrecedences
 
-let normToRawPrecedences
-    (precedences:Map<string,int>)
-    =
+let normToRawPrecedences (precedences:Map<string,int>) =
     precedences
     |> Map.toList
     |> List.sortBy snd
@@ -17,7 +15,7 @@ let normToRawPrecedences
             | 0 -> "nonassoc"
             | 1 -> "right"
             | 9 -> "left"
-            | _ -> failwith $"precedence nonassoc(0)/right(1)/left(9): {i}"
+            | _ -> failwith $"precedence nonassoc(0)/right(1)/left(9) != {i}"
 
         assoc,tokens
     )

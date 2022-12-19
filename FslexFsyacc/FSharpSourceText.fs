@@ -70,6 +70,7 @@ let tryPercentRBrace =
     tryStart "%}" 
     // 1代表终止循环标记，%}出现的次数
     >> Option.map(fun rest -> 1,"%}",rest)
+
 let tryHeaderTokens = tryPercentRBrace :: tries
 
 let getHeaderLength (inp:string) =
@@ -88,7 +89,9 @@ let getHeaderLength (inp:string) =
     loop 0 inp
 
 let tryLBrace = tryFirst '{' >> Option.map(fun rest -> -1,"{",rest)
+
 let tryRBrace = tryFirst '}' >> Option.map(fun rest -> 1,"}",rest)
+
 let trySemanticTokens = tryLBrace :: tryRBrace :: tries
 
 let getSemanticLength(inp:string) =
@@ -132,7 +135,7 @@ let rec getColumnAndRest (start:int, inp:string) (pos:int) =
     match inp with
     | "" -> 
         failwithf "length:%d < pos:%d" start pos
-    | On(tryMatch (Regex @"^[^\n]*\n")) (x, rest) ->
+    | On(tryMatch(Regex @"^[^\n]*\n")) (x, rest) ->
         let nextStart = start + x.Length
         if pos < nextStart then
             let col = pos - start
@@ -146,7 +149,6 @@ let rec getColumnAndRest (start:int, inp:string) (pos:int) =
             col,nextStart, ""
         else
             failwithf "length:%d < pos:%d" nextStart pos
-
 
 // spaceCount是code前面填补的空格数
 // code 不带开括号，也不带闭括号

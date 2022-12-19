@@ -38,10 +38,28 @@ type Fsyacc2ParseTableTest(output:ITestOutputHelper) =
             |> AmbiguousCollection.create
 
         let conflictedClosures =
-            collection.filterConflictedClosures()
+            collection.filterProperConflicts()
 
         //show conflictedClosures
         Should.equal conflictedClosures Map.empty
+
+    [<Fact>]
+    member _.``03 - 汇总冲突的产生式``() =
+        let collection =
+            fsyacc.getMainProductions ()
+            |> AmbiguousCollection.create
+
+        let productions = 
+            collection.collectConflictedProductions()
+
+        // production -> %prec
+        let pprods =
+            ProductionUtils.precedenceOfProductions collection.grammar.terminals productions
+
+        //优先级应该据此结果给出，不能少，也不应该多。
+        let y = []
+
+        Should.equal y pprods
 
     [<Fact>]
     member _.``04 - print the template of type annotaitions``() =

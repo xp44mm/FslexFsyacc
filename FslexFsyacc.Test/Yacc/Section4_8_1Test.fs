@@ -26,13 +26,9 @@ type Section4_8_1Test(output:ITestOutputHelper) =
 
         let collection = AmbiguousCollection.create mainProductions
 
-        // 显示冲突状态的冲突项目
-        let conflictedClosures =
-            collection.filterConflictedClosures() 
-
         // 提取冲突的产生式
         let productions =
-            AmbiguousCollectionUtils.gatherProductions conflictedClosures
+            collection.collectConflictedProductions()
 
         //show productions
         let y =set[
@@ -41,19 +37,13 @@ type Section4_8_1Test(output:ITestOutputHelper) =
 
         Should.equal y productions
 
-
-
     [<Fact>]
     member _.``grammar 4-1: ProductionPrecedence``() =
         let collection = AmbiguousCollection.create mainProductions
 
-        // 显示冲突状态的冲突项目
-        let conflictedClosures =
-            collection.filterConflictedClosures() 
-
         // 提取冲突的产生式
         let productions =
-            AmbiguousCollectionUtils.gatherProductions conflictedClosures
+            collection.collectConflictedProductions()
 
         //产生式的优先级操作符
         let operators = 

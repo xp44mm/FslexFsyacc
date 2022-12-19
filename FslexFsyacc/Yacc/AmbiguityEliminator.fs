@@ -5,14 +5,14 @@ open FSharp.Literals.Literal
 type AmbiguityEliminator = 
     {
         terminals:Set<string>
-        dummyTokens:Map<string list,string> // production -> dummy token
+        prodTokens:Map<string list,string> // production -> dummy token
         precedences:Map<string,int> // token -> precedence
     }
 
     ///获取产生式的优先级的符号:getTokenOf
     member this.getPrecedence(production:string list) =
-        if this.dummyTokens.ContainsKey production then
-            this.dummyTokens.[production]
+        if this.prodTokens.ContainsKey production then
+            this.prodTokens.[production]
         else
             try
                 production

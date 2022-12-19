@@ -44,7 +44,7 @@ type FslexParseTableTest(output: ITestOutputHelper) =
             fsyacc.getMainProductions ()
             |> AmbiguousCollection.create
 
-        let y = collection.filterConflictedClosures ()
+        let y = collection.filterProperConflicts()
         //show conflicts
         let e = Map [15,Map ["&",set [{production= ["expr";"expr";"&";"expr"];dot= 1};{production= ["expr";"expr";"&";"expr"];dot= 3}];"*",set [{production= ["expr";"expr";"&";"expr"];dot= 3};{production= ["expr";"expr";"*"];dot= 1}];"+",set [{production= ["expr";"expr";"&";"expr"];dot= 3};{production= ["expr";"expr";"+"];dot= 1}];"?",set [{production= ["expr";"expr";"&";"expr"];dot= 3};{production= ["expr";"expr";"?"];dot= 1}];"|",set [{production= ["expr";"expr";"&";"expr"];dot= 3};{production= ["expr";"expr";"|";"expr"];dot= 1}]];16,Map ["&",set [{production= ["expr";"expr";"&";"expr"];dot= 1};{production= ["expr";"expr";"|";"expr"];dot= 3}];"*",set [{production= ["expr";"expr";"*"];dot= 1};{production= ["expr";"expr";"|";"expr"];dot= 3}];"+",set [{production= ["expr";"expr";"+"];dot= 1};{production= ["expr";"expr";"|";"expr"];dot= 3}];"?",set [{production= ["expr";"expr";"?"];dot= 1};{production= ["expr";"expr";"|";"expr"];dot= 3}];"|",set [{production= ["expr";"expr";"|";"expr"];dot= 1};{production= ["expr";"expr";"|";"expr"];dot= 3}]]]
 
@@ -56,9 +56,9 @@ type FslexParseTableTest(output: ITestOutputHelper) =
             fsyacc.getMainProductions ()
             |> AmbiguousCollection.create
 
-        let conflicts = collection.filterConflictedClosures ()
+        let productions = 
+            collection.collectConflictedProductions()
 
-        let productions = AmbiguousCollectionUtils.gatherProductions conflicts
         // production -> %prec
         let pprods =
             ProductionUtils.precedenceOfProductions collection.grammar.terminals productions

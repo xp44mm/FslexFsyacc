@@ -44,22 +44,6 @@ let getItemcores (conflicts:Map<string,Set<ItemCore>>) =
         |> Map.ofSeq
     result
 
-/// 从冲突汇总产生式
-[<Obsolete("AmbiguousCollection.render")>]
-let gatherProductions (conflicts:Map<int,Map<string,Set<ItemCore>>>) =
-    conflicts
-    |> Map.toSeq
-    |> Seq.map (fun(i,closure)->
-        closure
-        |> Map.toSeq
-        |> Seq.map (fun(s,ls)->
-            ls |> Set.map(fun icore -> icore.production)
-        )
-        |> Seq.concat
-        |> Set.ofSeq
-    )
-    |> Set.unionMany
-
 let sortItemsByKernel (items:Map<ItemCore,Set<string>>) =
     let kernel,ext =
         items
@@ -126,8 +110,12 @@ let renderConflict
     ]
     |> String.concat "\r\n"
 
-//let parsingTableClosures (conflicts: Map<int,Map<string,Set<ItemCore>>>) =
-//    conflicts
-//    |> Map.map(fun state cnflcts ->
-//        getItemcores cnflcts
-//    )
+///// 从冲突汇总产生式，以此得知哪些产生式必须指定优先级，以排除歧义。
+[<Obsolete("AmbiguousCollection.collectConflictedProductions()")>]
+let gatherProductions (conflicts:Map<int,Map<string,Set<ItemCore>>>) =
+    set [
+        for KeyValue(state,cnflcts) in conflicts do
+        for KeyValue(sym,st) in cnflcts do
+        for icore in st do
+        icore.production
+    ]

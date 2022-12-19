@@ -26,13 +26,10 @@ type Section4_8_2Test(output:ITestOutputHelper) =
 
         let collection = AmbiguousCollection.create mainProductions
 
-        // 显示冲突状态的冲突项目
-        let conflictedClosures =
-            collection.filterConflictedClosures()
-
         // 提取冲突的产生式
         let productions =
-            AmbiguousCollectionUtils.gatherProductions conflictedClosures
+            collection.collectConflictedProductions()
+
         show productions
 
         //产生式的优先级操作符: production -> symbol
