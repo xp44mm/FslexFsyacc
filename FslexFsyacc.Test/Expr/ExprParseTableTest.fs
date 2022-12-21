@@ -11,6 +11,7 @@ open System.Text
 
 open FslexFsyacc.Fsyacc
 open FslexFsyacc.Yacc
+open FslexFsyacc.Runtime
 
 type ExprParseTableTest(output:ITestOutputHelper) =
     let show res =
@@ -23,10 +24,17 @@ type ExprParseTableTest(output:ITestOutputHelper) =
     let rawFsyacc = RawFsyaccFile.parse text
     let fsyacc = FlatFsyaccFile.fromRaw rawFsyacc
 
-    [<Fact>]
-    member _.``01 - render FsyaccFile test``() =
-        let fsyacc = rawFsyacc.render()
-        output.WriteLine(fsyacc)
+    let parseTblName = "ExprParseTable"
+    let parseTblPath = Path.Combine(__SOURCE_DIRECTORY__, $"{parseTblName}.fs")
+
+    [<Fact(Skip="Run manually when required")>]
+    member _.``01 - norm fsyacc file``() =
+        let startSymbol = 
+            fsyacc.rules
+            |> FlatFsyaccFileRule.getStartSymbol
+        let fsyacc = fsyacc.start(startSymbol, Set.empty)
+        let txt = fsyacc.toRaw().render()
+        output.WriteLine(txt)
 
     [<Fact>]
     member _.``02 - extract FsyaccFile test``() =
@@ -81,16 +89,14 @@ type ExprParseTableTest(output:ITestOutputHelper) =
 
     [<Fact(Skip="once for all!")>] // 
     member _.``07 - expr generateParseTable``() =
-        let name = "ExprParseTable"
-        let moduleName = $"Expr.{name}"
+        let moduleName = $"Expr.{parseTblName}"
 
         //解析表数据
         let tbl = fsyacc.toFsyaccParseTableFile()
         let fsharpCode = tbl.generateModule(moduleName)
 
-        let outputDir = Path.Combine(__SOURCE_DIRECTORY__, $"{name}.fs")
-        File.WriteAllText(outputDir,fsharpCode,Encoding.UTF8)
-        output.WriteLine($"output yacc:\r\n{outputDir}")
+        File.WriteAllText(parseTblPath,fsharpCode,Encoding.UTF8)
+        output.WriteLine($"output yacc:\r\n{parseTblPath}")
 
 
     [<Fact>]
@@ -118,8 +124,7 @@ type ExprParseTableTest(output:ITestOutputHelper) =
             FSharp.Compiler.SyntaxTreeX.SourceCodeParser.semansFromMappers mappers
 
         let header,semans =
-            let filePath = Path.Combine(__SOURCE_DIRECTORY__, "ExprParseTable.fs")
-            let text = File.ReadAllText(filePath, Encoding.UTF8)
+            let text = File.ReadAllText(parseTblPath, Encoding.UTF8)
             FSharp.Compiler.SyntaxTreeX.SourceCodeParser.getHeaderSemansFromFSharp 2 text
 
         Should.equal headerFromFsyacc header

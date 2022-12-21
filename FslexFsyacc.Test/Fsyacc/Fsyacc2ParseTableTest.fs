@@ -2,6 +2,7 @@
 
 open FslexFsyacc.Fsyacc
 open FslexFsyacc.Yacc
+open FslexFsyacc.Runtime
 open FslexFsyacc.Dir
 
 open Xunit
@@ -26,25 +27,42 @@ type Fsyacc2ParseTableTest(output:ITestOutputHelper) =
     let rawFsyacc = RawFsyaccFile.parse text
     let fsyacc = FlatFsyaccFile.fromRaw rawFsyacc
 
-    [<Fact>]
-    member _.``01 - compiler test``() =
-        let result = FsyaccCompiler.compile text
-        show result
+    // ** input **
+    let parseTblName = "Fsyacc2ParseTable"
+    let parseTblPath = Path.Combine(sourcePath, $"{parseTblName}.fs")
+
+    [<Fact(Skip="Run manually when required")>]
+    member _.``01 - norm fsyacc file``() =
+        let startSymbol = 
+            fsyacc.rules
+            |> FlatFsyaccFileRule.getStartSymbol
+        let fsyacc = fsyacc.start(startSymbol, Set.empty)
+        let txt = fsyacc.toRaw().render()
+        output.WriteLine(txt)
 
     [<Fact>]
-    member _.``03 - 显示冲突状态的冲突项目``() =
+    member _.``02 - list all tokens``() =
+        let grammar = 
+            fsyacc.getMainProductions() 
+            |> Grammar.from
+
+        let y = set [ 
+                  ]
+
+        let tokens = grammar.symbols - grammar.nonterminals
+        show tokens
+
+    [<Fact>]
+    member _.``03 - list all states``() =
         let collection =
             fsyacc.getMainProductions()
             |> AmbiguousCollection.create
-
-        let conflictedClosures =
-            collection.filterProperConflicts()
-
-        //show conflictedClosures
-        Should.equal conflictedClosures Map.empty
+        
+        let text = collection.render()
+        output.WriteLine(text)
 
     [<Fact>]
-    member _.``03 - 汇总冲突的产生式``() =
+    member _.``04 - 汇总冲突的产生式``() =
         let collection =
             fsyacc.getMainProductions ()
             |> AmbiguousCollection.create
@@ -62,44 +80,38 @@ type Fsyacc2ParseTableTest(output:ITestOutputHelper) =
         Should.equal y pprods
 
     [<Fact>]
-    member _.``04 - print the template of type annotaitions``() =
+    member _.``05 - list the type annotaitions``() =
         let grammar =
             fsyacc.getMainProductions()
             |> Grammar.from
-
-        let symbols =
-            grammar.symbols
-            |> Set.filter(fun x -> Regex.IsMatch(x,@"^\w+$"))
 
         let sourceCode =
             [
-                for i in symbols do
+                "// Do not list symbols whose return value is always `null`"
+                "// terminals: ref to the returned type of getLexeme"
+                for i in grammar.terminals do
+                    let i = RenderUtils.renderSymbol i
                     i + " : \"\""
-            ] |> String.concat "\r\n"
+                "\r\n// nonterminals"
+                for i in grammar.nonterminals do
+                    let i = RenderUtils.renderSymbol i
+                    i + " : \"\""
+            ] 
+            |> String.concat "\r\n"
+
         output.WriteLine(sourceCode)
 
-    [<Fact>]
-    member _.``05 - list all tokens``() =
-        let grammar =
-            fsyacc.getMainProductions()
-            |> Grammar.from
-
-        let tokens = grammar.symbols - grammar.nonterminals
-        show tokens
 
     [<Fact(Skip="once for all!")>] // 
     member _.``06 - generate Fsyacc2ParseTable ParseTable``() =
-        // ** input **
-        let name = "Fsyacc2ParseTable"
-        let moduleName = $"FslexFsyacc.Fsyacc.{name}"
+        let parseTblModule = $"FslexFsyacc.Fsyacc.{parseTblName}"
 
         //解析表数据
         let parseTbl = fsyacc.toFsyaccParseTableFile()
-        let fsharpCode = parseTbl.generateModule(moduleName)
+        let fsharpCode = parseTbl.generateModule(parseTblModule)
 
-        let outputDir = Path.Combine(sourcePath, $"{name}.fs")
-        File.WriteAllText(outputDir,fsharpCode,System.Text.Encoding.UTF8)
-        output.WriteLine("output fsyacc:"+outputDir)
+        File.WriteAllText(parseTblPath,fsharpCode,Encoding.UTF8)
+        output.WriteLine("output fsyacc:"+parseTblPath)
 
     [<Fact>]
     member _.``10 - valid ParseTable``() =
@@ -123,9 +135,7 @@ type Fsyacc2ParseTableTest(output:ITestOutputHelper) =
             FSharp.Compiler.SyntaxTreeX.SourceCodeParser.semansFromMappers mappers
 
         let header,semans =
-            let filePath = Path.Combine(sourcePath, "Fsyacc2ParseTable.fs")
-
-            File.ReadAllText(filePath, Encoding.UTF8)
+            File.ReadAllText(parseTblPath, Encoding.UTF8)
             |> FSharp.Compiler.SyntaxTreeX.SourceCodeParser.getHeaderSemansFromFSharp 2
 
         Should.equal headerFromFsyacc header

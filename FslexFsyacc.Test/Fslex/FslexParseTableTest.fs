@@ -14,6 +14,7 @@ open FSharp.xUnit
 
 open FslexFsyacc.Yacc
 open FslexFsyacc.Fsyacc
+open FslexFsyacc.Runtime
 
 type FslexParseTableTest(output: ITestOutputHelper) =
     let show res =
@@ -33,62 +34,20 @@ type FslexParseTableTest(output: ITestOutputHelper) =
     let rawFsyacc = RawFsyaccFile.parse text
     let fsyacc = FlatFsyaccFile.fromRaw rawFsyacc
 
-    [<Fact>]
-    member _.``01 - compiler test``() =
-        let result = FsyaccCompiler.compile text
-        show result
+    let parseTblName = "FslexParseTable"
+    let parseTblPath = Path.Combine(sourcePath, $"{parseTblName}.fs")
+
+    [<Fact(Skip="Run manually when required")>]
+    member _.``01 - norm fsyacc file``() =
+        let startSymbol = 
+            fsyacc.rules
+            |> FlatFsyaccFileRule.getStartSymbol
+        let fsyacc = fsyacc.start(startSymbol, Set.empty)
+        let txt = fsyacc.toRaw().render()
+        output.WriteLine(txt)
 
     [<Fact>]
-    member _.``02 - 显示冲突状态的冲突项目``() =
-        let collection =
-            fsyacc.getMainProductions ()
-            |> AmbiguousCollection.create
-
-        let y = collection.filterProperConflicts()
-        //show conflicts
-        let e = Map [15,Map ["&",set [{production= ["expr";"expr";"&";"expr"];dot= 1};{production= ["expr";"expr";"&";"expr"];dot= 3}];"*",set [{production= ["expr";"expr";"&";"expr"];dot= 3};{production= ["expr";"expr";"*"];dot= 1}];"+",set [{production= ["expr";"expr";"&";"expr"];dot= 3};{production= ["expr";"expr";"+"];dot= 1}];"?",set [{production= ["expr";"expr";"&";"expr"];dot= 3};{production= ["expr";"expr";"?"];dot= 1}];"|",set [{production= ["expr";"expr";"&";"expr"];dot= 3};{production= ["expr";"expr";"|";"expr"];dot= 1}]];16,Map ["&",set [{production= ["expr";"expr";"&";"expr"];dot= 1};{production= ["expr";"expr";"|";"expr"];dot= 3}];"*",set [{production= ["expr";"expr";"*"];dot= 1};{production= ["expr";"expr";"|";"expr"];dot= 3}];"+",set [{production= ["expr";"expr";"+"];dot= 1};{production= ["expr";"expr";"|";"expr"];dot= 3}];"?",set [{production= ["expr";"expr";"?"];dot= 1};{production= ["expr";"expr";"|";"expr"];dot= 3}];"|",set [{production= ["expr";"expr";"|";"expr"];dot= 1};{production= ["expr";"expr";"|";"expr"];dot= 3}]]]
-
-        Should.equal e y
-
-    [<Fact>]
-    member _.``03 - 汇总冲突的产生式``() =
-        let collection =
-            fsyacc.getMainProductions ()
-            |> AmbiguousCollection.create
-
-        let productions = 
-            collection.collectConflictedProductions()
-
-        // production -> %prec
-        let pprods =
-            ProductionUtils.precedenceOfProductions collection.grammar.terminals productions
-        //优先级应该据此结果给出，不能少，也不应该多。
-        let y =
-            [ [ "expr"; "expr"; "&"; "expr" ], "&"
-              [ "expr"; "expr"; "*" ], "*"
-              [ "expr"; "expr"; "+" ], "+"
-              [ "expr"; "expr"; "?" ], "?"
-              [ "expr"; "expr"; "|"; "expr" ], "|" ]
-
-        Should.equal y pprods
-
-    [<Fact>]
-    member _.``04 - print the template of type annotaitions``() =
-        let grammar = fsyacc.getMainProductions () |> Grammar.from
-
-        let symbols =
-            grammar.symbols
-            |> Set.filter (fun x -> Regex.IsMatch(x, @"^\w+$"))
-
-        let sourceCode =
-            [ for i in symbols do
-                  i + " \"\";" ]
-            |> String.concat "\r\n"
-
-        output.WriteLine(sourceCode)
-
-    [<Fact>]
-    member _.``05 - list all tokens``() =
+    member _.``02 - list all tokens``() =
         let grammar = fsyacc.getMainProductions () |> Grammar.from
 
         let y =
@@ -114,15 +73,67 @@ type FslexParseTableTest(output: ITestOutputHelper) =
         let tokens = grammar.symbols - grammar.nonterminals
         show tokens
 
+    [<Fact>]
+    member _.``03 - list all states``() =
+        let collection =
+            fsyacc.getMainProductions()
+            |> AmbiguousCollection.create
+        
+        let text = collection.render()
+        output.WriteLine(text)
+
+    [<Fact>]
+    member _.``04 - 汇总冲突的产生式``() =
+        let collection =
+            fsyacc.getMainProductions ()
+            |> AmbiguousCollection.create
+
+        let productions = 
+            collection.collectConflictedProductions()
+
+        // production -> %prec
+        let pprods =
+            ProductionUtils.precedenceOfProductions collection.grammar.terminals productions
+
+        //优先级应该据此结果给出，不能少，也不应该多。
+        let y =
+            [ [ "expr"; "expr"; "&"; "expr" ], "&"
+              [ "expr"; "expr"; "*" ], "*"
+              [ "expr"; "expr"; "+" ], "+"
+              [ "expr"; "expr"; "?" ], "?"
+              [ "expr"; "expr"; "|"; "expr" ], "|" ]
+
+        Should.equal y pprods
+
+    [<Fact>]
+    member _.``05 - list the type annotaitions``() =
+        let grammar =
+            fsyacc.getMainProductions()
+            |> Grammar.from
+
+        let sourceCode =
+            [
+                "// Do not list symbols whose return value is always `null`"
+                "// terminals: ref to the returned type of getLexeme"
+                for i in grammar.terminals do
+                    let i = RenderUtils.renderSymbol i
+                    i + " : \"\""
+                "\r\n// nonterminals"
+                for i in grammar.nonterminals do
+                    let i = RenderUtils.renderSymbol i
+                    i + " : \"\""
+            ] 
+            |> String.concat "\r\n"
+
+        output.WriteLine(sourceCode)
+
     [<Fact(Skip="once for all!")>] // 
     member _.``06 - generate ParseTable``() =
-        let name = "FslexParseTable"
-        let moduleName = $"FslexFsyacc.Fslex.{name}"
+        let moduleName = $"FslexFsyacc.Fslex.{parseTblName}"
         let parseTbl = fsyacc.toFsyaccParseTableFile ()
         let fsharpCode = parseTbl.generateModule(moduleName)
-        let outputDir = Path.Combine(sourcePath, $"{name}.fs")
-        File.WriteAllText(outputDir, fsharpCode, Encoding.UTF8)
-        output.WriteLine("output yacc:" + outputDir)
+        File.WriteAllText(parseTblPath, fsharpCode, Encoding.UTF8)
+        output.WriteLine("output yacc:" + parseTblPath)
 
     [<Fact>]
     member _.``07 - valid ParseTable``() =
@@ -147,9 +158,7 @@ type FslexParseTableTest(output: ITestOutputHelper) =
             FSharp.Compiler.SyntaxTreeX.SourceCodeParser.semansFromMappers mappers
 
         let header,semans =
-            let filePath = Path.Combine(sourcePath, "FslexParseTable.fs")
-
-            File.ReadAllText(filePath, Encoding.UTF8)
+            File.ReadAllText(parseTblPath, Encoding.UTF8)
             |> FSharp.Compiler.SyntaxTreeX.SourceCodeParser.getHeaderSemansFromFSharp 2
 
         Should.equal headerFromFsyacc header
@@ -157,7 +166,9 @@ type FslexParseTableTest(output: ITestOutputHelper) =
 
     [<Fact>]
     member _.``08 - regex first or last token test``() =
-        let grammar = fsyacc.getMainProductions () |> Grammar.from
+        let grammar = 
+            fsyacc.getMainProductions () 
+            |> Grammar.from
 
         let lastsOfExpr = grammar.lasts.["expr"]
         let firstsOfExpr = grammar.firsts.["expr"]
@@ -167,8 +178,13 @@ type FslexParseTableTest(output: ITestOutputHelper) =
 
     [<Fact>]
     member _.``101 - format norm file test``() =
-        let startSymbol = fsyacc.rules.Head |> Triple.first |> List.head
-        show startSymbol
+        let startSymbol = 
+            fsyacc.rules.Head 
+            |> Triple.first 
+            |> List.head
+
+        //show startSymbol
+
         let fsyacc = fsyacc.start(startSymbol,Set.empty).toRaw()
         output.WriteLine(fsyacc.render())
 

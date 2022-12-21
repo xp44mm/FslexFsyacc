@@ -13,6 +13,8 @@ open System.Text.RegularExpressions
 
 open FSharp.xUnit
 open FSharp.Literals
+open FSharp.Idioms
+
 
 type TypeArgumentParseTableTest (output:ITestOutputHelper) =
     let show res =
@@ -26,16 +28,16 @@ type TypeArgumentParseTableTest (output:ITestOutputHelper) =
     let rawFsyacc = RawFsyaccFile.parse text
     let fsyacc = FlatFsyaccFile.fromRaw rawFsyacc
 
-    [<Fact>]
-    member _.``01 - typeArgument test``() =
-        let s0 = "typeArgument"
-        let terminals = set []
-        let fsyacc = fsyacc.start(s0,terminals)
+    let parseTblName = "TypeArgumentParseTable"
+    let parseTblPath = Path.Combine(Dir.FSharpAnatomyPath, $"{parseTblName}.fs")
 
+    [<Fact>] // (Skip="Run manually when required")
+    member _.``01 - norm fsyacc file``() =
+        let startSymbol = 
+            fsyacc.rules
+            |> FlatFsyaccFileRule.getStartSymbol
+        let fsyacc = fsyacc.start(startSymbol, Set.empty)
         let txt = fsyacc.toRaw().render()
-        //let outputDir = Path.Combine(Dir.FSharpAnatomyPath, $"{s0}.fsyacc")
-        //File.WriteAllText(outputDir,txt,Encoding.UTF8)
-        //output.WriteLine("output:\r\n" + outputDir)
         output.WriteLine(txt)
 
     [<Fact>]
@@ -67,7 +69,6 @@ type TypeArgumentParseTableTest (output:ITestOutputHelper) =
 
         Should.equal [] pprods
 
-
     [<Fact>]
     member _.``04 - list all states``() =
         let collection =
@@ -78,13 +79,14 @@ type TypeArgumentParseTableTest (output:ITestOutputHelper) =
         output.WriteLine(text)
 
     [<Fact>]
-    member _.``05 - print the template of type annotaitions``() =
+    member _.``05 - list the type annotaitions``() =
         let grammar =
             fsyacc.getMainProductions()
             |> Grammar.from
 
         let sourceCode =
             [
+                "// Do not list symbols whose return value is always `null`"
                 "// terminals: ref to the returned type of getLexeme"
                 for i in grammar.terminals do
                     let i = RenderUtils.renderSymbol i
@@ -98,48 +100,43 @@ type TypeArgumentParseTableTest (output:ITestOutputHelper) =
 
         output.WriteLine(sourceCode)
 
-
     [<Fact(Skip="once for all!")>] // 
-    member _.``06 - generate TypeArgumentParseTable``() =
-        // ** input **
-        let name = "TypeArgumentParseTable"
-        let moduleName = $"FSharpAnatomy.{name}"
+    member _.``06 - generate ParseTable``() =
+        let moduleName = $"FSharpAnatomy.{parseTblName}"
 
         //解析表数据
         let parseTbl = fsyacc.toFsyaccParseTableFile()
         let fsharpCode = parseTbl.generateModule(moduleName)
 
-        let outputDir = Path.Combine(Dir.FSharpAnatomyPath, $"{name}.fs")
-        File.WriteAllText(outputDir,fsharpCode,Encoding.UTF8)
-        output.WriteLine("output fsyacc:"+outputDir)
+        File.WriteAllText(parseTblPath,fsharpCode,Encoding.UTF8)
+        output.WriteLine("output fsyacc:"+parseTblPath)
 
-    //[<Fact>]
-    //member _.``10 - valid ParseTable``() =
-    //    let src = fsyacc.toFsyaccParseTableFile()
+    [<Fact>]
+    member _.``10 - valid ParseTable``() =
+        let src = fsyacc.toFsyaccParseTableFile()
 
-    //    Should.equal src.actions TypeArgumentParseTable.actions
-    //    Should.equal src.closures TypeArgumentParseTable.closures
+        Should.equal src.actions TypeArgumentParseTable.actions
+        Should.equal src.closures TypeArgumentParseTable.closures
 
-    //    let prodsFsyacc =
-    //        List.map fst src.rules
+        let prodsFsyacc =
+            List.map fst src.rules
 
-    //    let prodsParseTable =
-    //        List.map fst TypeArgumentParseTable.rules
-    //    Should.equal prodsFsyacc prodsParseTable
+        let prodsParseTable =
+            List.map fst TypeArgumentParseTable.rules
 
-    //    let headerFromFsyacc =
-    //        FSharp.Compiler.SyntaxTreeX.Parser.getDecls("header.fsx",src.header)
+        Should.equal prodsFsyacc prodsParseTable
 
-    //    let semansFsyacc =
-    //        let mappers = src.generateMappers()
-    //        FSharp.Compiler.SyntaxTreeX.SourceCodeParser.semansFromMappers mappers
+        let headerFromFsyacc =
+            FSharp.Compiler.SyntaxTreeX.Parser.getDecls("header.fsx",src.header)
 
-    //    let header,semans =
-    //        let filePath = Path.Combine(sourcePath, "TypeArgumentParseTable.fs")
+        let semansFsyacc =
+            let mappers = src.generateMappers()
+            FSharp.Compiler.SyntaxTreeX.SourceCodeParser.semansFromMappers mappers
 
-    //        File.ReadAllText(filePath, Encoding.UTF8)
-    //        |> FSharp.Compiler.SyntaxTreeX.SourceCodeParser.getHeaderSemansFromFSharp 2
+        let header,semans =
+            File.ReadAllText(parseTblPath, Encoding.UTF8)
+            |> FSharp.Compiler.SyntaxTreeX.SourceCodeParser.getHeaderSemansFromFSharp 2
 
-    //    Should.equal headerFromFsyacc header
-    //    Should.equal semansFsyacc semans
+        Should.equal headerFromFsyacc header
+        Should.equal semansFsyacc semans
 

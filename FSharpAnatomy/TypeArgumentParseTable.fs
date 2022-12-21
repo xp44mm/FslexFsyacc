@@ -106,17 +106,6 @@ let rules:(string list*(obj list->obj))list = [
         let result:SuffixType =
             ArrayTypeSuffix s0
         box result
-    ["longIdent";"IDENT";".";"longIdent"],fun(ss:obj list)->
-        let s0 = unbox<string> ss.[0]
-        let s2 = unbox<string list> ss.[2]
-        let result:string list =
-            s0::s2
-        box result
-    ["longIdent";"IDENT"],fun(ss:obj list)->
-        let s0 = unbox<string> ss.[0]
-        let result:string list =
-            [s0]
-        box result
     ["typeArguments";"typeArgument";",";"typeArguments"],fun(ss:obj list)->
         let s0 = unbox<TypeArgument> ss.[0]
         let s2 = unbox<TypeArgument list> ss.[2]
@@ -198,6 +187,17 @@ let rules:(string list*(obj list->obj))list = [
         let s0 = unbox<string> ss.[0]
         let result:Typar =
             NamedTypar(true,s0)
+        box result
+    ["longIdent";"IDENT";".";"longIdent"],fun(ss:obj list)->
+        let s0 = unbox<string> ss.[0]
+        let s2 = unbox<string list> ss.[2]
+        let result:string list =
+            s0::s2
+        box result
+    ["longIdent";"IDENT"],fun(ss:obj list)->
+        let s0 = unbox<string> ss.[0]
+        let result:string list =
+            [s0]
         box result
     ["{\";\"?}";";"],fun(ss:obj list)->
         null
