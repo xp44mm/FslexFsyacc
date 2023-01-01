@@ -60,9 +60,9 @@ type TypeArgumentCompilerTest(output:ITestOutputHelper) =
     member _.``03 - ArrayTypeSuffix``(x,e) =
         let y = 
             x 
-            |> FSharpTokenUtils.tokenize
-            |> TypeArgumentDFA.analyze
-            |> Seq.exactlyOne
+            |> TypeArgumentUtils.tokenize 0
+            |> ArrayTypeSuffixDFA.analyze
+            |> Seq.head
             |> (fun x -> match x.value with ARRAY_TYPE_SUFFIX i -> i |_->failwith"")
         Should.equal y e
 

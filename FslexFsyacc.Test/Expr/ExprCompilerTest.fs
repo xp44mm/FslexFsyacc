@@ -7,7 +7,8 @@ open System.IO
 open System.Text
 
 open FSharp.xUnit
-open FSharp.Literals
+open FSharp.Literals.Literal
+open FSharp.Idioms
 
 open FslexFsyacc.Runtime
 open Expr
@@ -15,7 +16,7 @@ open Expr
 type ExprCompilerTest(output:ITestOutputHelper) =
     let show res =
         res
-        |> Literal.stringify
+        |> stringify
         |> output.WriteLine
 
     let parser = 
@@ -36,8 +37,8 @@ type ExprCompilerTest(output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``01 - output closures details``() =
-        let tbl = parser.getParserTable()
-        let str = tbl.collection()
+        let theory = ExprParseTable.theoryParser
+        let str = theory.collection()
         //let name = "expr"
         //let outputDir = Path.Combine(__SOURCE_DIRECTORY__, $"{name}.txt")
         //File.WriteAllText(outputDir,str,Encoding.UTF8)
@@ -74,5 +75,32 @@ type ExprCompilerTest(output:ITestOutputHelper) =
         )
 
         output.WriteLine(y.Message)
+
+    [<Fact>]
+    member _.``11 - state symbol pair test``() =
+        let symbols = 
+            ExprParseTable.theoryParser.getStateSymbolPairs()
+            |> List.mapi Pair.ofApp
+
+        //output.WriteLine(stringify symbols)
+        let mp = [
+            0,"";
+            1,"expr";
+            2,"(";
+            3,"expr";
+            4,")";
+            5,"-";
+            6,"expr";
+            7,"NUMBER";
+            8,"expr";
+            9,"expr";
+            10,"expr";
+            11,"expr";
+            12,"*";
+            13,"+";
+            14,"-";
+            15,"/"]
+        Should.equal mp symbols
+
 
 

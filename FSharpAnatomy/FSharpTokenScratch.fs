@@ -3,6 +3,7 @@
 open System
 open FSharp.Idioms
 open System.Text.RegularExpressions
+open FSharp.Idioms.RegularExpressions
 
 let tryWS =
     Regex @"^\s+"
@@ -24,11 +25,11 @@ let tryDoubleTick =
     Regex @"^``[ \S]+?``"
     |> tryMatch
 
-let tryTypar =
+let tryQTypar =
     Regex @"^'\w+(?!')"
     |> tryMatch
 
-let tryInlineTypar =
+let tryHTypar =
     Regex @"^\^\w+(?!')"
     |> tryMatch
 
@@ -52,3 +53,6 @@ let tryTripleQuoteString =
     Regex @"^""""""(?!"")[\s\S]*?(?<!"")""""""(?!"")"
     |> tryMatch
 
+let tryOperatorName =
+    Regex @"^\(\s*[!$%&*+-./:<=>?@^|~]+\s*\)"
+    |> tryMatch

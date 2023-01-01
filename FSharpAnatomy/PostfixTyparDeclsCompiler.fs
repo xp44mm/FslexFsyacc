@@ -1,30 +1,33 @@
-﻿module FSharpAnatomy.TypeArgumentCompiler
+﻿module FSharpAnatomy.PostfixTyparDeclsCompiler
 
 open FslexFsyacc.Runtime
+open FSharp.Idioms
 open FSharp.Literals.Literal
+open System
+
 let analyze (posTokens:seq<Position<FSharpToken>>) = 
     posTokens
     |> ArrayTypeSuffixDFA.analyze
 
 let parser = Parser<Position<FSharpToken>> (
-    TypeArgumentParseTable.rules,
-    TypeArgumentParseTable.actions,
-    TypeArgumentParseTable.closures,
+    PostfixTyparDeclsParseTable.rules,
+    PostfixTyparDeclsParseTable.actions,
+    PostfixTyparDeclsParseTable.closures,
     
-    TypeArgumentUtils.getTag,
-    TypeArgumentUtils.getLexeme)
+    PostfixTyparDeclsUtils.getTag,
+    PostfixTyparDeclsUtils.getLexeme)
 
-let parse (tokens:seq<Position<FSharpToken>>) =
+let parse(tokens:seq<Position<FSharpToken>>) =
     tokens
     |> parser.parse
-    |> TypeArgumentParseTable.unboxRoot
+    |> PostfixTyparDeclsParseTable.unboxRoot
 
-let compile (txt:string) =
+let compile(txt:string) =
     let tokenize(context:CompilerContext<FSharpToken>) =
         let i = CompilerContext.nextIndex context
         match
             txt.[i..]
-            |> TypeArgumentUtils.tokenize i
+            |> PostfixTyparDeclsUtils.tokenize i
             |> ArrayTypeSuffixDFA.analyze
             |> Seq.head
         with tok ->
@@ -43,7 +46,7 @@ let compile (txt:string) =
             match states with
             |[(1,lxm);(0,null)] ->  
                 lxm
-                |> TypeArgumentParseTable.unboxRoot
+                |> PostfixTyparDeclsParseTable.unboxRoot
             | _ -> failwith "不完整"
         | lookahead ->
             let states = 
@@ -55,7 +58,7 @@ let compile (txt:string) =
             match states with
             |[(1,lxm);(0,null)] ->  
                 lxm
-                |> TypeArgumentParseTable.unboxRoot
+                |> PostfixTyparDeclsParseTable.unboxRoot
             | _ ->
                 loop {
                     context with

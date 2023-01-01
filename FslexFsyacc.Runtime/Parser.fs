@@ -1,51 +1,48 @@
 ﻿namespace FslexFsyacc.Runtime
 
 open FSharp.Idioms
-open FSharp.Literals
+open FSharp.Literals.Literal
 open FslexFsyacc.Runtime.ParserTableAction
 
 type Parser<'tok> (
-        rules: (string list*(obj list->obj))list,
-        actions: (string*int)list list,
-        closures: (int*int*string list)list list,
-        getTag: 'tok -> string,
+        rules    : (string list*(obj list->obj))list,
+        actions  : (string*int)list list,
+        closures : (int*int*string list)list list,
+        getTag   : 'tok -> string,
         getLexeme: 'tok->obj
     ) =
 
     let tbl =
-        ParserTable.create(rules, actions, closures)
+        TheoryParser.create(rules, actions, closures)
 
-    member this.getParserTable() = tbl
-
-    ///状态的符号
-    member this.getSymbol(state) = tbl.getSymbol(state)
-
-    ///将lookahead token压入状态栈中。
+    /// 将lookahead token压入状态栈中。
     member this.shift(states,token:'tok) =
         let ai = getTag token
         let rec loop states =
             match tbl.tryNextAction(states,ai) with
             | Some i when isStateOfShift i ->
-                let states = shift(getLexeme,states,token,i)
+                let statei = i
+                let states = shift(getLexeme,states,token,statei)
                 states
             | Some i when isRuleOfReduce i ->
-                let states = reduce(tbl.rules,tbl.actions,states,i)
+                let rulei = i
+                let states = reduce(tbl.rules,tbl.actions,states,rulei)
                 loop states
             | Some i -> 
                 failwith $"unexpected action:{i}."
             | None ->
-                failwith $"next state is dead state."
+                failwith $"next state is dead state.{stringify token}"
 
         loop states
 
-    ///对状态栈连续执行reduce，直到非reduce动作:shift,accept（不执行）
-    ///如果改变了states返回Some newStates，如果states保持不变，返回None
+    /// 对状态栈连续执行reduce，直到非reduce动作:shift,accept（不执行）
+    /// 如果改变了states返回Some newStates，如果states保持不变，返回None
     member this.tryReduce(states,token:'tok) =
         let ai = getTag token
         let rec loop times states =
             match tbl.tryNextAction(states,ai) with
             | None ->
-                failwith $"next state is dead state."
+                failwith $"next state is dead state.{stringify token}"
             | Some i when isRuleOfReduce i ->
                 let pushedStates = reduce(tbl.rules,tbl.actions,states,i)
                 loop (times+1) pushedStates
@@ -55,8 +52,8 @@ type Parser<'tok> (
                 else None
         loop 0 states
 
-    ///对状态栈执行reduce，直到非reduce动作:shift,accept（不执行）
-    ///如果改变了states返回Some newStates，如果states保持不变，返回None
+    /// 对状态栈执行reduce，直到非reduce动作:shift,accept（不执行）
+    /// 如果改变了states返回Some newStates，如果states保持不变，返回None
     member this.tryReduce(states) =
         let rec loop times states =
             match tbl.tryNextAction(states,"") with
@@ -73,7 +70,7 @@ type Parser<'tok> (
 
         loop 0 states
 
-    ///返回接受状态
+    /// 返回接受状态
     member this.isAccept(states) =
         match tbl.tryNextAction(states,"") with
         | None ->
@@ -115,11 +112,24 @@ type Parser<'tok> (
                 let tok =
                     match maybeToken with
                     | None -> "EOF"
-                    | Some tok -> Literal.stringify tok
+                    | Some tok -> stringify tok
                 failwith $"\r\nlookahead:{tok}\r\nclosure {sm}:\r\n{closure}"
 
         iterator.tryNext()
         |> loop [0,null]
         |> List.head
         |> snd
+
+    [<System.Obsolete("use ParseTable.theoryParser")>]
+    member this.getParserTable() = tbl
+
+    [<System.Obsolete("use ParseTable.theoryParser")>]
+    member this.getStateSymbolPairs() = 
+        tbl.getStateSymbolPairs()
+        |> List.mapi Pair.ofApp
+        |> Map.ofList
+
+    /// 状态的符号
+    [<System.Obsolete("use ParseTable.theoryParser")>]
+    member this.getSymbol(state) = tbl.getStateSymbolPairs().[state]
 

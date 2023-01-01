@@ -120,10 +120,10 @@ type FsyaccParseTableFile =
                 "]"
                 "let unboxRoot ="
                 $"    unbox<{types.[startSymbol]}>"
-            ] |> String.concat Environment.NewLine
+                "let theoryParser = FslexFsyacc.Runtime.TheoryParser.create(rules, actions, closures)"
+                "let stateSymbolPairs = theoryParser.getStateSymbolPairs()"
+            ] |> String.concat "\r\n"
         result
-
-
 
     /// 单独生成action code的源代码module
     member this.generateMappers() =

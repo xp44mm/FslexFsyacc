@@ -38,18 +38,20 @@ type ManyYaccFilesParseTableTest(output:ITestOutputHelper) =
         FsyaccFileRules.removeErrorRules robust
 
     [<Fact>]
-    member _.``001 - typeAnnot test``() =
-        let parsFsyacc = readYacc "pars"
-        let s0 = "typeAnnot"
+    member _.``001 - explicitMemberConstraint test``() =
+
+        let s0 = "explicitMemberConstraint"
         let typeAnnotWhenConstraintsFsyacc = readYacc s0
 
-        let sumFsyacc = 
+        let parsFsyacc = readYacc "pars"
+
+        let sumFsyacc =
             {
                 parsFsyacc with
-                    rules = 
-                        [ 
-                            yield! parsFsyacc.rules; 
+                    rules =
+                        [
                             yield! typeAnnotWhenConstraintsFsyacc.rules
+                            yield! parsFsyacc.rules;
                         ]
                         |> removeErrorRules
                         |> FsyaccFileRules.eliminateChomsky
@@ -59,7 +61,8 @@ type ManyYaccFilesParseTableTest(output:ITestOutputHelper) =
 
         //分解到关键字表达式（含）
         let terminals = set [
-            "attributes"    
+            "attributes"
+            "topTypeWithTypeConstraints"
         ]
         let fsyacc = sumFsyacc.start(s0,terminals)
         let txt = fsyacc.toRaw().render()

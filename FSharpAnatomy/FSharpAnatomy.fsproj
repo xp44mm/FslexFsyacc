@@ -6,15 +6,22 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="FSharpToken.fs" />
     <Compile Include="FSharpTokenScratch.fs" />
-    <Compile Include="FSharpTokenUtils.fs" />
     <Compile Include="TypeArgument.fs" />
+    <Compile Include="TypeConstraint.fs" />
+    <Compile Include="FSharpToken.fs" />
+    <Compile Include="ArrayTypeSuffixUtils.fs" />
+    <None Include="arrayTypeSuffix.fslex" />
+    <Compile Include="ArrayTypeSuffixDFA.fs" />
+    <Compile Include="TypeArgumentUtils.fs" />
     <None Include="typeArgument.fsyacc" />
     <Compile Include="TypeArgumentParseTable.fs" />
-    <None Include="typeArgument.fslex" />
-    <Compile Include="TypeArgumentDFA.fs" />
     <Compile Include="TypeArgumentCompiler.fs" />
+    <Compile Include="PostfixTyparDeclsUtils.fs" />
+    <None Include="postfixTyparDecls.fsyacc" />
+    <Compile Include="PostfixTyparDeclsParseTable.fs" />
+    <Compile Include="PostfixTyparDeclsCompiler.fs" />
+    <Compile Include="FSharpCompiler.fs" />
   </ItemGroup>
 
   <ItemGroup>

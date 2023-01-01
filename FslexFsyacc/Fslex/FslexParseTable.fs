@@ -129,3 +129,5 @@ let rules:(string list*(obj list->obj))list = [
 ]
 let unboxRoot =
     unbox<string*(string*RegularExpression<string>)list*(RegularExpression<string>list*string)list>
+let theoryParser = FslexFsyacc.Runtime.TheoryParser.create(rules, actions, closures)
+let stateSymbolPairs = theoryParser.getStateSymbolPairs()

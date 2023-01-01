@@ -11,23 +11,19 @@ open FSharp.Literals
 open FSharp.xUnit
 open FslexFsyacc.Fslex
 
-type TypeArgumentDFATest(output:ITestOutputHelper) =
+type ArrayTypeSuffixDFATest(output:ITestOutputHelper) =
     let show res =
         res
         |> Render.stringify
         |> output.WriteLine
 
-    let filePath = Path.Combine(Dir.FSharpAnatomyPath, @"typeArgument.fslex")
+    let filePath = Path.Combine(Dir.FSharpAnatomyPath, @"arrayTypeSuffix.fslex")
     let text = File.ReadAllText(filePath)
     let fslex = FslexFile.parse text
 
-    [<Fact>]
-    member _.``00 - compiler test``() =
-        let hdr,dfs,rls = FslexCompiler.parseToStructuralData text
-        show hdr
-        show dfs
-        show rls
-        
+    let dfaName = "ArrayTypeSuffixDFA"
+    let dfaPath = Path.Combine(Dir.FSharpAnatomyPath, $"{dfaName}.fs")
+            
     [<Fact>]
     member _.``01 - verify``() =
         let y = fslex.verify()
@@ -43,24 +39,23 @@ type TypeArgumentDFATest(output:ITestOutputHelper) =
             res
             |> List.collect(fun re -> re.getCharacters())
             |> Set.ofList
+
         show y
 
-    [<Fact(Skip="once and for all!") >] //
+    [<Fact>] // (Skip="once and for all!")
     member _.``03 - generate DFA``() =
-        let name = "TypeArgumentDFA"
-        let moduleName = $"FSharpAnatomy.{name}"
+        let moduleName = $"FSharpAnatomy.{dfaName}"
 
         let dfafile = fslex.toFslexDFAFile()
         let result = dfafile.generate(moduleName)
 
-        let outputDir = Path.Combine(Dir.FSharpAnatomyPath, $"{name}.fs")
-        File.WriteAllText(outputDir,result,Encoding.UTF8)
-        output.WriteLine("output lex:" + outputDir)
+        File.WriteAllText(dfaPath,result,Encoding.UTF8)
+        output.WriteLine("output lex:" + dfaPath)
 
     [<Fact>]
     member _.``10 - valid DFA``() =
         let src = fslex.toFslexDFAFile()
-        Should.equal src.nextStates TypeArgumentDFA.nextStates
+        Should.equal src.nextStates ArrayTypeSuffixDFA.nextStates
 
         let headerFslex =
             FSharp.Compiler.SyntaxTreeX.Parser.getDecls("header.fsx",src.header)
@@ -70,8 +65,7 @@ type TypeArgumentDFATest(output:ITestOutputHelper) =
             FSharp.Compiler.SyntaxTreeX.SourceCodeParser.semansFromMappers mappers
 
         let header,semans =
-            let filePath = Path.Combine(Dir.FSharpAnatomyPath, "TypeArgumentDFA.fs")
-            let text = File.ReadAllText(filePath, Encoding.UTF8)
+            let text = File.ReadAllText(dfaPath, Encoding.UTF8)
             FSharp.Compiler.SyntaxTreeX.SourceCodeParser.getHeaderSemansFromFSharp 1 text
 
         Should.equal headerFslex header

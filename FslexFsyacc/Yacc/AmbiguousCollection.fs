@@ -141,23 +141,35 @@ type AmbiguousCollection =
                     |> AmbiguousCollectionUtils.renderItems
 
                 let conflictsBlock =
-                    if properConflicts.IsEmpty then
-                        ""
-                    else
-                        properConflicts
-                        |> Map.toList
-                        |> List.map(fun(la,items)->
-                            renderConflict la items
-                        )
-                        |> String.concat "\r\n"
+                    properConflicts
+                    |> Map.toList
+                    |> List.map(fun(la,items)->
+                        renderConflict la items
+                    )
+                    |> String.concat "\r\n"
 
+                let errorLookaheads = 
+                    this.grammar.terminals - Map.keys conflicts
+
+                let errorBlock =
+                    errorLookaheads
+                    |> Set.toList
+                    |> List.map RenderUtils.renderSymbol
+                    |> String.concat " "
+                    |> fun ls -> "error lookaheads: " + ls
                 [
                     $"state {state}:"
                     itemsBlock |> Line.indentCodeBlock 4
-                    conflictsBlock |> Line.indentCodeBlock 4
+
+                    if properConflicts.IsEmpty then () else
+                        conflictsBlock |> Line.indentCodeBlock 4
+
+                    if errorLookaheads.IsEmpty then () else
+                        errorBlock |> Line.indentCodeBlock 4
+
                 ] |> String.concat "\r\n"
             )
-            |> String.concat "\r\n"
+            |> String.concat "\r\n\r\n"
 
         let hh =
             if properConflicts.IsEmpty then

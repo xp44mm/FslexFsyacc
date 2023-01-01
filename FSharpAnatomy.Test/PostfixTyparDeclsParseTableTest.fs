@@ -1,9 +1,8 @@
-﻿namespace FslexFsyacc.Fsyacc
+﻿namespace FSharpAnatomy
 
 open FslexFsyacc.Fsyacc
 open FslexFsyacc.Yacc
 open FslexFsyacc.Runtime
-open FslexFsyacc.Dir
 
 open Xunit
 open Xunit.Abstractions
@@ -14,24 +13,24 @@ open System.Text.RegularExpressions
 
 open FSharp.xUnit
 open FSharp.Literals
+open FSharp.Idioms
 
-type Fsyacc2ParseTableTest(output:ITestOutputHelper) =
+type PostfixTyparDeclsParseTableTest (output:ITestOutputHelper) =
     let show res =
         res
         |> Literal.stringify
         |> output.WriteLine
 
-    let sourcePath = Path.Combine(solutionPath, @"FslexFsyacc\Fsyacc")
-    let filePath = Path.Combine(sourcePath, @"fsyacc2.fsyacc")
-    let text = File.ReadAllText(filePath)
+    let fsyaccPath = Path.Combine(Dir.FSharpAnatomyPath,"postfixTyparDecls.fsyacc")
+    let text = File.ReadAllText(fsyaccPath)
+
     let rawFsyacc = RawFsyaccFile.parse text
     let fsyacc = FlatFsyaccFile.fromRaw rawFsyacc
 
-    // ** input **
-    let parseTblName = "Fsyacc2ParseTable"
-    let parseTblPath = Path.Combine(sourcePath, $"{parseTblName}.fs")
+    let parseTblName = "PostfixTyparDeclsParseTable"
+    let parseTblPath = Path.Combine(Dir.FSharpAnatomyPath, $"{parseTblName}.fs")
 
-    [<Fact(Skip="Run manually when required")>]
+    [<Fact>]
     member _.``01 - norm fsyacc file``() =
         let startSymbol = 
             fsyacc.rules
@@ -42,42 +41,41 @@ type Fsyacc2ParseTableTest(output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``02 - list all tokens``() =
-        let grammar = 
-            fsyacc.getMainProductions() 
+        let grammar =
+            fsyacc.getMainProductions()
             |> Grammar.from
 
-        let y = set [ 
-                  ]
+        let tokens = grammar.terminals
+        let res = set ["#";"(";")";"*";",";"->";".";":";":>";";";"<";">";"ARRAY_TYPE_SUFFIX";"HTYPAR";"IDENT";"OPERATOR_NAME";"QTYPAR";"_";"and";"comparison";"delegate";"enum";"equality";"member";"new";"not";"null";"or";"static";"struct";"unmanaged";"when";"{|";"|}"]
 
-        let tokens = grammar.symbols - grammar.nonterminals
-        show tokens
+        //show tokens
+        Should.equal tokens res
 
     [<Fact>]
-    member _.``03 - list all states``() =
+    member _.``03 - precedence Of Productions``() =
+        let collection = 
+            fsyacc.getMainProductions() 
+            |> AmbiguousCollection.create
+
+        let terminals = 
+            collection.grammar.terminals
+
+        let productions =
+            collection.collectConflictedProductions()
+
+        let pprods = 
+            ProductionUtils.precedenceOfProductions terminals productions
+
+        Should.equal [] pprods
+
+    [<Fact>]
+    member _.``04 - list all states``() =
         let collection =
             fsyacc.getMainProductions()
             |> AmbiguousCollection.create
         
         let text = collection.render()
         output.WriteLine(text)
-
-    [<Fact>]
-    member _.``04 - 汇总冲突的产生式``() =
-        let collection =
-            fsyacc.getMainProductions ()
-            |> AmbiguousCollection.create
-
-        let productions = 
-            collection.collectConflictedProductions()
-
-        // production -> %prec
-        let pprods =
-            ProductionUtils.precedenceOfProductions collection.grammar.terminals productions
-
-        //优先级应该据此结果给出，不能少，也不应该多。
-        let y = []
-
-        Should.equal y pprods
 
     [<Fact>]
     member _.``05 - list the type annotaitions``() =
@@ -101,14 +99,13 @@ type Fsyacc2ParseTableTest(output:ITestOutputHelper) =
 
         output.WriteLine(sourceCode)
 
-
     [<Fact(Skip="once for all!")>] // 
-    member _.``06 - generate Fsyacc2ParseTable ParseTable``() =
-        let parseTblModule = $"FslexFsyacc.Fsyacc.{parseTblName}"
+    member _.``06 - generate ParseTable``() =
+        let moduleName = $"FSharpAnatomy.{parseTblName}"
 
         //解析表数据
         let parseTbl = fsyacc.toFsyaccParseTableFile()
-        let fsharpCode = parseTbl.generateModule(parseTblModule)
+        let fsharpCode = parseTbl.generateModule(moduleName)
 
         File.WriteAllText(parseTblPath,fsharpCode,Encoding.UTF8)
         output.WriteLine("output fsyacc:"+parseTblPath)
@@ -117,14 +114,15 @@ type Fsyacc2ParseTableTest(output:ITestOutputHelper) =
     member _.``10 - valid ParseTable``() =
         let src = fsyacc.toFsyaccParseTableFile()
 
-        Should.equal src.actions Fsyacc2ParseTable.actions
-        Should.equal src.closures Fsyacc2ParseTable.closures
+        Should.equal src.actions PostfixTyparDeclsParseTable.actions
+        Should.equal src.closures PostfixTyparDeclsParseTable.closures
 
         let prodsFsyacc =
             List.map fst src.rules
 
         let prodsParseTable =
-            List.map fst Fsyacc2ParseTable.rules
+            List.map fst PostfixTyparDeclsParseTable.rules
+
         Should.equal prodsFsyacc prodsParseTable
 
         let headerFromFsyacc =

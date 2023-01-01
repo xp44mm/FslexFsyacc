@@ -3,8 +3,11 @@ module FSharpAnatomy.Program
 open System
 open System.IO
 
+open FSharp.Idioms
+
 open FSharp.Literals.Literal
 open FslexFsyacc.Yacc
+
 
 let [<EntryPoint>] main _ = 
     Console.WriteLine(stringify 0)

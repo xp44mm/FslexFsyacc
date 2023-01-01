@@ -45,3 +45,5 @@ let rules:(string list*(obj list->obj))list = [
 ]
 let unboxRoot =
     unbox<float>
+let theoryParser = FslexFsyacc.Runtime.TheoryParser.create(rules, actions, closures)
+let stateSymbolPairs = theoryParser.getStateSymbolPairs()

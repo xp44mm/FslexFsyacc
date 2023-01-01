@@ -1,10 +1,10 @@
 ﻿namespace FSharpAnatomy
 
 type FSharpToken =
+    | EOF
+
     | HASH
-    | LBRACK | RBRACK
     | LPAREN | RPAREN
-    | LBRACE_BAR | BAR_RBRACE
     | STAR
     | COMMA
     | RARROW
@@ -12,13 +12,36 @@ type FSharpToken =
     | COLON
     | COLON_GREATER
     | SEMICOLON
+    | LBRACK | RBRACK
+    | ARRAY_TYPE_SUFFIX of rank:int
+    | HTYPAR of string
+    | IDENT of string
+    | OPERATOR_NAME of string
+    | QTYPAR of string
+    | UNDERSCORE
+
+    | LBRACE_BAR | BAR_RBRACE
     | LESS
     | GREATER
-    | UNDERSCORE
-    | IDENT of string
-    | TYPAR of string
-    | INLINE_TYPAR of string
-    | STRUCT
+
     | WHITESPACE of string
     | COMMENT of string
-    | ARRAY_TYPE_SUFFIX of rank:int
+
+    | AND
+    | COMPARISON
+    | DELEGATE
+    | ENUM
+    | EQUALITY
+    | MEMBER
+    | NEW
+    | NOT
+    | NULL
+    | OR
+    | STATIC
+    | STRUCT
+    | UNMANAGED
+    | WHEN
+
+    | TYPE_ARGUMENT of TypeArgument
+
+

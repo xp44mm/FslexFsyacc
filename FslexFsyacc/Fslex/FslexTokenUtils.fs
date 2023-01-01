@@ -3,6 +3,21 @@ open FSharp.Idioms
 open System.Text.RegularExpressions
 open FslexFsyacc.FSharpSourceText
 
+let ops = Map [
+    "%%",PERCENT;
+    "&",AMP;
+    "(",LPAREN;
+    ")",RPAREN;
+    "*",STAR;
+    "+",PLUS;
+    "/",SLASH;
+    "=",EQUALS;
+    "?",QMARK;
+    "[",LBRACK;
+    "]",RBRACK;
+    "|",BAR
+    ]
+
 let getTag(pos,len,token) = 
     match token with
     | HEADER   _ -> "HEADER"
@@ -26,12 +41,12 @@ let getTag(pos,len,token) =
 
 let getLexeme (pos,len,token) = 
     match token with
-    | HEADER x -> box x
-    | ID x -> box x
-    | CAP x -> box x
-    | LITERAL x -> box x
+    | HEADER   x -> box x
+    | ID       x -> box x
+    | CAP      x -> box x
+    | LITERAL  x -> box x
     | SEMANTIC x -> box x
-    | HOLE x -> box x
+    | HOLE     x -> box x
     | _ -> null
 
 let tryHole =
@@ -73,56 +88,6 @@ let tokenize inp =
                 yield pos,len,PERCENT
                 yield! loop (lpos,linp) (pos+len,rest)
 
-            | On(tryFirst '=') rest ->
-                let len = 1
-                yield pos,len,EQUALS
-                yield! loop (lpos,linp) (pos+len,rest)
-
-            | On(tryFirst '(') rest ->
-                let len = 1
-                yield pos,len,LPAREN
-                yield! loop (lpos,linp) (pos+len,rest)
-
-            | On(tryFirst ')') rest ->
-                let len = 1
-                yield pos,len,RPAREN
-                yield! loop (lpos,linp) (pos+len,rest)
-
-            | On(tryFirst '[') rest ->
-                let len = 1
-                yield pos,len,LBRACK
-                yield! loop (lpos,linp) (pos+len,rest)
-
-            | On(tryFirst ']') rest ->
-                let len = 1
-                yield pos,len,RBRACK
-                yield! loop (lpos,linp) (pos+len,rest)
-
-            | On(tryFirst '+') rest ->
-                let len = 1
-                yield pos,len,PLUS
-                yield! loop (lpos,linp) (pos+len,rest)
-
-            | On(tryFirst '*') rest ->
-                let len = 1
-                yield pos,len,STAR
-                yield! loop (lpos,linp) (pos+len,rest)
-
-            | On(tryFirst '/') rest ->
-                let len = 1
-                yield pos,len,SLASH
-                yield! loop (lpos,linp) (pos+len,rest)
-
-            | On(tryFirst '|') rest ->
-                let len = 1
-                yield pos,len,BAR
-                yield! loop (lpos,linp) (pos+len,rest)
-
-            | On(tryFirst '?') rest ->
-                let len = 1
-                yield pos,len,QMARK
-                yield! loop (lpos,linp) (pos+len,rest)
-
             | On tryHole (x, rest) ->
                 let len = x.Length
                 yield pos,len,HOLE x.[1..len-2]
@@ -157,7 +122,13 @@ let tokenize inp =
 
                 yield pos,len,HEADER fcode
                 yield! loop (nlpos,nlinp) (pos+len,rest)
-
+            
+            | On(tryLongestPrefix (Map.keys ops)) (x, rest) ->
+                let len = x.Length
+                yield pos,len,ops.[x]
+                let nextPos = pos+len
+                yield! loop (lpos,linp) (nextPos,rest)
+            
             | never -> failwith never
         }
     

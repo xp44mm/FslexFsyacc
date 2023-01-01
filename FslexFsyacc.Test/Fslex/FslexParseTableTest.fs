@@ -50,25 +50,26 @@ type FslexParseTableTest(output: ITestOutputHelper) =
     member _.``02 - list all tokens``() =
         let grammar = fsyacc.getMainProductions () |> Grammar.from
 
-        let y =
-            set [ "%%"
-                  "&"
-                  "("
-                  ")"
-                  "*"
-                  "+"
-                  "/"
-                  "="
-                  "?"
-                  "CAP"
-                  "HEADER"
-                  "HOLE"
-                  "ID"
-                  "LITERAL"
-                  "SEMANTIC"
-                  "["
-                  "]"
-                  "|" ]
+        let y = set [ 
+            "%%"
+            "&"
+            "("
+            ")"
+            "*"
+            "+"
+            "/"
+            "="
+            "?"
+            "CAP"
+            "HEADER"
+            "HOLE"
+            "ID"
+            "LITERAL"
+            "SEMANTIC"
+            "["
+            "]"
+            "|" 
+            ]
 
         let tokens = grammar.symbols - grammar.nonterminals
         show tokens

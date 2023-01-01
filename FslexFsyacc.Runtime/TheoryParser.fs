@@ -1,10 +1,10 @@
 ﻿namespace FslexFsyacc.Runtime
 
-open FslexFsyacc.Runtime.ParserTableAction
 open FSharp.Idioms
 open FSharp.Literals
 
-type ParserTable =
+/// without getTag, getLexeme
+type TheoryParser =
     {
         rules: Map<int,string list*(obj list->obj)>
         actions: Map<int,Map<string,int>>
@@ -56,10 +56,10 @@ type ParserTable =
         }
 
     ///状态的闭包
-    member this.getClosure(state) =
-        this.closures.[state]
+    /// for state in [0..len-1]
+    member this.getClosure(state) = this.closures.[state]
 
-    ///状态的符号
+    [<System.Obsolete("use this.getSymbols()")>]
     member this.getSymbol(state) =
         //闭包的kernel
         let kernel =
@@ -70,13 +70,27 @@ type ParserTable =
         |> Seq.map(fun(prod,dot,_)->prod.[dot])
         |> Seq.head
 
-    // print state
+    ///状态的符号
+    member this.getStateSymbolPairs() =
+        this.closures 
+        |> List.map(fun closure ->
+            match
+                closure
+                |> Seq.find(fun(prod,dot,_)-> 
+                    // kernel
+                    List.head prod = "" || dot > 0)
+            with prod,dot,_ ->
+                prod.[dot]
+        )
+
+    /// print state
     member this.collection() =
+        let symbols = this.getStateSymbolPairs()
+
         this.closures
         |> List.mapi(fun i cls ->
             let symbol =
-                i
-                |> this.getSymbol
+                symbols.[i]
                 |> RenderUtils.renderSymbol
 
             let ls =
@@ -86,10 +100,8 @@ type ParserTable =
         )
         |> String.concat "\r\n"
 
-    member this.tryNextAction(
-        states: (int*obj) list,
-        ai:string
-    ) =
+    /// theory method: token抽象成字符串
+    member this.tryNextAction(states: (int*obj)list, ai:string) =
         let actions = this.actions
         let sm,_ = states.Head
         if actions.ContainsKey sm && actions.[sm].ContainsKey ai then
@@ -109,11 +121,11 @@ type ParserTable =
         this.tryNextAction(states, getTag token)
         |> Option.map(fun i ->
             match i with
-            | _ when isStateOfShift i ->
-                let pushedStates = shift(getLexeme,states,token,i)
+            | _ when ParserTableAction.isStateOfShift i ->
+                let pushedStates = ParserTableAction.shift(getLexeme,states,token,i)
                 i,pushedStates
-            | _ when isRuleOfReduce i ->
-                let pushedStates = reduce(rules,actions,states,i)
+            | _ when ParserTableAction.isRuleOfReduce i ->
+                let pushedStates = ParserTableAction.reduce(rules,actions,states,i)
                 i,pushedStates
             | _ ->
                 i,states
@@ -125,10 +137,10 @@ type ParserTable =
         this.tryNextAction(states,"")
         |> Option.map(fun i ->
             match i with
-            | _ when isStateOfShift i ->
+            | _ when ParserTableAction.isStateOfShift i ->
                 failwith $"no more shift."
-            | _ when isRuleOfReduce i ->
-                let pushedStates = reduce(rules,actions,states,i)
+            | _ when ParserTableAction.isRuleOfReduce i ->
+                let pushedStates = ParserTableAction.reduce(rules,actions,states,i)
                 i,pushedStates
             | _ ->
                 i,states

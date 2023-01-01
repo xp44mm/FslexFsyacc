@@ -10,10 +10,10 @@
 		<PackageProjectUrl>https://github.com/xp44mm/FslexFsyacc</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/xp44mm/FslexFsyacc</RepositoryUrl>
 		<PackageTags>lex;yacc;compiler;parser;analyzer</PackageTags>
-		<PackageReleaseNotes>AmbiguousCollection</PackageReleaseNotes>
+		<PackageReleaseNotes>TheoryParser</PackageReleaseNotes>
 		<Company>34696643@qq.com</Company>
 		<Authors>xp44m</Authors>
-		<Version>1.3.1</Version>
+		<Version>1.3.2</Version>
 		<IsPublishable>True</IsPublishable>
 		<PackageReadmeFile>readme.md</PackageReadmeFile>
 	</PropertyGroup>
@@ -78,9 +78,7 @@
 		<Compile Include="Fsyacc\RegularSymbolToken.fs" />
 		<None Include="Fsyacc\fsyacc2.fsyacc" />
 		<Compile Include="Fsyacc\Fsyacc2ParseTable.fs" />
-		<Compile Include="Fsyacc\RegularSymbolParseTable.fs" />
 		<Compile Include="Fsyacc\FsyaccCompiler.fs" />
-		<Compile Include="Fsyacc\RegularSymbolCompiler.fs" />
 		<Compile Include="Fsyacc\FsyaccParseTableFile.fs" />
 		<Compile Include="Fsyacc\FsyaccFileRender.fs" />
 		<Compile Include="Fsyacc\FsyaccFileRules.fs" />
@@ -99,7 +97,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="FSharp.Idioms" Version="1.2.13" />
+		<PackageReference Include="FSharp.Idioms" Version="1.2.16" />
 		<PackageReference Include="FSharp.Literals" Version="2.2.11" />
 	</ItemGroup>
 

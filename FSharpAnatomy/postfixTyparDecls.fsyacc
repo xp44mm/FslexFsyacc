@@ -1,5 +1,58 @@
-﻿%{
-%}
+﻿%{%}
+postfixTyparDecls :
+    | "<" typarDeclList typeConstraints? ">" {List.rev s1,List.rev s2}
+typarDeclList :
+    | typarDecl "," typarDeclList {s0::s2}
+    | typarDecl {[s0]}
+typarDecl :
+    | typar {s0}
+typeConstraints? :
+    | (*empty*) {[]}
+    | when typeConstraints {s1}
+
+// %{%}
+typeConstraints :
+    | typeConstraint and typeConstraints {s0::s2}
+    | typeConstraint {[s0]}
+
+typeConstraint :
+    | typar ":>" typeArgument {SubtypeConstraint(s0,s2)}
+    | typar ":" null {NullConstraint s0}
+    | typar ":" struct {ValueTypeConstraint s0}
+    | typar ":" not struct {RefTypeConstraint s0}
+    | typar ":" comparison {ComparisonConstraint s0}
+    | typar ":" equality {EqualityConstraint s0}
+    | typar ":" unmanaged {UnmanagedConstraint s0}
+    | typar ":" delegate "<" typeArgument "," typeArgument ">" {DelegateConstraint(s0,s4,s6)}
+    | typar ":" enum "<" typeArgument ">" {EnumConstraint(s0,s4)}
+    | typar ":" "(" new ":" typeArgument ")" {DefaultConstructorConstraint(s0,s5)}
+    | typar ":" "(" memberConstraintSig ")" {
+        match s3 with isStatic,isOp,name,typ ->
+        MemberConstraint([s0],isStatic,isOp,name,typ)
+        }
+    | "(" typarAlts ")" ":" "(" memberConstraintSig ")" {
+        match s5 with isStatic,isOp,name,typ ->
+        MemberConstraint(List.rev s1,isStatic,isOp,name,typ)
+        }
+
+typarAlts :
+    | typar or typarAlts {s0::s2}
+    | typar {[s0]}
+
+memberConstraintSig :
+    | static? member identOrOp ":" typeArgument {match s2 with isOp,name -> s0,isOp,name,s4}
+
+static?:
+    | {false}
+    | static {true}
+
+identOrOp :
+    | IDENT {false,s0}
+    | OPERATOR_NAME {true,s0}
+
+
+//%{%}
+
 typeArgument :
     | funtype {TypeArgument.ofFun s0}
     | flexibletype {Flexible s0}
@@ -62,13 +115,26 @@ longIdent :
 
 %%
 
-// terminals: ref to the returned type of getLexeme
+postfixTyparDecls: "Typar list * TypeConstraint list"
+typarDeclList: "Typar list"
+typarDecl: Typar
+typeConstraints? : "TypeConstraint list"
+
+IDENT : string
+OPERATOR_NAME : string
+QTYPAR : string
+HTYPAR : string
+typeArgument : TypeArgument
+typar : Typar
+identOrOp : "bool*string"
+memberConstraintSig : "bool*bool*string*TypeArgument"
+typarAlts : "Typar list"
+typeConstraint : TypeConstraint
+typeConstraints : "TypeConstraint list"
 ARRAY_TYPE_SUFFIX : int
 IDENT : string
 HTYPAR : string
 QTYPAR : string
-
-// nonterminals
 anonRecordType : TypeArgument
 apptype : TypeArgument
 atomtype : TypeArgument
@@ -87,5 +153,4 @@ typeArgument : TypeArgument
 typeArguments : "TypeArgument list"
 typar : Typar
 variabletype : Typar
-
-
+static?:bool

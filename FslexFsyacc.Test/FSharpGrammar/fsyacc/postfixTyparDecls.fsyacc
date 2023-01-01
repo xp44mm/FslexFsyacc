@@ -1,0 +1,17 @@
+﻿%{%}
+postfixTyparDecls :
+    | opt_HIGH_PRECEDENCE_TYAPP LESS typarDeclList opt_typeConstraints GREATER {}
+opt_HIGH_PRECEDENCE_TYAPP :
+    | HIGH_PRECEDENCE_TYAPP {}
+    | (*empty*) {}
+typarDeclList :
+    | typarDeclList COMMA typarDecl {}
+    | typarDecl {}
+typarDecl :
+    | opt_attributes typar {}
+typar :
+    | QUOTE IDENT {}
+    | INFIX_AT_HAT_OP IDENT {}
+opt_typeConstraints :
+    | (*empty*) {}
+    | WHEN typeConstraints {}

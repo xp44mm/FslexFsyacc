@@ -11,8 +11,10 @@
     <Compile Include="Dir.fs" />
     <Compile Include="DirTest.fs" />
     <Compile Include="TypeArgumentParseTableTest.fs" />
-    <Compile Include="TypeArgumentDFATest.fs" />
     <Compile Include="TypeArgumentCompilerTest.fs" />
+    <Compile Include="PostfixTyparDeclsParseTableTest.fs" />
+    <Compile Include="ArrayTypeSuffixDFATest.fs" />
+    <Compile Include="PostfixTyparDeclsCompilerTest.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

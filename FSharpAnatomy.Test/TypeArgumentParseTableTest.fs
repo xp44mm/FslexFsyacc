@@ -15,7 +15,6 @@ open FSharp.xUnit
 open FSharp.Literals
 open FSharp.Idioms
 
-
 type TypeArgumentParseTableTest (output:ITestOutputHelper) =
     let show res =
         res
@@ -31,7 +30,7 @@ type TypeArgumentParseTableTest (output:ITestOutputHelper) =
     let parseTblName = "TypeArgumentParseTable"
     let parseTblPath = Path.Combine(Dir.FSharpAnatomyPath, $"{parseTblName}.fs")
 
-    [<Fact>] // (Skip="Run manually when required")
+    [<Fact(Skip="Run manually when required")>] // 
     member _.``01 - norm fsyacc file``() =
         let startSymbol = 
             fsyacc.rules
@@ -47,9 +46,9 @@ type TypeArgumentParseTableTest (output:ITestOutputHelper) =
             |> Grammar.from
 
         let tokens = grammar.terminals
-        let res = set ["#";"(";")";"*";",";"->";".";":";":>";";";"<";">";"IDENT";"INLINE_TYPAR";"TYPAR";"_";"ARRAY_TYPE_SUFFIX";"struct";"{|";"|}"]
+        let res = set ["#";"(";")";"*";",";"->";".";":";":>";";";"<";">";"IDENT";"HTYPAR";"QTYPAR";"_";"ARRAY_TYPE_SUFFIX";"struct";"{|";"|}"]
 
-        //show tokens
+        show tokens
         Should.equal tokens res
 
     [<Fact>]

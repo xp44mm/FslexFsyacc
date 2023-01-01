@@ -73,9 +73,8 @@ declaration+ :
 declaration :
     | symbol ":" atomic { RegularSymbol.innerSymbol s0,s2.Trim() }
 
-regularSymbol:
-    | "{" symbol "}" { s1 }
 %%
+
 HEADER : string
 ID : string
 LITERAL : string
@@ -99,5 +98,4 @@ symbol* : "RegularSymbol list"
 brackets : "RegularSymbol list"
 parens : "RegularSymbol list"
 repetition : "RegularSymbol*string"
-regularSymbol : RegularSymbol
 

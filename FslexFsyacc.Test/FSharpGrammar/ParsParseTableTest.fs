@@ -171,32 +171,7 @@ type ParsParseTableTest(output:ITestOutputHelper) =
         output.WriteLine("output:\r\n" + outputDir)
 
     [<Fact>]
-    member _.``003 - pathOp test``() =
-        let s0 = "pathOp"
-
-        //分解到关键字表达式（含）
-        let terminals = set ["opName"]
-
-        let flat = fsyacc.start(s0,terminals)
-
-        let flat =
-            {
-                flat with
-                    rules = 
-                        flat.rules
-                        |> removeErrorRules
-                        |> FsyaccFileRules.eliminateChomsky
-                        |> List.map (fun(prod,nm,ac)->prod,"","")
-            }
-
-        let txt = flat.toRaw().render()
-
-        let outputDir = Path.Combine(sourcePath, $"{s0}.fsyacc")
-        File.WriteAllText(outputDir,txt,Encoding.UTF8)
-        output.WriteLine("output:\r\n" + outputDir)
-
-    [<Fact>]
-    member _.``004 - rawConstant test``() =
+    member _.``003 - rawConstant test``() =
         let s0 = "rawConstant"
 
         //分解到关键字表达式（含）
@@ -221,44 +196,12 @@ type ParsParseTableTest(output:ITestOutputHelper) =
         output.WriteLine("output:\r\n" + outputDir)
 
     [<Fact>]
-    member _.``005 - topTypeWithTypeConstraints test``() =
-        let s0 = "topTypeWithTypeConstraints"
+    member _.``004 - tyconDefn test``() =
+        let s0 = "tyconDefn"
         let terminals = set [
-            "attributes"
-            ]
-
-        let flat = fsyacc.start(s0, terminals)
-
-        let flat =
-            {
-                flat with
-                    rules = 
-                        flat.rules
-                        |> removeErrorRules
-                        |> FsyaccFileRules.eliminateChomsky
-                        |> List.map (fun(prod,nm,ac)->prod,"","")
-            }
-
-        let txt = flat.toRaw().render()
-
-        let outputDir = Path.Combine(sourcePath, $"{s0}.fsyacc")
-        File.WriteAllText(outputDir,txt,Encoding.UTF8)
-        output.WriteLine("output:\r\n"+outputDir)
-
-    [<Fact>]
-    member _.``006 - classMemberSpfn test``() =
-        let s0 = "classMemberSpfn"
-        let terminals = set [
-            "attributes"
-            "identOrOp"
-            "typeConstraints"
-            "topType"
-            "declExpr"
-            "appType"
-            "typ"
-            "path"
-            "rawConstant"
-            "measureTypeArg"
+            "attributes";"opt_attributes"
+            "access";"opt_access"
+            "typar";
 
         ]
 
@@ -279,6 +222,34 @@ type ParsParseTableTest(output:ITestOutputHelper) =
         let outputDir = Path.Combine(sourcePath, $"{s0}.fsyacc")
         File.WriteAllText(outputDir,txt,Encoding.UTF8)
         output.WriteLine("output:\r\n"+outputDir)
+
+    [<Fact>]
+    member _.``005 - postfixTyparDecls test``() =
+        let s0 = "postfixTyparDecls"
+        let terminals = set [
+            "attributes";"opt_attributes"
+            "typeConstraints"
+            ]
+
+        let flat = fsyacc.start(s0, terminals)
+
+        let flat =
+            {
+                flat with
+                    rules = 
+                        flat.rules
+                        |> removeErrorRules
+                        |> FsyaccFileRules.eliminateChomsky
+                        |> List.map (fun(prod,nm,ac)->prod,"","")
+            }
+
+        let txt = flat.toRaw().render()
+
+        let outputDir = Path.Combine(sourcePath, $"{s0}.fsyacc")
+        File.WriteAllText(outputDir,txt,Encoding.UTF8)
+        output.WriteLine("output:\r\n"+outputDir)
+
+
 
 
 

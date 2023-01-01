@@ -68,15 +68,8 @@ type ExprParseTableTest(output:ITestOutputHelper) =
 
         //show pprods
 
-        //( production, dummy token)
-        let expected =
-            [
-                ["expr";"-";"expr"]," - (0 of 2)";
-                ["expr";"expr";"-";"expr"]," - (1 of 2)";
-                ["expr";"expr";"*";"expr"],"*";
-                ["expr";"expr";"+";"expr"],"+";
-                ["expr";"expr";"/";"expr"],"/"
-                ]
+        //( production, dummytoken)
+        let expected =[["expr";"-";"expr"]," - (1 of 2)";["expr";"expr";"-";"expr"]," - (2 of 2)";["expr";"expr";"*";"expr"],"*";["expr";"expr";"+";"expr"],"+";["expr";"expr";"/";"expr"],"/"]
 
         Should.equal expected pprods
 

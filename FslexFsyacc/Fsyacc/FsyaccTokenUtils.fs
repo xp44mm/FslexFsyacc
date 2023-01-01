@@ -1,4 +1,18 @@
 ﻿module FslexFsyacc.Fsyacc.FsyaccTokenUtils
+open FSharp.Idioms
+
+let ops = Map [
+    "(",LPAREN;
+    ")",RPAREN;
+    "*",STAR;
+    "+",PLUS;
+    ":",COLON;
+    "?",QMARK;
+    "[",LBRACK;
+    "]",RBRACK;
+    "|",BAR;
+    ]
+
 
 /// the tag of token
 let getTag(pos,len,token) =
@@ -8,7 +22,6 @@ let getTag(pos,len,token) =
     | LITERAL _    -> "LITERAL"
     | SEMANTIC _ -> "SEMANTIC"
     | COLON        -> ":"
-    | SEMICOLON    -> ";"
     | BAR          -> "|"
     | PERCENT      -> "%%"
     | LEFT         -> "%left"
@@ -71,42 +84,7 @@ let tokenize inp =
                 yield pos,len,PERCENT
                 yield! loop (lpos,linp) (pos+len,rest)
 
-            | On (tryFirst ':') rest ->
-                yield pos, 1, COLON
-                yield! loop (lpos,linp) (pos+1,rest)
 
-            | On (tryFirst '|') rest ->
-                yield pos,1,BAR
-                yield! loop (lpos,linp) (pos+1,rest)
-
-            | On (tryFirst ';') rest ->
-                yield pos,1,SEMICOLON
-                yield! loop (lpos,linp) (pos+1,rest)
-
-            | On (tryFirst '?') rest ->
-                yield pos,1,QMARK
-                yield! loop (lpos,linp) (pos+1,rest)
-
-            | On (tryFirst '+') rest ->
-                yield pos,1,PLUS
-                yield! loop (lpos,linp) (pos+1,rest)
-
-            | On (tryFirst '*') rest ->
-                yield pos,1,STAR
-                yield! loop (lpos,linp) (pos+1,rest)
-
-            | On (tryFirst '[') rest ->
-                yield pos,1,LBRACK
-                yield! loop (lpos,linp) (pos+1,rest)
-            | On (tryFirst ']') rest ->
-                yield pos,1,RBRACK
-                yield! loop (lpos,linp) (pos+1,rest)
-            | On (tryFirst '(') rest ->
-                yield pos,1,LPAREN
-                yield! loop (lpos,linp) (pos+1,rest)
-            | On (tryFirst ')') rest ->
-                yield pos,1,RPAREN
-                yield! loop (lpos,linp) (pos+1,rest)
             | On(tryMatch(Regex @"^%[a-z]+")) (x, rest) ->
                 let tok =
                     match x with
@@ -148,6 +126,49 @@ let tokenize inp =
 
                 yield pos,len,HEADER fcode
                 yield! loop (nlpos,nlinp) (pos+len,rest)
+            
+            | On(tryLongestPrefix (Map.keys ops)) (x, rest) ->
+                let len = x.Length
+                yield pos,len,ops.[x]
+                let nextPos = pos+len
+                yield! loop (lpos,linp) (nextPos,rest)
+
+            //| On (tryFirst ':') rest ->
+            //    yield pos, 1, COLON
+            //    yield! loop (lpos,linp) (pos+1,rest)
+
+            //| On (tryFirst '|') rest ->
+            //    yield pos,1,BAR
+            //    yield! loop (lpos,linp) (pos+1,rest)
+
+            ////| On (tryFirst ';') rest ->
+            ////    yield pos,1,SEMICOLON
+            ////    yield! loop (lpos,linp) (pos+1,rest)
+
+            //| On (tryFirst '?') rest ->
+            //    yield pos,1,QMARK
+            //    yield! loop (lpos,linp) (pos+1,rest)
+
+            //| On (tryFirst '+') rest ->
+            //    yield pos,1,PLUS
+            //    yield! loop (lpos,linp) (pos+1,rest)
+
+            //| On (tryFirst '*') rest ->
+            //    yield pos,1,STAR
+            //    yield! loop (lpos,linp) (pos+1,rest)
+
+            //| On (tryFirst '[') rest ->
+            //    yield pos,1,LBRACK
+            //    yield! loop (lpos,linp) (pos+1,rest)
+            //| On (tryFirst ']') rest ->
+            //    yield pos,1,RBRACK
+            //    yield! loop (lpos,linp) (pos+1,rest)
+            //| On (tryFirst '(') rest ->
+            //    yield pos,1,LPAREN
+            //    yield! loop (lpos,linp) (pos+1,rest)
+            //| On (tryFirst ')') rest ->
+            //    yield pos,1,RPAREN
+            //    yield! loop (lpos,linp) (pos+1,rest)
 
             | never -> failwithf "%A" never
         }

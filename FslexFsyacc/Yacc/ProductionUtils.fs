@@ -46,8 +46,10 @@ let precedenceOfProductions (terminals:Set<string>)(productions:Set<string list>
             | len ->
                 items
                 |> List.mapi(fun i (prod,term) -> 
-                    let tip = $" {term} ({i} of {len})" // head space be used to sort first
-                    prod, tip
+                    let tip = 
+                        // head space be used to sort first
+                        $" {term} ({i+1} of {len})"
+                    prod,tip
                     )
         )
         |> List.concat

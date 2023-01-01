@@ -757,6 +757,8 @@ When trying to resolve conflicts, start with the rules that are involved in the 
 
 If you’re writing a parser for a language you’re inventing, conflicts in the parser often indicate ambiguities or inconsistencies in the language’s definition. First figure out what’s causing the conflict, and then decide whether the language is OK and you just need to adjust the grammar to describe the language correctly or whether the language is ambiguous, in which case you may want to change both the language and the grammar to be unambiguous. Languages that bison has trouble parsing are often hard for people to parse in their heads; you’ll often end up with a better language design if you change your language to remove the conflicts.
 
+产生式体相同的非空产生式是嫌疑冲突源泉。
+
 ### IF/THEN/ELSE (Shift/Reduce)
 
 We saw this conflict earlier in this chapter. Here we describe what to do with the shift/reduce conflict once you’ve tracked it down. It turns out that the default way that bison resolves this particular conflict is usually what you want it to do anyway. How do you know it’s doing what you want it to do? Your choices are to
