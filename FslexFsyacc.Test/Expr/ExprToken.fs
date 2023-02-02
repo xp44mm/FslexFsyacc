@@ -9,80 +9,71 @@ type ExprToken =
     | MINUS
     | STAR
     | DIV
+    | EOF
+open System
+open System.Text.RegularExpressions
+
+open FslexFsyacc.Runtime
+open FSharp.Idioms
+
 
 module ExprToken =
-    let getTag(pos,len,token) = 
-        match token with
-        | NUMBER _ -> "NUMBER"
-        | LPAREN   -> "("
-        | RPAREN   -> ")"
-        | PLUS     -> "+"
-        | MINUS   -> "-"
-        | STAR -> "*"
-        | DIV    -> "/"
+    let ops = Map [
+           "(", LPAREN
+           ")", RPAREN
+           "+", PLUS  
+           "-", MINUS 
+           "*", STAR  
+           "/", DIV   
+    ]
 
-    let getLexeme(pos,len,token) = 
-        match token with
+    let ops_inverse = 
+        ops 
+        |> Map.inverse 
+        |> Map.map(fun k v -> Seq.exactlyOne v)
+
+    let getTag (token:Position<ExprToken>) = 
+        match token.value with
+        | x when ops_inverse.ContainsKey x -> ops_inverse.[x]
+        | NUMBER _ -> "NUMBER"
+        | EOF -> ""
+        | _ -> null
+
+    let getLexeme (token:Position<ExprToken>) = 
+        match token.value with
         | NUMBER n -> box n
         | _   -> null
 
-    open FSharp.Idioms.ActivePatterns
-    open FSharp.Idioms.StringOps
-    open System.Text.RegularExpressions
+    let rec tokenize pos (inp:string) =
+        seq {
+            match inp with
+            | "" -> () // yield {index=pos;length=0;value=EOF}
 
-    let tokenize(inp:string) =
-        let rec loop pos (inp:string) =
-            seq {
-                match inp with
-                | "" -> ()
+            | On(tryMatch(Regex @"^\s+")) (x, rest) ->
+                let len = x.Length
+                let pos = pos + len
+                yield! tokenize pos rest
 
-                | On(tryMatch(Regex @"^\s+")) (x, rest) ->
-                    let len = x.Length
-                    let pos = pos + len
-                    yield! loop pos rest
+            | On(tryMatch(Regex @"^\d+(\.\d+)?")) (x, rest) ->
+                let tok =
+                    {
+                        index = pos
+                        length = x.Length
+                        value = NUMBER(Double.Parse(x))
+                    }
+                yield tok
+                yield! tokenize tok.nextIndex rest
 
-                | On(tryMatch(Regex @"^\d+(\.\d+)?")) (x, rest) ->
-                    let len = x.Length
-                    yield pos,len,NUMBER <| System.Double.Parse(x)
-                    let pos = pos + len
-                    yield! loop pos rest
+            | On(tryLongestPrefix (Map.keys ops)) (x, rest) ->
+                let tok =
+                    {
+                        index = pos
+                        length = x.Length
+                        value = ops.[x]
+                    }
+                yield tok
+                yield! tokenize tok.nextIndex rest
 
-                | On(tryFirst '(') rest ->
-                    let len = 1
-                    yield pos,len, LPAREN
-                    let pos = pos + len
-                    yield! loop pos rest
+            | never -> failwith never
+        }
 
-                | On(tryFirst ')') rest ->
-                    let len = 1
-                    yield pos,len, RPAREN
-                    let pos = pos + len
-                    yield! loop pos rest
-
-                | On(tryFirst '+') rest ->
-                    let len = 1
-                    yield pos, len, PLUS
-                    let pos = pos + len
-                    yield! loop pos rest
-
-                | On(tryFirst '-') rest ->
-                    let len = 1
-                    yield pos, len, MINUS
-                    let pos = pos + len
-                    yield! loop pos rest
-
-                | On(tryFirst '*') rest ->
-                    let len = 1
-                    yield pos, len, STAR
-                    let pos = pos + len
-                    yield! loop pos rest
-
-                | On(tryFirst '/') rest ->
-                    let len = 1
-                    yield pos, len, DIV
-                    let pos = pos + len
-                    yield! loop pos rest
-                | never -> failwith never
-            }
-
-        loop 0 inp

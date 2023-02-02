@@ -29,14 +29,14 @@ let ops = Map [
     "|}",BAR_RBRACE
     ]
 
+let kws = Map [
+    "_",UNDERSCORE;
+    "struct",STRUCT;]
+
 let ops_inverse = 
     ops 
     |> Map.inverse 
     |> Map.map(fun k v -> Seq.exactlyOne v)
-
-let kws = Map [
-    "_",UNDERSCORE;
-    "struct",STRUCT;]
 
 let kws_inverse = 
     kws 
@@ -46,7 +46,7 @@ let kws_inverse =
 let rec tokenize index (inp:string) =
     seq {
         match inp with
-        | "" -> yield {index=index;length=0;value=EOF}
+        | "" -> () // yield {index=index;length=0;value=EOF}
 
         | On(tryMatch(Regex @"^\s+")) (x, rest) ->
             let len = x.Length

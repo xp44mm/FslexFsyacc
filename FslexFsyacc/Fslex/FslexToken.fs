@@ -1,6 +1,7 @@
 ﻿namespace FslexFsyacc.Fslex
 
 type FslexToken =
+    | EOF
     | HEADER of string
     /// \w+
     | ID of string

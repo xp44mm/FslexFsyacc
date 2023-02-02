@@ -1,35 +1,35 @@
-﻿module FSharpAnatomy.TypeArgumentCompiler
+﻿module Expr.ExprCompiler
 
-open FslexFsyacc.Runtime
-open FSharp.Literals.Literal
+open System.IO
+open System.Text
 open System.Reactive
 open System.Reactive.Linq
 
-let analyze (posTokens:seq<Position<FSharpToken>>) = 
-    posTokens
-    |> ArrayTypeSuffixDFA.analyze
+open FSharp.Literals.Literal
+open FSharp.Idioms
 
-let parser = Parser<Position<FSharpToken>> (
-    TypeArgumentParseTable.rules,
-    TypeArgumentParseTable.actions,
-    TypeArgumentParseTable.closures,
-    
-    TypeArgumentUtils.getTag,
-    TypeArgumentUtils.getLexeme)
+open FslexFsyacc.Runtime
+open Expr
 
-let parse (tokens:seq<Position<FSharpToken>>) =
+let parser = 
+    Parser<Position<ExprToken>>(
+        ExprParseTable.rules,
+        ExprParseTable.actions,
+        ExprParseTable.closures,ExprToken.getTag,ExprToken.getLexeme)
+
+let parse(tokens:seq<Position<ExprToken>>) =
     tokens
     |> parser.parse
-    |> TypeArgumentParseTable.unboxRoot
+    |> ExprParseTable.unboxRoot
 
 let compile (txt:string) =
     let mutable tokens = []
     let mutable states = [0,null]
-    let mutable result = defaultValue<_>
+    let mutable result = defaultValue<float>
+
     let sq =
         txt
-        |> TypeArgumentUtils.tokenize 0
-        |> ArrayTypeSuffixDFA.analyze
+        |> ExprToken.tokenize 0
         |> Seq.map(fun tok ->
             tokens <- tok::tokens
             tok
@@ -51,10 +51,9 @@ let compile (txt:string) =
 
                 match states with
                 |[1,lxm; 0,null] ->
-                    result <- TypeArgumentParseTable.unboxRoot lxm
+                    result <- ExprParseTable.unboxRoot lxm
                 | _ ->
                     failwith $"{stringify states}"
              )
         ))
     result
-

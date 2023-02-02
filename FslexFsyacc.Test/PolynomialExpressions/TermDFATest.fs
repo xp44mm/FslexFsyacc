@@ -23,7 +23,7 @@ type TermDFATest(output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``0 = compiler test``() =
-        let hdr,dfs,rls = FslexCompiler.parseToStructuralData text
+        let hdr,dfs,rls = FslexCompiler.compile text
         show hdr
         show dfs
         show rls

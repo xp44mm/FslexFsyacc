@@ -37,7 +37,7 @@ type FslexParseTableTest(output: ITestOutputHelper) =
     let parseTblName = "FslexParseTable"
     let parseTblPath = Path.Combine(sourcePath, $"{parseTblName}.fs")
 
-    [<Fact(Skip="Run manually when required")>]
+    [<Fact>]
     member _.``01 - norm fsyacc file``() =
         let startSymbol = 
             fsyacc.rules
@@ -99,9 +99,9 @@ type FslexParseTableTest(output: ITestOutputHelper) =
         //优先级应该据此结果给出，不能少，也不应该多。
         let y =
             [ [ "expr"; "expr"; "&"; "expr" ], "&"
-              [ "expr"; "expr"; "*" ], "*"
-              [ "expr"; "expr"; "+" ], "+"
-              [ "expr"; "expr"; "?" ], "?"
+              [ "expr"; "expr"; "*"         ], "*"
+              [ "expr"; "expr"; "+"         ], "+"
+              [ "expr"; "expr"; "?"         ], "?"
               [ "expr"; "expr"; "|"; "expr" ], "|" ]
 
         Should.equal y pprods
@@ -176,16 +176,4 @@ type FslexParseTableTest(output: ITestOutputHelper) =
 
         show lastsOfExpr
         show firstsOfExpr
-
-    [<Fact>]
-    member _.``101 - format norm file test``() =
-        let startSymbol = 
-            fsyacc.rules.Head 
-            |> Triple.first 
-            |> List.head
-
-        //show startSymbol
-
-        let fsyacc = fsyacc.start(startSymbol,Set.empty).toRaw()
-        output.WriteLine(fsyacc.render())
 

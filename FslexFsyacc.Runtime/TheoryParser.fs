@@ -59,7 +59,7 @@ type TheoryParser =
     /// for state in [0..len-1]
     member this.getClosure(state) = this.closures.[state]
 
-    [<System.Obsolete("use this.getSymbols()")>]
+    [<System.Obsolete("use this.getStateSymbolPairs().[statei]")>]
     member this.getSymbol(state) =
         //闭包的kernel
         let kernel =

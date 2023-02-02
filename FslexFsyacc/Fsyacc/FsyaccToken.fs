@@ -6,7 +6,6 @@ type FsyaccToken =
     | LITERAL of string
     | SEMANTIC of string
     | COLON
-    //| SEMICOLON
     | BAR
     | PERCENT
     | LEFT

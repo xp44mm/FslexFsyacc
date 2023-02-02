@@ -46,13 +46,21 @@ let kws = Map [
      "struct"    , STRUCT
      "unmanaged" , UNMANAGED
      "when" , WHEN
-
 ]
+let ops_inverse = 
+    ops 
+    |> Map.inverse 
+    |> Map.map(fun k v -> Seq.exactlyOne v)
+
+let kws_inverse = 
+    kws 
+    |> Map.inverse 
+    |> Map.map(fun k v -> Seq.exactlyOne v)
 
 let rec tokenize index (inp:string) =
     seq {
         match inp with
-        | "" -> yield {index=index;length=0;value=EOF}
+        | "" -> () // yield {index=index;length=0;value=EOF}
         | On(tryMatch(Regex @"^\s+")) (x, rest) ->
             let len = x.Length
             let index = index + len
@@ -119,39 +127,9 @@ let rec tokenize index (inp:string) =
 
 let getTag (token:Position<FSharpToken>) =
     match token.value with
-    // ops
-    | HASH -> "#"
-    | LPAREN -> "("
-    | RPAREN -> ")"
-    | STAR -> "*"
-    | COMMA -> ","
-    | RARROW -> "->"
-    | DOT -> "."
-    | COLON -> ":"
-    | COLON_GREATER -> ":>"
-    | SEMICOLON -> ";"
-    | LESS -> "<"
-    | GREATER -> ">"
-    | LBRACK -> "["
-    | RBRACK -> "]"
-    | LBRACE_BAR -> "{|"
-    | BAR_RBRACE -> "|}"
-    // kws
-    | UNDERSCORE -> "_"
-    | AND -> "and"
-    | COMPARISON -> "comparison"
-    | DELEGATE -> "delegate"
-    | ENUM -> "enum"
-    | EQUALITY -> "equality"
-    | MEMBER -> "member"
-    | NEW -> "new"
-    | NOT -> "not"
-    | NULL -> "null"
-    | OR -> "or"
-    | STATIC -> "static"
-    | STRUCT -> "struct"
-    | UNMANAGED -> "unmanaged"
-    | WHEN -> "when"
+    | x when ops_inverse.ContainsKey x -> ops_inverse.[x]
+    | x when kws_inverse.ContainsKey x -> kws_inverse.[x]
+
     //with params
     | WHITESPACE _ -> "WHITESPACE"
     | COMMENT _ -> "COMMENT"
@@ -159,11 +137,10 @@ let getTag (token:Position<FSharpToken>) =
     | HTYPAR _ -> "HTYPAR"
     | QTYPAR _ -> "QTYPAR"
     | OPERATOR_NAME _ -> "OPERATOR_NAME"
-
     | ARRAY_TYPE_SUFFIX _ -> "ARRAY_TYPE_SUFFIX"
     | TYPE_ARGUMENT _ ->"TYPE_ARGUMENT"
     | EOF -> "EOF"
-    //| x -> failwith $"{stringify x}"
+    | x -> failwith $"getTag:{stringify x}"
 
 let getLexeme (token:Position<FSharpToken>) =
     match token.value with
@@ -179,23 +156,3 @@ let getLexeme (token:Position<FSharpToken>) =
 
     | _ -> null
 
-//let ops = PostfixTyparDeclsUtils.ops
-//let kws = PostfixTyparDeclsUtils.kws
-
-//let s =
-//    let ops =
-//        ops
-//        |> Map.toList
-//        |> List.map(fun(a,b)-> $"| {stringify b} -> {stringify a}")
-
-//    let kws =
-//        kws
-//        |> Map.toList
-//        |> List.map(fun(a,b)-> $"| {stringify b} -> {stringify a}")
-
-//    [
-//        "// ops"
-//        yield! ops
-//        "// kws"
-//        yield! kws
-//    ] |> String.concat "\r\n"

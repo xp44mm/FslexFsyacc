@@ -53,6 +53,7 @@
 		<None Include="Expr\expr.fsyacc" />
 		<Compile Include="Expr\ExprParseTable.fs" />
 		<Compile Include="Expr\ExprParseTableTest.fs" />
+		<Compile Include="Expr\ExprCompiler.fs" />
 		<Compile Include="Expr\ExprCompilerTest.fs" />
 		
 		<Compile Include="PolynomialExpressions\Polynomials.fs" />

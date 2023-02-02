@@ -7,7 +7,7 @@ type Position<'value> =
         value :'value
     }
 
-    static member from(index,length,value)=
+    static member from(index,length,value) =
         {
             index  = index
             length = length
@@ -32,4 +32,3 @@ type Position<'value> =
     member this.rest(source:string) = 
         source.Substring(this.nextIndex)
 
-    // Location : Line,Column

@@ -19,21 +19,6 @@ type ExprCompilerTest(output:ITestOutputHelper) =
         |> stringify
         |> output.WriteLine
 
-    let parser = 
-        Parser<int*int*ExprToken>(
-            ExprParseTable.rules,
-            ExprParseTable.actions,
-            ExprParseTable.closures,ExprToken.getTag,ExprToken.getLexeme)
-
-    let parse(tokens:seq<int*int*ExprToken>) =
-        tokens
-        |> parser.parse
-        |> ExprParseTable.unboxRoot
-
-    let compile (inp:string) =
-        inp
-        |> ExprToken.tokenize
-        |> parse
 
     [<Fact>]
     member _.``01 - output closures details``() =
@@ -48,21 +33,21 @@ type ExprCompilerTest(output:ITestOutputHelper) =
     [<Fact>]
     member _.``02 - basis test``() =
         let inp = "2 + 3"
-        let y = compile inp
+        let y = ExprCompiler.compile inp
         //show result
         Should.equal y 5.0
 
     [<Fact>]
     member _.``03 - prec test``() =
         let inp = "2 + 3 * 5"
-        let y = compile inp
+        let y = ExprCompiler.compile inp
         //show result
         Should.equal y 17.0
 
     [<Fact>]
     member _.``04 - named prod test``() =
         let inp = "2 + 3 * -5"
-        let y = compile inp
+        let y = ExprCompiler.compile inp
         //show result
         Should.equal y (-13.0)
 
@@ -70,7 +55,7 @@ type ExprCompilerTest(output:ITestOutputHelper) =
     member _.``05 - exception test``() =
         let y = Assert.Throws<_>(fun()->
             let inp = "2* + 4*3"
-            let y = compile inp
+            let y = ExprCompiler.compile inp
             show y
         )
 

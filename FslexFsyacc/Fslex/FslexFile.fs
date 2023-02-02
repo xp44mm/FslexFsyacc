@@ -20,7 +20,7 @@ type FslexFile =
 
     /// parse from file input to structural data
     static member parse(fslex:string) =
-        let header,definitions,rules = FslexCompiler.parseToStructuralData fslex
+        let header,definitions,rules = FslexCompiler.compile fslex
 
         {
             header = header

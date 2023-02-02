@@ -3,7 +3,10 @@
 open FslexFsyacc.Runtime
 open FSharp.Idioms
 open FSharp.Literals.Literal
+
 open System
+open System.Reactive
+open System.Reactive.Linq
 
 let analyze (posTokens:seq<Position<FSharpToken>>) = 
     posTokens
@@ -22,55 +25,40 @@ let parse(tokens:seq<Position<FSharpToken>>) =
     |> parser.parse
     |> PostfixTyparDeclsParseTable.unboxRoot
 
-let compile(txt:string) =
-    let tokenize(context:CompilerContext<FSharpToken>) =
-        let i = CompilerContext.nextIndex context
-        match
-            txt.[i..]
-            |> PostfixTyparDeclsUtils.tokenize i
-            |> ArrayTypeSuffixDFA.analyze
-            |> Seq.head
-        with tok ->
-            {
-                context with
-                    tokens = tok::context.tokens
-            }
-            
-    let parse loop (context:CompilerContext<FSharpToken>) =
-        match context.tokens.Head with
-        | {value=EOF} ->
-            let states = 
-                match parser.tryReduce(context.states) with
-                | Some nextStates -> nextStates
-                | None -> context.states
-            match states with
-            |[(1,lxm);(0,null)] ->  
-                lxm
-                |> PostfixTyparDeclsParseTable.unboxRoot
-            | _ -> failwith "不完整"
-        | lookahead ->
-            let states = 
-                try
-                match parser.tryReduce(context.states,lookahead) with
-                | Some nextStates -> nextStates
-                | None -> context.states
-                with _ -> failwith $"{stringify context}"
-            match states with
-            |[(1,lxm);(0,null)] ->  
-                lxm
-                |> PostfixTyparDeclsParseTable.unboxRoot
-            | _ ->
-                loop {
-                    context with
-                        states = parser.shift(states,lookahead)
-                }
+let compile (txt:string) =
+    let mutable tokens = []
+    let mutable states = [0,null]
+    let mutable result = defaultValue<_>
 
-    let rec loop (context:CompilerContext<FSharpToken>) =
-        context
-        |> tokenize
-        |> parse loop
+    let sq =
+        txt
+        |> PostfixTyparDeclsUtils.tokenize 0
+        |> ArrayTypeSuffixDFA.analyze
+        |> Seq.map(fun tok ->
+            tokens <- tok::tokens
+            tok
+        )
+        |> Seq.map(fun tok ->
+            match parser.tryReduce(states,tok) with
+            | Some x -> states <- x
+            | None -> ()
+            tok
+        )
+    use _ =
+        sq.Subscribe(Observer.Create(
+            (fun lookahead ->
+                states <- parser.shift(states,lookahead)
+             ),(fun () ->
+                match parser.tryReduce(states) with
+                | Some x -> states <- x
+                | None -> ()
 
-    loop {
-        tokens = []
-        states = [0,null]
-    }
+                match states with
+                |[1,lxm; 0,null] ->
+                    result <- PostfixTyparDeclsParseTable.unboxRoot lxm
+                | _ ->
+                    failwith $"{stringify states}"
+             )
+        ))
+    result
+

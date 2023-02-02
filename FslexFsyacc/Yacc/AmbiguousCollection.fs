@@ -156,7 +156,7 @@ type AmbiguousCollection =
                     |> Set.toList
                     |> List.map RenderUtils.renderSymbol
                     |> String.concat " "
-                    |> fun ls -> "error lookaheads: " + ls
+                    |> fun ls -> $"else lookaheads: {ls}"
                 [
                     $"state {state}:"
                     itemsBlock |> Line.indentCodeBlock 4

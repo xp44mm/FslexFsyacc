@@ -2,7 +2,7 @@
 open FslexFsyacc.Runtime
 open FslexFsyacc.Fslex
 open FslexFsyacc.Fslex.FslexTokenUtils
-type token = int*int*FslexToken
+type token = FslexToken Position
 %}
 
 last = [")" "*" "+" "?" HOLE ID LITERAL "]"]

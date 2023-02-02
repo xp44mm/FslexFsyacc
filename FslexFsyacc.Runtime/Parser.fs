@@ -12,8 +12,7 @@ type Parser<'tok> (
         getLexeme: 'tok->obj
     ) =
 
-    let tbl =
-        TheoryParser.create(rules, actions, closures)
+    let tbl = TheoryParser.create(rules, actions, closures)
 
     /// 将lookahead token压入状态栈中。
     member this.shift(states,token:'tok) =
@@ -130,6 +129,6 @@ type Parser<'tok> (
         |> Map.ofList
 
     /// 状态的符号
-    [<System.Obsolete("use ParseTable.theoryParser")>]
+    [<System.Obsolete("use ParseTable.theoryParser.getStateSymbolPairs().[state]")>]
     member this.getSymbol(state) = tbl.getStateSymbolPairs().[state]
 
