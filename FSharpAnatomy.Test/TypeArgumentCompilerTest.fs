@@ -16,7 +16,7 @@ type TypeArgumentCompilerTest(output:ITestOutputHelper) =
         res
         |> Render.stringify
         |> output.WriteLine
-    static let source = TheoryDataSource [
+    static let ls = [
         "_",Anon
         "'a",TypeParam(false,"a")
         "^bc",TypeParam(true,"bc")
@@ -36,8 +36,12 @@ type TypeArgumentCompilerTest(output:ITestOutputHelper) =
         "string list->int list",Fun [App(Ctor(["string"],[]),[LongIdent ["list"]]);App(Ctor(["int"],[]),[LongIdent ["list"]])]
 
         ]
+    static let source = TheoryDataSource ls
 
     static member keys = source.keys
+
+
+
 
     [<Theory;MemberData(nameof TypeArgumentCompilerTest.keys)>]
     member _.``01 - compile``(x) =
@@ -46,10 +50,9 @@ type TypeArgumentCompilerTest(output:ITestOutputHelper) =
         Should.equal e y
 
     [<Fact>]
-    member _.``02 - compile``() =
-        let x = "string list->int list"
-        let y = TypeArgumentCompiler.compile x
-
+    member _.``02 - tokenize``() =
+        for (x,_) in ls do
+        let y = TypeArgumentUtils.tokenize 0 x |> Seq.toList
         show (x,y)
 
     [<Theory>]

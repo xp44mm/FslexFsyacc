@@ -21,7 +21,6 @@
     <None Include="postfixTyparDecls.fsyacc" />
     <Compile Include="PostfixTyparDeclsParseTable.fs" />
     <Compile Include="PostfixTyparDeclsCompiler.fs" />
-    <Compile Include="FSharpCompiler.fs" />
   </ItemGroup>
 
   <ItemGroup>

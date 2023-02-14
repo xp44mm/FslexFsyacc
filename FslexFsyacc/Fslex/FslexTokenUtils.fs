@@ -1,6 +1,10 @@
 ﻿module FslexFsyacc.Fslex.FslexTokenUtils
 
 open FSharp.Idioms
+open FSharp.Idioms.StringOps
+open FSharp.Idioms.RegularExpressions
+open FSharp.Idioms.ActivePatterns
+
 open System.Text.RegularExpressions
 open FslexFsyacc.FSharpSourceText
 open FslexFsyacc.Runtime
@@ -51,7 +55,7 @@ let tryHole =
     |> tryMatch
 
 let tokenize index inp =
-    let rec loop (lpos:int,linp:string)(pos:int,inp:string) =
+    let rec loop (lpos:int,linp:string) (pos:int,inp:string) =
         seq {
             match inp with
             | "" -> ()
@@ -113,12 +117,14 @@ let tokenize index inp =
                 yield Position<_>.from(pos,len,HEADER fcode)
                 yield! loop (nlpos,nlinp) (pos+len,rest)
             
-            | On(tryMatch(Regex @"^%%+")) (x, rest) ->
-                let len = x.Length
-                yield Position<_>.from(pos,len,PERCENT)
-                yield! loop (lpos,linp) (pos+len,rest)
+            | Rgx @"^%%+" m ->
+                let x = m.Value
+                let rest = inp.Substring(x.Length)
 
-            | On(tryLongestPrefix (Map.keys ops)) (x, rest) ->
+                yield Position<_>.from(pos,x.Length,PERCENT)
+                yield! loop (lpos,linp) (pos+x.Length,rest)
+
+            | LongestPrefix (Map.keys ops) (x, rest) ->
                 let len = x.Length
                 yield Position<_>.from(pos,len,ops.[x])
                 let nextPos = pos+len

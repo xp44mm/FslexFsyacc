@@ -3,9 +3,6 @@
 open FslexFsyacc.Runtime
 open FslexFsyacc.Fsyacc
 
-open System.Reactive
-open System.Reactive.Linq
-
 open FSharp.Literals.Literal
 
 let parser = Parser<Position<FsyaccToken>>(
@@ -20,47 +17,34 @@ let parse(tokens:seq<Position<FsyaccToken>>) =
     |> parser.parse
     |> Fsyacc2ParseTable.unboxRoot
 
-//let compile (inp:string) =
-//    inp
-//    |> FsyaccTokenUtils.tokenize 0
-//    |> parse
-
-
 /// 解析文本为结构化数据
 let compile (txt:string) =
     let mutable tokens = []
     let mutable states = [0,null]
-    let mutable result = defaultValue<_>
-    let sq =
-        txt
-        |> FsyaccTokenUtils.tokenize 0
-        |> Seq.map(fun tok ->
-            tokens <- tok::tokens
-            tok
-        )
-        |> Seq.map(fun lookahead ->
-            match parser.tryReduce(states,lookahead) with
-            | Some x -> states <- x
-            | None -> ()
+    //let mutable result = defaultValue<_>
+    txt
+    |> FsyaccTokenUtils.tokenize 0
+    |> Seq.map(fun tok ->
+        tokens <- tok::tokens
+        tok
+    )
+    |> Seq.iter(fun lookahead ->
+        match parser.tryReduce(states,lookahead) with
+        | Some x -> states <- x
+        | None -> ()
 
-            states <- parser.shift(states,lookahead)
-        )
-    use _ = sq.Subscribe(Observer.Create(
-        (fun () -> ()),
-        (fun () ->
-            match parser.tryReduce(states) with
-            | Some x -> states <- x
-            | None -> ()
+        states <- parser.shift(states,lookahead)
+    )
 
-            match states with
-            |[1,lxm; 0,null] ->
-                result <- Fsyacc2ParseTable.unboxRoot lxm
-            | _ ->
-                failwith $"{stringify states}"
-        )
-    ))
+    match parser.tryReduce(states) with
+    | Some x -> states <- x
+    | None -> ()
 
-    result
+    match states with
+    |[1,lxm; 0,null] ->
+        Fsyacc2ParseTable.unboxRoot lxm
+    | _ ->
+        failwith $"{stringify states}"
 
 //bnf的语法检测代码
 

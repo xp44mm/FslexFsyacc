@@ -32,7 +32,7 @@ type PositionTest(output:ITestOutputHelper) =
             value = ()
         }
         let source = "1234"
-        let y = x.raw(source)
+        let y = source.Substring(x.index,x.length)
         let e = "1"
 
         Should.equal y e
@@ -45,7 +45,7 @@ type PositionTest(output:ITestOutputHelper) =
             value = ()
         }
         let source = "1234"
-        let y = x.rest(source)
+        let y = source.Substring(x.nextIndex)
         let e = "234"
 
         Should.equal y e

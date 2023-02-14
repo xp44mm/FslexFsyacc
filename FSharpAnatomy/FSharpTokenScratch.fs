@@ -2,8 +2,11 @@
 
 open System
 open FSharp.Idioms
-open System.Text.RegularExpressions
+open FSharp.Idioms.StringOps
 open FSharp.Idioms.RegularExpressions
+open FSharp.Idioms.ActivePatterns
+
+open System.Text.RegularExpressions
 
 let tryWS =
     Regex @"^\s+"

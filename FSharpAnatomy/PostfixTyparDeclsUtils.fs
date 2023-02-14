@@ -57,74 +57,6 @@ let kws_inverse =
     |> Map.inverse 
     |> Map.map(fun k v -> Seq.exactlyOne v)
 
-let rec tokenize index (inp:string) =
-    seq {
-        match inp with
-        | "" -> () // yield {index=index;length=0;value=EOF}
-        | On(tryMatch(Regex @"^\s+")) (x, rest) ->
-            let len = x.Length
-            let index = index + len
-            yield! tokenize index rest
-        | On tryQTypar (x, rest) ->
-            let tok = {
-                index = index
-                length = x.Length
-                value = QTYPAR x.[1..]
-            }
-            yield tok
-            yield! tokenize tok.nextIndex rest
-        | On tryHTypar (x, rest) ->
-            let tok = {
-                index = index
-                length = x.Length
-                value = HTYPAR x.[1..]
-            }
-            yield tok
-            yield! tokenize tok.nextIndex rest
-        | On tryIdent (x, rest) ->
-            let tok =
-                {
-                    index = index
-                    length = x.Length
-                    value =
-                        if kws.ContainsKey x then
-                            kws.[x]
-                        else IDENT x
-                }
-            yield tok
-            yield! tokenize tok.nextIndex rest
-
-        | On(tryStart "(*)") rest ->
-            let tok = {
-                index = index
-                length = 3
-                value = OPERATOR_NAME "*"
-            }
-            yield tok
-            yield! tokenize tok.nextIndex rest
-        | On tryOperatorName (x,rest) ->
-            let op = x.[1..x.Length-2].Trim()
-            let tok = {
-                index = index
-                length = x.Length
-                value = OPERATOR_NAME op
-            }
-            yield tok
-            yield! tokenize tok.nextIndex rest
-
-        | On(tryLongestPrefix (Map.keys ops)) (x,rest) ->
-            let tok = {
-                index = index
-                length = x.Length
-                value = ops.[x]
-            }
-            yield tok
-            yield! tokenize tok.nextIndex rest
-
-        | _ -> failwith "unimpl tokenize case"
-    }
-
-
 let getTag (token:Position<FSharpToken>) =
     match token.value with
     | x when ops_inverse.ContainsKey x -> ops_inverse.[x]
@@ -153,6 +85,72 @@ let getLexeme (token:Position<FSharpToken>) =
     | QTYPAR x -> box x 
     | OPERATOR_NAME x -> box x
     | TYPE_ARGUMENT x -> box x
-
     | _ -> null
+
+let tokenize pos (inp:string) =
+    let rec loop index =
+        seq {
+            match inp.[pos+index..] with
+            | "" -> ()
+            | Rgx @"^\s+" m ->
+                yield! loop (index+m.Length)
+            | On tryQTypar (x, rest) ->
+                let tok = {
+                    index = index
+                    length = x.Length
+                    value = QTYPAR x.[1..]
+                }
+                yield tok
+                yield! loop tok.nextIndex
+            | On tryHTypar (x, rest) ->
+                let tok = {
+                    index = index
+                    length = x.Length
+                    value = HTYPAR x.[1..]
+                }
+                yield tok
+                yield! loop tok.nextIndex
+            | On tryIdent (x, rest) ->
+                let tok =
+                    {
+                        index = index
+                        length = x.Length
+                        value =
+                            if kws.ContainsKey x then
+                                kws.[x]
+                            else IDENT x
+                    }
+                yield tok
+                yield! loop tok.nextIndex
+
+            | StartsWith "(*)" rest ->
+                let tok = {
+                    index = index
+                    length = 3
+                    value = OPERATOR_NAME "*"
+                }
+                yield tok
+                yield! loop tok.nextIndex
+            | On tryOperatorName (x,rest) ->
+                let op = x.[1..x.Length-2].Trim()
+                let tok = {
+                    index = index
+                    length = x.Length
+                    value = OPERATOR_NAME op
+                }
+                yield tok
+                yield! loop tok.nextIndex
+
+            | LongestPrefix (Map.keys ops) (x,rest) ->
+                let tok = {
+                    index = index
+                    length = x.Length
+                    value = ops.[x]
+                }
+                yield tok
+                yield! loop tok.nextIndex
+
+            | _ -> failwith "unimpl tokenize case"
+        }
+    loop pos
 

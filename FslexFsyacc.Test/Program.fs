@@ -1,11 +1,13 @@
 module FslexFsyacc.Program 
+open FslexFsyacc.Yacc
 
 open System
 open System.IO
+open System.Collections.Generic
 
 open FSharp.Literals.Literal
-open FslexFsyacc.Yacc
-open System.Collections.Generic
+
+
 
 let [<EntryPoint>] main _ = 
     Console.WriteLine(stringify "")

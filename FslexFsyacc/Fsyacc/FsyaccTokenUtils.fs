@@ -1,5 +1,9 @@
 ﻿module FslexFsyacc.Fsyacc.FsyaccTokenUtils
 open FSharp.Idioms
+open FSharp.Idioms.StringOps
+open FSharp.Idioms.RegularExpressions
+open FSharp.Idioms.ActivePatterns
+
 open FslexFsyacc.FSharpSourceText
 open System.Text.RegularExpressions
 open FslexFsyacc.Runtime
@@ -107,7 +111,10 @@ let tokenize (index:int) (txt:string) =
                 yield Position<_>.from(pos,len,HEADER fcode)
                 yield! loop (nlpos,nlinp) (pos+len,rest)
             
-            | On(tryMatch(Regex @"^%[a-z]+")) (x, rest) ->
+            | Rgx @"^%[a-z]+" m ->
+                let x = m.Value
+                let rest = inp.Substring(x.Length)
+
                 let tok =
                     match x with
                     | "%left" -> LEFT
@@ -119,12 +126,15 @@ let tokenize (index:int) (txt:string) =
                 yield Position<_>.from(pos,len,tok)
                 yield! loop (lpos,linp) (pos+len,rest)
 
-            | On(tryMatch(Regex @"^%%+")) (x, rest) ->
+            | Rgx @"^%%+" m ->
+                let x = m.Value
+                let rest = inp.Substring(x.Length)
+
                 let len = x.Length
                 yield Position<_>.from(pos,len,PERCENT)
                 yield! loop (lpos,linp) (pos+len,rest)
 
-            | On(tryLongestPrefix (Map.keys ops)) (x, rest) ->
+            | LongestPrefix (Map.keys ops) (x, rest) ->
                 let len = x.Length
                 let nextPos = pos+len
                 yield Position<_>.from(pos,len,ops.[x])

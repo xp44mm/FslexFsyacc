@@ -2,6 +2,9 @@
 
 open System
 open FSharp.Idioms
+open FSharp.Idioms.StringOps
+open FSharp.Idioms.RegularExpressions
+
 open System.Text.RegularExpressions
 
 let tryWS =
@@ -135,7 +138,9 @@ let rec getColumnAndRest (start:int, inp:string) (pos:int) =
     match inp with
     | "" -> 
         failwithf "length:%d < pos:%d" start pos
-    | On(tryMatch(Regex @"^[^\n]*\n")) (x, rest) ->
+    | Rgx @"^[^\n]*\n" m ->
+        let x = m.Value
+        let rest = inp.Substring(x.Length)
         let nextStart = start + x.Length
         if pos < nextStart then
             let col = pos - start

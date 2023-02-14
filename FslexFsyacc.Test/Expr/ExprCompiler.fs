@@ -2,11 +2,9 @@
 
 open System.IO
 open System.Text
-open System.Reactive
-open System.Reactive.Linq
 
-open FSharp.Literals.Literal
 open FSharp.Idioms
+open FSharp.Literals.Literal
 
 open FslexFsyacc.Runtime
 open Expr
@@ -25,35 +23,25 @@ let parse(tokens:seq<Position<ExprToken>>) =
 let compile (txt:string) =
     let mutable tokens = []
     let mutable states = [0,null]
-    let mutable result = defaultValue<float>
 
-    let sq =
-        txt
-        |> ExprToken.tokenize 0
-        |> Seq.map(fun tok ->
-            tokens <- tok::tokens
-            tok
-        )
-        |> Seq.map(fun tok ->
-            match parser.tryReduce(states,tok) with
-            | Some x -> states <- x
-            | None -> ()
-            tok
-        )
-    use _ =
-        sq.Subscribe(Observer.Create(
-            (fun lookahead ->
-                states <- parser.shift(states,lookahead)
-             ),(fun () ->
-                match parser.tryReduce(states) with
-                | Some x -> states <- x
-                | None -> ()
+    txt
+    |> ExprToken.tokenize 0
+    |> Seq.map(fun tok ->
+        tokens <- tok::tokens
+        tok
+    )
+    |> Seq.iter(fun tok ->
+        match parser.tryReduce(states,tok) with
+        | Some x -> states <- x
+        | None -> ()
+        states <- parser.shift(states,tok)
+    )
+    match parser.tryReduce(states) with
+    | Some x -> states <- x
+    | None -> ()
 
-                match states with
-                |[1,lxm; 0,null] ->
-                    result <- ExprParseTable.unboxRoot lxm
-                | _ ->
-                    failwith $"{stringify states}"
-             )
-        ))
-    result
+    match states with
+    |[1,lxm; 0,null] ->
+        ExprParseTable.unboxRoot lxm
+    | _ ->
+        failwith $"{stringify states}"

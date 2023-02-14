@@ -8,6 +8,7 @@ open FSharp.Idioms.ActivePatterns
 open FSharp.Idioms.StringOps
 open FSharp.Literals.Literal
 
+open System
 open System.Text.RegularExpressions
 
 let ops = Map [
@@ -43,59 +44,6 @@ let kws_inverse =
     |> Map.inverse 
     |> Map.map(fun k v -> Seq.exactlyOne v)
 
-let rec tokenize index (inp:string) =
-    seq {
-        match inp with
-        | "" -> () // yield {index=index;length=0;value=EOF}
-
-        | On(tryMatch(Regex @"^\s+")) (x, rest) ->
-            let len = x.Length
-            let index = index + len
-            yield! tokenize index rest
-
-        | On tryIdent (x, rest) ->
-            let tok =
-                {
-                    index = index
-                    length = x.Length
-                    value =
-                        if kws.ContainsKey x then kws.[x]
-                        else IDENT x
-                }
-            yield tok
-            yield! tokenize tok.nextIndex rest
-
-        | On tryQTypar (x, rest) ->
-            let tok = {
-                index = index
-                length = x.Length
-                value = QTYPAR x.[1..]
-            }
-            yield tok
-            yield! tokenize tok.nextIndex rest
-
-        | On tryHTypar (x, rest) ->
-            let tok = {
-                index = index
-                length = x.Length
-                value = HTYPAR x.[1..]
-            }
-            yield tok
-            yield! tokenize tok.nextIndex rest
-
-        | On(tryLongestPrefix (Map.keys ops)) (x, rest) ->
-            let tok = {
-                index = index
-                length = x.Length
-                value = ops.[x]
-            }
-            yield tok
-            yield! tokenize tok.nextIndex rest
-            
-        | _ -> failwith $"unimpl tokenize case{stringify(index,inp)}"
-    }
-
-
 let getTag (token:Position<FSharpToken>) =
     match token.value with
     | x when ops_inverse.ContainsKey x -> ops_inverse.[x]
@@ -118,3 +66,57 @@ let getLexeme (token:Position<FSharpToken>) =
     | COMMENT           x -> box x
     | ARRAY_TYPE_SUFFIX x -> box x
     | _ -> null
+
+let tokenize index (inp:string) =
+    let rec loop i =
+        seq {
+            match inp.[index+i..] with
+            | "" -> ()
+
+            | Rgx @"^\s+" m ->
+                yield! loop (i+m.Length)
+
+            | On tryIdent (x, _) ->
+                let tok =
+                    {
+                        index = i
+                        length = x.Length
+                        value =
+                            if kws.ContainsKey x 
+                            then kws.[x]
+                            else IDENT x
+                    }
+                yield tok
+                yield! loop tok.nextIndex
+
+            | On tryQTypar (x, _) ->
+                let tok = {
+                    index = i
+                    length = x.Length
+                    value = QTYPAR x.[1..]
+                }
+                yield tok
+                yield! loop tok.nextIndex
+
+            | On tryHTypar (x, _) ->
+                let tok = {
+                    index = i
+                    length = x.Length
+                    value = HTYPAR x.[1..]
+                }
+                yield tok
+                yield! loop tok.nextIndex
+
+            | LongestPrefix (Map.keys ops) (x, _) ->
+                let tok = {
+                    index = i
+                    length = x.Length
+                    value = ops.[x]
+                }
+                yield tok
+                yield! loop tok.nextIndex
+            
+            | rest -> failwith $"unimpl tokenize case{stringify(i,rest)}"
+        }
+
+    loop index

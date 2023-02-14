@@ -1,5 +1,7 @@
 ﻿namespace FslexFsyacc.Fsyacc
 
+open FSharp.Idioms.ActivePatterns
+
 type RegularSymbolToken =
     | ID of string
     | LITERAL of string
@@ -38,61 +40,61 @@ module RegularSymbolToken =
     open FSharp.Idioms
     open FslexFsyacc.FSharpSourceText
 
-    let tokenize inp =
-        let rec loop (pos:int)(inp:string) =
+    let tokenize (inp:string) =
+        let rec loop (pos:int) =
             seq {
-                match inp with
+                match inp.[pos..] with
                 | "" -> ()
-                | On tryWS (x, rest) ->
+                | On tryWS (x, _) ->
                     let len = x.Length
-                    yield! loop (pos+len) rest
+                    yield! loop (pos+len)
 
-                | On tryWord (x, rest) ->
+                | On tryWord (x, _) ->
                     let len = x.Length
                     yield pos, len, ID x
-                    yield! loop (pos+len) rest
+                    yield! loop (pos+len)
 
-                | On trySingleQuoteString (x, rest) ->
+                | On trySingleQuoteString (x, _) ->
                     let len = x.Length
                     yield pos,len,LITERAL(Quotation.unquote x)
-                    yield! loop (pos+len) rest
+                    yield! loop (pos+len)
 
-                | On (tryFirst '?') rest ->
+                | First '?' _ ->
                     yield pos,1,QMARK
-                    yield! loop (pos+1) rest
+                    yield! loop (pos+1)
 
-                | On (tryFirst '+') rest ->
+                | First '+' _ ->
                     yield pos,1,PLUS
-                    yield! loop (pos+1) rest
+                    yield! loop (pos+1)
 
-                | On (tryFirst '*') rest ->
+                | First '*' _ ->
                     yield pos,1,STAR
-                    yield! loop (pos+1) rest
+                    yield! loop (pos+1)
 
-                | On (tryFirst '{') rest ->
+                | First '{' _ ->
                     yield pos,1,LBRACE
-                    yield! loop (pos+1) rest
+                    yield! loop (pos+1)
 
-                | On (tryFirst '}') rest ->
+                | First '}' _ ->
                     yield pos,1,RBRACE
-                    yield! loop (pos+1) rest
+                    yield! loop (pos+1)
 
-                | On (tryFirst '[') rest ->
+                | First '[' _ ->
                     yield pos,1,LBRACK
-                    yield! loop (pos+1) rest
+                    yield! loop (pos+1)
 
-                | On (tryFirst ']') rest ->
+                | First ']' _ ->
                     yield pos,1,RBRACK
-                    yield! loop (pos+1) rest
+                    yield! loop (pos+1)
 
-                | On (tryFirst '(') rest ->
+                | First '(' _ ->
                     yield pos,1,LPAREN
-                    yield! loop (pos+1) rest
+                    yield! loop (pos+1)
 
-                | On (tryFirst ')') rest ->
+                | First ')' _ ->
                     yield pos,1,RPAREN
-                    yield! loop (pos+1) rest
+                    yield! loop (pos+1)
 
-                | never -> failwithf "%A" never
+                | never -> failwith $"{never}" 
             }
-        loop 0 inp
+        loop 0

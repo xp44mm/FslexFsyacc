@@ -26,9 +26,12 @@ type Position<'value> =
     member this.nextIndex = 
         this.index + this.length
 
-    member this.raw(source:string) =
-        source.Substring(this.index,this.length)
+    ////source对应的索引是0
+    //member this.raw(source:string) =
+    //    source.Substring(this.index,this.length)
 
-    member this.rest(source:string) = 
-        source.Substring(this.nextIndex)
-
+    //member this.rest(index,source:string) =
+    //    source.Substring(this.nextIndex-index)
+        
+    //member this.rest(source:string) =
+    //    this.rest(0,source)

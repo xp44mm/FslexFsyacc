@@ -1,5 +1,16 @@
 ﻿namespace Expr
 
+open FSharp.Idioms
+open FSharp.Idioms.StringOps
+open FSharp.Idioms.RegularExpressions
+open FSharp.Idioms.ActivePatterns
+
+open System
+open System.Text.RegularExpressions
+
+open FslexFsyacc.Runtime
+
+
 //"(" ")" "*" "+" "-" "/" "NUMBER"
 type ExprToken =
     | NUMBER of float
@@ -10,12 +21,6 @@ type ExprToken =
     | STAR
     | DIV
     | EOF
-open System
-open System.Text.RegularExpressions
-
-open FslexFsyacc.Runtime
-open FSharp.Idioms
-
 
 module ExprToken =
     let ops = Map [
@@ -44,36 +49,35 @@ module ExprToken =
         | NUMBER n -> box n
         | _   -> null
 
-    let rec tokenize pos (inp:string) =
-        seq {
-            match inp with
-            | "" -> () // yield {index=pos;length=0;value=EOF}
+    let tokenize pos (inp:string) =
+        let rec loop i =
+            seq {
+                match inp.[pos+i..] with
+                | "" -> ()
 
-            | On(tryMatch(Regex @"^\s+")) (x, rest) ->
-                let len = x.Length
-                let pos = pos + len
-                yield! tokenize pos rest
+                | Rgx @"^\s+" m ->
+                    yield! loop (i + m.Length)
 
-            | On(tryMatch(Regex @"^\d+(\.\d+)?")) (x, rest) ->
-                let tok =
-                    {
-                        index = pos
-                        length = x.Length
-                        value = NUMBER(Double.Parse(x))
-                    }
-                yield tok
-                yield! tokenize tok.nextIndex rest
+                | Rgx @"^\d+(\.\d+)?" m ->
+                    let tok =
+                        {
+                            index = i
+                            length = m.Length
+                            value = NUMBER(Double.Parse(m.Value))
+                        }
+                    yield tok
+                    yield! loop tok.nextIndex
 
-            | On(tryLongestPrefix (Map.keys ops)) (x, rest) ->
-                let tok =
-                    {
-                        index = pos
-                        length = x.Length
-                        value = ops.[x]
-                    }
-                yield tok
-                yield! tokenize tok.nextIndex rest
+                | LongestPrefix (Map.keys ops) (x, _) ->
+                    let tok =
+                        {
+                            index = i
+                            length = x.Length
+                            value = ops.[x]
+                        }
+                    yield tok
+                    yield! loop tok.nextIndex
 
-            | never -> failwith never
-        }
-
+                | never -> failwith never
+            }
+        loop pos
