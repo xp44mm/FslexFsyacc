@@ -38,7 +38,7 @@
 		<Compile Include="Fslex\AnalyzeTest.fs" />
 
 		<Compile Include="Fsyacc\SemanticGeneratorTest.fs" />
-		<Compile Include="Fsyacc\Fsyacc2ParseTableTest.fs" />
+		<Compile Include="Fsyacc\FsyaccParseTableTest.fs" />
 		<Compile Include="Fsyacc\RegularSymbolCompilerTest.fs" />
 		<Compile Include="Fsyacc\FsyaccFileRenderTest.fs" />
 		<Compile Include="Fsyacc\FsyaccFileShakingTest.fs" />

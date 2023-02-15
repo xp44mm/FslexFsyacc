@@ -75,8 +75,8 @@
 		<Compile Include="Fsyacc\FsyaccToken.fs" />
 		<Compile Include="Fsyacc\FsyaccTokenUtils.fs" />
 		<Compile Include="Fsyacc\RegularSymbol.fs" />
-		<None Include="Fsyacc\fsyacc2.fsyacc" />
-		<Compile Include="Fsyacc\Fsyacc2ParseTable.fs" />
+		<None Include="Fsyacc\fsyacc.fsyacc" />
+		<Compile Include="Fsyacc\FsyaccParseTable.fs" />
 		<Compile Include="Fsyacc\FsyaccCompiler.fs" />
 		<Compile Include="Fsyacc\FsyaccParseTableFile.fs" />
 		<Compile Include="Fsyacc\FsyaccFileRender.fs" />

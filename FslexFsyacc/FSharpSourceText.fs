@@ -133,15 +133,16 @@ let trySemantic(inp:string) =
         hdr,rest.[len..]
     )
 
+/// 计算一个位置pos是第几行，第几列。move to position
 /// pos是x第一个字符的位置
 let rec getColumnAndRest (start:int, inp:string) (pos:int) =
     match inp with
     | "" -> 
-        failwithf "length:%d < pos:%d" start pos
+        failwith $"length:{start} < pos:{pos}"  
     | Rgx @"^[^\n]*\n" m ->
         let x = m.Value
-        let rest = inp.Substring(x.Length)
-        let nextStart = start + x.Length
+        let rest = inp.Substring(m.Length)
+        let nextStart = start + m.Length
         if pos < nextStart then
             let col = pos - start
             col, nextStart, rest

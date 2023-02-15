@@ -6,16 +6,16 @@ open FslexFsyacc.Fsyacc
 open FSharp.Literals.Literal
 
 let parser = Parser<Position<FsyaccToken>>(
-    Fsyacc2ParseTable.rules,
-    Fsyacc2ParseTable.actions,
-    Fsyacc2ParseTable.closures,
+    FsyaccParseTable.rules,
+    FsyaccParseTable.actions,
+    FsyaccParseTable.closures,
     FsyaccTokenUtils.getTag,
     FsyaccTokenUtils.getLexeme)
 
 let parse(tokens:seq<Position<FsyaccToken>>) =
     tokens
     |> parser.parse
-    |> Fsyacc2ParseTable.unboxRoot
+    |> FsyaccParseTable.unboxRoot
 
 /// 解析文本为结构化数据
 let compile (txt:string) =
@@ -42,7 +42,7 @@ let compile (txt:string) =
 
     match states with
     |[1,lxm; 0,null] ->
-        Fsyacc2ParseTable.unboxRoot lxm
+        FsyaccParseTable.unboxRoot lxm
     | _ ->
         failwith $"{stringify states}"
 
