@@ -92,7 +92,7 @@ type ParsParseTableTest(output:ITestOutputHelper) =
             ]
         FsyaccFileRules.removeErrorRules robust
 
-    [<Fact>]
+    [<Fact(Skip="no for verify")>]
     member _.``000 - unused symbol in decls test``() =
         let x = 
             fsyacc.precedences
@@ -120,7 +120,7 @@ type ParsParseTableTest(output:ITestOutputHelper) =
 
         output.WriteLine(outp)
 
-    [<Fact>]
+    [<Fact(Skip="no for verify")>]
     member _.``001 - identOrOp test``() =
         let s0 = "identOrOp"
 
@@ -145,7 +145,7 @@ type ParsParseTableTest(output:ITestOutputHelper) =
         File.WriteAllText(outputDir,txt,Encoding.UTF8)
         output.WriteLine("output:\r\n" + outputDir)
 
-    [<Fact>]
+    [<Fact(Skip="no for verify")>]
     member _.``002 - path test``() =
         let s0 = "path"
 
@@ -170,7 +170,7 @@ type ParsParseTableTest(output:ITestOutputHelper) =
         File.WriteAllText(outputDir,txt,Encoding.UTF8)
         output.WriteLine("output:\r\n" + outputDir)
 
-    [<Fact>]
+    [<Fact(Skip="no for verify")>]
     member _.``003 - rawConstant test``() =
         let s0 = "rawConstant"
 
@@ -195,7 +195,7 @@ type ParsParseTableTest(output:ITestOutputHelper) =
         File.WriteAllText(outputDir,txt,Encoding.UTF8)
         output.WriteLine("output:\r\n" + outputDir)
 
-    [<Fact>]
+    [<Fact(Skip="no for verify")>]
     member _.``004 - tyconDefn test``() =
         let s0 = "tyconDefn"
         let terminals = set [
@@ -223,7 +223,7 @@ type ParsParseTableTest(output:ITestOutputHelper) =
         File.WriteAllText(outputDir,txt,Encoding.UTF8)
         output.WriteLine("output:\r\n"+outputDir)
 
-    [<Fact>]
+    [<Fact(Skip="no for verify")>]
     member _.``005 - postfixTyparDecls test``() =
         let s0 = "postfixTyparDecls"
         let terminals = set [

@@ -6,10 +6,11 @@ open System.IO
 open System.Collections.Generic
 
 open FSharp.Literals.Literal
+open FslexFsyacc.Runtime
+open FslexFsyacc
+open System.IO
+open FslexFsyacc.Fslex
 
-
-
-let [<EntryPoint>] main _ = 
-    Console.WriteLine(stringify "")
-    
+[<EntryPoint>]
+let main _ =
     0

@@ -15,7 +15,7 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "FSharpAnatomy", "FSharpAnat
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "FSharpAnatomy.Test", "FSharpAnatomy.Test\FSharpAnatomy.Test.fsproj", "{6997F170-1436-447E-8E5E-FB161CF6A6D3}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "RegularSymbolProj", "RegularSymbolProj\RegularSymbolProj.fsproj", "{F69FF74E-1410-4843-932A-7F4ADE34797D}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "RegularSymbolProj", "RegularSymbolProj\RegularSymbolProj.fsproj", "{F69FF74E-1410-4843-932A-7F4ADE34797D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

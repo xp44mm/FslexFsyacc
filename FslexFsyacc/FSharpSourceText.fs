@@ -6,48 +6,49 @@ open FSharp.Idioms.StringOps
 open FSharp.Idioms.RegularExpressions
 
 open System.Text.RegularExpressions
+open FSharp.Literals.Literal
 
 let tryWS =
     Regex @"^\s+"
-    |> tryMatch
+    |> trySearch
 
 let trySingleLineComment =
     Regex @"^//.*"
-    |> tryMatch
+    |> trySearch
 
 let tryMultiLineComment =
     Regex @"^\(\*(?!\s*\))[\s\S]*?\*\)"
-    |> tryMatch
+    |> trySearch
 
 let tryDoubleTick =
     Regex @"^``[ \S]+?``"
-    |> tryMatch
+    |> trySearch
 
 let tryTypeParameter =
     Regex @"^'\w+(?!')"
-    |> tryMatch
+    |> trySearch
 
 let tryChar =
     Regex @"^'(\\.|[^\\'])+'" // 转义斜杠后面紧跟着的一个字符作为整体看待。
-    |> tryMatch
+    |> trySearch
 
 let trySingleQuoteString =
     Regex @"^""(\\.|[^\\""])*"""
-    |> tryMatch
+    |> trySearch
 
 let tryVerbatimString =
     Regex @"^@""(""""|[^""])*"""
-    |> tryMatch
+    |> trySearch
 
 let tryTripleQuoteString =
     Regex @"^""""""(?!"")[\s\S]*?(?<!"")""""""(?!"")"
-    |> tryMatch
+    |> trySearch
 
 let tryWord =
     Regex @"^\w+"
-    |> tryMatch
+    |> trySearch
 
-// 不终止循环的消费者
+// 不终止循环的消费者 fsharpCodeCommonTries
 let tries = 
     [
         tryWS
@@ -60,101 +61,104 @@ let tries =
         tryVerbatimString
         tryTripleQuoteString
         tryWord
-        Regex @"^\S" |> tryMatch
+        Regex @"^\S" |> trySearch
     ]
     |> List.map(fun f -> 
         f 
-        >> Option.map(fun(x,rest)-> 
+        >> Option.map(fun mat -> 
             // 0代表不终止循环标记，%}出现的次数
-            0,x,rest)
+            0,mat.Value)
         )
 
 let tryPercentRBrace = 
-    tryStart "%}" 
+    tryStartsWith "%}" 
     // 1代表终止循环标记，%}出现的次数
-    >> Option.map(fun rest -> 1,"%}",rest)
+    >> Option.map(fun capt -> 1,capt) // capt = "%}"
 
 let tryHeaderTokens = tryPercentRBrace :: tries
 
+//匹配%{%}
 let getHeaderLength (inp:string) =
-    let rec loop len seed =
-        if seed = "" then failwithf "%A" (len,inp)
-        let i,x,rest =
+    let rec loop len =
+        if len > inp.Length-1 then failwith $"{len}"
+        let bal,capt =
             tryHeaderTokens
-            |> List.pick(fun tryToken ->
-                tryToken seed
-                )
-        let len = len+x.Length
-        if i = 0 then
-            loop len rest
+            |> List.pick(fun tryToken -> tryToken inp.[len..])
+        let len = len+capt.Length
+        if bal = 0 then
+            loop len
         else
             len
-    loop 0 inp
+    loop 0
 
-let tryLBrace = tryFirst '{' >> Option.map(fun rest -> -1,"{",rest)
+let tryLBrace = tryFirst '{' >> Option.map(fun capt -> -1,string capt)
 
-let tryRBrace = tryFirst '}' >> Option.map(fun rest -> 1,"}",rest)
+let tryRBrace = tryFirst '}' >> Option.map(fun capt -> 1,string capt)
 
 let trySemanticTokens = tryLBrace :: tryRBrace :: tries
 
+//匹配{}
 let getSemanticLength(inp:string) =
-    let rec loop depth len seed =
-        if seed = "" then failwithf "%A" (depth,len,inp)
-        let i,x,rest =
+    let rec loop depth len =
+        if len > inp.Length-1 then 
+            failwith $"depth:{depth};len:{len}"
+        let d,capt =
             trySemanticTokens
             |> List.pick(fun tryToken ->
-                tryToken seed
+                tryToken inp.[len..]
                 )
-        let depth = depth + i
-        let len = len + x.Length
+        let depth = depth + d
+        let len = len + capt.Length
         if depth = 0 then
             len
         else
-            loop depth len rest
-    loop -1 0 inp
+            loop depth len
+    loop -1 0
 
 let tryHeader(inp:string) =
-    let start = "%{"
     inp 
-    |> tryStart(start)
-    |> Option.map(fun rest ->
-        let len = getHeaderLength rest
-        let hdr = start + rest.[0..len-1]
-        hdr,rest.[len..]
+    |> tryStartsWith "%{"
+    |> Option.map(fun capt ->
+        let rest = inp.[capt.Length..]
+        let len = capt.Length+getHeaderLength rest
+        let hdr = inp.Substring(0,len)
+        hdr
     )
 
 let trySemantic(inp:string) =
-    let start = "{"
     inp 
-    |> tryStart(start)
-    |> Option.map(fun rest ->
-        let len = getSemanticLength rest
-        let hdr = start + rest.[0..len-1]
-        hdr,rest.[len..]
+    |> tryStartsWith "{"
+    |> Option.map(fun capt ->
+        let rest = inp.[capt.Length..]
+        let len = capt.Length+getSemanticLength rest
+        let hdr = inp.Substring(0,len)
+        hdr//,capt.[len..]
     )
 
-/// 计算一个位置pos是第几行，第几列。move to position
-/// pos是x第一个字符的位置
-let rec getColumnAndRest (start:int, inp:string) (pos:int) =
-    match inp with
-    | "" -> 
-        failwith $"length:{start} < pos:{pos}"  
-    | Rgx @"^[^\n]*\n" m ->
-        let x = m.Value
-        let rest = inp.Substring(m.Length)
-        let nextStart = start + m.Length
-        if pos < nextStart then
-            let col = pos - start
-            col, nextStart, rest
-        else
-            getColumnAndRest (nextStart, rest) pos
-    | _ ->
-        let nextStart = start + inp.Length
-        if pos < nextStart then
-            let col = pos - start
-            col,nextStart, ""
-        else
-            failwithf "length:%d < pos:%d" nextStart pos
+/// 计算一个位置pos是第几列；以及pos下一行的开始位置。
+/// lpos，行开始位置，linp从lpos以后的剩余文本 = inp.[lpos..]，pos某个字符在总文本中的位置
+[<Obsolete("=FSharp.Idioms.Line.getColumnAndLpos")>]
+let getColumnAndLpos (lpos:int, linp:string) (pos:int) =
+    let rec loop li =
+        match linp.[li-lpos..] with
+        | "" -> 
+            failwith $"should length:{li} < pos:{pos}"
+        | Rgx @"^[^\n]*\n" m ->
+            let nextLpos = li + m.Length
+            if pos < nextLpos then
+                let col = pos - li
+                col, nextLpos
+            else
+                loop nextLpos
+        | linp ->
+            let nextLpos = li + linp.Length
+            if pos < nextLpos then
+                let col = pos - li
+                col,nextLpos
+            else
+                failwithf "eof:%d < pos:%d" nextLpos pos
+    //fst:pos对应的列数，snd:pos的下一行开始位置。
+    loop lpos
 
 // spaceCount是code前面填补的空格数
 // code 不带开括号，也不带闭括号

@@ -45,18 +45,18 @@ module RegularSymbolToken =
             seq {
                 match inp.[pos..] with
                 | "" -> ()
-                | On tryWS (x, _) ->
+                | On tryWS x ->
                     let len = x.Length
                     yield! loop (pos+len)
 
-                | On tryWord (x, _) ->
+                | On tryWord x ->
                     let len = x.Length
-                    yield pos, len, ID x
+                    yield pos, len, ID x.Value
                     yield! loop (pos+len)
 
-                | On trySingleQuoteString (x, _) ->
+                | On trySingleQuoteString x ->
                     let len = x.Length
-                    yield pos,len,LITERAL(Quotation.unquote x)
+                    yield pos,len,LITERAL(JsonString.unquote x.Value)
                     yield! loop (pos+len)
 
                 | First '?' _ ->

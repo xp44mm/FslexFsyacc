@@ -4,10 +4,12 @@ open FSharp.Idioms
 open FSharp.Idioms.StringOps
 open FSharp.Idioms.RegularExpressions
 open FSharp.Idioms.ActivePatterns
+open FSharp.Literals.Literal
 
 open System.Text.RegularExpressions
 open FslexFsyacc.FSharpSourceText
 open FslexFsyacc.Runtime
+open System
 
 let ops = Map [
     "%%",PERCENT;
@@ -53,58 +55,64 @@ let getLexeme (token:_ Position) =
 
 let tryHole =
     Regex @"^\<\w+\>"
-    |> tryMatch
+    //|> tryMatch
+    |> trySearch
 
 let tokenize (index:int) (inp:string) =
     let rec loop (lpos:int) (pos:int) = //,linp:string,inp:string
         seq {
             match inp.[index+pos..] with
             | "" -> ()
-            | On tryWS (x, rest) ->
-                let len = x.Length
+            | On tryWS m ->
+                let len = m.Length
                 yield! loop (lpos) (pos+len) //,linp,rest
 
-            | On trySingleLineComment (x, rest) ->
-                let len = x.Length
+            | On trySingleLineComment m ->
+                let len = m.Length
                 yield! loop (lpos) (pos+len) //,linp,rest
 
-            | On tryMultiLineComment (x, rest) ->
-                let len = x.Length
+            | On tryMultiLineComment m ->
+                let len = m.Length
                 yield! loop (lpos) (pos+len) //,linp,rest
 
-            | On tryWord (x, rest) ->
-                let len = x.Length
+            | On tryWord m ->
+                let len = m.Length
+                let x = m.Value
+                let rest = m.Result("$'")
                 let v = if Regex.IsMatch(rest,@"^\s*=") then CAP x else ID x
                 yield Position<_>.from(pos, len, v)
                 yield! loop (lpos) (pos+len) //,linp,rest
 
-            | On trySingleQuoteString (x, rest) ->
-                let len = x.Length
-                yield Position<_>.from(pos,len,LITERAL(Quotation.unquote x))
+            | On trySingleQuoteString m ->
+                let len = m.Length
+                let x = m.Value
+                yield Position<_>.from(pos,len,LITERAL(JsonString.unquote x))
                 yield! loop (lpos) (pos+len) //,linp,rest
 
-            | On tryHole (x, rest) ->
-                let len = x.Length
+            | On tryHole m ->
+                let len = m.Length
+                let x = m.Value
                 yield Position<_>.from(pos,len,HOLE x.[1..len-2])
                 yield! loop (lpos) (pos+len) //,linp,rest
 
-            | On trySemantic (x, rest) ->
-                let len = x.Length
-                let code = x.[1..len-2]
+            | On trySemantic capt ->
+                let len = capt.Length
+                let code = capt.[1..len-2]
 
                 let nlpos,fcode = //,nlinp
                     if System.String.IsNullOrWhiteSpace(code) then
                         lpos,"" //,linp
                     else
                         let linp = inp.[index+lpos..]
-                        let col,nlpos,nlinp = getColumnAndRest (lpos,linp) (pos+1)
+                        let col,nlpos = Line.getColumnAndLpos (lpos,linp) (pos+1)
+
                         let fcode = formatNestedCode col code
                         nlpos,fcode //,nlinp
 
                 yield Position<_>.from(pos, len, SEMANTIC fcode)
                 yield! loop (nlpos) (pos+len) //,nlinp,rest
 
-            | On tryHeader (x, rest) ->
+            | On tryHeader x ->
                 let len = x.Length
                 let code = x.[2..len-3]
 
@@ -113,7 +121,7 @@ let tokenize (index:int) (inp:string) =
                         lpos,""//,linp
                     else
                         let linp = inp.[index+lpos..]
-                        let col,nlpos,nlinp = getColumnAndRest (lpos,linp) (pos+2)
+                        let col,nlpos = Line.getColumnAndLpos (lpos,linp) (pos+2)
                         let fcode = formatNestedCode col code
                         nlpos,fcode //,nlinp
 
@@ -127,13 +135,13 @@ let tokenize (index:int) (inp:string) =
                 yield Position<_>.from(pos,x.Length,PERCENT)
                 yield! loop (lpos) (pos+x.Length) //,linp,rest
 
-            | LongestPrefix (Map.keys ops) (x, rest) ->
+            | LongestPrefix (Map.keys ops) x ->
                 let len = x.Length
                 yield Position<_>.from(pos,len,ops.[x])
                 let nextPos = pos+len
                 yield! loop (lpos) (nextPos) //,linp,rest
             
-            | _ -> failwith $""
+            | rest -> failwith $"tokenize:{rest}"
         }
     
     loop (index) (index) //,inp,inp

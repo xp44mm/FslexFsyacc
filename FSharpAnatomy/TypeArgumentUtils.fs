@@ -76,38 +76,38 @@ let tokenize index (inp:string) =
             | Rgx @"^\s+" m ->
                 yield! loop (i+m.Length)
 
-            | On tryIdent (x, _) ->
+            | On tryIdent x ->
                 let tok =
                     {
                         index = i
                         length = x.Length
                         value =
-                            if kws.ContainsKey x 
-                            then kws.[x]
-                            else IDENT x
+                            if kws.ContainsKey x.Value
+                            then kws.[x.Value]
+                            else IDENT x.Value
                     }
                 yield tok
                 yield! loop tok.nextIndex
 
-            | On tryQTypar (x, _) ->
+            | On tryQTypar x ->
                 let tok = {
                     index = i
                     length = x.Length
-                    value = QTYPAR x.[1..]
+                    value = QTYPAR x.Value.[1..]
                 }
                 yield tok
                 yield! loop tok.nextIndex
 
-            | On tryHTypar (x, _) ->
+            | On tryHTypar x ->
                 let tok = {
                     index = i
                     length = x.Length
-                    value = HTYPAR x.[1..]
+                    value = HTYPAR x.Value.[1..]
                 }
                 yield tok
                 yield! loop tok.nextIndex
 
-            | LongestPrefix (Map.keys ops) (x, _) ->
+            | LongestPrefix (Map.keys ops) x ->
                 let tok = {
                     index = i
                     length = x.Length

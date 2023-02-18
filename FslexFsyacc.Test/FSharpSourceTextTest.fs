@@ -4,6 +4,13 @@ open Xunit
 open Xunit.Abstractions
 open FSharp.xUnit
 open FSharp.Literals
+open Xunit
+open Xunit.Abstractions
+open FSharp.xUnit
+open FSharp.Literals
+open FslexFsyacc.Runtime
+open FslexFsyacc
+open System.IO
 
 type FSharpSourceTextTest(output:ITestOutputHelper) =
     let show res =
@@ -14,137 +21,153 @@ type FSharpSourceTextTest(output:ITestOutputHelper) =
     [<Fact>]
     member _.``tryWord``() =
         let x = "xyz"
-        let y = FSharpSourceText.tryWord x
+        let y = 
+            FSharpSourceText.tryWord x 
+            |> Option.get
 
-        Should.equal y <| Some(x,"")
+        Should.equal x y.Value
 
     [<Fact>]
     member _.``tryWS``() =
         let x = "  "
-        let y = FSharpSourceText.tryWS x
-        Should.equal y <| Some(x,"")
+        let y = 
+            FSharpSourceText.tryWS x
+            |> Option.get
+
+        Should.equal x y.Value
 
     [<Fact>]
     member _.``trySingleLineComment``() =
         let x = "// xdfasdf\r\n   "
-        let y = FSharpSourceText.trySingleLineComment x
-        Should.equal y <| Some("// xdfasdf\r","\n   ")
+        let y = 
+            FSharpSourceText.trySingleLineComment x
+            |> Option.get
+        let e = "// xdfasdf\r"
+        Should.equal e y.Value 
 
-    [<Fact>]
-    member _.``tryMultiLineComment``() =
-        let x = "(* empty *) "
-        let y = FSharpSourceText.tryMultiLineComment x
-        Should.equal y <| Some("(* empty *)"," ")
+    [<Theory>]
+    [<InlineData("(* empty *) ","(* empty *)")>]
+    [<InlineData("(* ) ",null)>]
+    member _.``tryMultiLineComment``(x,e) =
+        let e = if e = null then None else Some e
+        let y = 
+            FSharpSourceText.tryMultiLineComment x
+            |> Option.map(fun m -> m.Value)
+        Should.equal y e
 
-        let x1 = "(* ) "
-        let y1 = FSharpSourceText.tryMultiLineComment x1
-        Should.equal y1 None
+    [<Theory>]
+    [<InlineData(@"'\\'")>]
+    [<InlineData(@"'\''")>]
+    [<InlineData(@"'\u0000'")>]
+    [<InlineData(@"'{'")>]
+    member _.``tryChar`` x =
+        let y = 
+            FSharpSourceText.tryChar x
+            |> Option.get
+        Should.equal x y.Value
 
-    [<Fact>]
-    member _.``tryChar``() =
-        let xs = [@"'\\'";@"'\''";@"'\u0000'";@"'{'"]
-        for x in xs do
-            let y = FSharpSourceText.tryChar x
-            Should.equal y <| Some(x,"")
+    [<Theory>]
+    [<InlineData("``xs ys``")>]
+    member _.``tryDoubleTick`` x =
+        let y = 
+            FSharpSourceText.tryDoubleTick x
+            |> Option.get
 
-    [<Fact>]
-    member _.``tryDoubleTick``() =
-        let xs = ["``xs ys``"]
-        for x in xs do
-            let y = FSharpSourceText.tryDoubleTick x
-            Should.equal y <| Some(x,"")
+        Should.equal x y.Value
 
-    [<Fact>]
-    member _.``tryTypeParameter``() =
-        let xs = ["'a";"'abc"]
-        for x in xs do
-            let y = FSharpSourceText.tryTypeParameter x
-            Should.equal y <| Some(x,"")
+    [<Theory>]
+    [<InlineData("'a",true)>]
+    [<InlineData("'abc",true)>]
+    [<InlineData("'a'",false)>]
+    member _.``tryTypeParameter``(x,e) =
+        let y = 
+            FSharpSourceText.tryTypeParameter x
+            |> Option.map(fun m -> m.Value)
+        let e = if e then Some x else None
+        Should.equal y e
 
-        let ns = ["'a'"]
-        for n in ns do
-            let m = FSharpSourceText.tryTypeParameter n
-            Should.equal m None
+    [<Theory>]
+    [<InlineData(""" "" """)>]
+    [<InlineData(""" "\\" """)>]
+    [<InlineData(""" "\"" """)>]
+    [<InlineData(""" "\u1234" """)>]
+    [<InlineData(""" "{" """)>]
+    member _.``trySingleQuoteString``(x:string) =
+        let x = x.Trim()
 
-    [<Fact>]
-    member _.``trySingleQuoteString``() =
-        let xs = 
-            [""" "" """;""" "\\" """;""" "\"" """;""" "\u1234" """;""" "{" """;]
-            |> List.map (fun x -> x.Trim())
+        let y = 
+            FSharpSourceText.trySingleQuoteString x
+            |> Option.map(fun m -> m.Value)
+            |> Option.get
 
-        for x in xs do
-            let y = FSharpSourceText.trySingleQuoteString x
-            Should.equal y <| Some(x,"")
+        Should.equal y x
 
-    [<Fact>]
-    member _.``tryVerbatimString``() =
-        let xs = 
-            [""" @"" """;""" @"\""x" """;]
-            |> List.map (fun x -> x.Trim())
+    [<Theory>]
+    [<InlineData(""" @"" """)>]
+    [<InlineData(""" @"\""x" """)>]
+    member _.``tryVerbatimString``(x:string) =
+        let x = x.Trim()
 
-        for x in xs do
-            let y = FSharpSourceText.tryVerbatimString x
-            Should.equal y <| Some(x,"")
+        let y = 
+            FSharpSourceText.tryVerbatimString x
+            |> Option.map(fun m -> m.Value)
+            |> Option.get
 
-    [<Fact>]
-    member _.``tryTripleQuoteString``() =
-        let xs = 
-            ["\"\"\"xyz\"\"\""]
+        Should.equal y x
 
-        for x in xs do
-            let y = FSharpSourceText.tryTripleQuoteString x
-            Should.equal y <| Some(x,"")
+    [<Theory>]
+    [<InlineData("\"\"\"xyz\"\"\"")>]
+    member _.``tryTripleQuoteString`` (x:string) =
+        let x = x.Trim()
+        let y = 
+            FSharpSourceText.tryTripleQuoteString x
+            |> Option.map(fun m -> m.Value)
+            |> Option.get
+
+        Should.equal y x
 
 
-    [<Fact>]
-    member _.``getHeaderLength``() =
-        let x = "%}"
+    [<Theory>]
+    [<InlineData("%}")>]
+    [<InlineData("(*%}*)%}")>]
+    member _.``getHeaderLength`` (x:string) =
+        //
         let y = FSharpSourceText.getHeaderLength x
         let z = x.[0..y-1]
+        show z
         Should.equal x z
 
-        let x1 = "(*%}*)%}"
-        let y1 = FSharpSourceText.getHeaderLength x1
-        let z1 = x1.[0..y1-1]
-        Should.equal x1 z1
 
-    [<Fact>]
-    member _.``getNestedActionLength``() =
-        let x = "}"
+    [<Theory>]
+    [<InlineData("}")>]
+    [<InlineData("(*}*){}}")>]
+    member _.``getNestedActionLength`` (x:string) =
+        
         let y = FSharpSourceText.getSemanticLength x
         let z = x.[0..y-1]
+        show z
         Should.equal x z
 
-        let x1 = "(*}*){}}"
-        let y1 = FSharpSourceText.getSemanticLength x1
-        let z1 = x1.[0..y1-1]
-        Should.equal x1 z1
+    [<Theory>]
+    [<InlineData("%{%}")>]
+    [<InlineData("%{open System%}")>]
+    member _.``tryHeader`` (x:string) =
+        let y = 
+            FSharpSourceText.tryHeader x
+            |> Option.get
+        show y
+        Should.equal y x
 
-    [<Fact>]
-    member _.``tryHeader``() =
-        let x = "%{%}"
-        let y = FSharpSourceText.tryHeader x
-        //show y
-        Should.equal y <| Some(x,"")
+    [<Theory>]
+    [<InlineData("{{}}")>]
+    [<InlineData("{'}'}")>]
+    member _.``trySemantic`` (x:string) =
+        let y = 
+            FSharpSourceText.trySemantic x
+            |> Option.get
 
-    [<Fact>]
-    member _.``trySemantic``() =
-        let x = "{{}}"
-        let y = FSharpSourceText.trySemantic x
-        //show y
-        Should.equal y <| Some(x,"")
-
-    [<Fact>]
-    member _.``getColumnAndRest``() =
-        let start = 19
-        let inp = "0123456789\nabc"
-        let pos = 20
-        let col,nextStart,rest = 
-            FSharpSourceText.getColumnAndRest (start, inp) pos
-        //show (col,nextStart,rest)
-        Should.equal col 1 //20-19,col base on 0
-        Should.equal nextStart 30 //19+11
-        Should.equal rest "abc" // rest after first \n
+        show y
+        Should.equal y x
 
     [<Fact>]
     member _.``formatNestedCode``() =
@@ -159,6 +182,4 @@ type FSharpSourceTextTest(output:ITestOutputHelper) =
             FSharpSourceText.formatNestedCode col code
         //show result
         Should.equal result "let a = 0\r\nlet b = 1"
-
-
 

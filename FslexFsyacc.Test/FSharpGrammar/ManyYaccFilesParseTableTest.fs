@@ -37,7 +37,7 @@ type ManyYaccFilesParseTableTest(output:ITestOutputHelper) =
             ]
         FsyaccFileRules.removeErrorRules robust
 
-    [<Fact>]
+    [<Fact(Skip="no for verify")>]
     member _.``001 - explicitMemberConstraint test``() =
 
         let s0 = "explicitMemberConstraint"

@@ -10,52 +10,52 @@ open System.Text.RegularExpressions
 
 let tryWS =
     Regex @"^\s+"
-    |> tryMatch
+    |> trySearch
 
 let tryWord =
     Regex @"^\w+"
-    |> tryMatch
+    |> trySearch
 
 let trySingleLineComment =
     Regex @"^//.*"
-    |> tryMatch
+    |> trySearch
 
 let tryMultiLineComment =
     Regex @"^\(\*(?!\s*\))[\s\S]*?\*\)"
-    |> tryMatch
+    |> trySearch
 
 let tryDoubleTick =
     Regex @"^``[ \S]+?``"
-    |> tryMatch
+    |> trySearch
 
 let tryQTypar =
     Regex @"^'\w+(?!')"
-    |> tryMatch
+    |> trySearch
 
 let tryHTypar =
     Regex @"^\^\w+(?!')"
-    |> tryMatch
+    |> trySearch
 
 let tryIdent =
     Regex @"^[_\p{L}\p{Nl}][\p{L}\p{Mn}\p{Mc}\p{Nl}\p{Nd}\p{Pc}\p{Cf}']*"
-    |> tryMatch
+    |> trySearch
 
 let tryChar =
     Regex @"^'(\\.|[^\\'])+'" // 转义斜杠后面紧跟着的一个字符作为整体看待。
-    |> tryMatch
+    |> trySearch
 
 let trySingleQuoteString =
     Regex @"^""(\\.|[^\\""])*"""
-    |> tryMatch
+    |> trySearch
 
 let tryVerbatimString =
     Regex @"^@""(""""|[^""])*"""
-    |> tryMatch
+    |> trySearch
 
 let tryTripleQuoteString =
     Regex @"^""""""(?!"")[\s\S]*?(?<!"")""""""(?!"")"
-    |> tryMatch
+    |> trySearch
 
 let tryOperatorName =
     Regex @"^\(\s*[!$%&*+-./:<=>?@^|~]+\s*\)"
-    |> tryMatch
+    |> trySearch

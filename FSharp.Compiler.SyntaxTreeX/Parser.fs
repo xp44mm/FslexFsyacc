@@ -24,7 +24,7 @@ let getModuleOrNamespace (parseResults:FSharpParseFileResults) =
     else
         match parseResults.ParseTree with
         | ParsedInput.ImplFile(ParsedImplFileInput(
-            fn, _, _, _, _, [ m ], _,_
+            fn, _, _, _, _, [ m ], _,_,_
             )) -> 
             Transformation.getModuleOrNamespace m
         | _ -> 

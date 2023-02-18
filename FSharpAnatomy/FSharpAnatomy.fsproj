@@ -29,4 +29,8 @@
     <ProjectReference Include="..\FslexFsyacc\FslexFsyacc.fsproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Update="FSharp.Core" Version="7.0.200" />
+  </ItemGroup>
+
 </Project>

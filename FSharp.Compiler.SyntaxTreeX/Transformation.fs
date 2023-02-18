@@ -398,8 +398,8 @@ let getExpr (expr:SynExpr) =
         XExpr.Null
     | SynExpr.AddressOf ( isByref: bool , expr: SynExpr , opRange: range , range: range)->
         XExpr.AddressOf ( isByref , getExpr expr)
-    | SynExpr.TraitCall ( supportTys: SynType list , traitSig: SynMemberSig , argExpr: SynExpr , range: range)->
-        XExpr.TraitCall (List.map getType supportTys ,getMemberSig traitSig,getExpr argExpr)
+    | SynExpr.TraitCall ( supportTys: SynType , traitSig: SynMemberSig , argExpr: SynExpr , range: range)->
+        XExpr.TraitCall (getType supportTys ,getMemberSig traitSig,getExpr argExpr)
     | SynExpr.JoinIn ( lhsExpr: SynExpr , lhsRange: range , rhsExpr: SynExpr , range: range)->
         XExpr.JoinIn (getExpr lhsExpr,getExpr rhsExpr)
     | SynExpr.ImplicitZero ( range: range)->
@@ -540,8 +540,8 @@ let getType(tp:SynType) =
         XType.WithGlobalConstraints (getType typeName ,List.map getTypeConstraint constraints)
     | SynType.HashConstraint ( innerType: SynType , range: range)->
         XType.HashConstraint (getType innerType)
-    | SynType.MeasureDivide ( dividend: SynType , divisor: SynType , range: range)->
-        XType.MeasureDivide (getType dividend,getType divisor)
+    //| SynType.MeasureDivide ( dividend: SynType , divisor: SynType , range: range)->
+    //    XType.MeasureDivide (getType dividend,getType divisor)
     | SynType.MeasurePower ( baseMeasure: SynType , exponent: SynRationalConst , range: range)->
         XType.MeasurePower (getType baseMeasure ,getRationalConst exponent)
     | SynType.StaticConstant ( constant: SynConst , range: range)->
@@ -553,6 +553,9 @@ let getType(tp:SynType) =
     | SynType.Paren ( innerType: SynType , range: range) ->
         XType.Paren (getType innerType)
     | SynType.SignatureParameter _ -> failwith ""
+    | SynType.Or _ -> failwith ""
+
+
 
 let getConst (c: SynConst) =
     match c with
@@ -657,7 +660,7 @@ let getBindingKind (src:SynBindingKind) =
 
 let getBindingReturnInfo(src: SynBindingReturnInfo) = 
     match src with
-    SynBindingReturnInfo ( typeName: SynType , range: range , attributes: SynAttributes) ->
+    SynBindingReturnInfo ( typeName: SynType , range: range , attributes: SynAttributes,trivia) ->
         XBindingReturnInfo (getType typeName,getAttributes attributes)
 
 let getPat(src: SynPat) =
@@ -732,6 +735,7 @@ let getPat(src: SynPat) =
 
     | SynPat.FromParseError( pat: SynPat , range: range) ->
         XPat.FromParseError(getPat pat)
+    | SynPat.ListCons _ -> failwith "unimpl"
 
 let getExprAtomicFlag (src:Syntax.ExprAtomicFlag) =
     match src with
@@ -762,7 +766,7 @@ let getArgPats(src: SynArgPats )=
     match src with
     | SynArgPats.Pats ( pats: SynPat list)->
         XArgPats.Pats (List.map getPat pats)
-    | SynArgPats.NamePatPairs ( pats: (Ident * range * SynPat) list , range: range) ->
+    | SynArgPats.NamePatPairs ( pats: (Ident * range * SynPat) list , range: range,trivia) ->
         XArgPats.NamePatPairs (pats |> List.map (fun(i,_,p)->i.idText,getPat p)) 
 
 let getComponentInfo(src: SynComponentInfo )=
@@ -872,7 +876,7 @@ let getMemberDefn (src:SynMemberDefn) =
     | SynMemberDefn.AbstractSlot ( 
         slotSig: SynValSig ,
         flags: SynMemberFlags ,
-        range: FSharp.Compiler.Text.range
+        range: FSharp.Compiler.Text.range,trivia
         ) ->
         XMemberDefn.AbstractSlot ( 
             getValSig slotSig ,
@@ -923,9 +927,9 @@ let getMemberDefn (src:SynMemberDefn) =
         memberFlagsForSet: SynMemberFlags,
         xmlDoc: PreXmlDoc,
         accessibility: SynAccess option,
-        _,
+        //_,
         synExpr: SynExpr,
-        _,
+        //_,
         _,
         _
         )  ->
@@ -1021,7 +1025,7 @@ let getMemberSig(src:SynMemberSig) =
     | SynMemberSig.Member ( 
         memberSig: SynValSig ,
         flags: SynMemberFlags ,
-        range: FSharp.Compiler.Text.range
+        range: FSharp.Compiler.Text.range,trivia
         ) ->
         XMemberSig.Member ( 
            getValSig memberSig ,
@@ -1126,11 +1130,11 @@ let getTypeConstraint(src:SynTypeConstraint) =
         XTypeConstraint.WhereTyparSubtypeOfType (getTypar typar ,getType typeName)
 
     | SynTypeConstraint.WhereTyparSupportsMember ( 
-        typars: SynType list ,
+        typars: SynType ,
         memberSig: SynMemberSig ,
         range: FSharp.Compiler.Text.range
         ) -> 
-        XTypeConstraint.WhereTyparSupportsMember (List.map getType typars ,getMemberSig memberSig)
+        XTypeConstraint.WhereTyparSupportsMember (getType typars ,getMemberSig memberSig)
 
     | SynTypeConstraint.WhereTyparIsEnum ( 
         typar: SynTypar ,
@@ -1300,7 +1304,7 @@ let getField(src:SynField) =
         isMutable: bool ,
         xmlDoc: FSharp.Compiler.Xml.PreXmlDoc ,
         accessibility: SynAccess option ,
-        range: FSharp.Compiler.Text.range
+        range: FSharp.Compiler.Text.range,trivia
         ) ->
         XField (
             getAttributes attributes  ,

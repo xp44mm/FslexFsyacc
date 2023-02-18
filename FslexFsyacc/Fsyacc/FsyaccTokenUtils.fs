@@ -1,12 +1,14 @@
 ﻿module FslexFsyacc.Fsyacc.FsyaccTokenUtils
+
+open FslexFsyacc.FSharpSourceText
+open FslexFsyacc.Runtime
+
 open FSharp.Idioms
 open FSharp.Idioms.StringOps
 open FSharp.Idioms.RegularExpressions
 open FSharp.Idioms.ActivePatterns
 
-open FslexFsyacc.FSharpSourceText
 open System.Text.RegularExpressions
-open FslexFsyacc.Runtime
 
 let ops = Map [
     "%%",PERCENT;
@@ -31,14 +33,14 @@ let getTag(token:Position<_>) =
     match token.value with
     | x when ops_inverse.ContainsKey x -> ops_inverse.[x]
 
-    | HEADER _ -> "HEADER"
-    | ID _ -> "ID"
-    | LITERAL _    -> "LITERAL"
+    | HEADER   _ -> "HEADER"
+    | ID       _ -> "ID"
+    | LITERAL  _ -> "LITERAL"
     | SEMANTIC _ -> "SEMANTIC"
-    | LEFT         -> "%left"
-    | RIGHT        -> "%right"
-    | NONASSOC     -> "%nonassoc"
-    | PREC         -> "%prec"
+    | LEFT     -> "%left"
+    | RIGHT    -> "%right"
+    | NONASSOC -> "%nonassoc"
+    | PREC     -> "%prec"
     | _ -> failwith $"getTag"
 
 /// 获取token携带的语义信息§
@@ -59,29 +61,29 @@ let tokenize (index:int) (txt:string) =
         seq {
             match txt.[index+pos..] with
             | "" -> ()
-            | On tryWS (x, rest) ->
+            | On tryWS x ->
                 let len = x.Length
                 yield! loop (lpos) (pos+len) //,linp,rest
 
-            | On trySingleLineComment (x, rest) ->
+            | On trySingleLineComment x ->
                 let len = x.Length
                 yield! loop (lpos) (pos+len) //,linp,rest
 
-            | On tryMultiLineComment (x, rest) ->
+            | On tryMultiLineComment x ->
                 let len = x.Length
                 yield! loop (lpos) (pos+len) //,linp,rest
 
-            | On tryWord (x, rest) ->
+            | On tryWord x ->
                 let len = x.Length
-                yield Position<_>.from(pos, len, ID x)
+                yield Position<_>.from(pos, len, ID x.Value)
                 yield! loop (lpos) (pos+len) //,linp,rest
 
-            | On trySingleQuoteString (x, rest) ->
+            | On trySingleQuoteString x ->
                 let len = x.Length
-                yield Position<_>.from(pos,len,LITERAL(Quotation.unquote x))
+                yield Position<_>.from(pos,len,LITERAL(JsonString.unquote x.Value))
                 yield! loop (lpos) (pos+len) //,linp,rest
 
-            | On trySemantic (x, rest) ->
+            | On trySemantic x ->
                 let len = x.Length
                 let code = x.[1..len-2]
 
@@ -90,14 +92,14 @@ let tokenize (index:int) (txt:string) =
                         lpos,"" //,linp
                     else
                         let linp = txt.[index+lpos..]
-                        let col,nlpos,nlinp = getColumnAndRest (lpos,linp) (pos+1)
+                        let col,nlpos = Line.getColumnAndLpos (lpos,linp) (pos+1)
                         let fcode = formatNestedCode col code
                         nlpos,fcode //,nlinp
 
                 yield Position<_>.from(pos,len,SEMANTIC fcode)
                 yield! loop (nlpos) (pos+len) //,nlinp,rest
 
-            | On tryHeader (x, rest) ->
+            | On tryHeader x ->
                 let len = x.Length
                 let code = x.[2..len-3]
 
@@ -106,7 +108,7 @@ let tokenize (index:int) (txt:string) =
                         lpos,"" //,linp
                     else
                         let linp = txt.[index+lpos..]
-                        let col,nlpos,nlinp = getColumnAndRest (lpos,linp) (pos+2)
+                        let col,nlpos = Line.getColumnAndLpos (lpos,linp) (pos+2)
                         let fcode = formatNestedCode col code
                         nlpos,fcode //,nlinp
 
@@ -136,7 +138,7 @@ let tokenize (index:int) (txt:string) =
                 yield Position<_>.from(pos,len,PERCENT)
                 yield! loop (lpos) (pos+len) //,linp,rest
 
-            | LongestPrefix (Map.keys ops) (x, rest) ->
+            | LongestPrefix (Map.keys ops) x ->
                 let len = x.Length
                 let nextPos = pos+len
                 yield Position<_>.from(pos,len,ops.[x])

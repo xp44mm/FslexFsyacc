@@ -37,10 +37,10 @@ type BalancedBracketCounter<'t when 't : equality>() =
     member this.getOpposite(bracket:'t) =
         let tck =
             brackets
-            |> List.find(fun(bra,tick) ->bra=bracket)
+            |> List.find(fun(bra,tick)-> bra = bracket)
             |> snd
         let opp =
             brackets
-            |> List.find(fun(bra,tick)->tick= -tck)
+            |> List.find(fun(bra,tick)-> tick = -tck)
             |> fst
         opp

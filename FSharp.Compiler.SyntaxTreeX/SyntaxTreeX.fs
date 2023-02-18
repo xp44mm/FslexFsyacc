@@ -97,7 +97,7 @@ type XTypeConstraint =
     | WhereTyparIsEquatable of typar: XTypar
     | WhereTyparDefaultsToType of typar: XTypar * typeName: XType
     | WhereTyparSubtypeOfType of typar: XTypar * typeName: XType
-    | WhereTyparSupportsMember of typars: XType list * memberSig: XMemberSig
+    | WhereTyparSupportsMember of typars: XType * memberSig: XMemberSig
     | WhereTyparIsEnum of typar: XTypar * typeArgs: XType list
     | WhereTyparIsDelegate of typar: XTypar * typeArgs: XType list
 
@@ -241,7 +241,7 @@ type XExpr =
     | InferredDowncast of expr: XExpr
     | Null
     | AddressOf of isByref: bool * expr: XExpr
-    | TraitCall of supportTys: XType list * traitSig: XMemberSig * argExpr: XExpr
+    | TraitCall of supportTys: XType * traitSig: XMemberSig * argExpr: XExpr
     | JoinIn of lhsExpr: XExpr  * rhsExpr: XExpr
     | ImplicitZero
     | SequentialOrImplicitYield of  expr1: XExpr * expr2: XExpr * ifNotStmt: XExpr

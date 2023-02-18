@@ -14,6 +14,9 @@ type Position<'value> =
             value  = value
         }
 
+    member this.nextIndex = 
+        this.index + this.length
+
     static member totalLength(ls:list<Position<'value>>) =
         let index = ls.Head.index
         let nextIndex =
@@ -23,8 +26,8 @@ type Position<'value> =
         let length = nextIndex - index
         length
 
-    member this.nextIndex = 
-        this.index + this.length
+
+
 
     ////source对应的索引是0
     //member this.raw(source:string) =

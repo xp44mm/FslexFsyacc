@@ -94,31 +94,31 @@ let tokenize pos (inp:string) =
             | "" -> ()
             | Rgx @"^\s+" m ->
                 yield! loop (index+m.Length)
-            | On tryQTypar (x, rest) ->
+            | On tryQTypar x ->
                 let tok = {
                     index = index
                     length = x.Length
-                    value = QTYPAR x.[1..]
+                    value = QTYPAR x.Value.[1..]
                 }
                 yield tok
                 yield! loop tok.nextIndex
-            | On tryHTypar (x, rest) ->
+            | On tryHTypar x ->
                 let tok = {
                     index = index
                     length = x.Length
-                    value = HTYPAR x.[1..]
+                    value = HTYPAR x.Value.[1..]
                 }
                 yield tok
                 yield! loop tok.nextIndex
-            | On tryIdent (x, rest) ->
+            | On tryIdent x ->
                 let tok =
                     {
                         index = index
                         length = x.Length
                         value =
-                            if kws.ContainsKey x then
-                                kws.[x]
-                            else IDENT x
+                            if kws.ContainsKey x.Value then
+                                kws.[x.Value]
+                            else IDENT x.Value
                     }
                 yield tok
                 yield! loop tok.nextIndex
@@ -131,8 +131,8 @@ let tokenize pos (inp:string) =
                 }
                 yield tok
                 yield! loop tok.nextIndex
-            | On tryOperatorName (x,rest) ->
-                let op = x.[1..x.Length-2].Trim()
+            | On tryOperatorName x ->
+                let op = x.Value.[1..x.Length-2].Trim()
                 let tok = {
                     index = index
                     length = x.Length
@@ -141,7 +141,7 @@ let tokenize pos (inp:string) =
                 yield tok
                 yield! loop tok.nextIndex
 
-            | LongestPrefix (Map.keys ops) (x,rest) ->
+            | LongestPrefix (Map.keys ops) x ->
                 let tok = {
                     index = index
                     length = x.Length

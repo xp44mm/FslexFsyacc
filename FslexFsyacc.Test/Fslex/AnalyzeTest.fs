@@ -25,7 +25,7 @@ type AnalyzeTest(output:ITestOutputHelper) =
     [<Fact>]
     member _.``explicit amp test``() =
         let tokens = 
-            [LPAREN;ID "";RPAREN;LBRACK;RBRACK;STAR;LITERAL ""] 
+            [LPAREN;ID "";RPAREN;LBRACK;RBRACK;STAR;LITERAL ""]
             |> List.map(fun t -> Position<_>.from(0,0,t))
         let y = analyze tokens |> List.map(fun x -> x.value)
         //show y

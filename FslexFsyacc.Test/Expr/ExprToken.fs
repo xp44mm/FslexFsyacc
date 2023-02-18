@@ -68,7 +68,7 @@ module ExprToken =
                     yield tok
                     yield! loop tok.nextIndex
 
-                | LongestPrefix (Map.keys ops) (x, _) ->
+                | LongestPrefix (Map.keys ops) x ->
                     let tok =
                         {
                             index = i
