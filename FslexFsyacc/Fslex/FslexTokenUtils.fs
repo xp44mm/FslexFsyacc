@@ -70,26 +70,35 @@ let tokenize (offset:int) (input:string) =
                 let len = m.Length
                 yield! loop (lpos,lrest) (pos+len,rest.[len..])
 
-            | Rgx @"^(\w+)\s*(=)?" m -> //todo: @"^\w+"
+            | Rgx @"^\w+" m ->
+                yield Position<_>.from(pos,m.Length,ID m.Value)
+                yield! loop (lpos,lrest) (pos+m.Length,rest.[m.Length..])
+
+            | Rgx @"^<(\w+)>\s*(=)?" m ->
                 let g1 = m.Groups.[1]
                 let tok =
                     if m.Groups.[2].Success then
                         CAP g1.Value
                     else
-                        ID g1.Value
-                yield Position<_>.from(pos, g1.Length, tok)
-                yield! loop (lpos,lrest) (pos+g1.Length,rest.[g1.Length..])
-
-            | Rgx @"^<(\w+)>" m -> //todo: @"^<(\w+)>\s*(=)?"
-                let len = m.Length
-                yield Position<_>.from(pos,len,HOLE m.Groups.[1].Value)
+                        HOLE g1.Value
+                let len = g1.Length+2 // '<(\w+)>' 的长度
+                yield Position<_>.from(pos, len, tok)
                 yield! loop (lpos,lrest) (pos+len,rest.[len..])
 
+            //| Rgx @"^<(\w+)>" m -> //todo: @"^<(\w+)>\s*(=)?"
+            //    let len = m.Length
+            //    yield Position<_>.from(pos,len,HOLE m.Groups.[1].Value)
+            //    yield! loop (lpos,lrest) (pos+len,rest.[len..])
 
-
-
-
-
+            //| Rgx @"^(\w+)\s*(=)?" m -> //todo: @"^\w+"
+            //    let g1 = m.Groups.[1]
+            //    let tok =
+            //        if m.Groups.[2].Success then
+            //            CAP g1.Value
+            //        else
+            //            ID g1.Value
+            //    yield Position<_>.from(pos, g1.Length, tok)
+            //    yield! loop (lpos,lrest) (pos+g1.Length,rest.[g1.Length..])
 
 
             | On trySingleQuoteString m ->

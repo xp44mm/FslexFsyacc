@@ -31,21 +31,21 @@ type TermDFATest(output:ITestOutputHelper) =
         output.WriteLine(tokens)
 
     [<Fact>]
-    member _.``0 = compiler test``() =
+    member _.``00 = compiler test``() =
         let hdr,dfs,rls = FslexCompiler.compile text
         show hdr
         show dfs
         show rls
         
     [<Fact>]
-    member _.``1 = verify``() =
+    member _.``01 = verify``() =
         let y = fslex.verify()
 
         Assert.True(y.undeclared.IsEmpty)
         Assert.True(y.unused.IsEmpty)
 
     [<Fact>]
-    member _.``2 = universal characters``() =
+    member _.``02 = universal characters``() =
         let res = fslex.getRegularExpressions()
 
         let y = 
@@ -55,7 +55,7 @@ type TermDFATest(output:ITestOutputHelper) =
         show y
 
     [<Fact(Skip="once and for all!")>] // 
-    member _.``3 = generate DFA``() =
+    member _.``03 = generate DFA``() =
         let name = "TermDFA"
         let moduleName = $"PolynomialExpressions.{name}"
 

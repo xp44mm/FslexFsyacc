@@ -3,8 +3,8 @@ open FslexFsyacc.Runtime
 open PolynomialExpressions.Tokenizer
 type token = Position<Token>
 %}
-index = "**" INT
-sign = [ "+" "-" ]
+<index> = "**" INT
+<sign>  = [ "+" "-" ]
 %%
 <sign>? INT { // multiline test
               toConst lexbuf }

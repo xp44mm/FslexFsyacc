@@ -3,14 +3,14 @@
 open Xunit
 open Xunit.Abstractions
 open FSharp.xUnit
-open FSharp.Literals
+open FSharp.Literals.Literal
 open FslexFsyacc.Runtime
 open FslexFsyacc
 open System.IO
 type FslexTokenUtilsTest(output:ITestOutputHelper) =
     let show res =
         res
-        |> Literal.stringify
+        |> stringify
         |> output.WriteLine
 
     [<Fact>]
@@ -88,9 +88,10 @@ type FslexTokenUtilsTest(output:ITestOutputHelper) =
         let filePath = Path.Combine(sourcePath, @"fslex.fslex")
         let text = File.ReadAllText(filePath)
         let y = 
-            FslexTokenUtils.tokenize 0 text 
-            |> Seq.toList
-        show y
+            FslexTokenUtils.tokenize 0 text
+            |> Seq.map(fun tok -> stringify tok)
+            |> String.concat "\r\n"
+        output.WriteLine(y)
 
 
 

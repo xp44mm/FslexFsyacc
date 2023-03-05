@@ -50,8 +50,8 @@ The ch8.6 Some Recursive Descent Parsing in Expert F# 4.0, the fslex input file:
 open PolynomialExpressions.Tokenizer
 type token = int*int*Token
 %}
-index = "**" INT
-sign = [ "+" "-" ]
+<index> = "**" INT
+<sign>  = [ "+" "-" ]
 %%
 <sign>? INT { // multiline test
               toConst lexbuf }
