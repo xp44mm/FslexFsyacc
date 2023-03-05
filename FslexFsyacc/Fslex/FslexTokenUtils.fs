@@ -26,12 +26,12 @@ let ops = Map [
     "|",BAR
     ]
 
-let ops_inverse = 
-    ops 
-    |> Map.inverse 
+let ops_inverse =
+    ops
+    |> Map.inverse
     |> Map.map(fun k v -> Seq.exactlyOne v)
 
-let getTag (token:_ Position) = 
+let getTag (token:_ Position) =
     match token.value with
     | x when ops_inverse.ContainsKey x -> ops_inverse.[x]
 
@@ -43,7 +43,7 @@ let getTag (token:_ Position) =
     | HOLE     _ -> "HOLE"
     | _ -> failwith "getTag Wild"
 
-let getLexeme (token:_ Position) = 
+let getLexeme (token:_ Position) =
     match token.value with
     | HEADER   x -> box x
     | ID       x -> box x
@@ -53,101 +53,99 @@ let getLexeme (token:_ Position) =
     | HOLE     x -> box x
     | _ -> null
 
-let tryHole =
-    Regex @"^\<\w+\>"
-    //|> tryMatch
-    |> trySearch
-
-let tokenize (index:int) (inp:string) =
-    let rec loop (lpos:int) (pos:int) = //,linp:string,inp:string
+let tokenize (offset:int) (input:string) =
+    let rec loop (lpos:int,lrest:string) (pos:int,rest:string) =
         seq {
-            match inp.[index+pos..] with
+            match rest with
             | "" -> ()
             | On tryWS m ->
                 let len = m.Length
-                yield! loop (lpos) (pos+len) //,linp,rest
+                yield! loop (lpos,lrest) (pos+len,rest.[len..])
 
             | On trySingleLineComment m ->
                 let len = m.Length
-                yield! loop (lpos) (pos+len) //,linp,rest
+                yield! loop (lpos,lrest) (pos+len,rest.[len..])
 
             | On tryMultiLineComment m ->
                 let len = m.Length
-                yield! loop (lpos) (pos+len) //,linp,rest
+                yield! loop (lpos,lrest) (pos+len,rest.[len..])
 
-            | On tryWord m ->
+            | Rgx @"^(\w+)\s*(=)?" m -> //todo: @"^\w+"
+                let g1 = m.Groups.[1]
+                let tok =
+                    if m.Groups.[2].Success then
+                        CAP g1.Value
+                    else
+                        ID g1.Value
+                yield Position<_>.from(pos, g1.Length, tok)
+                yield! loop (lpos,lrest) (pos+g1.Length,rest.[g1.Length..])
+
+            | Rgx @"^<(\w+)>" m -> //todo: @"^<(\w+)>\s*(=)?"
                 let len = m.Length
-                let x = m.Value
-                let rest = m.Result("$'")
-                let v = if Regex.IsMatch(rest,@"^\s*=") then CAP x else ID x
-                yield Position<_>.from(pos, len, v)
-                yield! loop (lpos) (pos+len) //,linp,rest
+                yield Position<_>.from(pos,len,HOLE m.Groups.[1].Value)
+                yield! loop (lpos,lrest) (pos+len,rest.[len..])
+
+
+
+
+
+
+
 
             | On trySingleQuoteString m ->
                 let len = m.Length
-                let x = m.Value
-                yield Position<_>.from(pos,len,LITERAL(JsonString.unquote x))
-                yield! loop (lpos) (pos+len) //,linp,rest
-
-            | On tryHole m ->
-                let len = m.Length
-                let x = m.Value
-                yield Position<_>.from(pos,len,HOLE x.[1..len-2])
-                yield! loop (lpos) (pos+len) //,linp,rest
+                yield Position<_>.from(pos,len,LITERAL(JsonString.unquote m.Value))
+                yield! loop (lpos,lrest) (pos+len,rest.[len..])
 
             | On trySemantic capt ->
                 let len = capt.Length
                 let code = capt.[1..len-2]
 
-                let nlpos,fcode = //,nlinp
+                let nlpos,nlinp,fcode =
                     if System.String.IsNullOrWhiteSpace(code) then
-                        lpos,"" //,linp
+                        lpos,lrest,""
                     else
-                        let linp = inp.[index+lpos..]
-                        let col,nlpos = Line.getColumnAndLpos (lpos,linp) (pos+1)
-
+                        let col,nli = Line.getColumnAndLpos (lpos,lrest) (pos+1)
+                        let nlrest = input.[offset+nli..]
                         let fcode = formatNestedCode col code
-                        nlpos,fcode //,nlinp
+                        nli,nlrest,fcode
 
                 yield Position<_>.from(pos, len, SEMANTIC fcode)
-                yield! loop (nlpos) (pos+len) //,nlinp,rest
+                yield! loop (nlpos,nlinp) (pos+len,rest.[len..])
 
             | On tryHeader x ->
                 let len = x.Length
                 let code = x.[2..len-3]
 
-                let nlpos,fcode = //,nlinp
+                let nli,nlrest,fcode =
                     if System.String.IsNullOrWhiteSpace(code) then
-                        lpos,""//,linp
+                        lpos,lrest,""
                     else
-                        let linp = inp.[index+lpos..]
-                        let col,nlpos = Line.getColumnAndLpos (lpos,linp) (pos+2)
+                        let col,nli = Line.getColumnAndLpos (lpos,lrest) (pos+2)
+                        let nlrest = input.[offset+nli..]
                         let fcode = formatNestedCode col code
-                        nlpos,fcode //,nlinp
+                        nli,nlrest,fcode
 
                 yield Position<_>.from(pos,len,HEADER fcode)
-                yield! loop (nlpos) (pos+len) //,nlinp,rest
-            
+                yield! loop (nli,nlrest) (pos+len,rest.[len..])
+
             | Rgx @"^%%+" m ->
                 let x = m.Value
-                let rest = inp.Substring(m.Length)
-
                 yield Position<_>.from(pos,x.Length,PERCENT)
-                yield! loop (lpos) (pos+x.Length) //,linp,rest
+                yield! loop (lpos,lrest) (pos+x.Length,rest.[m.Length..])
 
             | LongestPrefix (Map.keys ops) x ->
                 let len = x.Length
                 yield Position<_>.from(pos,len,ops.[x])
-                let nextPos = pos+len
-                yield! loop (lpos) (nextPos) //,linp,rest
-            
+                yield! loop (lpos,lrest) (pos+len,rest.[x.Length..])
+
             | rest -> failwith $"tokenize:{rest}"
         }
-    
-    loop (index) (index) //,inp,inp
+
+    loop (offset,input) (offset,input)
 
 let appendAMP (lexbuf: Position<FslexToken> list) =
-    let last = 
+    let last =
         lexbuf
         |> List.exactlyOne
     [last;Position<_>.from(last.nextIndex,0,AMP)]

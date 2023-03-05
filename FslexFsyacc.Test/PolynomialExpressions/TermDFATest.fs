@@ -7,19 +7,28 @@ open System.Text
 open Xunit
 open Xunit.Abstractions
 
-open FSharp.Literals
+open FSharp.Literals.Literal
 open FSharp.xUnit
 open FslexFsyacc.Fslex
 
 type TermDFATest(output:ITestOutputHelper) =
     let show res =
         res
-        |> Render.stringify
+        |> stringify
         |> output.WriteLine
 
     let filePath = Path.Combine(__SOURCE_DIRECTORY__, @"term.fslex")
     let text = File.ReadAllText(filePath)
     let fslex = FslexFile.parse text
+
+    [<Fact>]
+    member _.``00 = tokenize test``() =
+        let tokens = 
+            FslexTokenUtils.tokenize 0 text
+            //|> Seq.map(fun postok -> postok.value)
+            |> Seq.map(stringify )
+            |> String.concat "\r\n"
+        output.WriteLine(tokens)
 
     [<Fact>]
     member _.``0 = compiler test``() =

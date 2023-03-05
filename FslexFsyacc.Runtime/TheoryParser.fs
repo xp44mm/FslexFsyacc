@@ -59,17 +59,6 @@ type TheoryParser =
     /// for state in [0..len-1]
     member this.getClosure(state) = this.closures.[state]
 
-    [<System.Obsolete("use this.getStateSymbolPairs().[statei]")>]
-    member this.getSymbol(state) =
-        //闭包的kernel
-        let kernel =
-            this.closures.[state]
-            |> List.filter(fun(prod,dot,_)-> List.head prod = "" || dot > 0)
-
-        kernel
-        |> Seq.map(fun(prod,dot,_)->prod.[dot])
-        |> Seq.head
-
     ///状态的符号
     member this.getStateSymbolPairs() =
         this.closures 
@@ -130,12 +119,12 @@ type TheoryParser =
             | _ ->
                 i,states
         )
-
+    // accept, done, final
     member this.complete(states:(int*obj) list) =
         let rules = this.rules
         let actions = this.actions
         this.tryNextAction(states,"")
-        |> Option.map(fun i ->
+        |> Option.map(fun i -> // i is action's code. shift nextstate or reduce rule.
             match i with
             | _ when ParserTableAction.isStateOfShift i ->
                 failwith $"no more shift."
@@ -145,4 +134,15 @@ type TheoryParser =
             | _ ->
                 i,states
         )
+
+    [<System.Obsolete("use this.getStateSymbolPairs().[statei]")>]
+    member this.getSymbol(state) =
+        //闭包的kernel
+        let kernel =
+            this.closures.[state]
+            |> List.filter(fun(prod,dot,_)-> List.head prod = "" || dot > 0)
+
+        kernel
+        |> Seq.map(fun(prod,dot,_)->prod.[dot])
+        |> Seq.head
 

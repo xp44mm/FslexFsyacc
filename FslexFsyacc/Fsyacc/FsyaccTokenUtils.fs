@@ -52,101 +52,95 @@ let getLexeme(token:Position<_>) =
     | SEMANTIC x -> box x
     | _ -> null
 
-let tokenize (index:int) (txt:string) =
+let tokenize (offset:int) (input:string) =
     
     /// lpos:行首的索引
     /// linp:从行首开始，到inp结束的字符串
     /// pos: inp开始的字符串
-    let rec loop (lpos:int) (pos:int) = //,linp:string,inp:string
+    let rec loop (lpos:int,lrest:string) (pos:int,rest:string) =
         seq {
-            match txt.[index+pos..] with
+            match rest with
             | "" -> ()
             | On tryWS x ->
                 let len = x.Length
-                yield! loop (lpos) (pos+len) //,linp,rest
+                yield! loop (lpos,lrest) (pos+len,rest.[len..])
 
             | On trySingleLineComment x ->
                 let len = x.Length
-                yield! loop (lpos) (pos+len) //,linp,rest
+                yield! loop (lpos,lrest) (pos+len,rest.[len..])
 
             | On tryMultiLineComment x ->
                 let len = x.Length
-                yield! loop (lpos) (pos+len) //,linp,rest
+                yield! loop (lpos,lrest) (pos+len,rest.[len..])
 
             | On tryWord x ->
                 let len = x.Length
                 yield Position<_>.from(pos, len, ID x.Value)
-                yield! loop (lpos) (pos+len) //,linp,rest
+                yield! loop (lpos,lrest) (pos+len,rest.[len..])
 
             | On trySingleQuoteString x ->
                 let len = x.Length
                 yield Position<_>.from(pos,len,LITERAL(JsonString.unquote x.Value))
-                yield! loop (lpos) (pos+len) //,linp,rest
+                yield! loop (lpos,lrest) (pos+len,rest.[len..])
 
             | On trySemantic x ->
                 let len = x.Length
                 let code = x.[1..len-2]
 
-                let nlpos,fcode = //,nlinp
+                let nlpos,nlinp,fcode =
                     if System.String.IsNullOrWhiteSpace(code) then
-                        lpos,"" //,linp
+                        lpos,lrest,""
                     else
-                        let linp = txt.[index+lpos..]
-                        let col,nlpos = Line.getColumnAndLpos (lpos,linp) (pos+1)
+                        let col,nlpos = Line.getColumnAndLpos (lpos,lrest) (pos+1)
+                        let nlinp = input.[offset+nlpos..]
                         let fcode = formatNestedCode col code
-                        nlpos,fcode //,nlinp
+                        nlpos,nlinp,fcode
 
                 yield Position<_>.from(pos,len,SEMANTIC fcode)
-                yield! loop (nlpos) (pos+len) //,nlinp,rest
+                yield! loop (nlpos,nlinp) (pos+len,rest.[len..])
 
             | On tryHeader x ->
                 let len = x.Length
                 let code = x.[2..len-3]
 
-                let nlpos,fcode = //,nlinp
+                let nlpos,nlinp,fcode =
                     if System.String.IsNullOrWhiteSpace(code) then
-                        lpos,"" //,linp
+                        lpos,lrest,""
                     else
-                        let linp = txt.[index+lpos..]
-                        let col,nlpos = Line.getColumnAndLpos (lpos,linp) (pos+2)
+                        let col,nlpos = Line.getColumnAndLpos (lpos,lrest) (pos+2)
+                        let nlinp = input.[offset+nlpos..]
                         let fcode = formatNestedCode col code
-                        nlpos,fcode //,nlinp
+                        nlpos,nlinp,fcode
 
                 yield Position<_>.from(pos,len,HEADER fcode)
-                yield! loop (nlpos) (pos+len) //,nlinp,rest
+                yield! loop (nlpos,nlinp) (pos+len,rest.[len..])
             
             | Rgx @"^%[a-z]+" m ->
-                let x = m.Value
-                //let rest = inp.Substring(x.Length)
-
                 let tok =
-                    match x with
+                    match m.Value with
                     | "%left" -> LEFT
                     | "%right" -> RIGHT
                     | "%nonassoc" -> NONASSOC
                     | "%prec" -> PREC
                     | never -> failwith ""
-                let len = x.Length
+                let len = m.Length
                 yield Position<_>.from(pos,len,tok)
-                yield! loop (lpos) (pos+len) //,linp,rest
+                yield! loop (lpos,lrest) (pos+len,rest.[len..])
 
             | Rgx @"^%%+" m ->
-                //let x = m.Value
-                //let rest = inp.Substring(x.Length)
-
                 let len = m.Length
                 yield Position<_>.from(pos,len,PERCENT)
-                yield! loop (lpos) (pos+len) //,linp,rest
+                yield! loop (lpos,lrest) (pos+len,rest.[len..])
 
             | LongestPrefix (Map.keys ops) x ->
                 let len = x.Length
                 let nextPos = pos+len
                 yield Position<_>.from(pos,len,ops.[x])
-                yield! loop (lpos) (nextPos) //,linp,rest
+                yield! loop (lpos,lrest) (nextPos,rest.[len..])
 
-            | never -> failwith $"tokenize:{never}" 
+            | _ -> failwith $"tokenize:{rest}" 
         }
-    loop (index) (index)
+    loop (offset,input) (offset,input)
 
 
 

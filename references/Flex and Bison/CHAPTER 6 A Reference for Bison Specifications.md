@@ -583,9 +583,10 @@ A 10-element expression list poses no problems in a parser, but grammars often p
 %start program
 %%
 program: statementlist ;
-statementlist: statement
-             | statementlist ';' statement
-;
+statementlist: 
+    |                   statement
+    | statementlist ';' statement
+    ;
 statement: . . .
 ```
 
@@ -594,8 +595,9 @@ In this case, a 5,000-statement program is parsed as a 10,000-element list of st
 Right-recursive grammars can be useful for a list of items that you know will be short and that you want to make into a linked list of values:
 
 ```c
-thinglist: THING { $$ = $1; }
-         | THING thinglist { $1->next = $2; $$ = $1; }
+thinglist: 
+    | THING           { $$ = $1; }
+    | THING thinglist { $1->next = $2; $$ = $1; }
 ;
 ```
 

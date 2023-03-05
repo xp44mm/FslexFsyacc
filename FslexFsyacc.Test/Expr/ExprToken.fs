@@ -49,35 +49,35 @@ module ExprToken =
         | NUMBER n -> box n
         | _   -> null
 
-    let tokenize pos (inp:string) =
-        let rec loop i =
+    let tokenize offset (input:string) =
+        let rec loop pos rest =
             seq {
-                match inp.[pos+i..] with
+                match rest with // input.[offset+pos..]
                 | "" -> ()
 
                 | Rgx @"^\s+" m ->
-                    yield! loop (i + m.Length)
+                    yield! loop (pos + m.Length) rest.[m.Length..]
 
                 | Rgx @"^\d+(\.\d+)?" m ->
                     let tok =
                         {
-                            index = i
+                            index = pos
                             length = m.Length
                             value = NUMBER(Double.Parse(m.Value))
                         }
                     yield tok
-                    yield! loop tok.nextIndex
+                    yield! loop tok.nextIndex rest.[m.Length..]
 
                 | LongestPrefix (Map.keys ops) x ->
                     let tok =
                         {
-                            index = i
+                            index = pos
                             length = x.Length
                             value = ops.[x]
                         }
                     yield tok
-                    yield! loop tok.nextIndex
+                    yield! loop tok.nextIndex rest.[x.Length..]
 
                 | never -> failwith never
             }
-        loop pos
+        loop offset input

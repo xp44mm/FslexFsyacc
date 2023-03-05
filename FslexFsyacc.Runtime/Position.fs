@@ -1,5 +1,6 @@
 ﻿namespace FslexFsyacc.Runtime
 
+// band
 type Position<'value> =
     {
         index :int
@@ -26,15 +27,5 @@ type Position<'value> =
         let length = nextIndex - index
         length
 
-
-
-
-    ////source对应的索引是0
-    //member this.raw(source:string) =
-    //    source.Substring(this.index,this.length)
-
-    //member this.rest(index,source:string) =
-    //    source.Substring(this.nextIndex-index)
-        
-    //member this.rest(source:string) =
-    //    this.rest(0,source)
+    //this位于rest的开头
+    member this.follows(rest:string) = rest.[this.length..]

@@ -17,6 +17,7 @@ type Parser<'tok> (
     /// 将lookahead token压入状态栈中。
     member this.shift(states,token:'tok) =
         let ai = getTag token
+        //reduce* + shift
         let rec loop states =
             match tbl.tryNextAction(states,ai) with
             | Some i when isStateOfShift i ->
@@ -27,7 +28,7 @@ type Parser<'tok> (
                 let rulei = i
                 let states = reduce(tbl.rules,tbl.actions,states,rulei)
                 loop states
-            | Some i -> 
+            | Some i -> // 0 accept
                 failwith $"unexpected action:{i}."
             | None ->
                 failwith $"next state is dead state.{stringify token}"
@@ -40,15 +41,15 @@ type Parser<'tok> (
         let ai = getTag token
         let rec loop times states =
             match tbl.tryNextAction(states,ai) with
-            | None ->
-                failwith $"next state is dead state.{stringify token}"
             | Some i when isRuleOfReduce i ->
                 let pushedStates = reduce(tbl.rules,tbl.actions,states,i)
                 loop (times+1) pushedStates
-            | Some i ->
+            | Some _ -> //next action is shift
                 if times > 0 then
                     Some states
                 else None
+            | None ->
+                failwith $"dead state.{stringify token}"
         loop 0 states
 
     /// 对状态栈执行reduce，直到非reduce动作:shift,accept（不执行）
@@ -56,31 +57,41 @@ type Parser<'tok> (
     member this.tryReduce(states) =
         let rec loop times states =
             match tbl.tryNextAction(states,"") with
-            | None ->
-                failwith $"next state is dead state."
-            | Some i when isRuleOfReduce i ->
-                let pushedStates = reduce(tbl.rules,tbl.actions,states,i)
-                loop (times+1) pushedStates
             | Some 0 ->
                 if times > 0 then
                     Some states
                 else None
-            | Some i -> failwith $"unexpected action:{i}."
+            | Some i when isRuleOfReduce i ->
+                let pushedStates = reduce(tbl.rules,tbl.actions,states,i)
+                loop (times+1) pushedStates
+            | Some i -> failwith $"unexpected shift:{i}."
+            | None -> failwith $"next state is dead state."
 
         loop 0 states
+
+    // 获得接受状态
+    member this.accept(states) =
+        let rec loop states =
+            match tbl.tryNextAction(states,"") with
+            | Some 0 -> states
+            | Some i when isRuleOfReduce i ->
+                reduce(tbl.rules,tbl.actions,states,i)
+                |> loop
+            | Some i -> failwith $"unexpected shift:{i}."
+            | None -> failwith $"next state is dead state."
+
+        loop states
 
     /// 返回接受状态
     member this.isAccept(states) =
         match tbl.tryNextAction(states,"") with
-        | None ->
-            failwith $"next state is dead state."
         | Some 0 -> true
-        | Some _ -> false
+        | Some i when isRuleOfReduce i -> false
+        | Some i -> failwith $"unexpected shift:{i}."
+        | None -> failwith $"dead state."
 
     member this.parse(tokens:seq<'tok>) =
-        let iterator =
-            tokens.GetEnumerator()
-            |> Iterator
+        let iterator = Iterator tokens
 
         let rec loop (states:(int*obj)list) (maybeToken:'tok option) =
             let act() =

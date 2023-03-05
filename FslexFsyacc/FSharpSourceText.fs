@@ -13,7 +13,7 @@ let tryWS =
     |> trySearch
 
 let trySingleLineComment =
-    Regex @"^//.*"
+    Regex @"^//[^\r\n]*"
     |> trySearch
 
 let tryMultiLineComment =
@@ -134,31 +134,6 @@ let trySemantic(inp:string) =
         let hdr = inp.Substring(0,len)
         hdr//,capt.[len..]
     )
-
-/// 计算一个位置pos是第几列；以及pos下一行的开始位置。
-/// lpos，行开始位置，linp从lpos以后的剩余文本 = inp.[lpos..]，pos某个字符在总文本中的位置
-[<Obsolete("=FSharp.Idioms.Line.getColumnAndLpos")>]
-let getColumnAndLpos (lpos:int, linp:string) (pos:int) =
-    let rec loop li =
-        match linp.[li-lpos..] with
-        | "" -> 
-            failwith $"should length:{li} < pos:{pos}"
-        | Rgx @"^[^\n]*\n" m ->
-            let nextLpos = li + m.Length
-            if pos < nextLpos then
-                let col = pos - li
-                col, nextLpos
-            else
-                loop nextLpos
-        | linp ->
-            let nextLpos = li + linp.Length
-            if pos < nextLpos then
-                let col = pos - li
-                col,nextLpos
-            else
-                failwithf "eof:%d < pos:%d" nextLpos pos
-    //fst:pos对应的列数，snd:pos的下一行开始位置。
-    loop lpos
 
 // spaceCount是code前面填补的空格数
 // code 不带开括号，也不带闭括号

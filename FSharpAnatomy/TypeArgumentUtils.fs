@@ -67,19 +67,19 @@ let getLexeme (token:Position<FSharpToken>) =
     | ARRAY_TYPE_SUFFIX x -> box x
     | _ -> null
 
-let tokenize index (inp:string) =
-    let rec loop i =
+let tokenize offset (input:string) =
+    let rec loop pos rest =
         seq {
-            match inp.[index+i..] with
+            match rest with //input.[offset+pos..]
             | "" -> ()
 
             | Rgx @"^\s+" m ->
-                yield! loop (i+m.Length)
+                yield! loop (pos+m.Length) rest.[m.Length..]
 
             | On tryIdent x ->
                 let tok =
                     {
-                        index = i
+                        index = pos
                         length = x.Length
                         value =
                             if kws.ContainsKey x.Value
@@ -87,36 +87,36 @@ let tokenize index (inp:string) =
                             else IDENT x.Value
                     }
                 yield tok
-                yield! loop tok.nextIndex
+                yield! loop tok.nextIndex rest.[tok.length..]
 
             | On tryQTypar x ->
                 let tok = {
-                    index = i
+                    index = pos
                     length = x.Length
                     value = QTYPAR x.Value.[1..]
                 }
                 yield tok
-                yield! loop tok.nextIndex
+                yield! loop tok.nextIndex rest.[tok.length..]
 
             | On tryHTypar x ->
                 let tok = {
-                    index = i
+                    index = pos
                     length = x.Length
                     value = HTYPAR x.Value.[1..]
                 }
                 yield tok
-                yield! loop tok.nextIndex
+                yield! loop tok.nextIndex rest.[tok.length..]
 
             | LongestPrefix (Map.keys ops) x ->
                 let tok = {
-                    index = i
+                    index = pos
                     length = x.Length
                     value = ops.[x]
                 }
                 yield tok
-                yield! loop tok.nextIndex
+                yield! loop tok.nextIndex rest.[tok.length..]
             
-            | rest -> failwith $"unimpl tokenize case{stringify(i,rest)}"
+            | rest -> failwith $"unimpl tokenize case{stringify(pos,rest)}"
         }
 
-    loop index
+    loop offset input

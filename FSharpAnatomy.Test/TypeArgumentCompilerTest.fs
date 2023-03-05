@@ -40,9 +40,6 @@ type TypeArgumentCompilerTest(output:ITestOutputHelper) =
 
     static member keys = source.keys
 
-
-
-
     [<Theory;MemberData(nameof TypeArgumentCompilerTest.keys)>]
     member _.``01 - compile``(x) =
         let y = TypeArgumentCompiler.compile x

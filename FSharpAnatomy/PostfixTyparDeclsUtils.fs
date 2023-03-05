@@ -87,33 +87,33 @@ let getLexeme (token:Position<FSharpToken>) =
     | TYPE_ARGUMENT x -> box x
     | _ -> null
 
-let tokenize pos (inp:string) =
-    let rec loop index =
+let tokenize offset (input:string) =
+    let rec loop pos rest =
         seq {
-            match inp.[pos+index..] with
+            match rest with // input.[offset+pos..] 
             | "" -> ()
             | Rgx @"^\s+" m ->
-                yield! loop (index+m.Length)
+                yield! loop (pos+m.Length) rest.[m.Length..]
             | On tryQTypar x ->
                 let tok = {
-                    index = index
+                    index = pos
                     length = x.Length
                     value = QTYPAR x.Value.[1..]
                 }
                 yield tok
-                yield! loop tok.nextIndex
+                yield! loop tok.nextIndex rest.[tok.length..]
             | On tryHTypar x ->
                 let tok = {
-                    index = index
+                    index = pos
                     length = x.Length
                     value = HTYPAR x.Value.[1..]
                 }
                 yield tok
-                yield! loop tok.nextIndex
+                yield! loop tok.nextIndex rest.[tok.length..]
             | On tryIdent x ->
                 let tok =
                     {
-                        index = index
+                        index = pos
                         length = x.Length
                         value =
                             if kws.ContainsKey x.Value then
@@ -121,36 +121,36 @@ let tokenize pos (inp:string) =
                             else IDENT x.Value
                     }
                 yield tok
-                yield! loop tok.nextIndex
+                yield! loop tok.nextIndex rest.[tok.length..]
 
             | StartsWith "(*)" rest ->
                 let tok = {
-                    index = index
+                    index = pos
                     length = 3
                     value = OPERATOR_NAME "*"
                 }
                 yield tok
-                yield! loop tok.nextIndex
+                yield! loop tok.nextIndex rest.[tok.length..]
             | On tryOperatorName x ->
                 let op = x.Value.[1..x.Length-2].Trim()
                 let tok = {
-                    index = index
+                    index = pos
                     length = x.Length
                     value = OPERATOR_NAME op
                 }
                 yield tok
-                yield! loop tok.nextIndex
+                yield! loop tok.nextIndex rest.[tok.length..]
 
             | LongestPrefix (Map.keys ops) x ->
                 let tok = {
-                    index = index
+                    index = pos
                     length = x.Length
                     value = ops.[x]
                 }
                 yield tok
-                yield! loop tok.nextIndex
+                yield! loop tok.nextIndex rest.[tok.length..]
 
             | _ -> failwith "unimpl tokenize case"
         }
-    loop pos
+    loop offset input
 

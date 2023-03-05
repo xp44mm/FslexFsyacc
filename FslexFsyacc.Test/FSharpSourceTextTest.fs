@@ -7,15 +7,16 @@ open FSharp.Literals
 open Xunit
 open Xunit.Abstractions
 open FSharp.xUnit
-open FSharp.Literals
+open FSharp.Literals.Literal
 open FslexFsyacc.Runtime
 open FslexFsyacc
 open System.IO
+open System.Text.RegularExpressions
 
 type FSharpSourceTextTest(output:ITestOutputHelper) =
     let show res =
         res
-        |> Literal.stringify
+        |> stringify
         |> output.WriteLine
 
     [<Fact>]
@@ -42,7 +43,7 @@ type FSharpSourceTextTest(output:ITestOutputHelper) =
         let y = 
             FSharpSourceText.trySingleLineComment x
             |> Option.get
-        let e = "// xdfasdf\r"
+        let e = "// xdfasdf"
         Should.equal e y.Value 
 
     [<Theory>]
@@ -182,4 +183,16 @@ type FSharpSourceTextTest(output:ITestOutputHelper) =
             FSharpSourceText.formatNestedCode col code
         //show result
         Should.equal result "let a = 0\r\nlet b = 1"
+
+    [<Theory>]
+    [<InlineData("<id>xyz")>]
+    [<InlineData("<id> =")>]
+    member _.``cap or hole``(x:string) =
+        let pattern = Regex @"^<(\w+)>\s*(=)?"
+
+        let m = pattern.Match x
+        if m.Groups.[2].Success then
+            output.WriteLine($"'{x}' is cap")
+        else
+            output.WriteLine($"'{x}' is hole")
 

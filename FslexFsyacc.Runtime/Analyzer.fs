@@ -72,10 +72,7 @@ type Analyzer<'tok,'u>
 
     member _.analyze(inputs:seq<'tok>, getTag:'tok -> string) =
         let iterator =
-            let tagTokenPairs =
-                inputs
-                |> Seq.map(fun tok -> getTag tok,tok)
-            RetractableIterator(tagTokenPairs.GetEnumerator())
+            RetractableIterator(inputs |> Seq.map(fun tok -> getTag tok,tok))
 
         let rec forward state states =
             let nextStates = state::states

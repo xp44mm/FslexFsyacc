@@ -23,7 +23,7 @@ let parse (tokens:seq<Position<FSharpToken>>) =
 let compile (txt:string) =
     let mutable tokens = []
     let mutable states = [0,null]
-    //let mutable result = defaultValue<_>
+
     txt
     |> TypeArgumentUtils.tokenize 0
     |> ArrayTypeSuffixDFA.analyze
@@ -32,18 +32,18 @@ let compile (txt:string) =
         tok
     )
     |> Seq.iter(fun tok ->
-        match parser.tryReduce(states,tok) with
-        | Some x -> states <- x
-        | None -> ()
+        //match parser.tryReduce(states,tok) with
+        //| Some x -> states <- x
+        //| None -> ()
 
         states <- parser.shift(states,tok)
     )
-    match parser.tryReduce(states) with
-    | Some x -> states <- x
-    | None -> ()
+    //match parser.tryReduce(states) with
+    //| Some x -> states <- x
+    //| None -> ()
 
-    match states with
-    |[1,lxm; 0,null] ->
+    match parser.accept states with
+    | [1,lxm; 0,null] ->
         TypeArgumentParseTable.unboxRoot lxm
     | _ ->
         failwith $"{stringify states}"

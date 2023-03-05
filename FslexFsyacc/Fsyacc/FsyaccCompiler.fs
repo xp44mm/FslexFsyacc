@@ -29,19 +29,19 @@ let compile (txt:string) =
         tok
     )
     |> Seq.iter(fun lookahead ->
-        match parser.tryReduce(states,lookahead) with
-        | Some x -> states <- x
-        | None -> ()
+        //match parser.tryReduce(states,lookahead) with
+        //| Some x -> states <- x
+        //| None -> ()
 
         states <- parser.shift(states,lookahead)
     )
 
-    match parser.tryReduce(states) with
-    | Some x -> states <- x
-    | None -> ()
+    //match parser.tryReduce(states) with
+    //| Some x -> states <- x
+    //| None -> ()
 
-    match states with
-    |[1,lxm; 0,null] ->
+    match parser.accept states with
+    | [1,lxm; 0,null] ->
         FsyaccParseTable.unboxRoot lxm
     | _ ->
         failwith $"{stringify states}"
