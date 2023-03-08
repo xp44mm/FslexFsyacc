@@ -1,11 +1,12 @@
-﻿module FslexFsyacc.FSharpSourceText
+﻿module FslexFsyacc.VanillaFSharp.FSharpSourceText
 
 open System
+open System.Text.RegularExpressions
+
 open FSharp.Idioms
 open FSharp.Idioms.StringOps
 open FSharp.Idioms.RegularExpressions
 
-open System.Text.RegularExpressions
 open FSharp.Literals.Literal
 
 let tryWS =
@@ -46,6 +47,18 @@ let tryTripleQuoteString =
 
 let tryWord =
     Regex @"^\w+"
+    |> trySearch
+
+let tryIdent =
+    Regex @"^[_\p{L}\p{Nl}][\p{L}\p{Mn}\p{Mc}\p{Nl}\p{Nd}\p{Pc}\p{Cf}']*"
+    |> trySearch
+
+let tryQTypar =
+    Regex @"^'\w+(?!')"
+    |> trySearch
+
+let tryHTypar =
+    Regex @"^\^\w+"
     |> trySearch
 
 // 不终止循环的消费者 fsharpCodeCommonTries
@@ -151,3 +164,4 @@ let formatNestedCode (spaceCount:int) (code:string) =
     lines
     |> List.map(fun line -> line.[spaces..])
     |> String.concat Environment.NewLine
+

@@ -24,10 +24,6 @@ type ExprCompilerTest(output:ITestOutputHelper) =
     member _.``01 - output closures details``() =
         let theory = ExprParseTable.theoryParser
         let str = theory.collection()
-        //let name = "expr"
-        //let outputDir = Path.Combine(__SOURCE_DIRECTORY__, $"{name}.txt")
-        //File.WriteAllText(outputDir,str,Encoding.UTF8)
-        //output.WriteLine($"output:\r\n{outputDir}")
         output.WriteLine(str)
 
     [<Fact>]

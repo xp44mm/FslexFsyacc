@@ -57,7 +57,29 @@
 		<Compile Include="Yacc\ParseTable.fs" />
 		<Compile Include="Yacc\BNF.fs" />
 		
-		<Compile Include="FSharpSourceText.fs" />
+		<Compile Include="Brackets\Band.fs" />
+		
+		<None Include="Brackets\bounded.fsyacc" />
+		
+		<Compile Include="Brackets\BoundedParseTable.fs" />
+		
+		<Compile Include="VanillaFSharp\FSharpSourceText.fs" />
+		
+		<Compile Include="VanillaFSharp\TypeArgument.fs" />
+		
+		<Compile Include="VanillaFSharp\FSharpToken.fs" />
+		
+		<Compile Include="VanillaFSharp\TypeArgumentTokenUtils.fs" />
+		
+		<None Include="VanillaFSharp\typeArgument.fsyacc" />
+		
+		<Compile Include="VanillaFSharp\TypeArgumentParseTable.fs" />
+		
+		<Compile Include="VanillaFSharp\TypeArgumentCompiler.fs" />
+		
+		<Compile Include="VanillaFSharp\TypeArgumentAngleToken.fs" />
+		
+		<Compile Include="VanillaFSharp\TypeArgumentAngleCompiler.fs" />
 		
 		<Compile Include="Fslex\LexSemanticGenerator.fs" />
 		<Compile Include="Fslex\LexFileNormalization.fs" />
@@ -87,6 +109,7 @@
 		<Compile Include="Fsyacc\FsyaccFilePrecedences.fs" />
 		<Compile Include="Fsyacc\FlatFsyaccFile.fs" />
 		<Compile Include="Fsyacc\FlatFsyaccFileRule.fs" />
+		<Compile Include="Fsyacc\FsyaccToken2.fs" />
 		
 		<None Include="..\readme.md">
 		  <Pack>True</Pack>

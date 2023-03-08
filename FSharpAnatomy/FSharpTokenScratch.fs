@@ -17,7 +17,7 @@ let tryWord =
     |> trySearch
 
 let trySingleLineComment =
-    Regex @"^//.*"
+    Regex @"^//[^\r\n]*"
     |> trySearch
 
 let tryMultiLineComment =

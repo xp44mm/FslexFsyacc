@@ -1,16 +1,20 @@
-module FslexFsyacc.Program 
-open FslexFsyacc.Yacc
+module FslexFsyacc.Program
+open FslexFsyacc.VanillaFSharp
 
 open System
-open System.IO
-open System.Collections.Generic
+open System.Text.RegularExpressions
 
+open Xunit
+open Xunit.Abstractions
+
+open FSharp.xUnit
 open FSharp.Literals.Literal
-open FslexFsyacc.Runtime
-open FslexFsyacc
-open System.IO
-open FslexFsyacc.Fslex
+open FSharp.Idioms
 
 [<EntryPoint>]
 let main _ =
+    let b =
+        "<>"
+        |> TypeArgumentAngleCompiler.compile 0
+    Console.WriteLine(stringify b)
     0

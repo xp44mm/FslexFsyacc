@@ -1,6 +1,8 @@
 ﻿namespace FslexFsyacc.Fsyacc
 
+open FSharp.Idioms
 open FSharp.Idioms.ActivePatterns
+open FslexFsyacc.VanillaFSharp.FSharpSourceText
 
 type RegularSymbolToken =
     | ID of string
@@ -37,8 +39,6 @@ module RegularSymbolToken =
         | LITERAL x -> box x
         | _ -> null
 
-    open FSharp.Idioms
-    open FslexFsyacc.FSharpSourceText
 
     let tokenize (inp:string) =
         let rec loop (pos:int) =

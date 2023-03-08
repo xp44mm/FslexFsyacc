@@ -1,4 +1,4 @@
-﻿namespace FslexFsyacc.Fslex
+﻿namespace FslexFsyacc.Brackets
 
 open System
 open System.Text
@@ -12,30 +12,23 @@ open FSharp.Idioms
 open FSharp.Literals
 open FSharp.xUnit
 
+open FslexFsyacc
 open FslexFsyacc.Yacc
 open FslexFsyacc.Fsyacc
 open FslexFsyacc.Runtime
 
-type FslexParseTableTest(output: ITestOutputHelper) =
+type BoundedParseTableTest(output: ITestOutputHelper) =
     let show res =
         res |> Literal.stringify |> output.WriteLine
 
-    let solutionPath =
-        DirectoryInfo(
-            __SOURCE_DIRECTORY__
-        )
-            .Parent
-            .Parent
-            .FullName
-
-    let sourcePath = Path.Combine(solutionPath, @"FslexFsyacc\Fslex")
-    let filePath = Path.Combine(sourcePath, @"fslex.fsyacc")
+    let sourcePath = Path.Combine(Dir.solutionPath, @"FslexFsyacc\Brackets")
+    let filePath = Path.Combine(sourcePath, "bounded.fsyacc")
     let text = File.ReadAllText(filePath)
     let rawFsyacc = RawFsyaccFile.parse text
     let fsyacc = FlatFsyaccFile.fromRaw rawFsyacc
 
-    let parseTblName = "FslexParseTable"
-    let parseTblModule = $"FslexFsyacc.Fslex.{parseTblName}"
+    let parseTblName = "BoundedParseTable"
+    let parseTblModule = $"FslexFsyacc.Brackets.{parseTblName}"
     let parseTblPath = Path.Combine(sourcePath, $"{parseTblName}.fs")
 
     [<Fact>]
@@ -49,32 +42,15 @@ type FslexParseTableTest(output: ITestOutputHelper) =
 
     [<Fact>]
     member _.``02 - list all tokens``() =
-        let grammar = fsyacc.getMainProductions () |> Grammar.from
+        let grammar = 
+            fsyacc.getMainProductions () 
+            |> Grammar.from
 
-        let y = set [ 
-            "%%"
-            "&"
-            "("
-            ")"
-            "*"
-            "+"
-            "/"
-            "="
-            "?"
-            "CAP"
-            "HEADER"
-            "HOLE"
-            "ID"
-            "LITERAL"
-            "SEMANTIC"
-            "["
-            "]"
-            "|" 
-            ]
+        let e = set ["LEFT";"RIGHT";"TICK"]
 
-        let tokens = grammar.symbols - grammar.nonterminals
-        show tokens
-
+        let y = grammar.symbols - grammar.nonterminals
+        show y
+        Should.equal e y
     [<Fact>]
     member _.``03 - list all states``() =
         let collection =
@@ -98,12 +74,7 @@ type FslexParseTableTest(output: ITestOutputHelper) =
             ProductionUtils.precedenceOfProductions collection.grammar.terminals productions
 
         //优先级应该据此结果给出，不能少，也不应该多。
-        let y =
-            [ [ "expr"; "expr"; "&"; "expr" ], "&"
-              [ "expr"; "expr"; "*"         ], "*"
-              [ "expr"; "expr"; "+"         ], "+"
-              [ "expr"; "expr"; "?"         ], "?"
-              [ "expr"; "expr"; "|"; "expr" ], "|" ]
+        let y = []
 
         Should.equal y pprods
 
@@ -129,7 +100,7 @@ type FslexParseTableTest(output: ITestOutputHelper) =
 
         output.WriteLine(sourceCode)
 
-    [<Fact(Skip="once for all!")>] // 
+    [<Fact()>] // Skip="once for all!"
     member _.``06 - generate ParseTable``() =
         let parseTbl = fsyacc.toFsyaccParseTableFile ()
         let fsharpCode = parseTbl.generateModule(parseTblModule)
@@ -140,14 +111,14 @@ type FslexParseTableTest(output: ITestOutputHelper) =
     member _.``07 - valid ParseTable``() =
         let src = fsyacc.toFsyaccParseTableFile()
 
-        Should.equal src.actions FslexParseTable.actions
-        Should.equal src.closures FslexParseTable.closures
+        Should.equal src.actions BoundedParseTable.actions
+        Should.equal src.closures BoundedParseTable.closures
 
         let prodsFsyacc = 
             List.map fst src.rules
 
         let prodsParseTable = 
-            List.map fst FslexParseTable.rules
+            List.map fst BoundedParseTable.rules
 
         Should.equal prodsFsyacc prodsParseTable
 
@@ -164,16 +135,4 @@ type FslexParseTableTest(output: ITestOutputHelper) =
 
         Should.equal headerFromFsyacc header
         Should.equal semansFsyacc semans
-
-    [<Fact>]
-    member _.``08 - regex first or last token test``() =
-        let grammar = 
-            fsyacc.getMainProductions () 
-            |> Grammar.from
-
-        let lastsOfExpr = grammar.lasts.["expr"]
-        let firstsOfExpr = grammar.firsts.["expr"]
-
-        show lastsOfExpr
-        show firstsOfExpr
 

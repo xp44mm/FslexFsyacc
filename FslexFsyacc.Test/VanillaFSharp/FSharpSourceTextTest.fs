@@ -1,15 +1,16 @@
-﻿namespace FslexFsyacc
+﻿namespace FslexFsyacc.VanillaFSharp
+
+open FslexFsyacc
+open FslexFsyacc.Runtime
 
 open Xunit
 open Xunit.Abstractions
+
 open FSharp.xUnit
+open FSharp.Idioms
 open FSharp.Literals
-open Xunit
-open Xunit.Abstractions
-open FSharp.xUnit
 open FSharp.Literals.Literal
-open FslexFsyacc.Runtime
-open FslexFsyacc
+
 open System.IO
 open System.Text.RegularExpressions
 
@@ -196,3 +197,12 @@ type FSharpSourceTextTest(output:ITestOutputHelper) =
         else
             output.WriteLine($"'{x}' is hole")
 
+    [<Fact>]
+    member _.``Captures``() =
+        let re = Regex @"(,\s*)*"
+        let x = ",,"
+        let m = re.Match(x)
+        let y = m.Groups.[1].Captures.Count
+
+        //show result
+        Should.equal y 2

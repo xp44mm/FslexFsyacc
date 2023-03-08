@@ -1,0 +1,91 @@
+﻿%{
+%}
+typeArgument :
+    | funtype {TypeArgument.ofFun s0}
+    | flexibletype {Flexible s0}
+    | subtype {s0}
+funtype :
+    | tupletype "->" funtype {s0::s2}
+    | tupletype {[s0]}
+tupletype :
+    | apptype "*" tupletype {s0::s2}
+    | apptype {[s0]}
+apptype :
+    | atomtype suffixTypes {TypeArgument.ofApp(s0,s1)}
+atomtype :
+    | "_" {Anon}
+    | typar { TypeArgument.ofTypar s0 }
+    | namedtype {match s0 with a,b -> Ctor(a,b)}
+    | anonRecordType {s0}
+    | "(" typeArgument ")" {s1}
+    | struct "(" tupletype ")" {match TypeArgument.ofTuple s2 with Tuple(_,ls) -> Tuple(true,ls) |_->failwith""}
+    | struct anonRecordType {match s1 with AnonRecd(_,ls) -> AnonRecd(true,ls) |_->failwith""}
+namedtype :
+    | ctortype {s0,[]}
+    | ctortype "<" typeArguments ">" {s0,List.rev s2}
+ctortype :
+    | longIdent {List.rev s0}
+suffixType:
+    | ctortype {LongIdent s0}
+    | ARRAY_TYPE_SUFFIX {ArrayTypeSuffix s0}
+typeArguments :
+    | typeArgument "," typeArguments {s0::s2}
+    | typeArgument {[s0]}
+anonRecordType :
+    | "{|" recdFieldDeclList "|}" {AnonRecd(false,List.rev s1)}
+recdFieldDeclList :
+    | fieldDecl ";" recdFieldDeclList {s0::s2}
+    | fieldDecl ";"? {[s0]}
+fieldDecl :
+    | IDENT ":" typeArgument {(s0,s2)}
+suffixTypes :
+    | suffixType suffixTypes {s0::s1}
+    | (*empty*) {[]}
+flexibletype :
+    | "#" namedtype {match s1 with ctor,targs -> FlexibleCtor(ctor,targs)}
+    | "#" "(" apptype ")" {TypeArgument.toBaseOrInterfaceType s2}
+    | "#" "_" {FlexibleAnon}
+subtype :
+    | variabletype ":>" apptype { Subtype(s0,TypeArgument.toBaseOrInterfaceType s2) }
+variabletype :
+    | "_" {AnonTypar}
+    | typar {s0}
+typar :
+    | QTYPAR {NamedTypar(false,s0)}
+    | HTYPAR {NamedTypar(true,s0)}
+longIdent :
+    | IDENT "." longIdent {s0::s2}
+    | IDENT {[s0]}
+";"? :
+    | ";" {}
+    | (*empty*) {}
+
+%%
+
+// terminals: ref to the returned type of getLexeme
+ARRAY_TYPE_SUFFIX : int
+IDENT : string
+HTYPAR : string
+QTYPAR : string
+
+// nonterminals
+anonRecordType : TypeArgument
+apptype : TypeArgument
+atomtype : TypeArgument
+ctortype : "string list"
+fieldDecl : "string*TypeArgument"
+flexibletype : BaseOrInterfaceType
+funtype : "TypeArgument list list"
+longIdent : "string list"
+namedtype : "string list * TypeArgument list"
+recdFieldDeclList : "(string*TypeArgument)list"
+subtype : TypeArgument
+suffixType : SuffixType
+suffixTypes : "SuffixType list"
+tupletype : "TypeArgument list"
+typeArgument : TypeArgument
+typeArguments : "TypeArgument list"
+typar : Typar
+variabletype : Typar
+
+

@@ -19,12 +19,12 @@ type Position<'value> =
         this.index + this.length
 
     static member totalLength(ls:list<Position<'value>>) =
-        let index = ls.Head.index
-        let nextIndex =
+        let i0 = ls.Head.index
+        let i1 =
             ls
-            |> List.last
+            |> Seq.last
             |> (fun p -> p.nextIndex)
-        let length = nextIndex - index
+        let length = i1 - i0
         length
 
     //this位于rest的开头

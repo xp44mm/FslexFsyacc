@@ -29,6 +29,7 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
 
     // ** input **
     let parseTblName = "FsyaccParseTable"
+    let parseTblModule = $"FslexFsyacc.Fsyacc.{parseTblName}"
     let parseTblPath = Path.Combine(sourcePath, $"{parseTblName}.fs")
 
     [<Fact>]
@@ -104,7 +105,6 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
 
     [<Fact()>] // Skip="once for all!"
     member _.``06 - generate Fsyacc2ParseTable ParseTable``() =
-        let parseTblModule = $"FslexFsyacc.Fsyacc.{parseTblName}"
 
         //解析表数据
         let parseTbl = fsyacc.toFsyaccParseTableFile()

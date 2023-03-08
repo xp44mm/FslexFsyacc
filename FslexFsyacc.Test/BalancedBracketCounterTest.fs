@@ -15,7 +15,7 @@ type BalancedBracketCounterTest(output:ITestOutputHelper) =
         |> Literal.stringify
         |> output.WriteLine
 
-    static let sourceOfBrackets = [
+    static let sourceOfBrackets = TheoryDataSource [
         "{}",[(0,'{'),1;(1,'}'),-1]
         "((){})[]",[
             (0,'('),1;
@@ -27,11 +27,8 @@ type BalancedBracketCounterTest(output:ITestOutputHelper) =
             (6,'['),4;
             (7,']'),-4]
         ]
-    static let mapOfBrackets = Map.ofList sourceOfBrackets
 
-    static member keysOfBrackets = 
-        sourceOfBrackets
-        |> Seq.map (fst>>Array.singleton)
+    static member keysOfBrackets = sourceOfBrackets.keys
 
     [<Theory>]
     [<MemberData(nameof BalancedBracketCounterTest.keysOfBrackets)>]
@@ -47,7 +44,7 @@ type BalancedBracketCounterTest(output:ITestOutputHelper) =
         )
 
         let y = counter.getBrackets()
-        let e = mapOfBrackets.[x]
+        let e = sourceOfBrackets.[x]
         Should.equal y e
 
     [<Theory>]

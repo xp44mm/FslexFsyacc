@@ -31,7 +31,11 @@
 		<Compile Include="Yacc\Section4_8_1Test.fs" />
 		<Compile Include="Yacc\Section4_8_2Test.fs" />
 		
-		<Compile Include="FSharpSourceTextTest.fs" />
+		<Compile Include="Brackets\BoundedParseTableTest.fs" />
+		
+		<Compile Include="VanillaFSharp\FSharpSourceTextTest.fs" />
+		
+		<Compile Include="VanillaFSharp\TypeArgumentAngleCompilerTest.fs" />
 		
 		<Compile Include="Fslex\FslexTokenUtilsTest.fs" />
     
@@ -46,6 +50,7 @@
 		<Compile Include="Fsyacc\FsyaccFileShakingTest.fs" />
 		<Compile Include="Fsyacc\FsyaccFileNameTest.fs" />
 		<Compile Include="Fsyacc\FsyaccFileRulesTest.fs" />
+		<Compile Include="Fsyacc\FsyaccToken2Test.fs" />
     
 		<None Include="FSharpGrammar\fsyacc\pars.fsyacc" />
 		<Compile Include="FSharpGrammar\ParsParseTableTest.fs" />

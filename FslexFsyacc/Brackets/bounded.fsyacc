@@ -1,0 +1,24 @@
+﻿%{
+
+%}
+
+bounded:
+    | LEFT bands RIGHT {Bounded(s0,List.rev s1,s2)}
+
+bands:
+    | bands band {s1::s0}
+    | (* empty *) {[]}
+
+band:
+    | TICK {Tick s0}
+    | bounded {s0}
+
+%%
+LEFT:int
+RIGHT:int
+TICK: string
+bounded: Band
+band: Band
+bands: "Band list"
+
+

@@ -7,7 +7,7 @@ open FSharp.Idioms.ActivePatterns
 open FSharp.Literals.Literal
 
 open System.Text.RegularExpressions
-open FslexFsyacc.FSharpSourceText
+open FslexFsyacc.VanillaFSharp.FSharpSourceText
 open FslexFsyacc.Runtime
 open System
 

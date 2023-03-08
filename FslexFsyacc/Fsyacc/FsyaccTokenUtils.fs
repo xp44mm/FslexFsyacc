@@ -1,6 +1,6 @@
 ﻿module FslexFsyacc.Fsyacc.FsyaccTokenUtils
 
-open FslexFsyacc.FSharpSourceText
+open FslexFsyacc.VanillaFSharp.FSharpSourceText
 open FslexFsyacc.Runtime
 
 open FSharp.Idioms
