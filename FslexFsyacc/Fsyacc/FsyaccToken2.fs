@@ -176,7 +176,7 @@ module FsyaccToken2 =
                             {
                                 index = pos
                                 length = j-i+1
-                                value = TYPE_ARGUMENT rest.[..j-offset]
+                                value = TYPE_ARGUMENT (rest.[1..j-i-1].Trim())
                                 }
                         | never -> failwith $"{never}"
 

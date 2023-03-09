@@ -15,20 +15,20 @@ open System.Text.RegularExpressions
 open FSharp.xUnit
 open FSharp.Literals
 
-type FsyaccParseTableTest(output:ITestOutputHelper) =
+type Fsyacc2ParseTableTest(output:ITestOutputHelper) =
     let show res =
         res
         |> Literal.stringify
         |> output.WriteLine
 
     let sourcePath = Path.Combine(solutionPath, @"FslexFsyacc\Fsyacc")
-    let filePath = Path.Combine(sourcePath, @"fsyacc.fsyacc")
+    let filePath = Path.Combine(sourcePath, @"fsyacc2.fsyacc")
     let text = File.ReadAllText(filePath)
     let rawFsyacc = RawFsyaccFile.parse text
     let fsyacc = FlatFsyaccFile.fromRaw rawFsyacc
 
     // ** input **
-    let parseTblName = "FsyaccParseTable"
+    let parseTblName = "Fsyacc2ParseTable"
     let parseTblModule = $"FslexFsyacc.Fsyacc.{parseTblName}"
     let parseTblPath = Path.Combine(sourcePath, $"{parseTblName}.fs")
 
@@ -103,9 +103,8 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
         output.WriteLine(sourceCode)
 
 
-    [<Fact(Skip="once for all!")>] // 
+    [<Fact()>] // Skip="once for all!"
     member _.``06 - generate Fsyacc2ParseTable ParseTable``() =
-
         //解析表数据
         let parseTbl = fsyacc.toFsyaccParseTableFile()
         let fsharpCode = parseTbl.generateModule(parseTblModule)
@@ -117,14 +116,14 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
     member _.``10 - valid ParseTable``() =
         let src = fsyacc.toFsyaccParseTableFile()
 
-        Should.equal src.actions FsyaccParseTable.actions
-        Should.equal src.closures FsyaccParseTable.closures
+        Should.equal src.actions Fsyacc2ParseTable.actions
+        Should.equal src.closures Fsyacc2ParseTable.closures
 
         let prodsFsyacc =
             List.map fst src.rules
 
         let prodsParseTable =
-            List.map fst FsyaccParseTable.rules
+            List.map fst Fsyacc2ParseTable.rules
         Should.equal prodsFsyacc prodsParseTable
 
         let headerFromFsyacc =

@@ -65,12 +65,12 @@ let renderRule (lhs:string,rhs:(string list*string*string)list) =
     ]
     |> String.concat "\r\n"
 
-let renderPrecedence (assoc:string, symbols:string list) =
+let renderPrecedenceLine (assoc:string, symbols:string list) =
     let symbols =
         symbols
         |> List.map renderSymbol
         |> String.concat " "
-    "%" + $"{assoc} {symbols}"
+    $"%%{assoc} {symbols}"
 
 let renderDec (symbol:string, typeD:string) =
     [
@@ -79,6 +79,13 @@ let renderDec (symbol:string, typeD:string) =
     ]
     |> List.map renderSymbol
     |> String.concat " : "
+
+let renderTypeLine (typeArg:string, symbols:string list) =
+    let symbols =
+        symbols
+        |> List.map renderSymbol
+        |> String.concat " "
+    $"%%type<{typeArg}> {symbols}"
 
 let renderFsyacc
     (header:string                                       )
@@ -94,7 +101,7 @@ let renderFsyacc
 
     let p() =
         precedences
-        |> List.map renderPrecedence
+        |> List.map renderPrecedenceLine
         |> String.concat "\r\n"
 
     let d() =

@@ -1,4 +1,4 @@
-﻿namespace Expr
+﻿namespace FslexFsyacc.Expr
 
 open Xunit
 open Xunit.Abstractions
@@ -14,36 +14,31 @@ open FslexFsyacc.Runtime
 open Expr
 
 type ExprCompilerTest(output:ITestOutputHelper) =
-    let show res =
-        res
-        |> stringify
-        |> output.WriteLine
-
 
     [<Fact>]
     member _.``01 - output closures details``() =
-        let theory = ExprParseTable.theoryParser
+        let theory = Expr2ParseTable.theoryParser
         let str = theory.collection()
         output.WriteLine(str)
 
     [<Fact>]
     member _.``02 - basis test``() =
         let inp = "2 + 3"
-        let y = ExprCompiler.compile inp
+        let y = Expr2Compiler.compile inp
         //show result
         Should.equal y 5.0
 
     [<Fact>]
     member _.``03 - prec test``() =
         let inp = "2 + 3 * 5"
-        let y = ExprCompiler.compile inp
+        let y = Expr2Compiler.compile inp
         //show result
         Should.equal y 17.0
 
     [<Fact>]
     member _.``04 - named prod test``() =
         let inp = "2 + 3 * -5"
-        let y = ExprCompiler.compile inp
+        let y = Expr2Compiler.compile inp
         //show result
         Should.equal y (-13.0)
 
@@ -51,8 +46,8 @@ type ExprCompilerTest(output:ITestOutputHelper) =
     member _.``05 - exception test``() =
         let y = Assert.Throws<_>(fun()->
             let inp = "2* + 4*3"
-            let y = ExprCompiler.compile inp
-            show y
+            let y = Expr2Compiler.compile inp
+            output.WriteLine(stringify y)
         )
 
         output.WriteLine(y.Message)
@@ -60,7 +55,7 @@ type ExprCompilerTest(output:ITestOutputHelper) =
     [<Fact>]
     member _.``11 - state symbol pair test``() =
         let symbols = 
-            ExprParseTable.theoryParser.getStateSymbolPairs()
+            Expr2ParseTable.theoryParser.getStateSymbolPairs()
             |> List.mapi Pair.ofApp
 
         //output.WriteLine(stringify symbols)
@@ -82,6 +77,7 @@ type ExprCompilerTest(output:ITestOutputHelper) =
             14,"-";
             15,"/"]
         Should.equal mp symbols
+
 
 
 

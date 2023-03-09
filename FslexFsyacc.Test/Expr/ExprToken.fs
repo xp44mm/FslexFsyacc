@@ -1,4 +1,4 @@
-﻿namespace Expr
+﻿namespace FslexFsyacc.Expr
 
 open FSharp.Idioms
 open FSharp.Idioms.StringOps
@@ -52,7 +52,7 @@ module ExprToken =
     let tokenize offset (input:string) =
         let rec loop pos rest =
             seq {
-                match rest with // input.[offset+pos..]
+                match rest with
                 | "" -> ()
 
                 | Rgx @"^\s+" m ->

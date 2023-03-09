@@ -1,0 +1,137 @@
+﻿%{
+%}
+file :
+    | HEADER rule+ "%%"? {
+        {
+            header= s0;
+            rules= List.rev s1;
+            precedences= [];
+            declarations= []
+        }
+    }
+    | HEADER rule+ "%%" precedence+ "%%"? {
+        {
+            header= s0;
+            rules= List.rev s1;
+            precedences= List.rev s3;
+            declarations= []
+        }
+    }
+    | HEADER rule+ "%%" declaration+ "%%"? {
+        {
+            header= s0;
+            rules= List.rev s1;
+            precedences= [];
+            declarations= List.rev s3
+        }
+    }
+    | HEADER rule+ "%%" precedence+ "%%" declaration+ "%%"? {
+        {
+            header= s0;
+            rules= List.rev s1;
+            precedences= List.rev s3;
+            declarations= List.rev s5
+        }
+    }
+rule+ :
+    | rule {[s0]}
+    | rule+ rule {s1::s0}
+rule :
+    | symbol ":" "|"? body+ {RegularSymbol.innerSymbol s0,List.rev s3}
+symbol :
+    | atomic {Atomic s0}
+    | repetition {
+        match s0 with (f,q) ->
+        Repetition(f,q)
+    }
+    | brackets {Oneof s0}
+    | parens {Chain s0}
+atomic :
+    | ID {s0}
+    | LITERAL {s0}
+repetition :
+    | symbol quantifier {s0,s1}
+quantifier :
+    | "?" {"?"}
+    | "+" {"+"}
+    | "*" {"*"}
+brackets :
+    | "[" symbol+ "]" {List.rev s1}
+symbol+ :
+    | symbol {[s0]}
+    | symbol+ symbol {s1::s0}
+parens :
+    | "(" symbol+ ")" {List.rev s1}
+"|"? :
+    | (*empty*) {}
+    | "|" {}
+body+ :
+    | body {[s0]}
+    | body+ "|" body {s2::s0}
+body :
+    | symbol* precToken? SEMANTIC {
+        let s0 = s0 |> List.map RegularSymbol.innerSymbol |> List.rev
+        s0,s1,s2
+    }
+symbol* :
+    | (*empty*) {[]}
+    | symbol+ {s0}
+precToken? :
+    | (*empty*) {""}
+    | "%prec" ID {s1}
+"%%"? :
+    | (*empty*) {}
+    | "%%" {}
+precedence+ :
+    | precedence {[s0]}
+    | precedence+ precedence {s1::s0}
+precedence :
+    | assoc symbol+ {
+        let s1 = s1 |> List.map RegularSymbol.innerSymbol |> List.rev
+        s0,s1
+    }
+assoc :
+    | "%left" {"left"}
+    | "%right" {"right"}
+    | "%nonassoc" {"nonassoc"}
+declaration+ :
+    | declaration {[s0]}
+    | declaration+ declaration {s1::s0}
+declaration :
+    | "%type" TYPE_ARGUMENT symbol+ {
+        let symbols = s2 |> List.map RegularSymbol.innerSymbol |> List.rev
+        s1,symbols
+    }
+
+%%
+
+HEADER : string
+ID : string
+LITERAL : string
+SEMANTIC : string
+TYPE_ARGUMENT: string
+assoc : string
+body+ : "(string list*string*string)list"
+body : "string list*string*string"
+
+file : RawFsyaccFile2
+
+rule : "string*((string list*string*string)list)"
+rule+ : "(string*((string list*string*string)list))list"
+
+precedence : "string*string list"
+precedence+ : "(string*string list)list"
+
+declaration : "string*string list"
+declaration+ : "(string*string list)list"
+
+precToken? : string
+atomic : string
+quantifier : string
+symbol : RegularSymbol
+symbol+ : "RegularSymbol list"
+symbol* : "RegularSymbol list"
+brackets : "RegularSymbol list"
+parens : "RegularSymbol list"
+repetition : "RegularSymbol*string"
+

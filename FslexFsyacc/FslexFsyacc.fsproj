@@ -110,6 +110,11 @@
 		<Compile Include="Fsyacc\FlatFsyaccFile.fs" />
 		<Compile Include="Fsyacc\FlatFsyaccFileRule.fs" />
 		<Compile Include="Fsyacc\FsyaccToken2.fs" />
+		<Compile Include="Fsyacc\RawFsyaccFile2.fs" />
+		<None Include="fsyacc\fsyacc2.fsyacc" />
+		<Compile Include="Fsyacc\Fsyacc2ParseTable.fs" />
+		<Compile Include="Fsyacc\Fsyacc2Compiler.fs" />
+		<Compile Include="Fsyacc\RawFsyaccFile2Utils.fs" />
 		
 		<None Include="..\readme.md">
 		  <Pack>True</Pack>
