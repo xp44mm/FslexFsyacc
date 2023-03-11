@@ -50,8 +50,18 @@ let compile (offset) (input:string) =
         //Console.WriteLine(stringify states)
         states <- parser.shift(states,tok)
     )
-
     match parser.accept states with
     | [1,lxm; 0,null] -> BoundedParseTable.unboxRoot lxm
     | _ -> failwith $"{stringify states}"
 
+    
+let getRange (offset) (input:string) =
+    match compile offset input with
+    | FslexFsyacc.Brackets.Band.Bounded(i,_,j) ->
+        Diagnostics.Debug.Assert((i=offset))
+        {
+            index = i
+            length = j-i+1
+            value = input.[1..j-i-1].Trim()
+        }
+    | never -> failwith $"{never}"

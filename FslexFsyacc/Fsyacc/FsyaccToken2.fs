@@ -171,14 +171,12 @@ module FsyaccToken2 =
                     yield! loop (lpos,lrest) (pos+len,rest.[len..])
                 | First '<' _ ->
                     let postok = 
-                        match FslexFsyacc.VanillaFSharp.TypeArgumentAngleCompiler.compile pos rest with
-                        | FslexFsyacc.Brackets.Band.Bounded(i,_,j) ->
-                            {
-                                index = pos
-                                length = j-i+1
-                                value = TYPE_ARGUMENT (rest.[1..j-i-1].Trim())
-                                }
-                        | never -> failwith $"{never}"
+                        let rg = FslexFsyacc.VanillaFSharp.TypeArgumentAngleCompiler.getRange pos rest 
+                        {
+                            index = rg.index
+                            length = rg.length
+                            value = TYPE_ARGUMENT rg.value
+                        }
 
                     yield postok
                     yield! loop (lpos,lrest) (postok.nextIndex, rest.[postok.length..])
