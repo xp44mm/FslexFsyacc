@@ -9,7 +9,7 @@ open Xunit
 open Xunit.Abstractions
 
 open FSharp.Idioms
-open FSharp.Literals
+open FSharp.Literals.Literal
 open FSharp.xUnit
 
 open FslexFsyacc.Yacc
@@ -18,7 +18,7 @@ open FslexFsyacc.Runtime
 
 type FslexParseTableTest(output: ITestOutputHelper) =
     let show res =
-        res |> Literal.stringify |> output.WriteLine
+        res |> stringify |> output.WriteLine
 
     let solutionPath =
         DirectoryInfo(
@@ -31,25 +31,48 @@ type FslexParseTableTest(output: ITestOutputHelper) =
     let sourcePath = Path.Combine(solutionPath, @"FslexFsyacc\Fslex")
     let filePath = Path.Combine(sourcePath, @"fslex.fsyacc")
     let text = File.ReadAllText(filePath)
-    let rawFsyacc = RawFsyaccFile.parse text
-    let fsyacc = FlatFsyaccFile.fromRaw rawFsyacc
+    //let rawFsyacc = RawFsyaccFile.parse text
+    //let fsyacc = FlatFsyaccFile.fromRaw rawFsyacc
 
     let parseTblName = "FslexParseTable"
     let parseTblModule = $"FslexFsyacc.Fslex.{parseTblName}"
     let parseTblPath = Path.Combine(sourcePath, $"{parseTblName}.fs")
 
+    let grammar text =
+        text
+        |> FlatFsyaccFileUtils.parse
+        |> FlatFsyaccFileUtils.toGrammar
+
+    let ambiguousCollection text =
+        text
+        |> FlatFsyaccFileUtils.parse
+        |> FlatFsyaccFileUtils.toAmbiguousCollection
+
+    let parseTbl text = 
+        text
+        |> FlatFsyaccFileUtils.parse
+        |> FlatFsyaccFileUtils.toFsyaccParseTableFile
+
     [<Fact>]
     member _.``01 - norm fsyacc file``() =
+        let fsyacc = 
+            text
+            |> FlatFsyaccFileUtils.parse
+
         let startSymbol = 
             fsyacc.rules
             |> FlatFsyaccFileRule.getStartSymbol
-        let fsyacc = fsyacc.start(startSymbol, Set.empty)
-        let txt = fsyacc.toRaw().render()
+
+        let txt = 
+            fsyacc.start(startSymbol, Set.empty)
+            |> RawFsyaccFile2Utils.fromFlat
+            |> RawFsyaccFile2Utils.render
+
         output.WriteLine(txt)
 
     [<Fact>]
     member _.``02 - list all tokens``() =
-        let grammar = fsyacc.getMainProductions () |> Grammar.from
+        let grammar = grammar text
 
         let y = set [ 
             "%%"
@@ -77,18 +100,14 @@ type FslexParseTableTest(output: ITestOutputHelper) =
 
     [<Fact>]
     member _.``03 - list all states``() =
-        let collection =
-            fsyacc.getMainProductions()
-            |> AmbiguousCollection.create
+        let collection = ambiguousCollection text
         
         let text = collection.render()
         output.WriteLine(text)
 
     [<Fact>]
     member _.``04 - 汇总冲突的产生式``() =
-        let collection =
-            fsyacc.getMainProductions ()
-            |> AmbiguousCollection.create
+        let collection = ambiguousCollection text
 
         let productions = 
             collection.collectConflictedProductions()
@@ -109,36 +128,43 @@ type FslexParseTableTest(output: ITestOutputHelper) =
 
     [<Fact>]
     member _.``05 - list the type annotaitions``() =
-        let grammar =
-            fsyacc.getMainProductions()
-            |> Grammar.from
+        let grammar = grammar text
 
-        let sourceCode =
+        let terminals =
+            grammar.terminals
+            |> Seq.map RenderUtils.renderSymbol
+            |> String.concat " "
+
+        let nonterminals =
+            grammar.nonterminals
+            |> Seq.map RenderUtils.renderSymbol
+            |> String.concat " "
+
+        let src =
             [
                 "// Do not list symbols whose return value is always `null`"
-                "// terminals: ref to the returned type of getLexeme"
-                for i in grammar.terminals do
-                    let i = RenderUtils.renderSymbol i
-                    i + " : \"\""
-                "\r\n// nonterminals"
-                for i in grammar.nonterminals do
-                    let i = RenderUtils.renderSymbol i
-                    i + " : \"\""
+                ""
+                "// terminals: ref to the returned type of `getLexeme`"
+                "%type<> " + terminals
+                ""
+                "// nonterminals"
+                "%type<> " + nonterminals
             ] 
             |> String.concat "\r\n"
 
-        output.WriteLine(sourceCode)
+        output.WriteLine(src)
 
-    [<Fact(Skip="once for all!")>] // 
+    [<Fact()>] // Skip="once for all!"
     member _.``06 - generate ParseTable``() =
-        let parseTbl = fsyacc.toFsyaccParseTableFile ()
+        let parseTbl = parseTbl text
+
         let fsharpCode = parseTbl.generateModule(parseTblModule)
         File.WriteAllText(parseTblPath, fsharpCode, Encoding.UTF8)
         output.WriteLine("output yacc:" + parseTblPath)
 
     [<Fact>]
     member _.``07 - valid ParseTable``() =
-        let src = fsyacc.toFsyaccParseTableFile()
+        let src = parseTbl text
 
         Should.equal src.actions FslexParseTable.actions
         Should.equal src.closures FslexParseTable.closures
@@ -167,9 +193,7 @@ type FslexParseTableTest(output: ITestOutputHelper) =
 
     [<Fact>]
     member _.``08 - regex first or last token test``() =
-        let grammar = 
-            fsyacc.getMainProductions () 
-            |> Grammar.from
+        let grammar = grammar text
 
         let lastsOfExpr = grammar.lasts.["expr"]
         let firstsOfExpr = grammar.firsts.["expr"]

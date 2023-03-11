@@ -24,47 +24,63 @@ type BoundedParseTableTest(output: ITestOutputHelper) =
     let sourcePath = Path.Combine(Dir.solutionPath, @"FslexFsyacc\Brackets")
     let filePath = Path.Combine(sourcePath, "bounded.fsyacc")
     let text = File.ReadAllText(filePath)
-    let rawFsyacc = RawFsyaccFile.parse text
-    let fsyacc = FlatFsyaccFile.fromRaw rawFsyacc
+    //let rawFsyacc = RawFsyaccFile.parse text
+    //let fsyacc = FlatFsyaccFile.fromRaw rawFsyacc
 
     let parseTblName = "BoundedParseTable"
     let parseTblModule = $"FslexFsyacc.Brackets.{parseTblName}"
     let parseTblPath = Path.Combine(sourcePath, $"{parseTblName}.fs")
 
+    let grammar text =
+        text
+        |> FlatFsyaccFileUtils.parse
+        |> FlatFsyaccFileUtils.toGrammar
+
+    let ambiguousCollection text =
+        text
+        |> FlatFsyaccFileUtils.parse
+        |> FlatFsyaccFileUtils.toAmbiguousCollection
+
+    let parseTbl text = 
+        text
+        |> FlatFsyaccFileUtils.parse
+        |> FlatFsyaccFileUtils.toFsyaccParseTableFile
+
     [<Fact>]
     member _.``01 - norm fsyacc file``() =
-        let startSymbol = 
+        let fsyacc = 
+            text
+            |> FlatFsyaccFileUtils.parse
+
+        let s0 = 
             fsyacc.rules
             |> FlatFsyaccFileRule.getStartSymbol
-        let fsyacc = fsyacc.start(startSymbol, Set.empty)
-        let txt = fsyacc.toRaw().render()
-        output.WriteLine(txt)
+
+        let src = 
+            fsyacc.start(s0, Set.empty)
+            |> RawFsyaccFile2Utils.fromFlat
+            |> RawFsyaccFile2Utils.render
+
+        output.WriteLine(src)
 
     [<Fact>]
     member _.``02 - list all tokens``() =
-        let grammar = 
-            fsyacc.getMainProductions () 
-            |> Grammar.from
-
+        let grammar = grammar text
         let e = set ["LEFT";"RIGHT";"TICK"]
 
         let y = grammar.symbols - grammar.nonterminals
         show y
         Should.equal e y
+
     [<Fact>]
     member _.``03 - list all states``() =
-        let collection =
-            fsyacc.getMainProductions()
-            |> AmbiguousCollection.create
-        
-        let text = collection.render()
-        output.WriteLine(text)
+        let collection = ambiguousCollection text
+        let src = collection.render()
+        output.WriteLine(src)
 
     [<Fact>]
     member _.``04 - 汇总冲突的产生式``() =
-        let collection =
-            fsyacc.getMainProductions ()
-            |> AmbiguousCollection.create
+        let collection = ambiguousCollection text
 
         let productions = 
             collection.collectConflictedProductions()
@@ -79,43 +95,50 @@ type BoundedParseTableTest(output: ITestOutputHelper) =
         Should.equal y pprods
 
     [<Fact>]
-    member _.``05 - list the type annotaitions``() =
-        let grammar =
-            fsyacc.getMainProductions()
-            |> Grammar.from
+    member _.``05 - list declarations``() =
+        let grammar = grammar text
 
-        let sourceCode =
+        let terminals =
+            grammar.terminals
+            |> Seq.map RenderUtils.renderSymbol
+            |> String.concat " "
+
+        let nonterminals =
+            grammar.nonterminals
+            |> Seq.map RenderUtils.renderSymbol
+            |> String.concat " "
+
+        let src =
             [
                 "// Do not list symbols whose return value is always `null`"
-                "// terminals: ref to the returned type of getLexeme"
-                for i in grammar.terminals do
-                    let i = RenderUtils.renderSymbol i
-                    i + " : \"\""
-                "\r\n// nonterminals"
-                for i in grammar.nonterminals do
-                    let i = RenderUtils.renderSymbol i
-                    i + " : \"\""
+                ""
+                "// terminals: ref to the returned type of `getLexeme`"
+                "%type<> " + terminals
+                ""
+                "// nonterminals"
+                "%type<> " + nonterminals
             ] 
             |> String.concat "\r\n"
 
-        output.WriteLine(sourceCode)
+        output.WriteLine(src)
 
-    [<Fact()>] // Skip="once for all!"
+    [<Fact(Skip="once for all!")>] // 
     member _.``06 - generate ParseTable``() =
-        let parseTbl = fsyacc.toFsyaccParseTableFile ()
+        let parseTbl = parseTbl text
+
         let fsharpCode = parseTbl.generateModule(parseTblModule)
         File.WriteAllText(parseTblPath, fsharpCode, Encoding.UTF8)
         output.WriteLine("output yacc:" + parseTblPath)
 
     [<Fact>]
     member _.``07 - valid ParseTable``() =
-        let src = fsyacc.toFsyaccParseTableFile()
+        let parseTbl = parseTbl text
 
-        Should.equal src.actions BoundedParseTable.actions
-        Should.equal src.closures BoundedParseTable.closures
+        Should.equal parseTbl.actions BoundedParseTable.actions
+        Should.equal parseTbl.closures BoundedParseTable.closures
 
         let prodsFsyacc = 
-            List.map fst src.rules
+            List.map fst parseTbl.rules
 
         let prodsParseTable = 
             List.map fst BoundedParseTable.rules
@@ -123,10 +146,10 @@ type BoundedParseTableTest(output: ITestOutputHelper) =
         Should.equal prodsFsyacc prodsParseTable
 
         let headerFromFsyacc =
-            FSharp.Compiler.SyntaxTreeX.Parser.getDecls("header.fsx",src.header)
+            FSharp.Compiler.SyntaxTreeX.Parser.getDecls("header.fsx",parseTbl.header)
 
         let semansFsyacc =
-            let mappers = src.generateMappers()
+            let mappers = parseTbl.generateMappers()
             FSharp.Compiler.SyntaxTreeX.SourceCodeParser.semansFromMappers mappers
 
         let header,semans =

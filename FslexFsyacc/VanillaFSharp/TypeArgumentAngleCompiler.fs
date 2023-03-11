@@ -41,13 +41,13 @@ let compile (offset) (input:string) =
     //    tokens <- tok::tokens
     //    tok
     //)
-    //|> Seq.filter(fun tok ->
-    //    match tok.value with
-    //    | WHITESPACE _ | COMMENT _ -> false
-    //    | _ -> true
-    //)
+    |> Seq.filter(fun tok ->
+        match tok.value with
+        | WHITESPACE _ | COMMENT _ -> false
+        | _ -> true
+    )
     |> Seq.iter(fun tok ->
-        Console.WriteLine(stringify states)
+        //Console.WriteLine(stringify states)
         states <- parser.shift(states,tok)
     )
 

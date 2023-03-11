@@ -1,11 +1,10 @@
-﻿module FslexFsyacc.Fsyacc.FsyaccFileRules
+﻿module FslexFsyacc.Fsyacc.FsyaccFileRules // FlatRules
 
 open FSharp.Idioms
+open System
 
 /// 对相同lhs的rule合并，仅此
-let flatToRawRules
-    (rules:list<string list*string*string>)
-    =
+let flatToRawRules (rules:list<string list*string*string>) =
     rules
     |> List.groupBy(fun(prod,_,_)->prod.Head) //lhs
     |> List.map(fun(lhs,groups)->
@@ -96,9 +95,13 @@ let duplicateRule
     |> List.map(fun(rule,group)->rule,group.Length)
     |> List.filter(fun(r,c)->c>1)
 
-let getProductions (rules:list<string list*string*string>) =
-    rules
-    |> List.map Triple.first
+let getMainProductions (rules:list<string list*string*string>) =
+    rules |> List.map Triple.first
+
+//[<Obsolete("getMainProductions")>]
+//let getProductions (rules:list<string list*string*string>) =
+//    rules
+//    |> List.map Triple.first
 
 let getProductionNames(rules:list<string list*string*string>) =
     rules

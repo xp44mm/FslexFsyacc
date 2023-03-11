@@ -105,33 +105,40 @@ declaration :
 
 %%
 
-HEADER : string
-ID : string
-LITERAL : string
-SEMANTIC : string
-TYPE_ARGUMENT: string
-assoc : string
-body+ : "(string list*string*string)list"
-body : "string list*string*string"
+%type<string> HEADER ID LITERAL SEMANTIC TYPE_ARGUMENT assoc precToken? atomic quantifier
+%type<(string list*string*string)list> body+
+%type<string list*string*string> body
+%type<RawFsyaccFile2> file
+%type<string*((string list*string*string)list)> rule
+%type<(string*((string list*string*string)list))list> rule+
+%type<string*string list> precedence declaration
+%type<(string*string list)list> precedence+ declaration+
+%type<RegularSymbol> symbol
+%type<RegularSymbol list> symbol+ symbol* brackets parens
+%type<RegularSymbol*string> repetition
 
-file : RawFsyaccFile2
-
-rule : "string*((string list*string*string)list)"
-rule+ : "(string*((string list*string*string)list))list"
-
-precedence : "string*string list"
-precedence+ : "(string*string list)list"
-
-declaration : "string*string list"
-declaration+ : "(string*string list)list"
-
-precToken? : string
-atomic : string
-quantifier : string
-symbol : RegularSymbol
-symbol+ : "RegularSymbol list"
-symbol* : "RegularSymbol list"
-brackets : "RegularSymbol list"
-parens : "RegularSymbol list"
-repetition : "RegularSymbol*string"
+// HEADER : string
+// ID : string
+// LITERAL : string
+// SEMANTIC : string
+// TYPE_ARGUMENT: string
+// assoc : string
+// body+ : "(string list*string*string)list"
+// body : "string list*string*string"
+// file : RawFsyaccFile2
+// rule : "string*((string list*string*string)list)"
+// rule+ : "(string*((string list*string*string)list))list"
+// precedence : "string*string list"
+// precedence+ : "(string*string list)list"
+// declaration : "string*string list"
+// declaration+ : "(string*string list)list"
+// precToken? : string
+// atomic : string
+// quantifier : string
+// symbol : RegularSymbol
+// symbol+ : "RegularSymbol list"
+// symbol* : "RegularSymbol list"
+// brackets : "RegularSymbol list"
+// parens : "RegularSymbol list"
+// repetition : "RegularSymbol*string"
 

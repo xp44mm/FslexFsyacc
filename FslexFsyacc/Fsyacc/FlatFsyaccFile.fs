@@ -110,11 +110,13 @@ type FlatFsyaccFile =
                 rules = re.rules
         }
 
+    [<Obsolete("FsyaccFileRules.getMainProductions")>]
     member this.getMainProductions() =
         this.rules |> List.map Triple.first
 
+    [<Obsolete("FlatFsyaccFileUtils.toFsyaccParseTableFile")>]
     member this.toFsyaccParseTableFile() =
-        let mainProductions = FsyaccFileRules.getProductions this.rules
+        let mainProductions = FsyaccFileRules.getMainProductions this.rules
         let productionNames = FsyaccFileRules.getProductionNames this.rules
         let parseTable =
             ParseTable.create(

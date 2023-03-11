@@ -47,10 +47,9 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
             fsyacc.getMainProductions() 
             |> Grammar.from
 
-        let y = set [ 
-                  ]
+        let y = set []
 
-        let tokens = grammar.symbols - grammar.nonterminals
+        let tokens = grammar.terminals
         show tokens
 
     [<Fact>]

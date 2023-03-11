@@ -65,18 +65,6 @@
 		
 		<Compile Include="VanillaFSharp\FSharpSourceText.fs" />
 		
-		<Compile Include="VanillaFSharp\TypeArgument.fs" />
-		
-		<Compile Include="VanillaFSharp\FSharpToken.fs" />
-		
-		<Compile Include="VanillaFSharp\TypeArgumentTokenUtils.fs" />
-		
-		<None Include="VanillaFSharp\typeArgument.fsyacc" />
-		
-		<Compile Include="VanillaFSharp\TypeArgumentParseTable.fs" />
-		
-		<Compile Include="VanillaFSharp\TypeArgumentCompiler.fs" />
-		
 		<Compile Include="VanillaFSharp\TypeArgumentAngleToken.fs" />
 		
 		<Compile Include="VanillaFSharp\TypeArgumentAngleCompiler.fs" />
@@ -115,6 +103,7 @@
 		<Compile Include="Fsyacc\Fsyacc2ParseTable.fs" />
 		<Compile Include="Fsyacc\Fsyacc2Compiler.fs" />
 		<Compile Include="Fsyacc\RawFsyaccFile2Utils.fs" />
+		<Compile Include="Fsyacc\FlatFsyaccFileUtils.fs" />
 		
 		<None Include="..\readme.md">
 		  <Pack>True</Pack>

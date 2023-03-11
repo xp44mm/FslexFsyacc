@@ -107,7 +107,7 @@ module TypeArgumentAngleToken =
                     yield tok
                     yield! loop (pos+m.Length) rest.[m.Length..]
 
-                | Rgx @"//[^\r\n]*" m ->
+                | Rgx @"^//[^\r\n]*" m ->
                     let tok =
                         {
                             index = pos
@@ -117,7 +117,7 @@ module TypeArgumentAngleToken =
                     yield tok
                     yield! loop (pos+m.Length) rest.[m.Length..]
 
-                | Rgx @"\(\*[\s\S]+\*\)" m ->
+                | Rgx @"^\(\*[\s\S]+\*\)" m ->
                     let tok =
                         {
                             index = pos
@@ -162,7 +162,9 @@ module TypeArgumentAngleToken =
                     let tok = {
                         index = pos
                         length = m.Length
-                        value = ARRAY_TYPE_SUFFIX (m.Groups.[1].Captures.Count-1)
+                        value = 
+                            let rank = m.Groups.[1].Captures.Count-1
+                            ARRAY_TYPE_SUFFIX rank
                     }
                     yield tok
                     yield! loop tok.nextIndex rest.[tok.length..]

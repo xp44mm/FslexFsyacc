@@ -25,7 +25,6 @@ let flat (raw:RawFsyaccFile2) =
     let declarations = 
         raw.declarations
         |> List.collect(fun (tp,symbols)->symbols|>List.map(fun sym -> sym,tp))
-        //|> List.sort
 
     id<FlatFsyaccFile> {
         header = raw.header

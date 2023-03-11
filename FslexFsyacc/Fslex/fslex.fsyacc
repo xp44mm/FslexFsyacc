@@ -41,18 +41,26 @@ rule :
 
 %%
 
-HEADER : string
-ID : string
-CAP : string
-LITERAL : string
-SEMANTIC : string
-HOLE : string
-atomic : "RegularExpression<string>"
-atomic+ : "RegularExpression<string> list"
-definition : "string*RegularExpression<string>"
-definition+ : "(string*RegularExpression<string>)list"
-expr : "RegularExpression<string>"
-rule : "RegularExpression<string>list*string"
-rule+ : "(RegularExpression<string>list*string)list"
-file : "string*(string*RegularExpression<string>)list*(RegularExpression<string>list*string)list"
+// HEADER : string
+// ID : string
+// CAP : string
+// LITERAL : string
+// SEMANTIC : string
+// HOLE : string
+// atomic : "RegularExpression<string>"
+// atomic+ : "RegularExpression<string> list"
+// definition : "string*RegularExpression<string>"
+// definition+ : "(string*RegularExpression<string>)list"
+// expr : "RegularExpression<string>"
+// rule : "RegularExpression<string>list*string"
+// rule+ : "(RegularExpression<string>list*string)list"
+// file : "string*(string*RegularExpression<string>)list*(RegularExpression<string>list*string)list"
 
+%type<string> HEADER ID CAP LITERAL SEMANTIC HOLE
+%type<RegularExpression<string>> atomic expr
+%type<RegularExpression<string> list> atomic+
+%type<string*RegularExpression<string>> definition
+%type<(string*RegularExpression<string>)list> definition+
+%type<RegularExpression<string>list*string> rule
+%type<(RegularExpression<string>list*string)list> rule+
+%type<string*(string*RegularExpression<string>)list*(RegularExpression<string>list*string)list> file
