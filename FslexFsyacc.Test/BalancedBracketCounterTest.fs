@@ -15,7 +15,7 @@ type BalancedBracketCounterTest(output:ITestOutputHelper) =
         |> Literal.stringify
         |> output.WriteLine
 
-    static let sourceOfBrackets = TheoryDataSource [
+    static let sourceOfBrackets = SingleDataSource [
         "{}",[(0,'{'),1;(1,'}'),-1]
         "((){})[]",[
             (0,'('),1;

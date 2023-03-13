@@ -62,30 +62,41 @@ longIdent :
 
 %%
 
-// terminals: ref to the returned type of getLexeme
-ARRAY_TYPE_SUFFIX : int
-IDENT : string
-HTYPAR : string
-QTYPAR : string
+%type<int> ARRAY_TYPE_SUFFIX
+%type<string> IDENT HTYPAR QTYPAR
+%type<TypeArgument> anonRecordType apptype atomtype subtype typeArgument
+%type<string list> ctortype longIdent
+%type<string*TypeArgument> fieldDecl
+%type<BaseOrInterfaceType> flexibletype
+%type<TypeArgument list list> funtype
+%type<string list * TypeArgument list> namedtype
+%type<(string*TypeArgument)list> recdFieldDeclList
+%type<SuffixType> suffixType
+%type<SuffixType list> suffixTypes
+%type<TypeArgument list> tupletype typeArguments
+%type<Typar> typar variabletype
 
-// nonterminals
-anonRecordType : TypeArgument
-apptype : TypeArgument
-atomtype : TypeArgument
-ctortype : "string list"
-fieldDecl : "string*TypeArgument"
-flexibletype : BaseOrInterfaceType
-funtype : "TypeArgument list list"
-longIdent : "string list"
-namedtype : "string list * TypeArgument list"
-recdFieldDeclList : "(string*TypeArgument)list"
-subtype : TypeArgument
-suffixType : SuffixType
-suffixTypes : "SuffixType list"
-tupletype : "TypeArgument list"
-typeArgument : TypeArgument
-typeArguments : "TypeArgument list"
-typar : Typar
-variabletype : Typar
+// ARRAY_TYPE_SUFFIX : int
+// IDENT : string
+// HTYPAR : string
+// QTYPAR : string
+// anonRecordType : TypeArgument
+// apptype : TypeArgument
+// atomtype : TypeArgument
+// ctortype : "string list"
+// fieldDecl : "string*TypeArgument"
+// flexibletype : BaseOrInterfaceType
+// funtype : "TypeArgument list list"
+// longIdent : "string list"
+// namedtype : "string list * TypeArgument list"
+// recdFieldDeclList : "(string*TypeArgument)list"
+// subtype : TypeArgument
+// suffixType : SuffixType
+// suffixTypes : "SuffixType list"
+// tupletype : "TypeArgument list"
+// typeArgument : TypeArgument
+// typeArguments : "TypeArgument list"
+// typar : Typar
+// variabletype : Typar
 
 

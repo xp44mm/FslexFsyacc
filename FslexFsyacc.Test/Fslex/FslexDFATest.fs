@@ -21,6 +21,10 @@ type FslexDFATest(output:ITestOutputHelper) =
     let text = File.ReadAllText(filePath)
     let fslex = FslexFile.parse text
 
+    let name = "FslexDFA"
+    let moduleName = $"FslexFsyacc.Fslex.{name}"
+    let modulePath = Path.Combine(sourcePath, $"{name}.fs")
+
     [<Fact>]
     member _.``01 - compiler test``() =
         let hdr,dfs,rls = FslexCompiler.compile text
@@ -47,15 +51,11 @@ type FslexDFATest(output:ITestOutputHelper) =
 
     [<Fact(Skip="once and for all!")>] // 
     member _.``04 - generate DFA``() =
-        let name = "FslexDFA"
-        let moduleName = $"FslexFsyacc.Fslex.{name}"
-
         let y = fslex.toFslexDFAFile()
         let result = y.generate(moduleName)
 
-        let outputDir = Path.Combine(sourcePath, $"{name}.fs")
-        File.WriteAllText(outputDir, result, Encoding.UTF8)
-        output.WriteLine("output lex:" + outputDir)
+        File.WriteAllText(modulePath, result, Encoding.UTF8)
+        output.WriteLine("output lex:" + modulePath)
 
     [<Fact>]
     member _.``10 - valid DFA``() =
@@ -70,8 +70,7 @@ type FslexDFATest(output:ITestOutputHelper) =
             FSharp.Compiler.SyntaxTreeX.SourceCodeParser.semansFromMappers mappers
 
         let header,semans =
-            let filePath = Path.Combine(sourcePath, "FslexDFA.fs")
-            let src = File.ReadAllText(filePath, Encoding.UTF8)
+            let src = File.ReadAllText(modulePath, Encoding.UTF8)
             FSharp.Compiler.SyntaxTreeX.SourceCodeParser.getHeaderSemansFromFSharp 1 src
 
         Should.equal headerFslex header

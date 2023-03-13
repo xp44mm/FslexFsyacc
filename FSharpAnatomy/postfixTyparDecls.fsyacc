@@ -115,42 +115,63 @@ longIdent :
 
 %%
 
-postfixTyparDecls: "Typar list * TypeConstraint list"
-typarDeclList: "Typar list"
-typarDecl: Typar
-typeConstraints? : "TypeConstraint list"
+%type<Typar list * TypeConstraint list> postfixTyparDecls
+%type<Typar list> typarDeclList typarAlts
+%type<Typar> typarDecl typar typar variabletype
+%type<TypeConstraint list> typeConstraints? typeConstraints
+%type<string> IDENT OPERATOR_NAME QTYPAR HTYPAR IDENT HTYPAR QTYPAR
+%type<TypeArgument> typeArgument anonRecordType apptype atomtype subtype typeArgument
+%type<bool*string> identOrOp
+%type<bool*bool*string*TypeArgument> memberConstraintSig
+%type<TypeConstraint> typeConstraint
+%type<int> ARRAY_TYPE_SUFFIX
+%type<string list> ctortype longIdent
+%type<string*TypeArgument> fieldDecl
+%type<BaseOrInterfaceType> flexibletype
+%type<TypeArgument list list> funtype
+%type<string list * TypeArgument list> namedtype
+%type<(string*TypeArgument)list> recdFieldDeclList
+%type<SuffixType> suffixType
+%type<SuffixType list> suffixTypes
+%type<TypeArgument list> tupletype typeArguments
+%type<bool> static?
 
-IDENT : string
-OPERATOR_NAME : string
-QTYPAR : string
-HTYPAR : string
-typeArgument : TypeArgument
-typar : Typar
-identOrOp : "bool*string"
-memberConstraintSig : "bool*bool*string*TypeArgument"
-typarAlts : "Typar list"
-typeConstraint : TypeConstraint
-typeConstraints : "TypeConstraint list"
-ARRAY_TYPE_SUFFIX : int
-IDENT : string
-HTYPAR : string
-QTYPAR : string
-anonRecordType : TypeArgument
-apptype : TypeArgument
-atomtype : TypeArgument
-ctortype : "string list"
-fieldDecl : "string*TypeArgument"
-flexibletype : BaseOrInterfaceType
-funtype : "TypeArgument list list"
-longIdent : "string list"
-namedtype : "string list * TypeArgument list"
-recdFieldDeclList : "(string*TypeArgument)list"
-subtype : TypeArgument
-suffixType : SuffixType
-suffixTypes : "SuffixType list"
-tupletype : "TypeArgument list"
-typeArgument : TypeArgument
-typeArguments : "TypeArgument list"
-typar : Typar
-variabletype : Typar
-static?:bool
+// postfixTyparDecls: "Typar list * TypeConstraint list"
+// typarDeclList: "Typar list"
+// typarDecl: Typar
+// typeConstraints? : "TypeConstraint list"
+// 
+// IDENT : string
+// OPERATOR_NAME : string
+// QTYPAR : string
+// HTYPAR : string
+// typeArgument : TypeArgument
+// typar : Typar
+// identOrOp : "bool*string"
+// memberConstraintSig : "bool*bool*string*TypeArgument"
+// typarAlts : "Typar list"
+// typeConstraint : TypeConstraint
+// typeConstraints : "TypeConstraint list"
+// ARRAY_TYPE_SUFFIX : int
+// IDENT : string
+// HTYPAR : string
+// QTYPAR : string
+// anonRecordType : TypeArgument
+// apptype : TypeArgument
+// atomtype : TypeArgument
+// ctortype : "string list"
+// fieldDecl : "string*TypeArgument"
+// flexibletype : BaseOrInterfaceType
+// funtype : "TypeArgument list list"
+// longIdent : "string list"
+// namedtype : "string list * TypeArgument list"
+// recdFieldDeclList : "(string*TypeArgument)list"
+// subtype : TypeArgument
+// suffixType : SuffixType
+// suffixTypes : "SuffixType list"
+// tupletype : "TypeArgument list"
+// typeArgument : TypeArgument
+// typeArguments : "TypeArgument list"
+// typar : Typar
+// variabletype : Typar
+// static?:bool

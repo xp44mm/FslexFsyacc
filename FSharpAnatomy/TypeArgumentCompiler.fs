@@ -3,9 +3,9 @@
 open FslexFsyacc.Runtime
 open FSharp.Literals.Literal
 
-let analyze (posTokens:seq<Position<FSharpToken>>) = 
-    posTokens
-    |> ArrayTypeSuffixDFA.analyze
+//let analyze (posTokens:seq<Position<FSharpToken>>) = 
+//    posTokens
+//    |> ArrayTypeSuffixDFA.analyze
 
 let parser = Parser<Position<FSharpToken>> (
     TypeArgumentParseTable.rules,
@@ -26,7 +26,7 @@ let compile (txt:string) =
 
     txt
     |> TypeArgumentUtils.tokenize 0
-    |> ArrayTypeSuffixDFA.analyze
+    //|> ArrayTypeSuffixDFA.analyze
     |> Seq.map(fun tok ->
         tokens <- tok::tokens
         tok

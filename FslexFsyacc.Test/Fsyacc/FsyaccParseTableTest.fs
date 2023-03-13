@@ -24,6 +24,7 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
     let sourcePath = Path.Combine(solutionPath, @"FslexFsyacc\Fsyacc")
     let filePath = Path.Combine(sourcePath, @"fsyacc.fsyacc")
     let text = File.ReadAllText(filePath)
+
     let rawFsyacc = RawFsyaccFile.parse text
     let fsyacc = FlatFsyaccFile.fromRaw rawFsyacc
 
@@ -34,17 +35,32 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``01 - norm fsyacc file``() =
-        let startSymbol = 
+        //let startSymbol = 
+        //    fsyacc.rules
+        //    |> FlatFsyaccFileRule.getStartSymbol
+        //let fsyacc = fsyacc.start(startSymbol, Set.empty)
+        //let txt = fsyacc.toRaw().render()
+        //output.WriteLine(txt)
+        //let fsyacc = 
+        //    text
+        //    |> FlatFsyaccFileUtils.parse
+
+        let s0 = 
             fsyacc.rules
             |> FlatFsyaccFileRule.getStartSymbol
-        let fsyacc = fsyacc.start(startSymbol, Set.empty)
-        let txt = fsyacc.toRaw().render()
-        output.WriteLine(txt)
+
+        let src = 
+            fsyacc.start(s0, Set.empty)
+            |> RawFsyaccFile2Utils.fromFlat
+            |> RawFsyaccFile2Utils.render
+
+        output.WriteLine(src)
 
     [<Fact>]
     member _.``02 - list all tokens``() =
         let grammar = 
-            fsyacc.getMainProductions() 
+            fsyacc.rules
+            |> FsyaccFileRules.getMainProductions
             |> Grammar.from
 
         let y = set []
@@ -55,7 +71,8 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
     [<Fact>]
     member _.``03 - list all states``() =
         let collection =
-            fsyacc.getMainProductions()
+            fsyacc.rules
+            |> FsyaccFileRules.getMainProductions
             |> AmbiguousCollection.create
         
         let text = collection.render()
@@ -64,7 +81,8 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
     [<Fact>]
     member _.``04 - 汇总冲突的产生式``() =
         let collection =
-            fsyacc.getMainProductions ()
+            fsyacc.rules
+            |> FsyaccFileRules.getMainProductions
             |> AmbiguousCollection.create
 
         let productions = 
@@ -82,7 +100,8 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
     [<Fact>]
     member _.``05 - list the type annotaitions``() =
         let grammar =
-            fsyacc.getMainProductions()
+            fsyacc.rules
+            |> FsyaccFileRules.getMainProductions
             |> Grammar.from
 
         let sourceCode =
@@ -106,7 +125,11 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
     member _.``06 - generate Fsyacc2ParseTable ParseTable``() =
 
         //解析表数据
-        let parseTbl = fsyacc.toFsyaccParseTableFile()
+        let parseTbl = 
+            fsyacc
+            |> FlatFsyaccFileUtils.toFsyaccParseTableFile
+
+
         let fsharpCode = parseTbl.generateModule(parseTblModule)
 
         File.WriteAllText(parseTblPath,fsharpCode,Encoding.UTF8)
@@ -114,7 +137,10 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``10 - valid ParseTable``() =
-        let src = fsyacc.toFsyaccParseTableFile()
+        let src = 
+            fsyacc
+            |> FlatFsyaccFileUtils.toFsyaccParseTableFile
+
 
         Should.equal src.actions FsyaccParseTable.actions
         Should.equal src.closures FsyaccParseTable.closures

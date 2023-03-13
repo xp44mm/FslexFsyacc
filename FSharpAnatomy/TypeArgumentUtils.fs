@@ -76,6 +76,16 @@ let tokenize offset (input:string) =
             | Rgx @"^\s+" m ->
                 yield! loop (pos+m.Length) rest.[m.Length..]
 
+            | Rgx @"^\[\s*(,\s*)*\]" m ->
+                let rank = m.Groups.[1].Captures.Count+1
+                let tok = {
+                    index = pos
+                    length = m.Length
+                    value = ARRAY_TYPE_SUFFIX rank
+                }
+                yield tok
+                yield! loop tok.nextIndex rest.[tok.length..]            
+
             | On tryIdent x ->
                 let tok =
                     {
@@ -115,7 +125,7 @@ let tokenize offset (input:string) =
                 }
                 yield tok
                 yield! loop tok.nextIndex rest.[tok.length..]
-            
+
             | rest -> failwith $"unimpl tokenize case{stringify(pos,rest)}"
         }
 

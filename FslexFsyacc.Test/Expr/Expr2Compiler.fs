@@ -7,7 +7,6 @@ open FSharp.Idioms
 open FSharp.Literals.Literal
 
 open FslexFsyacc.Runtime
-open Expr
 
 let parser = 
     Parser<Position<ExprToken>>(

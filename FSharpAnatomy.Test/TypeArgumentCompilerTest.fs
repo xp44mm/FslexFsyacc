@@ -7,16 +7,17 @@ open System.Text
 open Xunit
 open Xunit.Abstractions
 
-open FSharp.Literals
+open FSharp.Literals.Literal
 open FSharp.xUnit
 open FSharpAnatomy
 
 type TypeArgumentCompilerTest(output:ITestOutputHelper) =
     let show res =
         res
-        |> Render.stringify
+        |> stringify
         |> output.WriteLine
-    static let ls = [
+
+    static let source = SingleDataSource [
         "_",Anon
         "'a",TypeParam(false,"a")
         "^bc",TypeParam(true,"bc")
@@ -36,7 +37,6 @@ type TypeArgumentCompilerTest(output:ITestOutputHelper) =
         "string list->int list",Fun [App(Ctor(["string"],[]),[LongIdent ["list"]]);App(Ctor(["int"],[]),[LongIdent ["list"]])]
 
         ]
-    static let source = TheoryDataSource ls
 
     static member keys = source.keys
 
@@ -46,23 +46,18 @@ type TypeArgumentCompilerTest(output:ITestOutputHelper) =
         let e = source.[x]
         Should.equal e y
 
-    [<Fact>]
-    member _.``02 - tokenize``() =
-        for (x,_) in ls do
-        let y = TypeArgumentUtils.tokenize 0 x |> Seq.toList
-        show (x,y)
-
     [<Theory>]
     [<InlineData("[]", 1)>]
     [<InlineData("[,]", 2)>]
     [<InlineData("[,,]", 3)>]
     [<InlineData("[,,,]", 4)>]
-    member _.``03 - ArrayTypeSuffix``(x,e) =
+    member _.``03 - TypeArgumentUtils ArrayTypeSuffix``(x,e) =
         let y = 
             x 
             |> TypeArgumentUtils.tokenize 0
-            |> ArrayTypeSuffixDFA.analyze
             |> Seq.head
-            |> (fun x -> match x.value with ARRAY_TYPE_SUFFIX i -> i |_->failwith"")
+            |> (fun x -> x.value)
+
+        let e = ARRAY_TYPE_SUFFIX e
         Should.equal y e
 

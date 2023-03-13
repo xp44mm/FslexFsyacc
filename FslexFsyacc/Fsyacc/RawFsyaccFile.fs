@@ -1,6 +1,7 @@
 ﻿namespace FslexFsyacc.Fsyacc
 open System
 
+[<Obsolete("=> RawFsyaccFile2")>]
 type RawFsyaccFile = 
     {
         header:string

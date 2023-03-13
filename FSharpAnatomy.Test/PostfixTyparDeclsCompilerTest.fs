@@ -17,7 +17,7 @@ type PostfixTyparDeclsCompilerTest (output:ITestOutputHelper) =
         |> Render.stringify
         |> output.WriteLine
 
-    static let source = TheoryDataSource [
+    static let source = SingleDataSource [
         "<'a when 'a : null>",([NamedTypar(false,"a")],[NullConstraint(NamedTypar(false,"a"))])
         "<'a when 'a : struct>",([NamedTypar(false,"a")],[ValueTypeConstraint(NamedTypar(false,"a"))])
         "<'a when 'a : not struct>",([NamedTypar(false,"a")],[RefTypeConstraint(NamedTypar(false,"a"))])

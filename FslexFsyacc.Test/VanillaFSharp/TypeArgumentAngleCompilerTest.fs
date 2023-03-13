@@ -11,12 +11,11 @@ open FSharp.Idioms
 open FslexFsyacc.Brackets
 
 type TypeArgumentAngleCompilerTest(output:ITestOutputHelper) =
-    static let DataSource = TheoryDataSource [
+    static let DataSource = SingleDataSource [
         "<>",Bounded(0,[],1)
         "<int> count",Bounded(0,[Tick "int"],4)
         "<int*int> pair",Bounded(0,[Tick "int";Tick "*";Tick "int"],8)
         "<list<int>> ls",Bounded(0,[Tick "list";Bounded(5,[Tick "int"],9)],10)
-
         ]
 
     static member keys = DataSource.keys

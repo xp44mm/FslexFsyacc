@@ -10,9 +10,6 @@
     <Compile Include="TypeArgument.fs" />
     <Compile Include="TypeConstraint.fs" />
     <Compile Include="FSharpToken.fs" />
-    <Compile Include="ArrayTypeSuffixUtils.fs" />
-    <None Include="arrayTypeSuffix.fslex" />
-    <Compile Include="ArrayTypeSuffixDFA.fs" />
     <Compile Include="TypeArgumentUtils.fs" />
     <None Include="typeArgument.fsyacc" />
     <Compile Include="TypeArgumentParseTable.fs" />

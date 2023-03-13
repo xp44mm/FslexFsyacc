@@ -4,7 +4,8 @@ type FSharpToken =
     | EOF
 
     | HASH
-    | LPAREN | RPAREN
+    | LPAREN 
+    | RPAREN
     | STAR
     | COMMA
     | RARROW
@@ -12,7 +13,8 @@ type FSharpToken =
     | COLON
     | COLON_GREATER
     | SEMICOLON
-    | LBRACK | RBRACK
+    | LBRACK 
+    | RBRACK
     | ARRAY_TYPE_SUFFIX of rank:int
     | HTYPAR of string
     | IDENT of string
@@ -20,7 +22,8 @@ type FSharpToken =
     | QTYPAR of string
     | UNDERSCORE
 
-    | LBRACE_BAR | BAR_RBRACE
+    | LBRACE_BAR 
+    | BAR_RBRACE
     | LESS
     | GREATER
 

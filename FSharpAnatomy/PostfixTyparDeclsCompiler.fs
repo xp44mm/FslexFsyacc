@@ -6,9 +6,9 @@ open FSharp.Literals.Literal
 
 open System
 
-let analyze (posTokens:seq<Position<FSharpToken>>) = 
-    posTokens
-    |> ArrayTypeSuffixDFA.analyze
+//let analyze (posTokens:seq<Position<FSharpToken>>) = 
+//    posTokens
+//    |> ArrayTypeSuffixDFA.analyze
 
 let parser = Parser<Position<FSharpToken>> (
     PostfixTyparDeclsParseTable.rules,
@@ -30,7 +30,7 @@ let compile (txt:string) =
 
     txt
     |> PostfixTyparDeclsUtils.tokenize 0
-    |> ArrayTypeSuffixDFA.analyze
+    //|> ArrayTypeSuffixDFA.analyze
     |> Seq.map(fun tok ->
         tokens <- tok::tokens
         tok

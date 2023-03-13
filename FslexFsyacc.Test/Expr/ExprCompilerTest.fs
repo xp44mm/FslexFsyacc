@@ -11,7 +11,6 @@ open FSharp.Literals.Literal
 open FSharp.Idioms
 
 open FslexFsyacc.Runtime
-open Expr
 
 type ExprCompilerTest(output:ITestOutputHelper) =
 

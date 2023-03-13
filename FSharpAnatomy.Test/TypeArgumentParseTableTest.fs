@@ -12,38 +12,58 @@ open System.Text
 open System.Text.RegularExpressions
 
 open FSharp.xUnit
-open FSharp.Literals
+open FSharp.Literals.Literal
 open FSharp.Idioms
 
 type TypeArgumentParseTableTest (output:ITestOutputHelper) =
     let show res =
         res
-        |> Literal.stringify
+        |> stringify
         |> output.WriteLine
 
     let fsyaccPath = Path.Combine(Dir.FSharpAnatomyPath,"typeArgument.fsyacc")
     let text = File.ReadAllText(fsyaccPath)
 
-    let rawFsyacc = RawFsyaccFile.parse text
-    let fsyacc = FlatFsyaccFile.fromRaw rawFsyacc
-
     let parseTblName = "TypeArgumentParseTable"
+    let parseTblModule = $"FSharpAnatomy.{parseTblName}"
     let parseTblPath = Path.Combine(Dir.FSharpAnatomyPath, $"{parseTblName}.fs")
+    
+    let grammar text =
+        text
+        |> FlatFsyaccFileUtils.parse
+        |> FlatFsyaccFileUtils.toGrammar
 
-    [<Fact(Skip="Run manually when required")>] // 
+    let ambiguousCollection text =
+        text
+        |> FlatFsyaccFileUtils.parse
+        |> FlatFsyaccFileUtils.toAmbiguousCollection
+
+    //解析表数据
+    let parseTbl text = 
+        text
+        |> FlatFsyaccFileUtils.parse
+        |> FlatFsyaccFileUtils.toFsyaccParseTableFile
+
+    [<Fact>] // 
     member _.``01 - norm fsyacc file``() =
-        let startSymbol = 
+        let fsyacc = 
+            text
+            |> FlatFsyaccFileUtils.parse
+
+        let s0 = 
             fsyacc.rules
             |> FlatFsyaccFileRule.getStartSymbol
-        let fsyacc = fsyacc.start(startSymbol, Set.empty)
-        let txt = fsyacc.toRaw().render()
-        output.WriteLine(txt)
+
+        let src = 
+            fsyacc.start(s0, Set.empty)
+            |> RawFsyaccFile2Utils.fromFlat
+            |> RawFsyaccFile2Utils.render
+
+        output.WriteLine(src)
 
     [<Fact>]
     member _.``02 - list all tokens``() =
-        let grammar =
-            fsyacc.getMainProductions()
-            |> Grammar.from
+        let grammar = grammar text
 
         let tokens = grammar.terminals
         let res = set ["#";"(";")";"*";",";"->";".";":";":>";";";"<";">";"IDENT";"HTYPAR";"QTYPAR";"_";"ARRAY_TYPE_SUFFIX";"struct";"{|";"|}"]
@@ -53,9 +73,7 @@ type TypeArgumentParseTableTest (output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``03 - precedence Of Productions``() =
-        let collection = 
-            fsyacc.getMainProductions() 
-            |> AmbiguousCollection.create
+        let collection = ambiguousCollection text
 
         let terminals = 
             collection.grammar.terminals
@@ -70,30 +88,33 @@ type TypeArgumentParseTableTest (output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``04 - list all states``() =
-        let collection =
-            fsyacc.getMainProductions()
-            |> AmbiguousCollection.create
+        let collection = ambiguousCollection text
         
         let text = collection.render()
         output.WriteLine(text)
 
     [<Fact>]
     member _.``05 - list the type annotaitions``() =
-        let grammar =
-            fsyacc.getMainProductions()
-            |> Grammar.from
+        let grammar = grammar text
+        let terminals =
+            grammar.terminals
+            |> Seq.map RenderUtils.renderSymbol
+            |> String.concat " "
+
+        let nonterminals =
+            grammar.nonterminals
+            |> Seq.map RenderUtils.renderSymbol
+            |> String.concat " "
 
         let sourceCode =
             [
                 "// Do not list symbols whose return value is always `null`"
-                "// terminals: ref to the returned type of getLexeme"
-                for i in grammar.terminals do
-                    let i = RenderUtils.renderSymbol i
-                    i + " : \"\""
-                "\r\n// nonterminals"
-                for i in grammar.nonterminals do
-                    let i = RenderUtils.renderSymbol i
-                    i + " : \"\""
+                ""
+                "// terminals: ref to the returned type of `getLexeme`"
+                "%type<> " + terminals
+                ""
+                "// nonterminals"
+                "%type<> " + nonterminals
             ] 
             |> String.concat "\r\n"
 
@@ -101,18 +122,16 @@ type TypeArgumentParseTableTest (output:ITestOutputHelper) =
 
     [<Fact(Skip="once for all!")>] // 
     member _.``06 - generate ParseTable``() =
-        let moduleName = $"FSharpAnatomy.{parseTblName}"
+        let parseTbl = parseTbl text
 
-        //解析表数据
-        let parseTbl = fsyacc.toFsyaccParseTableFile()
-        let fsharpCode = parseTbl.generateModule(moduleName)
+        let fsrc = parseTbl.generateModule(parseTblModule)
 
-        File.WriteAllText(parseTblPath,fsharpCode,Encoding.UTF8)
+        File.WriteAllText(parseTblPath,fsrc,Encoding.UTF8)
         output.WriteLine("output fsyacc:"+parseTblPath)
 
     [<Fact>]
     member _.``10 - valid ParseTable``() =
-        let src = fsyacc.toFsyaccParseTableFile()
+        let src = parseTbl text
 
         Should.equal src.actions TypeArgumentParseTable.actions
         Should.equal src.closures TypeArgumentParseTable.closures
@@ -138,4 +157,11 @@ type TypeArgumentParseTableTest (output:ITestOutputHelper) =
 
         Should.equal headerFromFsyacc header
         Should.equal semansFsyacc semans
+
+    [<Fact>]
+    member _.``08 - typeArgument follows test``() =
+        let grammar = grammar text
+        grammar.follows.["typeArgument"]
+        |> Seq.iter(fun tok -> output.WriteLine(stringify tok))
+
 

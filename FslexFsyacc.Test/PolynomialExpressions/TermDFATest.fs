@@ -21,6 +21,10 @@ type TermDFATest(output:ITestOutputHelper) =
     let text = File.ReadAllText(filePath)
     let fslex = FslexFile.parse text
 
+    let name = "TermDFA"
+    let moduleName = $"PolynomialExpressions.{name}"
+    let modulePath = Path.Combine(__SOURCE_DIRECTORY__, $"{name}.fs")
+
     [<Fact>]
     member _.``00 = tokenize test``() =
         let tokens = 
@@ -56,15 +60,12 @@ type TermDFATest(output:ITestOutputHelper) =
 
     [<Fact(Skip="once and for all!")>] // 
     member _.``03 = generate DFA``() =
-        let name = "TermDFA"
-        let moduleName = $"PolynomialExpressions.{name}"
 
         let dfafile = fslex.toFslexDFAFile()
         let result = dfafile.generate(moduleName)
-        let outputDir = Path.Combine(__SOURCE_DIRECTORY__, $"{name}.fs")
 
-        File.WriteAllText(outputDir, result,System.Text.Encoding.UTF8)
-        output.WriteLine("output lex:" + outputDir)
+        File.WriteAllText(modulePath, result,System.Text.Encoding.UTF8)
+        output.WriteLine("output lex:" + modulePath)
 
     [<Fact>]
     member _.``10 - valid DFA``() =
@@ -79,8 +80,7 @@ type TermDFATest(output:ITestOutputHelper) =
             FSharp.Compiler.SyntaxTreeX.SourceCodeParser.semansFromMappers mappers
 
         let header,semans =
-            let filePath = Path.Combine(__SOURCE_DIRECTORY__, "TermDFA.fs")
-            let text = File.ReadAllText(filePath, Encoding.UTF8)
+            let text = File.ReadAllText(modulePath, Encoding.UTF8)
             FSharp.Compiler.SyntaxTreeX.SourceCodeParser.getHeaderSemansFromFSharp 1 text
 
         Should.equal headerFslex header

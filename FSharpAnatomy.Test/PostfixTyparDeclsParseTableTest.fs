@@ -24,26 +24,55 @@ type PostfixTyparDeclsParseTableTest (output:ITestOutputHelper) =
     let fsyaccPath = Path.Combine(Dir.FSharpAnatomyPath,"postfixTyparDecls.fsyacc")
     let text = File.ReadAllText(fsyaccPath)
 
-    let rawFsyacc = RawFsyaccFile.parse text
-    let fsyacc = FlatFsyaccFile.fromRaw rawFsyacc
+    //let rawFsyacc = RawFsyaccFile.parse text
+    //let fsyacc = FlatFsyaccFile.fromRaw rawFsyacc
 
     let parseTblName = "PostfixTyparDeclsParseTable"
+    let moduleName = $"FSharpAnatomy.{parseTblName}"
     let parseTblPath = Path.Combine(Dir.FSharpAnatomyPath, $"{parseTblName}.fs")
+
+    let grammar text =
+        text
+        |> FlatFsyaccFileUtils.parse
+        |> FlatFsyaccFileUtils.toGrammar
+
+    let ambiguousCollection text =
+        text
+        |> FlatFsyaccFileUtils.parse
+        |> FlatFsyaccFileUtils.toAmbiguousCollection
+
+    //解析表数据
+    let parseTbl text = 
+        text
+        |> FlatFsyaccFileUtils.parse
+        |> FlatFsyaccFileUtils.toFsyaccParseTableFile
 
     [<Fact>]
     member _.``01 - norm fsyacc file``() =
-        let startSymbol = 
+        let fsyacc = 
+            text
+            |> FlatFsyaccFileUtils.parse
+
+        //let startSymbol = 
+        //    fsyacc.rules
+        //    |> FlatFsyaccFileRule.getStartSymbol
+        //let fsyacc = fsyacc.start(startSymbol, Set.empty)
+        //let txt = fsyacc.toRaw().render()
+        //output.WriteLine(txt)
+        let s0 = 
             fsyacc.rules
             |> FlatFsyaccFileRule.getStartSymbol
-        let fsyacc = fsyacc.start(startSymbol, Set.empty)
-        let txt = fsyacc.toRaw().render()
-        output.WriteLine(txt)
+
+        let src = 
+            fsyacc.start(s0, Set.empty)
+            |> RawFsyaccFile2Utils.fromFlat
+            |> RawFsyaccFile2Utils.render
+
+        output.WriteLine(src)
 
     [<Fact>]
     member _.``02 - list all tokens``() =
-        let grammar =
-            fsyacc.getMainProductions()
-            |> Grammar.from
+        let grammar = grammar text
 
         let tokens = grammar.terminals
         let res = set ["#";"(";")";"*";",";"->";".";":";":>";";";"<";">";"ARRAY_TYPE_SUFFIX";"HTYPAR";"IDENT";"OPERATOR_NAME";"QTYPAR";"_";"and";"comparison";"delegate";"enum";"equality";"member";"new";"not";"null";"or";"static";"struct";"unmanaged";"when";"{|";"|}"]
@@ -53,9 +82,7 @@ type PostfixTyparDeclsParseTableTest (output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``03 - precedence Of Productions``() =
-        let collection = 
-            fsyacc.getMainProductions() 
-            |> AmbiguousCollection.create
+        let collection = ambiguousCollection text
 
         let terminals = 
             collection.grammar.terminals
@@ -70,30 +97,34 @@ type PostfixTyparDeclsParseTableTest (output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``04 - list all states``() =
-        let collection =
-            fsyacc.getMainProductions()
-            |> AmbiguousCollection.create
+        let collection = ambiguousCollection text
         
         let text = collection.render()
         output.WriteLine(text)
 
     [<Fact>]
     member _.``05 - list the type annotaitions``() =
-        let grammar =
-            fsyacc.getMainProductions()
-            |> Grammar.from
+        let grammar = grammar text
+
+        let terminals =
+            grammar.terminals
+            |> Seq.map RenderUtils.renderSymbol
+            |> String.concat " "
+
+        let nonterminals =
+            grammar.nonterminals
+            |> Seq.map RenderUtils.renderSymbol
+            |> String.concat " "
 
         let sourceCode =
             [
                 "// Do not list symbols whose return value is always `null`"
-                "// terminals: ref to the returned type of getLexeme"
-                for i in grammar.terminals do
-                    let i = RenderUtils.renderSymbol i
-                    i + " : \"\""
-                "\r\n// nonterminals"
-                for i in grammar.nonterminals do
-                    let i = RenderUtils.renderSymbol i
-                    i + " : \"\""
+                ""
+                "// terminals: ref to the returned type of `getLexeme`"
+                "%type<> " + terminals
+                ""
+                "// nonterminals"
+                "%type<> " + nonterminals
             ] 
             |> String.concat "\r\n"
 
@@ -101,10 +132,7 @@ type PostfixTyparDeclsParseTableTest (output:ITestOutputHelper) =
 
     [<Fact(Skip="once for all!")>] // 
     member _.``06 - generate ParseTable``() =
-        let moduleName = $"FSharpAnatomy.{parseTblName}"
-
-        //解析表数据
-        let parseTbl = fsyacc.toFsyaccParseTableFile()
+        let parseTbl = parseTbl text
         let fsharpCode = parseTbl.generateModule(moduleName)
 
         File.WriteAllText(parseTblPath,fsharpCode,Encoding.UTF8)
@@ -112,7 +140,7 @@ type PostfixTyparDeclsParseTableTest (output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``10 - valid ParseTable``() =
-        let src = fsyacc.toFsyaccParseTableFile()
+        let src = parseTbl text
 
         Should.equal src.actions PostfixTyparDeclsParseTable.actions
         Should.equal src.closures PostfixTyparDeclsParseTable.closures

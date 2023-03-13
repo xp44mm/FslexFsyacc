@@ -1,4 +1,4 @@
-﻿namespace FslexFsyacc.FSharpGrammar
+﻿namespace FSharpAnatomy.FSharpGrammar
 
 open FslexFsyacc.Fsyacc
 open FslexFsyacc.Yacc
