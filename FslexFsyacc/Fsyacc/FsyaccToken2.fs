@@ -107,12 +107,12 @@ module FsyaccToken2 =
 
                 | On tryWord x ->
                     let len = x.Length
-                    yield Position<_>.from(pos, len, ID x.Value)
+                    yield Position.from(pos, len, ID x.Value)
                     yield! loop (lpos,lrest) (pos+len,rest.[len..])
 
                 | On trySingleQuoteString x ->
                     let len = x.Length
-                    yield Position<_>.from(pos,len,LITERAL(JsonString.unquote x.Value))
+                    yield Position.from(pos,len,LITERAL(JsonString.unquote x.Value))
                     yield! loop (lpos,lrest) (pos+len,rest.[len..])
 
                 | On trySemantic x ->
@@ -128,7 +128,7 @@ module FsyaccToken2 =
                             let fcode = formatNestedCode col code
                             nlpos,nlinp,fcode
 
-                    yield Position<_>.from(pos,len,SEMANTIC fcode)
+                    yield Position.from(pos,len,SEMANTIC fcode)
                     yield! loop (nlpos,nlinp) (pos+len,rest.[len..])
 
                 | On tryHeader x ->
@@ -144,7 +144,7 @@ module FsyaccToken2 =
                             let fcode = formatNestedCode col code
                             nlpos,nlinp,fcode
 
-                    yield Position<_>.from(pos,len,HEADER fcode)
+                    yield Position.from(pos,len,HEADER fcode)
                     yield! loop (nlpos,nlinp) (pos+len,rest.[len..])
             
                 | Rgx @"^%[a-z]+" m ->
@@ -157,17 +157,17 @@ module FsyaccToken2 =
                         | "%type" -> TYPE
                         | never -> failwith ""
                     let len = m.Length
-                    yield Position<_>.from(pos,len,tok)
+                    yield Position.from(pos,len,tok)
                     yield! loop (lpos,lrest) (pos+len,rest.[len..])
 
                 | Rgx @"^%%+" m ->
                     let len = m.Length
-                    yield Position<_>.from(pos,len,PERCENT)
+                    yield Position.from(pos,len,PERCENT)
                     yield! loop (lpos,lrest) (pos+len,rest.[len..])
 
                 | LongestPrefix (Map.keys ops) x ->
                     let len = x.Length
-                    yield Position<_>.from(pos,len,ops.[x])
+                    yield Position.from(pos,len,ops.[x])
                     yield! loop (lpos,lrest) (pos+len,rest.[len..])
                 | First '<' _ ->
                     let postok = 

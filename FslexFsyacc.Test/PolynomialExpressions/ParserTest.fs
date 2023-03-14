@@ -32,7 +32,7 @@ type ParserTest(output:ITestOutputHelper) =
     [<Fact>]
     member _.``split``() =
         let tokens = [INT 2;ID "x";HAT;INT 2;PLUS;INT 3;ID "x";MINUS;INT 5]
-        let y = tokens |> Seq.map(fun tok -> Position<_>.from(0,0,tok)) |> Parser.parse
+        let y = tokens |> Seq.map(fun tok -> Position.from(0,0,tok)) |> Parser.parse
         show y
         Should.equal y [Term(2,"x",2);Term(3,"x",1);Const -5]
 

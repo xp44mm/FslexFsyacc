@@ -64,7 +64,7 @@ type TermDFATest(output:ITestOutputHelper) =
         let dfafile = fslex.toFslexDFAFile()
         let result = dfafile.generate(moduleName)
 
-        File.WriteAllText(modulePath, result,System.Text.Encoding.UTF8)
+        File.WriteAllText(modulePath, result, Encoding.UTF8)
         output.WriteLine("output lex:" + modulePath)
 
     [<Fact>]

@@ -8,17 +8,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Dir.fs" />
-    <Compile Include="DirTest.fs" />
-    
-    <None Include="FSharpGrammar\fsyacc\pars.fsyacc" />
-    <Compile Include="FSharpGrammar\ParsParseTableTest.fs" />
-    <Compile Include="FSharpGrammar\ManyYaccFilesParseTableTest.fs" />
-
-    <Compile Include="TypeArgumentParseTableTest.fs" />
-    <Compile Include="TypeArgumentCompilerTest.fs" />
-    <Compile Include="PostfixTyparDeclsParseTableTest.fs" />
-    <Compile Include="PostfixTyparDeclsCompilerTest.fs" />
+    <Compile Include="BalancedBracketCounter.fs" />
+    <Compile Include="BalancedBracketCounterTest.fs" />
+    <Compile Include="RegularSymbolToken.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
@@ -37,14 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FSharp.Compiler.SyntaxTreeX\FSharp.Compiler.SyntaxTreeX.fsproj" />
-    <ProjectReference Include="..\FSharpAnatomy\FSharpAnatomy.fsproj" />
-    <ProjectReference Include="..\FslexFsyacc.Runtime\FslexFsyacc.Runtime.fsproj" />
     <ProjectReference Include="..\FslexFsyacc\FslexFsyacc.fsproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="7.0.200" />
   </ItemGroup>
 
 </Project>

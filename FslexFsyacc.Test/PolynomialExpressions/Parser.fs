@@ -1,12 +1,15 @@
 ﻿module PolynomialExpressions.Parser
 
-open PolynomialExpressions.Tokenizer
+//open PolynomialExpressions.Tokenizer
 open PolynomialExpressions
 open FslexFsyacc.Runtime
 
-let parse (posTokens:seq<Position<Token>>) = 
+let analyze (tokens:seq<_>) = 
+    TermDFA.analyzer.analyze(tokens,Tokenizer.getTag)
+
+let parse (posTokens:seq<Position<Tokenizer.Token>>) =
     posTokens
-    |> TermDFA.analyze
+    |> analyze
     |> Seq.map(fun postok -> postok.value)
     |> Seq.toList
 

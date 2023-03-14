@@ -8,11 +8,11 @@
     <PackageProjectUrl>https://github.com/xp44mm/FslexFsyacc</PackageProjectUrl>
     <RepositoryUrl>https://github.com/xp44mm/FslexFsyacc</RepositoryUrl>
     <PackageTags>lex;yacc;compiler;parser;analyzer</PackageTags>
-    <PackageReleaseNotes>%type&lt;&gt;</PackageReleaseNotes>
+    <PackageReleaseNotes>Position refac</PackageReleaseNotes>
     <Authors>xp44m</Authors>
     <Company>34696643@qq.com</Company>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <Version>1.3.6</Version>
+    <Version>1.3.7</Version>
     <PackageReadmeFile>readme.md</PackageReadmeFile>
     <PackAsTool>False</PackAsTool>
   </PropertyGroup>
@@ -24,7 +24,6 @@
     <Compile Include="ParserTableAction.fs" />
     <Compile Include="TheoryParser.fs" />
     <Compile Include="Parser.fs" />
-    <Compile Include="BalancedBracketCounter.fs" />
   </ItemGroup>
 
   <ItemGroup>

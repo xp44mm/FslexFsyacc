@@ -71,7 +71,7 @@ let tokenize (offset:int) (input:string) =
                 yield! loop (lpos,lrest) (pos+len,rest.[len..])
 
             | Rgx @"^\w+" m ->
-                yield Position<_>.from(pos,m.Length,ID m.Value)
+                yield Position.from(pos,m.Length,ID m.Value)
                 yield! loop (lpos,lrest) (pos+m.Length,rest.[m.Length..])
 
             | Rgx @"^<(\w+)>\s*(=)?" m ->
@@ -82,7 +82,7 @@ let tokenize (offset:int) (input:string) =
                     else
                         HOLE g1.Value
                 let len = g1.Length+2 // '<(\w+)>' 的长度
-                yield Position<_>.from(pos, len, tok)
+                yield Position.from(pos, len, tok)
                 yield! loop (lpos,lrest) (pos+len,rest.[len..])
 
             //| Rgx @"^<(\w+)>" m -> //todo: @"^<(\w+)>\s*(=)?"
@@ -103,7 +103,7 @@ let tokenize (offset:int) (input:string) =
 
             | On trySingleQuoteString m ->
                 let len = m.Length
-                yield Position<_>.from(pos,len,LITERAL(JsonString.unquote m.Value))
+                yield Position.from(pos,len,LITERAL(JsonString.unquote m.Value))
                 yield! loop (lpos,lrest) (pos+len,rest.[len..])
 
             | On trySemantic capt ->
@@ -119,7 +119,7 @@ let tokenize (offset:int) (input:string) =
                         let fcode = formatNestedCode col code
                         nli,nlrest,fcode
 
-                yield Position<_>.from(pos, len, SEMANTIC fcode)
+                yield Position.from(pos, len, SEMANTIC fcode)
                 yield! loop (nlpos,nlinp) (pos+len,rest.[len..])
 
             | On tryHeader x ->
@@ -135,17 +135,17 @@ let tokenize (offset:int) (input:string) =
                         let fcode = formatNestedCode col code
                         nli,nlrest,fcode
 
-                yield Position<_>.from(pos,len,HEADER fcode)
+                yield Position.from(pos,len,HEADER fcode)
                 yield! loop (nli,nlrest) (pos+len,rest.[len..])
 
             | Rgx @"^%%+" m ->
                 let x = m.Value
-                yield Position<_>.from(pos,x.Length,PERCENT)
+                yield Position.from(pos,x.Length,PERCENT)
                 yield! loop (lpos,lrest) (pos+x.Length,rest.[m.Length..])
 
             | LongestPrefix (Map.keys ops) x ->
                 let len = x.Length
-                yield Position<_>.from(pos,len,ops.[x])
+                yield Position.from(pos,len,ops.[x])
                 yield! loop (lpos,lrest) (pos+len,rest.[x.Length..])
 
             | rest -> failwith $"tokenize:{rest}"
@@ -157,4 +157,4 @@ let appendAMP (lexbuf: Position<FslexToken> list) =
     let last =
         lexbuf
         |> List.exactlyOne
-    [last;Position<_>.from(last.nextIndex,0,AMP)]
+    [last;Position.from(last.nextIndex,0,AMP)]

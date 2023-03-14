@@ -18,7 +18,7 @@ type AnalyzeTest(output:ITestOutputHelper) =
 
     let analyze tokens =
         tokens
-        |> FslexDFA.analyze
+        |> FslexCompiler.analyze
         |> Seq.concat
         |> List.ofSeq
 
@@ -26,7 +26,7 @@ type AnalyzeTest(output:ITestOutputHelper) =
     member _.``explicit amp test``() =
         let tokens = 
             [LPAREN;ID "";RPAREN;LBRACK;RBRACK;STAR;LITERAL ""]
-            |> List.map(fun t -> Position<_>.from(0,0,t))
+            |> List.map(fun t -> Position.from(0,0,t))
         let y = analyze tokens |> List.map(fun x -> x.value)
         //show y
 

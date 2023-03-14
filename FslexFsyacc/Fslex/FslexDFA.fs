@@ -3,15 +3,12 @@ let nextStates = [0u,["%%",5u;"&",5u;"(",5u;")",3u;"*",3u;"+",3u;"/",5u;"=",5u;"
 open FslexFsyacc.Runtime
 open FslexFsyacc.Fslex
 open FslexFsyacc.Fslex.FslexTokenUtils
-type token = FslexToken Position
 let rules:list<uint32 list*uint32 list*_> = [
-    [1u],[],fun(lexbuf:token list)->
+    [1u],[],fun (lexbuf:list<_>) ->
         [lexbuf.Head]
-    [4u],[3u],fun(lexbuf:token list)->
+    [4u],[3u],fun (lexbuf:list<_>) ->
         appendAMP lexbuf
-    [2u;3u;5u],[],fun(lexbuf:token list)->
+    [2u;3u;5u],[],fun (lexbuf:list<_>) ->
         lexbuf
 ]
 let analyzer = Analyzer(nextStates, rules)
-let analyze (tokens:seq<_>) = 
-    analyzer.analyze(tokens,getTag)

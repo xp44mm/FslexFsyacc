@@ -18,7 +18,7 @@ type AnalyzerTest(output:ITestOutputHelper) =
     [<Fact>]
     member _.``basis``() =
         let x = "2x**2+3x-5"
-        let y = x |> Tokenizer.tokenize |> TermDFA.analyze |> Seq.map(fun postok -> postok.value) |> List.ofSeq
+        let y = x |> Tokenizer.tokenize |> Parser.analyze |> Seq.map(fun postok -> postok.value) |> List.ofSeq
         //show y
         Should.equal y [Term(2,"x",2);Term(3,"x",1);Const -5]
 
@@ -32,7 +32,7 @@ type AnalyzerTest(output:ITestOutputHelper) =
     [<Fact>]
     member _.``analyze test``() =
         let tokens = [INT 2;ID "x";HAT;INT 2;PLUS;INT 3;ID "x";MINUS;INT 5]
-        let y = tokens |> Seq.map(fun tok -> Position<_>.from(0,0,tok)) |> TermDFA.analyze |> Seq.map(fun postok -> postok.value) |> List.ofSeq
+        let y = tokens |> Seq.map(fun tok -> Position.from(0,0,tok)) |> Parser.analyze |> Seq.map(fun postok -> postok.value) |> List.ofSeq
         show y
         Should.equal y [Term(2,"x",2);Term(3,"x",1);Const -5]
 

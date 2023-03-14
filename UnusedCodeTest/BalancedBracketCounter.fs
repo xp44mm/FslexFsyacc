@@ -1,7 +1,6 @@
 ﻿namespace FslexFsyacc
 
 // 大小相等，符号相反的括号是配对的括号
-[<System.Obsolete("=>fsyacc")>]
 type BalancedBracketCounter<'t when 't : equality>() =
     let mutable tick = 0
     let mutable brackets = []

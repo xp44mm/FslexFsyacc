@@ -5,6 +5,9 @@ open FslexFsyacc.Lex
 open FslexFsyacc.Fslex.FslexTokenUtils
 open FSharp.Literals.Literal
 
+let analyze (tokens:seq<_>) = 
+    FslexDFA.analyzer.analyze(tokens,FslexTokenUtils.getTag)
+
 let parser = Parser<FslexToken Position>(
     FslexParseTable.rules,
     FslexParseTable.actions,
@@ -43,7 +46,7 @@ let compile (txt:string) =
     //let mutable result = defaultValue<_>
     txt
     |> FslexTokenUtils.tokenize 0
-    |> FslexDFA.analyze
+    |> analyze
     |> Seq.concat
     |> Seq.map(fun tok ->
         tokens <- tok::tokens

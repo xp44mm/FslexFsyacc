@@ -28,8 +28,8 @@ type FslexDFAFile =
             fxRules |> Line.indentCodeBlock 4
             "]"
             "let analyzer = Analyzer(nextStates, rules)"
-            "let analyze (tokens:seq<_>) = "
-            "    analyzer.analyze(tokens,getTag)"
+            //"let analyze (tokens:seq<_>) = "
+            //"    analyzer.analyze(tokens,getTag)"
         ]
         |> String.concat Environment.NewLine
 
