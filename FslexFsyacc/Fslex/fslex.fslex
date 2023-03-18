@@ -2,6 +2,7 @@
 open FslexFsyacc.Runtime
 open FslexFsyacc.Fslex
 open FslexFsyacc.Fslex.FslexTokenUtils
+type token = Position<FslexToken>
 %}
 
 <last>  = [")" "*" "+" "?" HOLE ID LITERAL "]"]

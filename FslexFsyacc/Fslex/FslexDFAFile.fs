@@ -7,8 +7,8 @@ open FSharp.Idioms
 type FslexDFAFile = 
     {
         header: string
-        nextStates: (uint32*(string*uint32)list)list
         rules: (uint32 list*uint32 list*string)list
+        nextStates: (uint32*(string*uint32)list)list
     }
 
     member this.generate(moduleName:string) =
@@ -24,12 +24,10 @@ type FslexDFAFile =
             $"module {moduleName}"
             $"let nextStates = {Literal.stringify this.nextStates}"
             this.header
-            "let rules:list<uint32 list*uint32 list*_> = ["
+            "let rules:list<uint32 list*uint32 list*(list<token>->_)> = ["
             fxRules |> Line.indentCodeBlock 4
             "]"
-            "let analyzer = Analyzer(nextStates, rules)"
-            //"let analyze (tokens:seq<_>) = "
-            //"    analyzer.analyze(tokens,getTag)"
+            "let analyzer = Analyzer<_,_>(nextStates, rules)"
         ]
         |> String.concat Environment.NewLine
 

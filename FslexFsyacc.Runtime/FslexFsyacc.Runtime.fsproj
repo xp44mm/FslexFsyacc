@@ -8,11 +8,11 @@
     <PackageProjectUrl>https://github.com/xp44mm/FslexFsyacc</PackageProjectUrl>
     <RepositoryUrl>https://github.com/xp44mm/FslexFsyacc</RepositoryUrl>
     <PackageTags>lex;yacc;compiler;parser;analyzer</PackageTags>
-    <PackageReleaseNotes>Position refac</PackageReleaseNotes>
+    <PackageReleaseNotes>analyzer</PackageReleaseNotes>
     <Authors>xp44m</Authors>
     <Company>34696643@qq.com</Company>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <Version>1.3.7</Version>
+    <Version>1.3.9</Version>
     <PackageReadmeFile>readme.md</PackageReadmeFile>
     <PackAsTool>False</PackAsTool>
   </PropertyGroup>
@@ -20,6 +20,7 @@
   <ItemGroup>
     <Compile Include="Position.fs" />
     <Compile Include="RenderUtils.fs" />
+    <Compile Include="AnalyzerUtils.fs" />
     <Compile Include="Analyzer.fs" />
     <Compile Include="ParserTableAction.fs" />
     <Compile Include="TheoryParser.fs" />
@@ -34,7 +35,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FSharp.Idioms" Version="1.2.23" />
+    <PackageReference Include="FSharp.Idioms" Version="1.2.25" />
     <PackageReference Include="FSharp.Literals" Version="2.2.11" />
   </ItemGroup>
 

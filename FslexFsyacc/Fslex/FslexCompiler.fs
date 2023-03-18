@@ -5,7 +5,7 @@ open FslexFsyacc.Lex
 open FslexFsyacc.Fslex.FslexTokenUtils
 open FSharp.Literals.Literal
 
-let analyze (tokens:seq<_>) = 
+let analyze (tokens:seq<Position<FslexToken>>) = 
     FslexDFA.analyzer.analyze(tokens,FslexTokenUtils.getTag)
 
 let parser = Parser<FslexToken Position>(

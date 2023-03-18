@@ -6,14 +6,14 @@ open System.IO
 open Xunit
 open Xunit.Abstractions
 
-open FSharp.Literals
+open FSharp.Literals.Literal
 open FSharp.xUnit
 open FSharp.Idioms
 
 type AnalyzeTest(output:ITestOutputHelper) =
     let show res =
         res
-        |> Literal.stringify
+        |> stringify
         |> output.WriteLine
 
     let analyze tokens =
@@ -21,6 +21,19 @@ type AnalyzeTest(output:ITestOutputHelper) =
         |> FslexCompiler.analyze
         |> Seq.concat
         |> List.ofSeq
+
+    [<Fact>]
+    member _.``input tokens is empty test``() =
+        let tokens = []
+        let y = 
+            tokens
+            |> analyze
+            |> List.map(fun x -> x.value)
+
+        output.WriteLine(stringify y)
+
+        let e = []
+        Should.equal e y
 
     [<Fact>]
     member _.``explicit amp test``() =
@@ -32,4 +45,3 @@ type AnalyzeTest(output:ITestOutputHelper) =
 
         let e = [LPAREN;ID "";RPAREN;AMP;LBRACK;RBRACK;STAR;AMP;LITERAL ""]
         Should.equal e y
-

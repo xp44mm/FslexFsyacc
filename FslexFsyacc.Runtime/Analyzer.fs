@@ -1,6 +1,7 @@
 ﻿namespace FslexFsyacc.Runtime
 
 open FSharp.Idioms
+open FSharp.Literals.Literal
 
 /// 解析带数据的对象
 type Analyzer<'tok,'u>
@@ -10,7 +11,7 @@ type Analyzer<'tok,'u>
     ) =
 
     // state -> tag -> state
-    let nextStates = 
+    let nextStates =
         nextStates
         |> Map.ofList
         |> Map.map(fun _ ls -> Map.ofList ls)
@@ -20,7 +21,7 @@ type Analyzer<'tok,'u>
         rules
         |> List.map Triple.first
 
-    let universalFinals = 
+    let universalFinals =
         finals
         |> List.concat
         |> Set.ofList
@@ -36,6 +37,11 @@ type Analyzer<'tok,'u>
         )
         |> Map.ofList
 
+    let (|Lookahead|_|) finalState =
+        if lexemesFromFinal.ContainsKey(finalState) then
+            Some lexemesFromFinal.[finalState]
+        else None
+
     let indicesFromFinal =
         finals
         |> List.mapi(fun i fs -> fs |> List.map(fun f -> f,i))
@@ -45,64 +51,57 @@ type Analyzer<'tok,'u>
     let finalMappers =
         indicesFromFinal
         |> Map.map(fun final i -> Triple.last rules.[i])
-    
+
     let tryNextState state symbol =
         if nextStates.ContainsKey(state) && nextStates.[state].ContainsKey(symbol) then
             Some nextStates.[state].[symbol]
         else None
 
-    //无副作用，根据 states 从后向前找到final,lexeme的位置。
-    let retractFinalAndLexemeSate (revStates) =
-        let finalStates =
-            revStates
-            |> List.skipWhile(universalFinals.Contains>>not)
+    let retract (revStates:uint32 list) (revTokens:'a list) =
+        let finalStates,finalTokens =
+            AnalyzerUtils.skipUntilFoundIn universalFinals (revStates) (revTokens)
+
         let finalState = finalStates.Head
 
-        let lexemeStates =
-            if lexemesFromFinal.ContainsKey(finalState) then
-                let lexemes = lexemesFromFinal.[finalState]
-                let lexemeStates =
-                    finalStates.Tail
-                    |> List.skipWhile(lexemes.Contains>>not)
-                if lexemeStates.IsEmpty then
-                    failwithf "no found: %A" revStates
-                lexemeStates
-            else finalStates
-        finalState, lexemeStates.Length
+        let revLexemeTokens =
+            match finalState with
+            | Lookahead lexemes ->
+                AnalyzerUtils.skipUntilFoundIn lexemes finalStates.Tail finalTokens.Tail
+                |> snd
+            | _ -> finalTokens
+        finalState,revLexemeTokens
 
     member _.analyze(inputs:seq<'tok>, getTag:'tok -> string) =
         let iterator =
-            RetractableIterator(inputs |> Seq.map(fun tok -> getTag tok,tok))
+            inputs
+            |> Seq.map(fun tok -> getTag tok,tok)
+            |> BufferIterator
 
-        let rec forward state states =
-            let nextStates = state::states
+        // todo:状态加索引，作用是缓存count
+        let rec tryForwardIterator (states:uint32 list) tokens =
             match iterator.tryNext() with
-            | None -> nextStates // 没有取到符号
+            | None ->
+                match tokens with
+                | [] -> None
+                | _ -> Some(states,tokens)
             | Some (tag, tok) ->
-                match tryNextState state tag with
-                | None -> nextStates //没有下一状态
-                | Some nextState ->
-                    forward nextState nextStates
-
-        ///division是相邻token,or division的容器。
-        let getDivision () =
-            let revStates = forward 0u []
-            if revStates.IsEmpty then
-                failwith "FslexFsyacc analyzer:`forward` cannot take any tokens."
-
-            let finalState,stateCount =
-                try
-                retractFinalAndLexemeSate(revStates)
-                with _ ->
-                let buffer = iterator.dequeue(revStates.Length-1)
-                failwithf "FslexFsyacc analyzer:retract was not able to find an accepted status in %A" (buffer)
-
-            let lexeme = iterator.dequeue(stateCount-1)
-            let mapper = finalMappers.[finalState]
-            let lexbuf = lexeme |> Array.map snd |> Array.toList
-            mapper lexbuf
+                match tryNextState states.Head tag with
+                | Some state ->
+                    tryForwardIterator (state::states) (tok::tokens)
+                | None -> Some(states,tokens)
 
         seq {
             while iterator.ongoing() do
-                yield getDivision()
+                match tryForwardIterator [0u] [] with
+                | None -> ()
+                | Some (revStates,revTokens) ->
+                    let finalState,revLexemeTokens =
+                        retract revStates revTokens
+                    let mapper = finalMappers.[finalState]
+                    // todo: 颠倒顺序同时计算长度
+                    let len,lexbuf =
+                        revLexemeTokens
+                        |> List.countRev
+                    iterator.dequeue(len)
+                    yield mapper lexbuf
         }

@@ -1,5 +1,5 @@
 ﻿namespace FslexFsyacc.Lex
-
+open FSharp.Literals.Literal
 /// 从Lex文件一个匹配模式翻译过来的NFA
 type PatternNFA<'a when 'a:comparison> =
     {
@@ -38,4 +38,4 @@ type PatternNFA<'a when 'a:comparison> =
             let n1 = RegularExpressionNFA.convertToNFA i rgx
             let n2 = RegularExpressionNFA.convertToNFA (n1.maxState+1u) trailling
             PatternNFA.lookahead(n1, n2)
-        | ls -> failwithf "never:%d" ls.Length
+        | _ -> failwith $"fromRgx never:{stringify pattern}"

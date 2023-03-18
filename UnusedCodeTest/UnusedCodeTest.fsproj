@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="Analyzer0.fs" />
     <Compile Include="BalancedBracketCounter.fs" />
     <Compile Include="BalancedBracketCounterTest.fs" />
     <Compile Include="RegularSymbolToken.fs" />

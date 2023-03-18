@@ -3,7 +3,8 @@ let nextStates = [0u,["%%",5u;"&",5u;"(",5u;")",3u;"*",3u;"+",3u;"/",5u;"=",5u;"
 open FslexFsyacc.Runtime
 open FslexFsyacc.Fslex
 open FslexFsyacc.Fslex.FslexTokenUtils
-let rules:list<uint32 list*uint32 list*_> = [
+type token = Position<FslexToken>
+let rules:list<uint32 list*uint32 list*(list<token>->_)> = [
     [1u],[],fun (lexbuf:list<_>) ->
         [lexbuf.Head]
     [4u],[3u],fun (lexbuf:list<_>) ->
@@ -11,4 +12,4 @@ let rules:list<uint32 list*uint32 list*_> = [
     [2u;3u;5u],[],fun (lexbuf:list<_>) ->
         lexbuf
 ]
-let analyzer = Analyzer(nextStates, rules)
+let analyzer = Analyzer<_,_>(nextStates, rules)
