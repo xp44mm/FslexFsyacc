@@ -78,7 +78,7 @@ type Fsyacc2ParseTableTest(output:ITestOutputHelper) =
         output.WriteLine(src)
 
     [<Fact>]
-    member _.``04 - 汇总冲突的产生式``() =
+    member _.``04 - precedence Of Productions`` () =
         let collection = ambiguousCollection text
 
         let productions = 

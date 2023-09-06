@@ -148,7 +148,7 @@ type XExpr =
     | Tuple of
         exprs: XExpr list
     | AnonRecd of
-        recordFields: (Ident * XExpr) list
+        recordFields: (LongIdent * XExpr) list
     | ArrayOrList of isArray: bool * exprs: XExpr list
     | Record of
         recordFields: XExprRecordField list
@@ -311,7 +311,7 @@ type XStaticOptimizationConstraint =
 [<RequireQualifiedAccess>]
 type XSimplePats =
     | SimplePats of pats: XSimplePat list
-    | Typed of pats: XSimplePats * targetType: XType
+    //| Typed of pats: XSimplePats * targetType: XType
 
 [<RequireQualifiedAccess>]
 type XArgPats =
@@ -474,7 +474,7 @@ type XEnumCase =
     | XEnumCase of
         attributes: XAttributes *
         ident: Ident *
-        value: XConst
+        valueExpr: XExpr
 
 type XUnionCase =
     | XUnionCase of

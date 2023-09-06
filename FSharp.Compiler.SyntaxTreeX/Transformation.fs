@@ -160,10 +160,13 @@ let getExpr (expr:SynExpr) =
     | SynExpr.AnonRecd (
         isStruct: bool ,
         copyInfo: (SynExpr * BlockSeparator) option ,
-        recordFields: (Ident * range option * SynExpr) list ,
-        range: range) ->
+        recordFields: (SynLongIdent * range option * SynExpr) list ,
+        range: range,
+        trivia) ->
         XExpr.AnonRecd (
-            recordFields|> List.map (fun(i,_,e)->i.idText, getExpr e) 
+            recordFields
+            |> List.map (fun(i,_,e)->
+                getLongIdentFromSyn i, getExpr e) 
             )
 
     | SynExpr.ArrayOrList(isArray: bool, exprs: SynExpr list, range: range)->
@@ -467,7 +470,7 @@ let getExpr (expr:SynExpr) =
         XExpr.ArbitraryAfterError
     | SynExpr.FromParseError ( expr: SynExpr , range: range)->
         XExpr.FromParseError
-    | SynExpr.DiscardAfterMissingQualificationAfterDot ( expr: SynExpr , range: range)->
+    | SynExpr.DiscardAfterMissingQualificationAfterDot ( expr: SynExpr, dotRange, range: range) ->
         XExpr.DiscardAfterMissingQualificationAfterDot
     | SynExpr.Fixed ( expr: SynExpr , range: range)->
         XExpr.Fixed (getExpr expr)
@@ -696,7 +699,7 @@ let getPat(src: SynPat) =
             getArgPats argPats ,
             Option.map getAccess accessibility
             )
-    | SynPat.Tuple( isStruct: bool , elementPats: SynPat list , range: range) ->
+    | SynPat.Tuple( isStruct: bool , elementPats: SynPat list ,commaRanges, range: range) ->
         XPat.Tuple( isStruct ,List.map getPat elementPats)
     | SynPat.Paren( pat: SynPat , range: range) ->
         XPat.Paren(getPat pat)
@@ -766,7 +769,7 @@ let getArgPats(src: SynArgPats )=
     match src with
     | SynArgPats.Pats ( pats: SynPat list)->
         XArgPats.Pats (List.map getPat pats)
-    | SynArgPats.NamePatPairs ( pats: (Ident * range * SynPat) list , range: range,trivia) ->
+    | SynArgPats.NamePatPairs ( pats: (Ident * range option * SynPat) list , range: range,trivia) ->
         XArgPats.NamePatPairs (pats |> List.map (fun(i,_,p)->i.idText,getPat p)) 
 
 let getComponentInfo(src: SynComponentInfo )=
@@ -843,7 +846,8 @@ let getMemberDefn (src:SynMemberDefn) =
         ctorArgs: SynSimplePats , 
         selfIdentifier: Ident option ,
         xmlDoc: FSharp.Compiler.Xml.PreXmlDoc ,
-        range: FSharp.Compiler.Text.range
+        range: FSharp.Compiler.Text.range,
+        trivia
         ) ->
         XMemberDefn.ImplicitCtor ( 
             Option.map getAccess accessibility , 
@@ -963,20 +967,21 @@ let getSimplePats(src:SynSimplePats)=
     match src with
     | SynSimplePats.SimplePats (
         pats: SynSimplePat list ,
+        commaRanges,
         range: FSharp.Compiler.Text.range
         ) ->
         XSimplePats.SimplePats (
             List.map getSimplePat pats
         )
-    | SynSimplePats.Typed (
-        pats: SynSimplePats,
-        targetType: SynType ,
-        range: FSharp.Compiler.Text.range
-        ) ->
-        XSimplePats.Typed (
-            getSimplePats pats,
-            getType targetType
-        )
+    //| SynSimplePats.Typed (
+    //    pats: SynSimplePats,
+    //    targetType: SynType ,
+    //    range: FSharp.Compiler.Text.range
+    //    ) ->
+    //    XSimplePats.Typed (
+    //        getSimplePats pats,
+    //        getType targetType
+    //    )
 
 let getMemberKind(src:SynMemberKind)=
     match src with
@@ -1443,19 +1448,18 @@ let getTypeDefnSigRepr(src:SynTypeDefnSigRepr) =
   
 let getEnumCase(src:SynEnumCase) =
     match src with
-    | SynEnumCase(
+    | SynEnumCase.SynEnumCase(
         attributes: SynAttributes ,
         ident: SynIdent ,
-        value: SynConst ,
-        valueRange: FSharp.Compiler.Text.range ,
+        valueExpr: SynExpr ,
         xmlDoc: FSharp.Compiler.Xml.PreXmlDoc ,
         range: FSharp.Compiler.Text.range ,
         trivia: FSharp.Compiler.SyntaxTrivia.SynEnumCaseTrivia
         ) ->
-        XEnumCase(
+        XEnumCase.XEnumCase(
             attributes |> getAttributes ,
             ident|> getIdent ,
-            value|> getConst
+            valueExpr |> getExpr
         )
 let getArgInfo(src:SynArgInfo) =
     match src with
