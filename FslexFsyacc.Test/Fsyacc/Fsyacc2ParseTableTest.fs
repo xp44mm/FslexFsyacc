@@ -21,29 +21,36 @@ type Fsyacc2ParseTableTest(output:ITestOutputHelper) =
         |> Literal.stringify
         |> output.WriteLine
 
-    let sourcePath = Path.Combine(solutionPath, @"FslexFsyacc\Fsyacc")
-    let filePath = Path.Combine(sourcePath, @"fsyacc2.fsyacc")
-    let text = File.ReadAllText(filePath)
-
     // ** input **
     let parseTblName = "Fsyacc2ParseTable"
     let parseTblModule = $"FslexFsyacc.Fsyacc.{parseTblName}"
+    let sourcePath = Path.Combine(solutionPath, @"FslexFsyacc\Fsyacc")
+    let filePath = Path.Combine(sourcePath, @"fsyacc2.fsyacc")
     let parseTblPath = Path.Combine(sourcePath, $"{parseTblName}.fs")
 
-    let grammar text =
+    let text = File.ReadAllText(filePath,Encoding.UTF8)
+
+    // 与fsyacc文件完全相对应的结构树
+    let rawFsyacc = 
         text
-        |> FlatFsyaccFileUtils.parse
+        |> RawFsyaccFile2Utils.parse 
+
+    let flatedFsyacc = 
+        rawFsyacc 
+        |> RawFsyaccFile2Utils.toFlated
+
+    let grammar (flatedFsyacc) =
+        flatedFsyacc
         |> FlatFsyaccFileUtils.toGrammar
 
-    let ambiguousCollection text =
-        text
-        |> FlatFsyaccFileUtils.parse
+    let ambiguousCollection (flatedFsyacc) =
+        flatedFsyacc
         |> FlatFsyaccFileUtils.toAmbiguousCollection
 
     //解析表数据
-    let parseTbl text = 
-        text
-        |> FlatFsyaccFileUtils.parse
+    let parseTbl (flatedFsyacc) = 
+        flatedFsyacc
+        //|> FlatFsyaccFileUtils.parse
         |> FlatFsyaccFileUtils.toFsyaccParseTableFile
 
     [<Fact>]
@@ -51,7 +58,7 @@ type Fsyacc2ParseTableTest(output:ITestOutputHelper) =
         let fsyacc = 
             text
             |> FlatFsyaccFileUtils.parse
-
+        // the start symbol of bnf 
         let s0 = 
             fsyacc.rules
             |> FlatFsyaccFileRule.getStartSymbol
@@ -65,21 +72,21 @@ type Fsyacc2ParseTableTest(output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``02 - list all tokens``() =
-        let grammar = grammar text
+        let grammar = grammar (flatedFsyacc)
         let y = set ["%%";"%left";"%nonassoc";"%prec";"%right";"%type";"(";")";"*";"+";":";"?";"HEADER";"ID";"LITERAL";"SEMANTIC";"TYPE_ARGUMENT";"[";"]";"|"]
         show grammar.terminals
         Should.equal y grammar.terminals
 
     [<Fact>]
     member _.``03 - list all states``() =
-        let collection = ambiguousCollection text
+        let collection = ambiguousCollection (flatedFsyacc)
         
         let src = collection.render()
         output.WriteLine(src)
 
     [<Fact>]
     member _.``04 - precedence Of Productions`` () =
-        let collection = ambiguousCollection text
+        let collection = ambiguousCollection (flatedFsyacc)
 
         let productions = 
             collection.collectConflictedProductions()
@@ -95,7 +102,7 @@ type Fsyacc2ParseTableTest(output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``05 - list declarations``() =
-        let grammar = grammar text
+        let grammar = grammar (flatedFsyacc)
 
         let terminals =
             grammar.terminals
@@ -124,7 +131,7 @@ type Fsyacc2ParseTableTest(output:ITestOutputHelper) =
 
     [<Fact(Skip="once for all!")>] // 
     member _.``06 - generate Fsyacc2ParseTable``() =
-        let parseTbl = parseTbl text
+        let parseTbl = parseTbl (flatedFsyacc)
 
         let fsharpCode = parseTbl.generateModule(parseTblModule)
         File.WriteAllText(parseTblPath,fsharpCode,Encoding.UTF8)
@@ -132,7 +139,7 @@ type Fsyacc2ParseTableTest(output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``10 - valid ParseTable``() =
-        let parseTbl = parseTbl text
+        let parseTbl = parseTbl (flatedFsyacc)
 
         Should.equal parseTbl.actions Fsyacc2ParseTable.actions
         Should.equal parseTbl.closures Fsyacc2ParseTable.closures

@@ -93,7 +93,6 @@
 		<Compile Include="Fsyacc\FsyaccFileRules.fs" />
 		<Compile Include="Fsyacc\FsyaccFileShaking.fs" />
 		<Compile Include="Fsyacc\FsyaccRules.fs" />
-		<Compile Include="Fsyacc\RawFsyaccFile.fs" />
 		<Compile Include="Fsyacc\FsyaccFilePrecedences.fs" />
 		<Compile Include="Fsyacc\FlatFsyaccFile.fs" />
 		<Compile Include="Fsyacc\FlatFsyaccFileRule.fs" />

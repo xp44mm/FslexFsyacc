@@ -80,8 +80,11 @@ type ParsParseTableTest(output:ITestOutputHelper) =
     let filePath = Path.Combine(sourcePath, "pars.fsyacc")
 
     let text = File.ReadAllText(filePath)
-    let rawFsyacc = RawFsyaccFile.parse text
-    let fsyacc = FlatFsyaccFile.fromRaw rawFsyacc
+    //let rawFsyacc = RawFsyaccFile.parse text
+    //let fsyacc = FlatFsyaccFile.fromRaw rawFsyacc
+    let fsyacc = 
+        text
+        |> FlatFsyaccFileUtils.parse
 
     let removeErrorRules =
         let robust = set [
@@ -139,7 +142,11 @@ type ParsParseTableTest(output:ITestOutputHelper) =
                         |> List.map (fun(prod,nm,ac)->prod,"","")
             }
 
-        let txt = flat.toRaw().render()
+        //let txt = flat.toRaw().render()
+        let txt =
+            flat
+            |> RawFsyaccFile2Utils.fromFlat
+            |> RawFsyaccFile2Utils.render
 
         let outputDir = Path.Combine(sourcePath, $"{s0}.fsyacc")
         File.WriteAllText(outputDir,txt,Encoding.UTF8)
@@ -164,7 +171,11 @@ type ParsParseTableTest(output:ITestOutputHelper) =
                         |> List.map (fun(prod,nm,ac)->prod,"","")
             }
 
-        let txt = flat.toRaw().render()
+        //let txt = flat.toRaw().render()
+        let txt =
+            flat
+            |> RawFsyaccFile2Utils.fromFlat
+            |> RawFsyaccFile2Utils.render
 
         let outputDir = Path.Combine(sourcePath, $"{s0}.fsyacc")
         File.WriteAllText(outputDir,txt,Encoding.UTF8)
@@ -189,7 +200,11 @@ type ParsParseTableTest(output:ITestOutputHelper) =
                         |> List.map (fun(prod,nm,ac)->prod,"","")
             }
 
-        let txt = flat.toRaw().render()
+        //let txt = flat.toRaw().render()
+        let txt =
+            flat
+            |> RawFsyaccFile2Utils.fromFlat
+            |> RawFsyaccFile2Utils.render
 
         let outputDir = Path.Combine(sourcePath, $"{s0}.fsyacc")
         File.WriteAllText(outputDir,txt,Encoding.UTF8)
@@ -217,7 +232,11 @@ type ParsParseTableTest(output:ITestOutputHelper) =
                         |> List.map (fun(prod,nm,ac)->prod,"","")
             }
 
-        let txt = flat.toRaw().render()
+        //let txt = flat.toRaw().render()
+        let txt =
+            flat
+            |> RawFsyaccFile2Utils.fromFlat
+            |> RawFsyaccFile2Utils.render
 
         let outputDir = Path.Combine(sourcePath, $"{s0}.fsyacc")
         File.WriteAllText(outputDir,txt,Encoding.UTF8)
@@ -243,7 +262,10 @@ type ParsParseTableTest(output:ITestOutputHelper) =
                         |> List.map (fun(prod,nm,ac)->prod,"","")
             }
 
-        let txt = flat.toRaw().render()
+        let txt = // flat.toRaw().render()
+            flat
+            |> RawFsyaccFile2Utils.fromFlat
+            |> RawFsyaccFile2Utils.render
 
         let outputDir = Path.Combine(sourcePath, $"{s0}.fsyacc")
         File.WriteAllText(outputDir,txt,Encoding.UTF8)

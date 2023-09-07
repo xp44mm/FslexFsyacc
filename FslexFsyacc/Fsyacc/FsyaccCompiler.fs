@@ -1,4 +1,5 @@
-﻿module FslexFsyacc.Fsyacc.FsyaccCompiler
+﻿[<System.Obsolete("=> Fsyacc2Compiler")>]
+module FslexFsyacc.Fsyacc.FsyaccCompiler
 
 open FslexFsyacc.Runtime
 open FslexFsyacc.Fsyacc

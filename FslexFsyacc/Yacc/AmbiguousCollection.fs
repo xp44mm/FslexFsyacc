@@ -51,9 +51,9 @@ type AmbiguousCollection =
             not conflicts.IsEmpty
         )
 
-    [<Obsolete("this.filterProperConflicts")>]
-    member this.filterConflictedClosures() = 
-        this.filterProperConflicts()
+    //[<Obsolete("this.filterProperConflicts")>]
+    //member this.filterConflictedClosures() = 
+    //    this.filterProperConflicts()
 
     /// 从冲突汇总产生式，以此得知哪些产生式必须指定优先级，以排除歧义。
     member this.collectConflictedProductions() =

@@ -557,7 +557,7 @@ let getType(tp:SynType) =
         XType.Paren (getType innerType)
     | SynType.SignatureParameter _ -> failwith ""
     | SynType.Or _ -> failwith ""
-
+    | SynType.FromParseError _ -> failwith ""
 
 
 let getConst (c: SynConst) =

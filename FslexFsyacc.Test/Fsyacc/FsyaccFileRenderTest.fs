@@ -31,7 +31,14 @@ rec? :
     | (*empty*) {  }
 """
 
-        let fsyacc = RawFsyaccFile.parse text
+        //let fsyacc = RawFsyaccFile.parse text
+
+        let fsyacc =
+            text
+            |> RawFsyaccFile2Utils.parse
+
+        let outp = fsyacc |> RawFsyaccFile2Utils.render
+
         output.WriteLine(stringify fsyacc.rules)
-        output.WriteLine(fsyacc.render())
-        ()
+        output.WriteLine(outp)
+        //()
