@@ -129,7 +129,7 @@ type Fsyacc2ParseTableTest(output:ITestOutputHelper) =
         output.WriteLine(sourceCode)
 
 
-    [<Fact(Skip="once for all!")>] // 
+    [<Fact>] // (Skip="once for all!")
     member _.``06 - generate Fsyacc2ParseTable``() =
         let parseTbl = parseTbl (flatedFsyacc)
 

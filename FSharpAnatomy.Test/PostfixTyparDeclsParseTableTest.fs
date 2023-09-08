@@ -21,30 +21,57 @@ type PostfixTyparDeclsParseTableTest (output:ITestOutputHelper) =
         |> Literal.stringify
         |> output.WriteLine
 
-    let fsyaccPath = Path.Combine(Dir.FSharpAnatomyPath,"postfixTyparDecls.fsyacc")
-    let text = File.ReadAllText(fsyaccPath)
-
-    //let rawFsyacc = RawFsyaccFile.parse text
-    //let fsyacc = FlatFsyaccFile.fromRaw rawFsyacc
-
     let parseTblName = "PostfixTyparDeclsParseTable"
     let moduleName = $"FSharpAnatomy.{parseTblName}"
+    let filePath = Path.Combine(Dir.FSharpAnatomyPath,"postfixTyparDecls.fsyacc")
     let parseTblPath = Path.Combine(Dir.FSharpAnatomyPath, $"{parseTblName}.fs")
 
-    let grammar text =
+
+    //let text = File.ReadAllText(fsyaccPath)
+
+    ////let rawFsyacc = RawFsyaccFile.parse text
+    ////let fsyacc = FlatFsyaccFile.fromRaw rawFsyacc
+
+
+    //let grammar text =
+    //    text
+    //    |> FlatFsyaccFileUtils.parse
+    //    |> FlatFsyaccFileUtils.toGrammar
+
+    //let ambiguousCollection text =
+    //    text
+    //    |> FlatFsyaccFileUtils.parse
+    //    |> FlatFsyaccFileUtils.toAmbiguousCollection
+
+    ////解析表数据
+    //let parseTbl text = 
+    //    text
+    //    |> FlatFsyaccFileUtils.parse
+    //    |> FlatFsyaccFileUtils.toFsyaccParseTableFile
+
+    let text = File.ReadAllText(filePath,Encoding.UTF8)
+
+    // 与fsyacc文件完全相对应的结构树
+    let rawFsyacc = 
         text
-        |> FlatFsyaccFileUtils.parse
+        |> RawFsyaccFile2Utils.parse 
+
+    let flatedFsyacc = 
+        rawFsyacc 
+        |> RawFsyaccFile2Utils.toFlated
+
+    let grammar (flatedFsyacc) =
+        flatedFsyacc
         |> FlatFsyaccFileUtils.toGrammar
 
-    let ambiguousCollection text =
-        text
-        |> FlatFsyaccFileUtils.parse
+    let ambiguousCollection (flatedFsyacc) =
+        flatedFsyacc
         |> FlatFsyaccFileUtils.toAmbiguousCollection
 
     //解析表数据
-    let parseTbl text = 
-        text
-        |> FlatFsyaccFileUtils.parse
+    let parseTbl (flatedFsyacc) = 
+        flatedFsyacc
+        //|> FlatFsyaccFileUtils.parse
         |> FlatFsyaccFileUtils.toFsyaccParseTableFile
 
     [<Fact>]
@@ -72,7 +99,7 @@ type PostfixTyparDeclsParseTableTest (output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``02 - list all tokens``() =
-        let grammar = grammar text
+        let grammar = grammar flatedFsyacc
 
         let tokens = grammar.terminals
         let res = set ["#";"(";")";"*";",";"->";".";":";":>";";";"<";">";"ARRAY_TYPE_SUFFIX";"HTYPAR";"IDENT";"OPERATOR_NAME";"QTYPAR";"_";"and";"comparison";"delegate";"enum";"equality";"member";"new";"not";"null";"or";"static";"struct";"unmanaged";"when";"{|";"|}"]
@@ -82,7 +109,7 @@ type PostfixTyparDeclsParseTableTest (output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``03 - precedence Of Productions``() =
-        let collection = ambiguousCollection text
+        let collection = ambiguousCollection flatedFsyacc
 
         let terminals = 
             collection.grammar.terminals
@@ -97,14 +124,14 @@ type PostfixTyparDeclsParseTableTest (output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``04 - list all states``() =
-        let collection = ambiguousCollection text
+        let collection = ambiguousCollection flatedFsyacc
         
         let text = collection.render()
         output.WriteLine(text)
 
     [<Fact>]
     member _.``05 - list the type annotaitions``() =
-        let grammar = grammar text
+        let grammar = grammar flatedFsyacc
 
         let terminals =
             grammar.terminals
@@ -132,7 +159,7 @@ type PostfixTyparDeclsParseTableTest (output:ITestOutputHelper) =
 
     [<Fact(Skip="once for all!")>] // 
     member _.``06 - generate ParseTable``() =
-        let parseTbl = parseTbl text
+        let parseTbl = parseTbl flatedFsyacc
         let fsharpCode = parseTbl.generateModule(moduleName)
 
         File.WriteAllText(parseTblPath,fsharpCode,Encoding.UTF8)
@@ -140,7 +167,7 @@ type PostfixTyparDeclsParseTableTest (output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``10 - valid ParseTable``() =
-        let src = parseTbl text
+        let src = parseTbl flatedFsyacc
 
         Should.equal src.actions PostfixTyparDeclsParseTable.actions
         Should.equal src.closures PostfixTyparDeclsParseTable.closures

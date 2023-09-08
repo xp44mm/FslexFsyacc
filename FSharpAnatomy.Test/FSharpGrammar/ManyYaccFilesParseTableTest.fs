@@ -24,7 +24,7 @@ type ManyYaccFilesParseTableTest(output:ITestOutputHelper) =
 
     let readYacc filename =
         let filePath = Path.Combine(sourcePath, $"{filename}.fsyacc")
-        let text = File.ReadAllText(filePath)
+        let text = File.ReadAllText(filePath,Encoding.UTF8)
 
         //let rawFsyacc = RawFsyaccFile.parse text
         //FlatFsyaccFile.fromRaw rawFsyacc

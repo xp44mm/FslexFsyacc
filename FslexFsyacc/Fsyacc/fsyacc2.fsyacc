@@ -117,28 +117,3 @@ declaration :
 %type<RegularSymbol list> symbol+ symbol* brackets parens
 %type<RegularSymbol*string> repetition
 
-// HEADER : string
-// ID : string
-// LITERAL : string
-// SEMANTIC : string
-// TYPE_ARGUMENT: string
-// assoc : string
-// body+ : "(string list*string*string)list"
-// body : "string list*string*string"
-// file : RawFsyaccFile2
-// rule : "string*((string list*string*string)list)"
-// rule+ : "(string*((string list*string*string)list))list"
-// precedence : "string*string list"
-// precedence+ : "(string*string list)list"
-// declaration : "string*string list"
-// declaration+ : "(string*string list)list"
-// precToken? : string
-// atomic : string
-// quantifier : string
-// symbol : RegularSymbol
-// symbol+ : "RegularSymbol list"
-// symbol* : "RegularSymbol list"
-// brackets : "RegularSymbol list"
-// parens : "RegularSymbol list"
-// repetition : "RegularSymbol*string"
-

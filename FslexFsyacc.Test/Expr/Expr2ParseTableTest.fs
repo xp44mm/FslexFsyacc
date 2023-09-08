@@ -14,26 +14,49 @@ open FslexFsyacc.Yacc
 open FslexFsyacc.Runtime
 
 type Expr2ParseTableTest(output:ITestOutputHelper) =
-    let filePath = Path.Combine(__SOURCE_DIRECTORY__, @"expr2.fsyacc")
-    let text = File.ReadAllText(filePath)
-
     let parseTblName = "Expr2ParseTable"
     let parseTblModule = $"FslexFsyacc.Expr.{parseTblName}"
+    let filePath = Path.Combine(__SOURCE_DIRECTORY__, @"expr2.fsyacc")
     let parseTblPath = Path.Combine(__SOURCE_DIRECTORY__, $"{parseTblName}.fs")
 
-    let grammar text =
+    //let text = File.ReadAllText(filePath)
+
+    //let grammar text =
+    //    text
+    //    |> FlatFsyaccFileUtils.parse
+    //    |> FlatFsyaccFileUtils.toGrammar
+
+    //let ambiguousCollection text =
+    //    text
+    //    |> FlatFsyaccFileUtils.parse
+    //    |> FlatFsyaccFileUtils.toAmbiguousCollection
+
+    //let parseTbl text = 
+    //    text
+    //    |> FlatFsyaccFileUtils.parse
+    //    |> FlatFsyaccFileUtils.toFsyaccParseTableFile
+    let text = File.ReadAllText(filePath,Encoding.UTF8)
+
+    // 与fsyacc文件完全相对应的结构树
+    let rawFsyacc = 
         text
-        |> FlatFsyaccFileUtils.parse
+        |> RawFsyaccFile2Utils.parse 
+
+    let flatedFsyacc = 
+        rawFsyacc 
+        |> RawFsyaccFile2Utils.toFlated
+
+    let grammar (flatedFsyacc) =
+        flatedFsyacc
         |> FlatFsyaccFileUtils.toGrammar
 
-    let ambiguousCollection text =
-        text
-        |> FlatFsyaccFileUtils.parse
+    let ambiguousCollection (flatedFsyacc) =
+        flatedFsyacc
         |> FlatFsyaccFileUtils.toAmbiguousCollection
 
-    let parseTbl text = 
-        text
-        |> FlatFsyaccFileUtils.parse
+    //解析表数据
+    let parseTbl (flatedFsyacc) = 
+        flatedFsyacc
         |> FlatFsyaccFileUtils.toFsyaccParseTableFile
 
     [<Fact>]
@@ -55,7 +78,7 @@ type Expr2ParseTableTest(output:ITestOutputHelper) =
 
     [<Fact()>] // Skip="once for all!"
     member _.``generate Parse Table``() =
-        let parseTbl = parseTbl text
+        let parseTbl = parseTbl flatedFsyacc
         let src = parseTbl.generateModule(parseTblModule)
 
         File.WriteAllText(parseTblPath, src, Encoding.UTF8)
@@ -63,7 +86,7 @@ type Expr2ParseTableTest(output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``10 - valid ParseTable``() =
-        let parseTbl = parseTbl text
+        let parseTbl = parseTbl flatedFsyacc
 
         Should.equal parseTbl.actions Expr2ParseTable.actions
         Should.equal parseTbl.closures Expr2ParseTable.closures

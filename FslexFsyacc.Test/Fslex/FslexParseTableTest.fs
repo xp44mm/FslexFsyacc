@@ -28,29 +28,55 @@ type FslexParseTableTest(output: ITestOutputHelper) =
             .Parent
             .FullName
 
+    let parseTblName = "FslexParseTable"
+    let parseTblModule = $"FslexFsyacc.Fslex.{parseTblName}"
     let sourcePath = Path.Combine(solutionPath, @"FslexFsyacc\Fslex")
     let filePath = Path.Combine(sourcePath, @"fslex.fsyacc")
-    let text = File.ReadAllText(filePath)
+    let parseTblPath = Path.Combine(sourcePath, $"{parseTblName}.fs")
+
+    //let text = File.ReadAllText(filePath)
     //let rawFsyacc = RawFsyaccFile.parse text
     //let fsyacc = FlatFsyaccFile.fromRaw rawFsyacc
 
-    let parseTblName = "FslexParseTable"
-    let parseTblModule = $"FslexFsyacc.Fslex.{parseTblName}"
-    let parseTblPath = Path.Combine(sourcePath, $"{parseTblName}.fs")
 
-    let grammar text =
+    //let grammar text =
+    //    text
+    //    |> FlatFsyaccFileUtils.parse
+    //    |> FlatFsyaccFileUtils.toGrammar
+
+    //let ambiguousCollection text =
+    //    text
+    //    |> FlatFsyaccFileUtils.parse
+    //    |> FlatFsyaccFileUtils.toAmbiguousCollection
+
+    //let parseTbl text = 
+    //    text
+    //    |> FlatFsyaccFileUtils.parse
+    //    |> FlatFsyaccFileUtils.toFsyaccParseTableFile
+
+    let text = File.ReadAllText(filePath,Encoding.UTF8)
+
+    // 与fsyacc文件完全相对应的结构树
+    let rawFsyacc = 
         text
-        |> FlatFsyaccFileUtils.parse
+        |> RawFsyaccFile2Utils.parse 
+
+    let flatedFsyacc = 
+        rawFsyacc 
+        |> RawFsyaccFile2Utils.toFlated
+
+    let grammar (flatedFsyacc) =
+        flatedFsyacc
         |> FlatFsyaccFileUtils.toGrammar
 
-    let ambiguousCollection text =
-        text
-        |> FlatFsyaccFileUtils.parse
+    let ambiguousCollection (flatedFsyacc) =
+        flatedFsyacc
         |> FlatFsyaccFileUtils.toAmbiguousCollection
 
-    let parseTbl text = 
-        text
-        |> FlatFsyaccFileUtils.parse
+    //解析表数据
+    let parseTbl (flatedFsyacc) = 
+        flatedFsyacc
+        //|> FlatFsyaccFileUtils.parse
         |> FlatFsyaccFileUtils.toFsyaccParseTableFile
 
     [<Fact>]
@@ -72,7 +98,7 @@ type FslexParseTableTest(output: ITestOutputHelper) =
 
     [<Fact>]
     member _.``02 - list all tokens``() =
-        let grammar = grammar text
+        let grammar = grammar flatedFsyacc
 
         let y = set [ 
             "%%"
@@ -100,14 +126,14 @@ type FslexParseTableTest(output: ITestOutputHelper) =
 
     [<Fact>]
     member _.``03 - list all states``() =
-        let collection = ambiguousCollection text
+        let collection = ambiguousCollection flatedFsyacc
         
         let text = collection.render()
         output.WriteLine(text)
 
     [<Fact>]
     member _.``04 - 汇总冲突的产生式``() =
-        let collection = ambiguousCollection text
+        let collection = ambiguousCollection flatedFsyacc
 
         let productions = 
             collection.collectConflictedProductions()
@@ -128,7 +154,7 @@ type FslexParseTableTest(output: ITestOutputHelper) =
 
     [<Fact>]
     member _.``05 - list the type annotaitions``() =
-        let grammar = grammar text
+        let grammar = grammar flatedFsyacc
 
         let terminals =
             grammar.terminals
@@ -156,7 +182,7 @@ type FslexParseTableTest(output: ITestOutputHelper) =
 
     [<Fact()>] // Skip="once for all!"
     member _.``06 - generate ParseTable``() =
-        let parseTbl = parseTbl text
+        let parseTbl = parseTbl flatedFsyacc
 
         let fsharpCode = parseTbl.generateModule(parseTblModule)
         File.WriteAllText(parseTblPath, fsharpCode, Encoding.UTF8)
@@ -164,7 +190,7 @@ type FslexParseTableTest(output: ITestOutputHelper) =
 
     [<Fact>]
     member _.``07 - valid ParseTable``() =
-        let src = parseTbl text
+        let src = parseTbl flatedFsyacc
 
         Should.equal src.actions FslexParseTable.actions
         Should.equal src.closures FslexParseTable.closures
@@ -193,7 +219,7 @@ type FslexParseTableTest(output: ITestOutputHelper) =
 
     [<Fact>]
     member _.``08 - regex first or last token test``() =
-        let grammar = grammar text
+        let grammar = grammar flatedFsyacc
 
         let lastsOfExpr = grammar.lasts.["expr"]
         let firstsOfExpr = grammar.firsts.["expr"]

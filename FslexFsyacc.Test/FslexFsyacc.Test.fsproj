@@ -44,7 +44,6 @@
 		<Compile Include="Fslex\AnalyzeTest.fs" />
 
 		<Compile Include="Fsyacc\SemanticGeneratorTest.fs" />
-		<Compile Include="Fsyacc\FsyaccParseTableTest.fs" />
 		<Compile Include="Fsyacc\RegularSymbolCompilerTest.fs" />
 		<Compile Include="Fsyacc\FsyaccFileRenderTest.fs" />
 		<Compile Include="Fsyacc\FsyaccFileShakingTest.fs" />
@@ -61,7 +60,6 @@
 		<Compile Include="Expr\ExprCompilerTest.fs" />
 		<None Include="Expr\expr.fsyacc" />
 		<Compile Include="Expr\ExprParseTable.fs" />
-		<Compile Include="Expr\ExprParseTableTest.fs" />
 		<Compile Include="Expr\ExprCompiler.fs" />
 		
 		<Compile Include="PolynomialExpressions\Polynomials.fs" />

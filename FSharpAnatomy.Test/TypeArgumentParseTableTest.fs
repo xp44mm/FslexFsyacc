@@ -21,27 +21,52 @@ type TypeArgumentParseTableTest (output:ITestOutputHelper) =
         |> stringify
         |> output.WriteLine
 
-    let fsyaccPath = Path.Combine(Dir.FSharpAnatomyPath,"typeArgument.fsyacc")
-    let text = File.ReadAllText(fsyaccPath)
-
     let parseTblName = "TypeArgumentParseTable"
     let parseTblModule = $"FSharpAnatomy.{parseTblName}"
+    let filePath = Path.Combine(Dir.FSharpAnatomyPath,"typeArgument.fsyacc")
     let parseTblPath = Path.Combine(Dir.FSharpAnatomyPath, $"{parseTblName}.fs")
-    
-    let grammar text =
+
+    //let text = File.ReadAllText(filePath)
+
+    //let grammar text =
+    //    text
+    //    |> FlatFsyaccFileUtils.parse
+    //    |> FlatFsyaccFileUtils.toGrammar
+
+    //let ambiguousCollection text =
+    //    text
+    //    |> FlatFsyaccFileUtils.parse
+    //    |> FlatFsyaccFileUtils.toAmbiguousCollection
+
+    ////解析表数据
+    //let parseTbl text = 
+    //    text
+    //    |> FlatFsyaccFileUtils.parse
+    //    |> FlatFsyaccFileUtils.toFsyaccParseTableFile
+
+    let text = File.ReadAllText(filePath,Encoding.UTF8)
+
+    // 与fsyacc文件完全相对应的结构树
+    let rawFsyacc = 
         text
-        |> FlatFsyaccFileUtils.parse
+        |> RawFsyaccFile2Utils.parse 
+
+    let flatedFsyacc = 
+        rawFsyacc 
+        |> RawFsyaccFile2Utils.toFlated
+
+    let grammar (flatedFsyacc) =
+        flatedFsyacc
         |> FlatFsyaccFileUtils.toGrammar
 
-    let ambiguousCollection text =
-        text
-        |> FlatFsyaccFileUtils.parse
+    let ambiguousCollection (flatedFsyacc) =
+        flatedFsyacc
         |> FlatFsyaccFileUtils.toAmbiguousCollection
 
     //解析表数据
-    let parseTbl text = 
-        text
-        |> FlatFsyaccFileUtils.parse
+    let parseTbl (flatedFsyacc) = 
+        flatedFsyacc
+        //|> FlatFsyaccFileUtils.parse
         |> FlatFsyaccFileUtils.toFsyaccParseTableFile
 
     [<Fact>] // 
@@ -63,7 +88,7 @@ type TypeArgumentParseTableTest (output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``02 - list all tokens``() =
-        let grammar = grammar text
+        let grammar = grammar flatedFsyacc
 
         let tokens = grammar.terminals
         let res = set ["#";"(";")";"*";",";"->";".";":";":>";";";"<";">";"IDENT";"HTYPAR";"QTYPAR";"_";"ARRAY_TYPE_SUFFIX";"struct";"{|";"|}"]
@@ -73,7 +98,7 @@ type TypeArgumentParseTableTest (output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``03 - precedence Of Productions``() =
-        let collection = ambiguousCollection text
+        let collection = ambiguousCollection flatedFsyacc
 
         let terminals = 
             collection.grammar.terminals
@@ -88,14 +113,14 @@ type TypeArgumentParseTableTest (output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``04 - list all states``() =
-        let collection = ambiguousCollection text
+        let collection = ambiguousCollection flatedFsyacc
         
         let text = collection.render()
         output.WriteLine(text)
 
     [<Fact>]
     member _.``05 - list the type annotaitions``() =
-        let grammar = grammar text
+        let grammar = grammar flatedFsyacc
         let terminals =
             grammar.terminals
             |> Seq.map RenderUtils.renderSymbol
@@ -122,7 +147,7 @@ type TypeArgumentParseTableTest (output:ITestOutputHelper) =
 
     [<Fact(Skip="once for all!")>] // 
     member _.``06 - generate ParseTable``() =
-        let parseTbl = parseTbl text
+        let parseTbl = parseTbl flatedFsyacc
 
         let fsrc = parseTbl.generateModule(parseTblModule)
 
@@ -131,7 +156,7 @@ type TypeArgumentParseTableTest (output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``10 - valid ParseTable``() =
-        let src = parseTbl text
+        let src = parseTbl flatedFsyacc
 
         Should.equal src.actions TypeArgumentParseTable.actions
         Should.equal src.closures TypeArgumentParseTable.closures
@@ -160,7 +185,7 @@ type TypeArgumentParseTableTest (output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``08 - typeArgument follows test``() =
-        let grammar = grammar text
+        let grammar = grammar flatedFsyacc
         grammar.follows.["typeArgument"]
         |> Seq.iter(fun tok -> output.WriteLine(stringify tok))
 

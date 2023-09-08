@@ -21,29 +21,35 @@ type BoundedParseTableTest(output: ITestOutputHelper) =
     let show res =
         res |> Literal.stringify |> output.WriteLine
 
-    let sourcePath = Path.Combine(Dir.solutionPath, @"FslexFsyacc\Brackets")
-    let filePath = Path.Combine(sourcePath, "bounded.fsyacc")
-    let text = File.ReadAllText(filePath)
-    //let rawFsyacc = RawFsyaccFile.parse text
-    //let fsyacc = FlatFsyaccFile.fromRaw rawFsyacc
-
     let parseTblName = "BoundedParseTable"
     let parseTblModule = $"FslexFsyacc.Brackets.{parseTblName}"
+    let sourcePath = Path.Combine(Dir.solutionPath, @"FslexFsyacc\Brackets")
+    let filePath = Path.Combine(sourcePath, "bounded.fsyacc")
     let parseTblPath = Path.Combine(sourcePath, $"{parseTblName}.fs")
 
-    let grammar text =
+    let text = File.ReadAllText(filePath,Encoding.UTF8)
+
+    // 与fsyacc文件完全相对应的结构树
+    let rawFsyacc = 
         text
-        |> FlatFsyaccFileUtils.parse
+        |> RawFsyaccFile2Utils.parse 
+
+    let flatedFsyacc = 
+        rawFsyacc 
+        |> RawFsyaccFile2Utils.toFlated
+
+    let grammar (flatedFsyacc) =
+        flatedFsyacc
         |> FlatFsyaccFileUtils.toGrammar
 
-    let ambiguousCollection text =
-        text
-        |> FlatFsyaccFileUtils.parse
+    let ambiguousCollection (flatedFsyacc) =
+        flatedFsyacc
         |> FlatFsyaccFileUtils.toAmbiguousCollection
 
-    let parseTbl text = 
-        text
-        |> FlatFsyaccFileUtils.parse
+    //解析表数据
+    let parseTbl (flatedFsyacc) = 
+        flatedFsyacc
+        //|> FlatFsyaccFileUtils.parse
         |> FlatFsyaccFileUtils.toFsyaccParseTableFile
 
     [<Fact>]
@@ -65,7 +71,7 @@ type BoundedParseTableTest(output: ITestOutputHelper) =
 
     [<Fact>]
     member _.``02 - list all tokens``() =
-        let grammar = grammar text
+        let grammar = grammar flatedFsyacc
         let e = set ["LEFT";"RIGHT";"TICK"]
 
         let y = grammar.symbols - grammar.nonterminals
@@ -74,13 +80,13 @@ type BoundedParseTableTest(output: ITestOutputHelper) =
 
     [<Fact>]
     member _.``03 - list all states``() =
-        let collection = ambiguousCollection text
+        let collection = ambiguousCollection flatedFsyacc
         let src = collection.render()
         output.WriteLine(src)
 
     [<Fact>]
     member _.``04 - 汇总冲突的产生式``() =
-        let collection = ambiguousCollection text
+        let collection = ambiguousCollection flatedFsyacc
 
         let productions = 
             collection.collectConflictedProductions()
@@ -96,7 +102,7 @@ type BoundedParseTableTest(output: ITestOutputHelper) =
 
     [<Fact>]
     member _.``05 - list declarations``() =
-        let grammar = grammar text
+        let grammar = grammar flatedFsyacc
 
         let terminals =
             grammar.terminals
@@ -124,7 +130,7 @@ type BoundedParseTableTest(output: ITestOutputHelper) =
 
     [<Fact(Skip="once for all!")>] // 
     member _.``06 - generate ParseTable``() =
-        let parseTbl = parseTbl text
+        let parseTbl = parseTbl flatedFsyacc
 
         let fsharpCode = parseTbl.generateModule(parseTblModule)
         File.WriteAllText(parseTblPath, fsharpCode, Encoding.UTF8)
@@ -132,7 +138,7 @@ type BoundedParseTableTest(output: ITestOutputHelper) =
 
     [<Fact>]
     member _.``07 - valid ParseTable``() =
-        let parseTbl = parseTbl text
+        let parseTbl = parseTbl flatedFsyacc
 
         Should.equal parseTbl.actions BoundedParseTable.actions
         Should.equal parseTbl.closures BoundedParseTable.closures

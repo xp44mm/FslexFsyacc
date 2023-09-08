@@ -79,7 +79,8 @@ type ParsParseTableTest(output:ITestOutputHelper) =
     let sourcePath = Path.Combine(__SOURCE_DIRECTORY__, "fsyacc")
     let filePath = Path.Combine(sourcePath, "pars.fsyacc")
 
-    let text = File.ReadAllText(filePath)
+    let text = File.ReadAllText(filePath,Encoding.UTF8)
+
     //let rawFsyacc = RawFsyaccFile.parse text
     //let fsyacc = FlatFsyaccFile.fromRaw rawFsyacc
     let fsyacc = 
