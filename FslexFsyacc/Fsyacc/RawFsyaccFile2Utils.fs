@@ -3,7 +3,7 @@
 ///从`*.fsyacc`文件中解析成本类型的数据
 let parse text =
     text
-    |> Fsyacc2Compiler.compile
+    |> FsyaccCompiler.compile
 
 let toFlated (raw:RawFsyaccFile2) =
     let rules =

@@ -15,17 +15,17 @@ open System.Text.RegularExpressions
 open FSharp.xUnit
 open FSharp.Literals
 
-type Fsyacc2ParseTableTest(output:ITestOutputHelper) =
+type FsyaccParseTableTest(output:ITestOutputHelper) =
     let show res =
         res
         |> Literal.stringify
         |> output.WriteLine
 
     // ** input **
-    let parseTblName = "Fsyacc2ParseTable"
+    let parseTblName = "FsyaccParseTable"
     let parseTblModule = $"FslexFsyacc.Fsyacc.{parseTblName}"
     let sourcePath = Path.Combine(solutionPath, @"FslexFsyacc\Fsyacc")
-    let filePath = Path.Combine(sourcePath, @"fsyacc2.fsyacc")
+    let filePath = Path.Combine(sourcePath, @"fsyacc.fsyacc")
     let parseTblPath = Path.Combine(sourcePath, $"{parseTblName}.fs")
 
     let text = File.ReadAllText(filePath,Encoding.UTF8)
@@ -130,7 +130,7 @@ type Fsyacc2ParseTableTest(output:ITestOutputHelper) =
 
 
     [<Fact>] // (Skip="once for all!")
-    member _.``06 - generate Fsyacc2ParseTable``() =
+    member _.``06 - generate FsyaccParseTable``() =
         let parseTbl = parseTbl (flatedFsyacc)
 
         let fsharpCode = parseTbl.generateModule(parseTblModule)
@@ -141,14 +141,14 @@ type Fsyacc2ParseTableTest(output:ITestOutputHelper) =
     member _.``10 - valid ParseTable``() =
         let parseTbl = parseTbl (flatedFsyacc)
 
-        Should.equal parseTbl.actions Fsyacc2ParseTable.actions
-        Should.equal parseTbl.closures Fsyacc2ParseTable.closures
+        Should.equal parseTbl.actions FsyaccParseTable.actions
+        Should.equal parseTbl.closures FsyaccParseTable.closures
 
         let prodsFsyacc =
             List.map fst parseTbl.rules
 
         let prodsParseTable =
-            List.map fst Fsyacc2ParseTable.rules
+            List.map fst FsyaccParseTable.rules
         Should.equal prodsFsyacc prodsParseTable
 
         let headerFromFsyacc =

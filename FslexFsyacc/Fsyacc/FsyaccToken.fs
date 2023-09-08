@@ -1,5 +1,6 @@
 ﻿namespace FslexFsyacc.Fsyacc
 
+[<System.Obsolete("FsyaccToken2")>]
 type FsyaccToken =
     | HEADER of string
     | ID of string

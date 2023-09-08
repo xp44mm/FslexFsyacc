@@ -1,4 +1,4 @@
-﻿module FslexFsyacc.Fsyacc.Fsyacc2Compiler
+﻿module FslexFsyacc.Fsyacc.FsyaccCompiler
 
 open FslexFsyacc.Runtime
 open FslexFsyacc.Fsyacc
@@ -6,12 +6,12 @@ open FslexFsyacc.Fsyacc
 open FSharp.Literals.Literal
 
 let parser = Parser<Position<FsyaccToken2>>(
-    Fsyacc2ParseTable.rules,
-    Fsyacc2ParseTable.actions,
-    Fsyacc2ParseTable.closures,
+    FsyaccParseTable.rules,
+    FsyaccParseTable.actions,
+    FsyaccParseTable.closures,
 
-    FsyaccToken2.getTag,
-    FsyaccToken2.getLexeme)
+    FsyaccToken2Utils.getTag,
+    FsyaccToken2Utils.getLexeme)
 
 //let parse(tokens:seq<Position<FsyaccToken2>>) =
 //    tokens
@@ -24,7 +24,7 @@ let compile (input:string) =
     let mutable states = [0,null]
 
     input
-    |> FsyaccToken2.tokenize 0
+    |> FsyaccToken2Utils.tokenize 0
     //|> Seq.map(fun tok ->
     //    tokens <- tok::tokens
     //    tok
@@ -43,7 +43,7 @@ let compile (input:string) =
 
     match parser.accept states with
     | [1,lxm; 0,null] ->
-        Fsyacc2ParseTable.unboxRoot lxm
+        FsyaccParseTable.unboxRoot lxm
     | _ ->
         failwith $"{stringify states}"
 
