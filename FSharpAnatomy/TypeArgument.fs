@@ -1,5 +1,5 @@
 ﻿namespace FSharpAnatomy
-
+/// 又名：signature syntax
 type Typar =
     | AnonTypar
     | NamedTypar of isInline:bool * string

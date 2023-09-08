@@ -16,28 +16,28 @@ type ExprCompilerTest(output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``01 - output closures details``() =
-        let theory = Expr2ParseTable.theoryParser
+        let theory = ExprParseTable.theoryParser
         let str = theory.collection()
         output.WriteLine(str)
 
     [<Fact>]
     member _.``02 - basis test``() =
         let inp = "2 + 3"
-        let y = Expr2Compiler.compile inp
+        let y = ExprCompiler.compile inp
         //show result
         Should.equal y 5.0
 
     [<Fact>]
     member _.``03 - prec test``() =
         let inp = "2 + 3 * 5"
-        let y = Expr2Compiler.compile inp
+        let y = ExprCompiler.compile inp
         //show result
         Should.equal y 17.0
 
     [<Fact>]
     member _.``04 - named prod test``() =
         let inp = "2 + 3 * -5"
-        let y = Expr2Compiler.compile inp
+        let y = ExprCompiler.compile inp
         //show result
         Should.equal y (-13.0)
 
@@ -45,7 +45,7 @@ type ExprCompilerTest(output:ITestOutputHelper) =
     member _.``05 - exception test``() =
         let y = Assert.Throws<_>(fun()->
             let inp = "2* + 4*3"
-            let y = Expr2Compiler.compile inp
+            let y = ExprCompiler.compile inp
             output.WriteLine(stringify y)
         )
 
@@ -54,7 +54,7 @@ type ExprCompilerTest(output:ITestOutputHelper) =
     [<Fact>]
     member _.``11 - state symbol pair test``() =
         let symbols = 
-            Expr2ParseTable.theoryParser.getStateSymbolPairs()
+            ExprParseTable.theoryParser.getStateSymbolPairs()
             |> List.mapi Pair.ofApp
 
         //output.WriteLine(stringify symbols)

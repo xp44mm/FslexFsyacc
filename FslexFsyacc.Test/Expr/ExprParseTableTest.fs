@@ -13,28 +13,12 @@ open FslexFsyacc.Fsyacc
 open FslexFsyacc.Yacc
 open FslexFsyacc.Runtime
 
-type Expr2ParseTableTest(output:ITestOutputHelper) =
-    let parseTblName = "Expr2ParseTable"
+type ExprParseTableTest(output:ITestOutputHelper) =
+    let parseTblName = "ExprParseTable"
     let parseTblModule = $"FslexFsyacc.Expr.{parseTblName}"
-    let filePath = Path.Combine(__SOURCE_DIRECTORY__, @"expr2.fsyacc")
+    let filePath = Path.Combine(__SOURCE_DIRECTORY__, @"expr.fsyacc")
     let parseTblPath = Path.Combine(__SOURCE_DIRECTORY__, $"{parseTblName}.fs")
 
-    //let text = File.ReadAllText(filePath)
-
-    //let grammar text =
-    //    text
-    //    |> FlatFsyaccFileUtils.parse
-    //    |> FlatFsyaccFileUtils.toGrammar
-
-    //let ambiguousCollection text =
-    //    text
-    //    |> FlatFsyaccFileUtils.parse
-    //    |> FlatFsyaccFileUtils.toAmbiguousCollection
-
-    //let parseTbl text = 
-    //    text
-    //    |> FlatFsyaccFileUtils.parse
-    //    |> FlatFsyaccFileUtils.toFsyaccParseTableFile
     let text = File.ReadAllText(filePath,Encoding.UTF8)
 
     // 与fsyacc文件完全相对应的结构树
@@ -88,15 +72,15 @@ type Expr2ParseTableTest(output:ITestOutputHelper) =
     member _.``10 - valid ParseTable``() =
         let parseTbl = parseTbl flatedFsyacc
 
-        Should.equal parseTbl.actions Expr2ParseTable.actions
-        Should.equal parseTbl.closures Expr2ParseTable.closures
+        Should.equal parseTbl.actions ExprParseTable.actions
+        Should.equal parseTbl.closures ExprParseTable.closures
 
         //产生式比较
         let prodsFsyacc = 
             List.map fst parseTbl.rules
 
         let prodsParseTable = 
-            List.map fst Expr2ParseTable.rules
+            List.map fst ExprParseTable.rules
 
         Should.equal prodsFsyacc prodsParseTable
 

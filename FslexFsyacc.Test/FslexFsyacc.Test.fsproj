@@ -53,14 +53,11 @@
 		<Compile Include="Fsyacc\FsyaccParseTableTest.fs" />
     
 		<Compile Include="Expr\ExprToken.fs" />
-		<None Include="expr\expr2.fsyacc" />
-		<Compile Include="Expr\Expr2ParseTable.fs" />
-		<Compile Include="Expr\Expr2ParseTableTest.fs" />
-		<Compile Include="Expr\Expr2Compiler.fs" />
-		<Compile Include="Expr\ExprCompilerTest.fs" />
-		<None Include="Expr\expr.fsyacc" />
+		<None Include="expr\expr.fsyacc" />
 		<Compile Include="Expr\ExprParseTable.fs" />
+		<Compile Include="Expr\ExprParseTableTest.fs" />
 		<Compile Include="Expr\ExprCompiler.fs" />
+		<Compile Include="Expr\ExprCompilerTest.fs" />
 		
 		<Compile Include="PolynomialExpressions\Polynomials.fs" />
 		<Compile Include="PolynomialExpressions\Tokenizer.fs" />

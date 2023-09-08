@@ -1,4 +1,4 @@
-﻿%{
+%{
 %}
 expr : 
      | expr "+" expr         { s0 + s2 }
@@ -17,5 +17,4 @@ expr :
 
 %%
 
-NUMBER : float
-expr   : float
+%type <float> NUMBER expr

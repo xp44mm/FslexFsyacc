@@ -1,47 +1,49 @@
-﻿module Expr.ExprCompiler
+﻿module FslexFsyacc.Expr.ExprCompiler
 
-//open System.IO
-//open System.Text
+open System.IO
+open System.Text
 
-//open FSharp.Idioms
-//open FSharp.Literals.Literal
+open FSharp.Idioms
+open FSharp.Literals.Literal
 
-//open FslexFsyacc.Runtime
-//open Expr
+open FslexFsyacc.Runtime
 
-//let parser = 
-//    Parser<Position<ExprToken>>(
-//        ExprParseTable.rules,
-//        ExprParseTable.actions,
-//        ExprParseTable.closures,ExprToken.getTag,ExprToken.getLexeme)
+let parser = 
+    Parser<Position<ExprToken>>(
+        ExprParseTable.rules,
+        ExprParseTable.actions,
+        ExprParseTable.closures,
 
-//let parse(tokens:seq<Position<ExprToken>>) =
-//    tokens
-//    |> parser.parse
-//    |> ExprParseTable.unboxRoot
+        ExprToken.getTag,
+        ExprToken.getLexeme)
 
-//let compile (txt:string) =
-//    let mutable tokens = []
-//    let mutable states = [0,null]
+let parse(tokens:seq<Position<ExprToken>>) =
+    tokens
+    |> parser.parse
+    |> ExprParseTable.unboxRoot
 
-//    txt
-//    |> ExprToken.tokenize 0
-//    |> Seq.map(fun tok ->
-//        tokens <- tok::tokens
-//        tok
-//    )
-//    |> Seq.iter(fun tok ->
-//        match parser.tryReduce(states,tok) with
-//        | Some x -> states <- x
-//        | None -> ()
-//        states <- parser.shift(states,tok)
-//    )
-//    match parser.tryReduce(states) with
-//    | Some x -> states <- x
-//    | None -> ()
+let compile (txt:string) =
+    let mutable tokens = []
+    let mutable states = [0,null]
 
-//    match states with
-//    |[1,lxm; 0,null] ->
-//        ExprParseTable.unboxRoot lxm
-//    | _ ->
-//        failwith $"{stringify states}"
+    txt
+    |> ExprToken.tokenize 0
+    |> Seq.map(fun tok ->
+        tokens <- tok::tokens
+        tok
+    )
+    |> Seq.iter(fun tok ->
+        match parser.tryReduce(states,tok) with
+        | Some x -> states <- x
+        | None -> ()
+        states <- parser.shift(states,tok)
+    )
+    match parser.tryReduce(states) with
+    | Some x -> states <- x
+    | None -> ()
+
+    match states with
+    |[1,lxm; 0,null] ->
+        ExprParseTable.unboxRoot lxm
+    | _ ->
+        failwith $"{stringify states}"
