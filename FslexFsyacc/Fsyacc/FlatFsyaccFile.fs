@@ -12,52 +12,6 @@ type FlatFsyaccFile =
         declarations:list<string*string> // symbol,type
     }
 
-    //[<Obsolete("=> FlatFsyaccFileUtils.fromRaw (raw:RawFsyaccFile2)")>]
-    //static member fromRaw(fsyacc:RawFsyaccFile) =
-    //    let rules =
-    //        fsyacc.rules
-    //        |> FsyaccFileRules.rawToFlatRules
-
-    //    let precedences =
-    //        fsyacc.precedences
-    //        |> List.mapi(fun i (assoc,symbols)->
-    //            let assocoffset =
-    //                match assoc with
-    //                | "left" -> -1
-    //                | "right" -> 1
-    //                | "nonassoc" -> 0
-    //                | _ -> failwith assoc
-
-    //            let prec = (i+1) * 100 // 索引大，则优先级高
-    //            symbols
-    //            |> List.map(fun symbol -> symbol, prec + assocoffset)
-    //        )
-    //        |> List.concat
-    //        |> Map.ofList
-
-    //    {
-    //        rules = rules
-    //        precedences = precedences
-    //        header = fsyacc.header
-    //        declarations = fsyacc.declarations
-    //    }
-    
-    //[<Obsolete("=> RawFsyaccFile2Utils.fromFlat (flat:FlatFsyaccFile)")>]
-    //member this.toRaw() =
-    //    let rules =
-    //        this.rules
-    //        |> FsyaccFileRules.flatToRawRules
-    //    let precedences =
-    //        this.precedences
-    //        |> FsyaccFilePrecedences.normToRawPrecedences
-
-    //    {
-    //        rules = rules
-    //        precedences = precedences
-    //        header = this.header
-    //        declarations = this.declarations
-    //    }:RawFsyaccFile
-
     /// 将相同lhs的规则合并到一起
     member this.normRules() =
         let rules =
@@ -112,23 +66,3 @@ type FlatFsyaccFile =
                 rules = re.rules
         }
 
-    //[<Obsolete("FsyaccFileRules.getMainProductions")>]
-    //member this.getMainProductions() =
-    //    this.rules |> List.map Triple.first
-
-    //[<Obsolete("FlatFsyaccFileUtils.toFsyaccParseTableFile")>]
-    //member this.toFsyaccParseTableFile() =
-    //    let mainProductions = FsyaccFileRules.getMainProductions this.rules
-    //    let productionNames = FsyaccFileRules.getProductionNames this.rules
-    //    let parseTable =
-    //        ParseTable.create(
-    //            mainProductions,
-    //            productionNames,
-    //            this.precedences)
-    //    {
-    //        rules = this.rules |> List.map Triple.ends
-    //        actions = parseTable.actions
-    //        closures = parseTable.closures
-    //        header = this.header
-    //        declarations = this.declarations
-    //    }

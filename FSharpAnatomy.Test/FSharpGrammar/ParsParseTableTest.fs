@@ -146,8 +146,8 @@ type ParsParseTableTest(output:ITestOutputHelper) =
         //let txt = flat.toRaw().render()
         let txt =
             flat
-            |> RawFsyaccFile2Utils.fromFlat
-            |> RawFsyaccFile2Utils.render
+            |> RawFsyaccFileUtils.fromFlat
+            |> RawFsyaccFileUtils.render
 
         let outputDir = Path.Combine(sourcePath, $"{s0}.fsyacc")
         File.WriteAllText(outputDir,txt,Encoding.UTF8)
@@ -175,8 +175,8 @@ type ParsParseTableTest(output:ITestOutputHelper) =
         //let txt = flat.toRaw().render()
         let txt =
             flat
-            |> RawFsyaccFile2Utils.fromFlat
-            |> RawFsyaccFile2Utils.render
+            |> RawFsyaccFileUtils.fromFlat
+            |> RawFsyaccFileUtils.render
 
         let outputDir = Path.Combine(sourcePath, $"{s0}.fsyacc")
         File.WriteAllText(outputDir,txt,Encoding.UTF8)
@@ -204,8 +204,8 @@ type ParsParseTableTest(output:ITestOutputHelper) =
         //let txt = flat.toRaw().render()
         let txt =
             flat
-            |> RawFsyaccFile2Utils.fromFlat
-            |> RawFsyaccFile2Utils.render
+            |> RawFsyaccFileUtils.fromFlat
+            |> RawFsyaccFileUtils.render
 
         let outputDir = Path.Combine(sourcePath, $"{s0}.fsyacc")
         File.WriteAllText(outputDir,txt,Encoding.UTF8)
@@ -236,8 +236,8 @@ type ParsParseTableTest(output:ITestOutputHelper) =
         //let txt = flat.toRaw().render()
         let txt =
             flat
-            |> RawFsyaccFile2Utils.fromFlat
-            |> RawFsyaccFile2Utils.render
+            |> RawFsyaccFileUtils.fromFlat
+            |> RawFsyaccFileUtils.render
 
         let outputDir = Path.Combine(sourcePath, $"{s0}.fsyacc")
         File.WriteAllText(outputDir,txt,Encoding.UTF8)
@@ -265,8 +265,8 @@ type ParsParseTableTest(output:ITestOutputHelper) =
 
         let txt = // flat.toRaw().render()
             flat
-            |> RawFsyaccFile2Utils.fromFlat
-            |> RawFsyaccFile2Utils.render
+            |> RawFsyaccFileUtils.fromFlat
+            |> RawFsyaccFileUtils.render
 
         let outputDir = Path.Combine(sourcePath, $"{s0}.fsyacc")
         File.WriteAllText(outputDir,txt,Encoding.UTF8)

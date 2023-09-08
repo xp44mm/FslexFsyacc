@@ -13,7 +13,7 @@ open FSharp.Idioms
 
 open FslexFsyacc.Fsyacc
 
-let x =id<RawFsyaccFile2>{header= "";rules= ["expr",[["expr";"+";"expr"],"","s0 + s2";["expr";"-";"expr"],"","s0 - s2";["expr";"*";"expr"],"","s0 * s2";["expr";"/";"expr"],"","s0 / s2";["(";"expr";")"],"","s1";["-";"expr"],"UMINUS","-s1";["NUMBER"],"","s0"]];precedences= ["left",["+";"-"];"left",["*";"/"];"right",["UMINUS"]];declarations= ["float",["NUMBER";"expr"]]}
+let x =id<RawFsyaccFile>{header= "";rules= ["expr",[["expr";"+";"expr"],"","s0 + s2";["expr";"-";"expr"],"","s0 - s2";["expr";"*";"expr"],"","s0 * s2";["expr";"/";"expr"],"","s0 / s2";["(";"expr";")"],"","s1";["-";"expr"],"UMINUS","-s1";["NUMBER"],"","s0"]];precedences= ["left",["+";"-"];"left",["*";"/"];"right",["UMINUS"]];declarations= ["float",["NUMBER";"expr"]]}
 
 
 [<EntryPoint>]

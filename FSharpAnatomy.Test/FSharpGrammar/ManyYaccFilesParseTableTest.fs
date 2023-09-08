@@ -70,8 +70,8 @@ type ManyYaccFilesParseTableTest(output:ITestOutputHelper) =
         //let txt = fsyacc.toRaw().render()
         let txt =
             fsyacc
-            |> RawFsyaccFile2Utils.fromFlat
-            |> RawFsyaccFile2Utils.render
+            |> RawFsyaccFileUtils.fromFlat
+            |> RawFsyaccFileUtils.render
 
         let outputDir = Path.Combine(sourcePath, $"{s0}_result.fsyacc")
         File.WriteAllText(outputDir,txt,Encoding.UTF8)

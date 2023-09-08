@@ -9,7 +9,7 @@ open FSharp.xUnit
 
 open FSharp.Literals.Literal
 
-type FsyaccToken2Test(output:ITestOutputHelper) =
+type FsyaccTokenTest(output:ITestOutputHelper) =
     let show res =
         res
         |> stringify

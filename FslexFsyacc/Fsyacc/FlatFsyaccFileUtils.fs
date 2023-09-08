@@ -10,13 +10,13 @@ open FSharp.Literals.Literal
 
 open FslexFsyacc.Yacc
 
-let fromRaw (raw:RawFsyaccFile2) =
+let fromRaw (raw:RawFsyaccFile) =
     raw
-    |> RawFsyaccFile2Utils.toFlated
+    |> RawFsyaccFileUtils.toFlated
 
 let parse text =
     text
-    |> RawFsyaccFile2Utils.parse
+    |> RawFsyaccFileUtils.parse
     |> fromRaw
 
 let toGrammar (fsyacc:FlatFsyaccFile) =

@@ -1,6 +1,6 @@
 ﻿namespace FslexFsyacc.Fsyacc
 
-type RawFsyaccFile2 = 
+type RawFsyaccFile = 
     {
         header:string
         rules:(string*((string list*string*string)list))list

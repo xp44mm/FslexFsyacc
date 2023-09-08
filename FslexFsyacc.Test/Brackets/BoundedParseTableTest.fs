@@ -32,11 +32,11 @@ type BoundedParseTableTest(output: ITestOutputHelper) =
     // 与fsyacc文件完全相对应的结构树
     let rawFsyacc = 
         text
-        |> RawFsyaccFile2Utils.parse 
+        |> RawFsyaccFileUtils.parse 
 
     let flatedFsyacc = 
         rawFsyacc 
-        |> RawFsyaccFile2Utils.toFlated
+        |> RawFsyaccFileUtils.toFlated
 
     let grammar (flatedFsyacc) =
         flatedFsyacc
@@ -64,8 +64,8 @@ type BoundedParseTableTest(output: ITestOutputHelper) =
 
         let src = 
             fsyacc.start(s0, Set.empty)
-            |> RawFsyaccFile2Utils.fromFlat
-            |> RawFsyaccFile2Utils.render
+            |> RawFsyaccFileUtils.fromFlat
+            |> RawFsyaccFileUtils.render
 
         output.WriteLine(src)
 

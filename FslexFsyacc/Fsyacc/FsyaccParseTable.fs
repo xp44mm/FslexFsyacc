@@ -6,7 +6,7 @@ let rules:(string list*(obj list->obj))list = [
     ["file";"HEADER";"{rule+}";"{\"%%\"?}"],fun(ss:obj list)->
         let s0 = unbox<string> ss.[0]
         let s1 = unbox<(string*((string list*string*string)list))list> ss.[1]
-        let result:RawFsyaccFile2 =
+        let result:RawFsyaccFile =
             {
                 header= s0;
                 rules= List.rev s1;
@@ -18,7 +18,7 @@ let rules:(string list*(obj list->obj))list = [
         let s0 = unbox<string> ss.[0]
         let s1 = unbox<(string*((string list*string*string)list))list> ss.[1]
         let s3 = unbox<(string*string list)list> ss.[3]
-        let result:RawFsyaccFile2 =
+        let result:RawFsyaccFile =
             {
                 header= s0;
                 rules= List.rev s1;
@@ -30,7 +30,7 @@ let rules:(string list*(obj list->obj))list = [
         let s0 = unbox<string> ss.[0]
         let s1 = unbox<(string*((string list*string*string)list))list> ss.[1]
         let s3 = unbox<(string*string list)list> ss.[3]
-        let result:RawFsyaccFile2 =
+        let result:RawFsyaccFile =
             {
                 header= s0;
                 rules= List.rev s1;
@@ -43,7 +43,7 @@ let rules:(string list*(obj list->obj))list = [
         let s1 = unbox<(string*((string list*string*string)list))list> ss.[1]
         let s3 = unbox<(string*string list)list> ss.[3]
         let s5 = unbox<(string*string list)list> ss.[5]
-        let result:RawFsyaccFile2 =
+        let result:RawFsyaccFile =
             {
                 header= s0;
                 rules= List.rev s1;
@@ -233,6 +233,6 @@ let rules:(string list*(obj list->obj))list = [
         box result
 ]
 let unboxRoot =
-    unbox<RawFsyaccFile2>
+    unbox<RawFsyaccFile>
 let theoryParser = FslexFsyacc.Runtime.TheoryParser.create(rules, actions, closures)
 let stateSymbolPairs = theoryParser.getStateSymbolPairs()

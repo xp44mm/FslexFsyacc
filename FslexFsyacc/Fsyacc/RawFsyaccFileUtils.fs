@@ -1,11 +1,11 @@
-﻿module FslexFsyacc.Fsyacc.RawFsyaccFile2Utils
+﻿module FslexFsyacc.Fsyacc.RawFsyaccFileUtils
 
 ///从`*.fsyacc`文件中解析成本类型的数据
 let parse text =
     text
     |> FsyaccCompiler.compile
 
-let toFlated (raw:RawFsyaccFile2) =
+let toFlated (raw:RawFsyaccFile) =
     let rules =
         raw.rules
         |> FsyaccFileRules.rawToFlatRules
@@ -55,7 +55,7 @@ let fromFlat (flat:FlatFsyaccFile) =
                 groups |> List.map fst
             tp,symbols
         )
-    id<RawFsyaccFile2>{
+    id<RawFsyaccFile>{
         rules = rules
         precedences = precedences
         header = flat.header
@@ -63,7 +63,7 @@ let fromFlat (flat:FlatFsyaccFile) =
     }
 
 ///打印`*.fsyacc`文件
-let render (fsyacc:RawFsyaccFile2) =
+let render (fsyacc:RawFsyaccFile) =
     let h = 
         fsyacc.header
         |> FsyaccFileRender.renderHeader 

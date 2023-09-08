@@ -49,7 +49,7 @@
 		<Compile Include="Fsyacc\FsyaccFileShakingTest.fs" />
 		<Compile Include="Fsyacc\FsyaccFileNameTest.fs" />
 		<Compile Include="Fsyacc\FsyaccFileRulesTest.fs" />
-		<Compile Include="Fsyacc\FsyaccToken2Test.fs" />
+		<Compile Include="Fsyacc\FsyaccTokenTest.fs" />
 		<Compile Include="Fsyacc\FsyaccParseTableTest.fs" />
     
 		<Compile Include="Expr\ExprToken.fs" />

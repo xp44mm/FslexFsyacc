@@ -35,9 +35,9 @@ rec? :
 
         let fsyacc =
             text
-            |> RawFsyaccFile2Utils.parse
+            |> RawFsyaccFileUtils.parse
 
-        let outp = fsyacc |> RawFsyaccFile2Utils.render
+        let outp = fsyacc |> RawFsyaccFileUtils.render
 
         output.WriteLine(stringify fsyacc.rules)
         output.WriteLine(outp)
