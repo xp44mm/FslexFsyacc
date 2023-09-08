@@ -1,11 +1,11 @@
 ﻿namespace FslexFsyacc.Fsyacc
 
-[<System.Obsolete("FsyaccToken2")>]
 type FsyaccToken =
     | HEADER of string
     | ID of string
     | LITERAL of string
     | SEMANTIC of string
+    | TYPE_ARGUMENT of string
     | COLON
     | BAR
     | PERCENT
@@ -13,10 +13,14 @@ type FsyaccToken =
     | RIGHT
     | NONASSOC
     | PREC
-
+    | TYPE
+    //qty
     | QMARK
     | PLUS
     | STAR
 
-    | LBRACK | RBRACK
-    | LPAREN | RPAREN
+    | LBRACK 
+    | RBRACK
+    | LPAREN 
+    | RPAREN
+

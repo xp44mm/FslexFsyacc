@@ -5,13 +5,13 @@ open FslexFsyacc.Fsyacc
 
 open FSharp.Literals.Literal
 
-let parser = Parser<Position<FsyaccToken2>>(
+let parser = Parser<Position<FsyaccToken>>(
     FsyaccParseTable.rules,
     FsyaccParseTable.actions,
     FsyaccParseTable.closures,
 
-    FsyaccToken2Utils.getTag,
-    FsyaccToken2Utils.getLexeme)
+    FsyaccTokenUtils.getTag,
+    FsyaccTokenUtils.getLexeme)
 
 //let parse(tokens:seq<Position<FsyaccToken2>>) =
 //    tokens
@@ -24,7 +24,7 @@ let compile (input:string) =
     let mutable states = [0,null]
 
     input
-    |> FsyaccToken2Utils.tokenize 0
+    |> FsyaccTokenUtils.tokenize 0
     //|> Seq.map(fun tok ->
     //    tokens <- tok::tokens
     //    tok
