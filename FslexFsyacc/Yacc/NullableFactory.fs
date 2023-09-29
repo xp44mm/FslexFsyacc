@@ -4,6 +4,7 @@ module FslexFsyacc.Yacc.NullableFactory
 open FSharp.Idioms
 open System.Collections.Concurrent
 
+/// get nullabe collection
 let make (mainProductions: Set<string list>) =
     /// 可以为空的非终结符表
     let rec loop (acc:Set<string>) (productions:Set<string list>) =
@@ -44,10 +45,12 @@ let nullable (nullables:Set<string>) =
 
 /// 每个nullables只生成一个缓存
 let leftmostLookupMemoiz = ConcurrentDictionary<
-                                Set<string>, 
-                                ConcurrentDictionary<string list, Set<string>>
+                                Set<string>, // nullables
+                                ConcurrentDictionary<string list, Set<string>> // alpha:string list -> leftmost
                                 >(HashIdentity.Structural)
-       
+//memoiLeftmost:ConcurrentDictionary<Set<string>*string list, Set<string>>
+//memoiRightmost:ConcurrentDictionary<Set<string>*string list, Set<string>>
+
 /// 一个符号串可能的最左符号（包括终结符，非终结符）
 let leftmost (nullables:Set<string>) =
     let lookup = 

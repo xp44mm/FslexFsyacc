@@ -1,4 +1,5 @@
 ﻿module FslexFsyacc.Yacc.CollectionFactory
+open FslexFsyacc.Runtime
 
 open FSharp.Idioms
 
@@ -38,6 +39,7 @@ let mergeClrKernels (slrKernel:Set<ItemCore>) (clrKernels:seq<Set<ItemCore*Set<s
     |> Set.ofList
 
 /// the collection of sets of items
+[<System.Obsolete("GrammarCrewUtils.getClosureCollection")>]
 let make (itemCores:Set<ItemCore>) (itemCoreAttributes:Map<ItemCore, bool*Set<string>>) (productions:Set<string list>) =
     // kernel -> closure
     let getClosure = ClosureFactory.make itemCoreAttributes productions
@@ -94,3 +96,4 @@ let make (itemCores:Set<ItemCore>) (itemCoreAttributes:Map<ItemCore, bool*Set<st
             ClosureOperators.getCore kernel, getClosure kernel
             )
     result
+

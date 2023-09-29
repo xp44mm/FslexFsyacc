@@ -4,7 +4,7 @@ open FslexFsyacc.Runtime
 open FSharp.Idioms
 open FSharp.Literals.Literal
 
-/// 原始解析表
+/// 原始解析表 before Encoder
 type ParsingTable =
     {
         grammar : Grammar
@@ -32,12 +32,12 @@ type ParsingTable =
                     |> Map.map(fun la icores ->
                         match 
                             icores
-                            |> Action.from
+                            |> ActionUtils.from
                             |> Set.toList
                         with
                         | [] -> failwith $"nonassoc error."
                         | [x] -> x
-                        | acts -> failwith $"this is a conflict: {stringify acts}"
+                        | acts -> failwith $"this is a one more actions conflict: {stringify acts}"
                     )
                 actions
             )

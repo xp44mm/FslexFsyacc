@@ -15,6 +15,10 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "FSharpAnatomy", "FSharpAnat
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "FSharpAnatomy.Test", "FSharpAnatomy.Test\FSharpAnatomy.Test.fsproj", "{6997F170-1436-447E-8E5E-FB161CF6A6D3}"
 EndProject
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "FslexFsyacc.Prototypes", "FslexFsyacc.Prototypes\FslexFsyacc.Prototypes.fsproj", "{760AAC8C-4D66-4629-BC18-C2019523D00F}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FslexFsyacc.Prototypes.Test", "FslexFsyacc.Prototypes.Test\FslexFsyacc.Prototypes.Test.fsproj", "{7C1A9B37-483A-4C0C-82C1-7E2F6CF50804}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +49,14 @@ Global
 		{6997F170-1436-447E-8E5E-FB161CF6A6D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6997F170-1436-447E-8E5E-FB161CF6A6D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6997F170-1436-447E-8E5E-FB161CF6A6D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{760AAC8C-4D66-4629-BC18-C2019523D00F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{760AAC8C-4D66-4629-BC18-C2019523D00F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{760AAC8C-4D66-4629-BC18-C2019523D00F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{760AAC8C-4D66-4629-BC18-C2019523D00F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C1A9B37-483A-4C0C-82C1-7E2F6CF50804}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C1A9B37-483A-4C0C-82C1-7E2F6CF50804}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C1A9B37-483A-4C0C-82C1-7E2F6CF50804}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C1A9B37-483A-4C0C-82C1-7E2F6CF50804}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

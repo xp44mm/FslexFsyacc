@@ -34,26 +34,6 @@ type FslexParseTableTest(output: ITestOutputHelper) =
     let filePath = Path.Combine(sourcePath, @"fslex.fsyacc")
     let parseTblPath = Path.Combine(sourcePath, $"{parseTblName}.fs")
 
-    //let text = File.ReadAllText(filePath)
-    //let rawFsyacc = RawFsyaccFile.parse text
-    //let fsyacc = FlatFsyaccFile.fromRaw rawFsyacc
-
-
-    //let grammar text =
-    //    text
-    //    |> FlatFsyaccFileUtils.parse
-    //    |> FlatFsyaccFileUtils.toGrammar
-
-    //let ambiguousCollection text =
-    //    text
-    //    |> FlatFsyaccFileUtils.parse
-    //    |> FlatFsyaccFileUtils.toAmbiguousCollection
-
-    //let parseTbl text = 
-    //    text
-    //    |> FlatFsyaccFileUtils.parse
-    //    |> FlatFsyaccFileUtils.toFsyaccParseTableFile
-
     let text = File.ReadAllText(filePath,Encoding.UTF8)
 
     // 与fsyacc文件完全相对应的结构树
@@ -67,7 +47,7 @@ type FslexParseTableTest(output: ITestOutputHelper) =
 
     let grammar (flatedFsyacc) =
         flatedFsyacc
-        |> FlatFsyaccFileUtils.toGrammar
+        |> FlatFsyaccFileUtils.getFollowPrecedeCrew
 
     let ambiguousCollection (flatedFsyacc) =
         flatedFsyacc

@@ -40,7 +40,7 @@ type BoundedParseTableTest(output: ITestOutputHelper) =
 
     let grammar (flatedFsyacc) =
         flatedFsyacc
-        |> FlatFsyaccFileUtils.toGrammar
+        |> FlatFsyaccFileUtils.getFollowPrecedeCrew
 
     let ambiguousCollection (flatedFsyacc) =
         flatedFsyacc

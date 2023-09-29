@@ -30,10 +30,9 @@ type Example427Test(output:ITestOutputHelper) =
         [ F   ; "(" ; E   ; ")" ]
         [ F   ; id ]
         ]
-    let grammar = Grammar.from mainProductions
 
     [<Fact>]
-    member _.``augment grammar productions``() =
+    member _.``0101 - augment grammar productions``() =
         //show grammar.productions
         let y = set [
             ["";"E"];
@@ -45,33 +44,55 @@ type Example427Test(output:ITestOutputHelper) =
             ["T";"F";"T'"];
             ["T'"];
             ["T'";"*";"F";"T'"]]
+        let grammar = 
+            mainProductions
+            |> GrammarCrewUtils.getProductionsCrew
 
-        Should.equal y grammar.productions 
+        Should.equal y grammar.augmentedProductions 
 
     [<Fact>]
-    member _.``symbols``() =
+    member _.``0201 - symbols``() =
         //show grammar.symbols
 
         let y = set ["(";")";"*";"+";"E";"E'";"F";"T";"T'";"id"]
+        let grammar = 
+            mainProductions
+            |> GrammarCrewUtils.getProductionsCrew
+            |> GrammarCrewUtils.getNullableCrew
 
         Should.equal y grammar.symbols
 
     [<Fact>]
-    member _.``nonterminals``() =
+    member _.``0202 nonterminals``() =
         //show grammar.nonterminals
 
         let y = set ["E";"E'";"F";"T";"T'"]
+        let grammar = 
+            mainProductions
+            |> GrammarCrewUtils.getProductionsCrew
+            |> GrammarCrewUtils.getNullableCrew
 
         Should.equal y grammar.nonterminals
 
     [<Fact>]
-    member _.``nullables``() =
+    member _.``0203 nullables``() =
         //show grammar.nullables
         let y = set ["E'";"T'"]
+        let grammar = 
+            mainProductions
+            |> GrammarCrewUtils.getProductionsCrew
+            |> GrammarCrewUtils.getNullableCrew
+
         Should.equal y grammar.nullables
 
     [<Fact>]
-    member _.``firsts``() =
+    member _.``0301 firsts``() =
+        let grammar = 
+            mainProductions
+            |> GrammarCrewUtils.getProductionsCrew
+            |> GrammarCrewUtils.getNullableCrew
+            |> GrammarCrewUtils.getFirstLastCrew
+
         show grammar.firsts
         let y = Map.ofList [
             "E",set ["(";"id"];
@@ -84,7 +105,13 @@ type Example427Test(output:ITestOutputHelper) =
         Should.equal y grammar.firsts
 
     [<Fact>]
-    member _.``lasts``() =
+    member _.``0302 lasts``() =
+        let grammar = 
+            mainProductions
+            |> GrammarCrewUtils.getProductionsCrew
+            |> GrammarCrewUtils.getNullableCrew
+            |> GrammarCrewUtils.getFirstLastCrew
+
         //show grammar.lasts
         let y = Map.ofList [
             "E",set [")";"id"];
@@ -97,7 +124,14 @@ type Example427Test(output:ITestOutputHelper) =
         Should.equal y grammar.lasts
 
     [<Fact>]
-    member _.``follows``() =
+    member _.``0303 follows``() =
+        let grammar = 
+            mainProductions
+            |> GrammarCrewUtils.getProductionsCrew
+            |> GrammarCrewUtils.getNullableCrew
+            |> GrammarCrewUtils.getFirstLastCrew
+            |> GrammarCrewUtils.getFollowPrecedeCrew
+
         //show grammar.follows
 
         //空字符串代表书中的$
@@ -110,7 +144,14 @@ type Example427Test(output:ITestOutputHelper) =
         Should.equal z grammar.follows
 
     [<Fact>]
-    member _.``precedes``() =
+    member _.``0304 precedes``() =
+        let grammar = 
+            mainProductions
+            |> GrammarCrewUtils.getProductionsCrew
+            |> GrammarCrewUtils.getNullableCrew
+            |> GrammarCrewUtils.getFirstLastCrew
+            |> GrammarCrewUtils.getFollowPrecedeCrew
+
         show grammar.precedes
         ////空字符串代表BOF
         let y = Map [
@@ -123,14 +164,20 @@ type Example427Test(output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``closures``() =
+        let grammar = 
+            mainProductions
+            |> GrammarCrewUtils.getProductionsCrew
+            |> GrammarCrewUtils.getNullableCrew
+            |> GrammarCrewUtils.getFirstLastCrew
+
         let itemCores = 
-            ItemCoreFactory.make grammar.productions
+            ItemCoreFactory.make grammar.augmentedProductions
 
         let itemCoreAttributes = 
             ItemCoreAttributeFactory.make grammar.nonterminals grammar.nullables grammar.firsts itemCores
    
         let closures = 
-            CollectionFactory.make itemCores itemCoreAttributes grammar.productions
+            CollectionFactory.make itemCores itemCoreAttributes grammar.augmentedProductions
             |> Set.map(fun (kernel,closure)->
                 let k = kernel |> Set.map(fun i -> i.production,i.dot)
                 let c = closure |> Set.map(fun (i,la)->(i.production,i.dot),la)
@@ -160,15 +207,22 @@ type Example427Test(output:ITestOutputHelper) =
     
     [<Fact>]
     member _.``goto factory``() =
+        let grammar = 
+            mainProductions
+            |> GrammarCrewUtils.getProductionsCrew
+            |> GrammarCrewUtils.getNullableCrew
+            |> GrammarCrewUtils.getFirstLastCrew
+
         let itemCores = 
-            ItemCoreFactory.make grammar.productions
+            ItemCoreFactory.make grammar.augmentedProductions
 
         let itemCoreAttributes = 
             ItemCoreAttributeFactory.make grammar.nonterminals grammar.nullables grammar.firsts itemCores
    
         let closures = 
-            CollectionFactory.make itemCores itemCoreAttributes grammar.productions
+            CollectionFactory.make itemCores itemCoreAttributes grammar.augmentedProductions
         ()
+
         //let gotos = 
         //    GotoFactory.make closures
         //    |> Set.map(fun(k1,s,k2)-> k1 |> Set.map(fun i -> i.production,i.dot),s,k2 |> Set.map(fun i -> i.production,i.dot))

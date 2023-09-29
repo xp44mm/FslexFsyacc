@@ -1,5 +1,12 @@
 ﻿module FslexFsyacc.Yacc.ProductionUtils
 
+let leftside (production:string list) = 
+        production 
+        |> List.head
+let body (production:string list) = 
+        production 
+        |> List.tail
+
 /// Normally, the precedence of a production is taken to be the same as
 /// that of its rightmost terminal.
 /// 过滤终结符，并反向保存在list中。
@@ -14,7 +21,7 @@ let revTerminalsOfProduction (terminals:Set<string>) (production:string list) =
     loop [] production.Tail
 
 /// 产生式优先级%prec命名的提示
-let precedenceOfProductions (terminals:Set<string>)(productions:Set<string list>) =
+let precedenceOfProductions (terminals:Set<string>) (productions:Set<string list>) =
     let productions =
         productions
         |> Set.map(fun prod ->

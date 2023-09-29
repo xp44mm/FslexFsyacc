@@ -39,7 +39,7 @@
 
   <ItemGroup>
     <PackageReference Include="FSharp.Compiler.Service" Version="43.7.400" />
-    <PackageReference Include="FSharp.Literals" Version="2.2.12" />
+    <PackageReference Include="FSharp.Literals" Version="2.2.14" />
   </ItemGroup>
 
   <ItemGroup>

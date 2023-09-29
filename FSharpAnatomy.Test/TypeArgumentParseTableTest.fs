@@ -26,24 +26,6 @@ type TypeArgumentParseTableTest (output:ITestOutputHelper) =
     let filePath = Path.Combine(Dir.FSharpAnatomyPath,"typeArgument.fsyacc")
     let parseTblPath = Path.Combine(Dir.FSharpAnatomyPath, $"{parseTblName}.fs")
 
-    //let text = File.ReadAllText(filePath)
-
-    //let grammar text =
-    //    text
-    //    |> FlatFsyaccFileUtils.parse
-    //    |> FlatFsyaccFileUtils.toGrammar
-
-    //let ambiguousCollection text =
-    //    text
-    //    |> FlatFsyaccFileUtils.parse
-    //    |> FlatFsyaccFileUtils.toAmbiguousCollection
-
-    ////解析表数据
-    //let parseTbl text = 
-    //    text
-    //    |> FlatFsyaccFileUtils.parse
-    //    |> FlatFsyaccFileUtils.toFsyaccParseTableFile
-
     let text = File.ReadAllText(filePath,Encoding.UTF8)
 
     // 与fsyacc文件完全相对应的结构树
@@ -57,7 +39,7 @@ type TypeArgumentParseTableTest (output:ITestOutputHelper) =
 
     let grammar (flatedFsyacc) =
         flatedFsyacc
-        |> FlatFsyaccFileUtils.toGrammar
+        |> FlatFsyaccFileUtils.getFollowPrecedeCrew
 
     let ambiguousCollection (flatedFsyacc) =
         flatedFsyacc

@@ -2,6 +2,7 @@
 
 open System.Collections.Concurrent
 
+// key:Augmented Productions
 let mainProductions = ConcurrentDictionary<Set<string list>, Set<string list>>(HashIdentity.Structural)
 let symbols         = ConcurrentDictionary<Set<string list>, Set<string>>(HashIdentity.Structural)
 let nonterminals    = ConcurrentDictionary<Set<string list>, Set<string>>(HashIdentity.Structural)

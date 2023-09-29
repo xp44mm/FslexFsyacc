@@ -37,7 +37,9 @@ let make
     Graph.propagate basis pairs
     |> Map.filter(fun s st -> st.Count > 1 || Set.minElement st <> s) // 只包括非终结符号
 
-let firstLookupMemoiz = ConcurrentDictionary<Set<string>*Map<string,Set<string>>, ConcurrentDictionary<string list, Set<string>>>(HashIdentity.Structural)
+let firstLookupMemoiz = ConcurrentDictionary<
+    Set<string>*Map<string,Set<string>>, 
+    ConcurrentDictionary<string list, Set<string>>>(HashIdentity.Structural)
 
 /// 符号串的first终结符集合
 let first (nullables:Set<string>) (firsts:Map<string,Set<string>>) =

@@ -1,4 +1,5 @@
 ﻿namespace FslexFsyacc.Yacc
+open FslexFsyacc.Runtime
 
 open FSharp.Idioms
 open FSharp.Literals.Literal

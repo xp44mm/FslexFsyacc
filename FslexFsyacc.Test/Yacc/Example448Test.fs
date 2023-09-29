@@ -25,18 +25,23 @@ type Example448Test(output:ITestOutputHelper) =
         [ R; L ]
     ]
 
-    let grammar = Grammar.from mainProductions
+    let grammar = 
+        mainProductions
+        |> GrammarCrewUtils.getProductionsCrew
+        |> GrammarCrewUtils.getNullableCrew
+        |> GrammarCrewUtils.getFirstLastCrew
+
 
     [<Fact>]
     member _.``closures``() =
         let itemCores = 
-            ItemCoreFactory.make grammar.productions
+            ItemCoreFactory.make grammar.augmentedProductions
 
         let itemCoreAttributes = 
             ItemCoreAttributeFactory.make grammar.nonterminals grammar.nullables grammar.firsts itemCores
    
         let closures = 
-            CollectionFactory.make itemCores itemCoreAttributes grammar.productions
+            CollectionFactory.make itemCores itemCoreAttributes grammar.augmentedProductions
             |> Set.map(fun (kernel,closure)->
                 let k = kernel |> Set.map(fun i -> i.production,i.dot)
                 let c = closure |> Set.map(fun (i,la)->(i.production,i.dot),la)
@@ -60,13 +65,13 @@ type Example448Test(output:ITestOutputHelper) =
     [<Fact>]
     member _.``goto factory``() =
         let itemCores = 
-            ItemCoreFactory.make grammar.productions
+            ItemCoreFactory.make grammar.augmentedProductions
 
         let itemCoreAttributes = 
             ItemCoreAttributeFactory.make grammar.nonterminals grammar.nullables grammar.firsts itemCores
    
         let closures = 
-            CollectionFactory.make itemCores itemCoreAttributes grammar.productions
+            CollectionFactory.make itemCores itemCoreAttributes grammar.augmentedProductions
 
         //let gotos = 
         //    GotoFactory.make closures

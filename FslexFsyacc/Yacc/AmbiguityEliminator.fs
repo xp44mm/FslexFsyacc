@@ -1,4 +1,5 @@
 ﻿namespace FslexFsyacc.Yacc
+open FslexFsyacc.Runtime
 
 open FSharp.Literals.Literal
 
@@ -9,7 +10,7 @@ type AmbiguityEliminator =
         precedences:Map<string,int> // token -> precedence
     }
 
-    ///获取产生式的优先级的符号:getTokenOf
+    ///获取产生式的优先级的符号:getDummyTokenOf
     member this.getPrecedence(production:string list) =
         if this.prodTokens.ContainsKey production then
             this.prodTokens.[production]
@@ -29,7 +30,7 @@ type AmbiguityEliminator =
     member this.disambiguate(itemcores:Set<ItemCore>) =
         let reduces,shifts =
             itemcores
-            |> Set.partition(fun i -> i.dotmax)
+            |> Set.partition(ItemCoreUtils.dotmax)
 
         if reduces.IsEmpty then
             //shift/shift 经常有一个以上的符号(终结符或非终结符)，无需去重

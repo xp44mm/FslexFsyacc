@@ -41,7 +41,7 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
 
     let grammar (flatedFsyacc) =
         flatedFsyacc
-        |> FlatFsyaccFileUtils.toGrammar
+        |> FlatFsyaccFileUtils.getFollowPrecedeCrew
 
     let ambiguousCollection (flatedFsyacc) =
         flatedFsyacc
@@ -50,7 +50,6 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
     //解析表数据
     let parseTbl (flatedFsyacc) = 
         flatedFsyacc
-        //|> FlatFsyaccFileUtils.parse
         |> FlatFsyaccFileUtils.toFsyaccParseTableFile
 
     [<Fact>]

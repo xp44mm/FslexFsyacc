@@ -19,10 +19,13 @@ let parse text =
     |> RawFsyaccFileUtils.parse
     |> fromRaw
 
-let toGrammar (fsyacc:FlatFsyaccFile) =
+let getFollowPrecedeCrew (fsyacc:FlatFsyaccFile) =
     fsyacc.rules
     |> FsyaccFileRules.getMainProductions
-    |> Grammar.from
+    |> GrammarCrewUtils.getProductionsCrew
+    |> GrammarCrewUtils.getNullableCrew
+    |> GrammarCrewUtils.getFirstLastCrew
+    |> GrammarCrewUtils.getFollowPrecedeCrew
 
 let toAmbiguousCollection (fsyacc:FlatFsyaccFile) =
     fsyacc.rules

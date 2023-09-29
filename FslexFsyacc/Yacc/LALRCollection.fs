@@ -1,4 +1,5 @@
 ﻿namespace FslexFsyacc.Yacc
+open FslexFsyacc.Runtime
 
 ///
 type LALRCollection =
@@ -8,6 +9,7 @@ type LALRCollection =
         closures: Map<int,Set<string*ItemCore>> // index -> lookahead*action
     }
 
+    [<System.Obsolete("LALRCollectionCrewUtils.getLALRCollectionCrew")>]
     static member create(mainProductions:string list list) =
         let grammar = Grammar.from mainProductions
         let itemCores = ItemCoreFactory.make grammar.productions
@@ -33,13 +35,13 @@ type LALRCollection =
                     |> Set.toList
                     |> List.collect(fun (itemCore,lookaheads) ->
                         let lookaheads =
-                            if itemCore.dotmax then
+                            if (ItemCoreUtils.dotmax itemCore) then
                                 lookaheads
                             else
                                 //GOTO的nextSymbol分为两种情况：
                                 //当nextSymbol是terminal时用于侦察冲突
                                 //当nextSymbol是nonterminal时仅用于占位
-                                Set.singleton itemCore.nextSymbol
+                                Set.singleton (ItemCoreUtils.nextSymbol itemCore) 
                         lookaheads
                         |> Set.toList
                         |> List.map(fun lookahead -> lookahead, itemCore)
@@ -54,20 +56,21 @@ type LALRCollection =
             closures = closures
         }
 
+    [<System.Obsolete("LALRCollectionCrewUtils.getGOTOs")>]
     member this.getGOTOs() =
         this.closures
         |> Map.map(fun i closure ->
             closure
-            |> Set.filter(fun(la,item)-> not item.dotmax)
+            |> Set.filter(fun(la,itemCore)-> not (ItemCoreUtils.dotmax itemCore))
             |> Seq.groupBy(fun (la,_) -> la)
             |> Seq.map(fun(la,pairs)->
-                let kernel =
+                let nextKernel =
                     pairs
-                    |> Seq.map(fun(la,itemcore) ->
-                        itemcore.dotIncr()
+                    |> Seq.map(fun(la,itemCore) ->
+                        (ItemCoreUtils.dotIncr itemCore)
                     )
                     |> Set.ofSeq
-                la, kernel
+                la, nextKernel
             )
             |> Map.ofSeq
         )

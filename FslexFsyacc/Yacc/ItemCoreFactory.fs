@@ -1,5 +1,6 @@
 ﻿[<RequireQualifiedAccess>]
 module FslexFsyacc.Yacc.ItemCoreFactory
+open FslexFsyacc.Runtime
 
 /// 语法中的所有ItemCore
 let make (productions:Set<string list>) =

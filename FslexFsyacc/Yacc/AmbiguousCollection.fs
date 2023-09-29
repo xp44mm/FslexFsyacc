@@ -51,10 +51,6 @@ type AmbiguousCollection =
             not conflicts.IsEmpty
         )
 
-    //[<Obsolete("this.filterProperConflicts")>]
-    //member this.filterConflictedClosures() = 
-    //    this.filterProperConflicts()
-
     /// 从冲突汇总产生式，以此得知哪些产生式必须指定优先级，以排除歧义。
     member this.collectConflictedProductions() =
         set [
@@ -77,7 +73,7 @@ type AmbiguousCollection =
                 precedences = precedences
             }:AmbiguityEliminator
 
-        let unambiguousClosures =
+        let unambiguousConflicts =
             this.conflicts
             |> Map.map(fun i closure ->
                 closure
@@ -94,9 +90,8 @@ type AmbiguousCollection =
             )
         {
             this with
-                conflicts = unambiguousClosures
+                conflicts = unambiguousConflicts
         }
-
 
     member this.render() =
         ///变换为(itemcore,lookaheads) list
@@ -109,9 +104,9 @@ type AmbiguousCollection =
         //过滤出点号在最后的产生式
         let getReducedProductions (itemlist:list<int*(ItemCore*_)>) =
             itemlist
-            |> List.choose(fun(i,(ic,_))->
-                if ic.dotmax then
-                    Some(ic.production,i)
+            |> List.choose(fun(i,(itemCore,_))->
+                if (ItemCoreUtils.dotmax itemCore) then
+                    Some(itemCore.production,i)
                 else None
             )
             |> Map.ofList

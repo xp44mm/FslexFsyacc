@@ -3,6 +3,7 @@
 open FSharp.Idioms
 open System
 
+[<Obsolete("FollowPrecedeCrew")>]
 type Grammar =
     {
         /// 增广语法：开始符号为""空字符串
@@ -24,7 +25,7 @@ type Grammar =
         }
 
     //不包括增广规则的主体规则
-    member private this.mainProductions =
+    member this.mainProductions =
         let valueFactory productions = 
             productions
             |> Set.remove(this.productions.MinimumElement)

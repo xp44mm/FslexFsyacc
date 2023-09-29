@@ -1,15 +1,17 @@
 ﻿[<RequireQualifiedAccess>]
 module FslexFsyacc.Yacc.ClosureFactory
+open FslexFsyacc.Runtime
 
 open FSharp.Idioms
 
+[<System.Obsolete("getClosure")>]
 let make 
     (itemCoreAttributes:Map<ItemCore, bool*Set<string>>)
     (productions:Set<string list>)
     =
 
     /// ItemCore*Set<lookahead:string> 返回Items
-    let rec loop (acc:Set<ItemCore*Set<string>>)(items: Set<ItemCore*Set<string>>) =
+    let rec loop (acc:Set<ItemCore*Set<string>>) (items: Set<ItemCore*Set<string>>) =
         let newAcc =
             items
             |> Set.filter(fst >> itemCoreAttributes.ContainsKey)
@@ -17,7 +19,7 @@ let make
                 let lookaheads = 
                     let propagatable,spontaneous = itemCoreAttributes.[itemCore]
                     if propagatable then spontaneous + las else spontaneous
-                itemCore.nextSymbol, lookaheads
+                (ItemCoreUtils.nextSymbol itemCore), lookaheads
             )
             |> Set.map(fun(nextSymbol, lookaheads) -> //扩展闭包一次。
                 productions

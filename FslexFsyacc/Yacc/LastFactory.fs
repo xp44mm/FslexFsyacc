@@ -7,6 +7,7 @@ open FSharp.Idioms
 let make 
     (nullables:Set<string>) 
     (mainProductions:#seq<string list>) =
+
     mainProductions
     |> Seq.map(fun p -> p.Head :: List.rev p.Tail)
     |> FirstFactory.make nullables
