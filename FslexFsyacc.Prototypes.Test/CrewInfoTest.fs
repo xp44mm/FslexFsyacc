@@ -107,6 +107,7 @@ type CrewInfoTest(output:ITestOutputHelper) =
         let fileText =
             [
                 yield "namespace FslexFsyacc.Yacc"
+                yield "open FslexFsyacc.Runtime"
 
                 yield!
                     tps

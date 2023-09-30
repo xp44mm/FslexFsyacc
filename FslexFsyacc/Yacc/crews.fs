@@ -1,4 +1,6 @@
 ﻿namespace FslexFsyacc.Yacc
+open FslexFsyacc.Runtime
+
 // ProductionCrew(production,leftside,body)
 type ProductionCrew(production:list<string>,leftside:string,body:list<string>) =
     member _.production = production
