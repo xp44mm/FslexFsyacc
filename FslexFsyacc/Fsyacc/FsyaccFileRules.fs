@@ -98,15 +98,10 @@ let duplicateRule
 let getMainProductions (rules:list<string list*string*string>) =
     rules |> List.map Triple.first
 
-//[<Obsolete("getMainProductions")>]
-//let getProductions (rules:list<string list*string*string>) =
-//    rules
-//    |> List.map Triple.first
-
-let getProductionNames(rules:list<string list*string*string>) =
+let getDummyTokens(rules:list<string list*string*string>) =
     rules
-    |> List.filter(fun(_,nm,_) -> nm > "")
-    |> List.map(fun(prod,name,_)-> prod,name)
+    |> List.filter(fun(_,dummyToken,_) -> dummyToken > "")
+    |> List.map(fun(prod,dummyToken,_)-> prod,dummyToken)
     |> Map.ofList
 
 let removeErrorRules (robust:string Set) (rules:list<string list*string*string>) =
@@ -135,9 +130,9 @@ let eliminateSymbolFromRules (symbol:string) (rules:list<string list*string*stri
                     |> List.map Triple.first
             }
 
-        let b1 = bnf.eliminate(symbol)
+        let bnf1 = bnf.eliminate(symbol)
 
-        b1.productions
+        bnf1.productions
         |> List.map(fun prod -> 
             let nm,act = 
                 if keeps.ContainsKey prod then 
@@ -151,7 +146,7 @@ let getChomsky (rules:list<string list*string*string>) =
         match prods with
         | [prod & ([_]|[_;_])] -> 
             Some prod
-        //| [prod & ] when terminals.Contains b -> //
+        //| [prod & ] when terminals.Contains b ->
         //    Some prod
         | _ -> None
 

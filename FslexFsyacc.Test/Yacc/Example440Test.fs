@@ -33,11 +33,10 @@ type Example440Test(output:ITestOutputHelper) =
         |> GrammarCrewUtils.getNullableCrew
         |> GrammarCrewUtils.getFirstLastCrew
 
-
     [<Fact>]
     member _.``all of item cores``() =
         let itemCores = 
-            ItemCoreFactory.make grammar.augmentedProductions
+            ItemCoreUtils.make grammar.augmentedProductions
             |> Set.map(fun i -> i.production,i.dot)
         //show itemCores
         let y = set [
@@ -57,38 +56,42 @@ type Example440Test(output:ITestOutputHelper) =
             ["T";"T";"*";"F"],0;["T";"T";"*";"F"],1;["T";"T";"*";"F"],2;["T";"T";"*";"F"],3]
         Should.equal y itemCores
 
-    [<Fact>]
-    member _.``item core attributes``() =
-        let itemCores = 
-            ItemCoreFactory.make grammar.augmentedProductions
+    //[<Fact>]
+    //member _.``item core attributes``() =
+    //    let itemCores = 
+    //        ItemCoreFactory.make grammar.augmentedProductions
 
-        let itemCoreAttributes = 
-            ItemCoreAttributeFactory.make grammar.nonterminals grammar.nullables grammar.firsts itemCores
-            |> Map.mapEntry(fun i v -> (i.production,i.dot), v )
-            |> Map.map(fun _ sq -> Seq.exactlyOne sq)
+    //    let itemCoreAttributes = 
+    //        ItemCoreAttributeFactory.make grammar.nonterminals grammar.nullables grammar.firsts itemCores
+    //        |> Map.mapEntry(fun i v -> (i.production,i.dot), v )
+    //        |> Map.map(fun _ sq -> Seq.exactlyOne sq)
    
-        //show itemCoreAttributes
-        let y = Map.ofList [
-            (["";"E"],0),(true,Set.empty);
-            (["E";"E";"+";"T"],0),(false,set ["+"]);
-            (["E";"E";"+";"T"],2),(true,Set.empty);
-            (["E";"T"],0),(true,Set.empty);
-            (["F";"(";"E";")"],1),(false,set [")"]);
-            (["T";"F"],0),(true,Set.empty);
-            (["T";"T";"*";"F"],0),(false,set ["*"]);
-            (["T";"T";"*";"F"],2),(true,Set.empty)]
-        Should.equal y itemCoreAttributes
+    //    //show itemCoreAttributes
+    //    let y = Map.ofList [
+    //        (["";"E"],0),(true,Set.empty);
+    //        (["E";"E";"+";"T"],0),(false,set ["+"]);
+    //        (["E";"E";"+";"T"],2),(true,Set.empty);
+    //        (["E";"T"],0),(true,Set.empty);
+    //        (["F";"(";"E";")"],1),(false,set [")"]);
+    //        (["T";"F"],0),(true,Set.empty);
+    //        (["T";"T";"*";"F"],0),(false,set ["*"]);
+    //        (["T";"T";"*";"F"],2),(true,Set.empty)]
+    //    Should.equal y itemCoreAttributes
 
     [<Fact>]
     member _.``closures``() =
-        let itemCores = 
-            ItemCoreFactory.make grammar.augmentedProductions
+        let grammar = 
+            mainProductions
+            |> GrammarCrewUtils.getProductionsCrew
+            |> GrammarCrewUtils.getNullableCrew
+            |> GrammarCrewUtils.getFirstLastCrew
+            |> GrammarCrewUtils.getFollowPrecedeCrew
+            |> GrammarCrewUtils.getItemCoresCrew
 
-        let itemCoreAttributes = 
-            ItemCoreAttributeFactory.make grammar.nonterminals grammar.nullables grammar.firsts itemCores
-   
         let closures = 
-            CollectionFactory.make itemCores itemCoreAttributes grammar.augmentedProductions
+            //CollectionFactory.make itemCores itemCoreAttributes grammar.augmentedProductions
+            grammar
+            |> GrammarCrewUtils.getClosureCollection 
             |> Set.map(fun (kernel,closure)->
                 let k = kernel |> Set.map(fun i -> i.production,i.dot)
                 let c = closure |> Set.map(fun (i,la)->(i.production,i.dot),la)
@@ -114,13 +117,13 @@ type Example440Test(output:ITestOutputHelper) =
     [<Fact>]
     member _.``goto factory``() =
         let itemCores = 
-            ItemCoreFactory.make grammar.augmentedProductions
+            ItemCoreUtils.make grammar.augmentedProductions
 
-        let itemCoreAttributes = 
-            ItemCoreAttributeFactory.make grammar.nonterminals grammar.nullables grammar.firsts itemCores
+        //let itemCoreAttributes = 
+        //    ItemCoreAttributeFactory.make grammar.nonterminals grammar.nullables grammar.firsts itemCores
    
-        let closures = 
-            CollectionFactory.make itemCores itemCoreAttributes grammar.augmentedProductions
+        //let closures = 
+        //    CollectionFactory.make itemCores itemCoreAttributes grammar.augmentedProductions
 
         //let y = 
         //    GotoFactory.make closures

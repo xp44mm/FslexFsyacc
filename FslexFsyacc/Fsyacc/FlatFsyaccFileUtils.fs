@@ -30,20 +30,26 @@ let getFollowPrecedeCrew (fsyacc:FlatFsyaccFile) =
 let toAmbiguousCollection (fsyacc:FlatFsyaccFile) =
     fsyacc.rules
     |> FsyaccFileRules.getMainProductions
-    |> AmbiguousCollection.create
+    |> GrammarCrewUtils.getProductionsCrew
+    |> GrammarCrewUtils.getNullableCrew
+    |> GrammarCrewUtils.getFirstLastCrew
+    |> GrammarCrewUtils.getFollowPrecedeCrew
+    |> GrammarCrewUtils.getItemCoresCrew
+    |> LALRCollectionCrewUtils.getLALRCollectionCrew
+    |> AmbiguousCollectionCrewUtils.getAmbiguousCollectionCrew
 
 let toFsyaccParseTableFile (this:FlatFsyaccFile) =
     let mainProductions = FsyaccFileRules.getMainProductions this.rules
-    let productionNames = FsyaccFileRules.getProductionNames this.rules
+    let dummyTokens = FsyaccFileRules.getDummyTokens this.rules
     let parseTable =
-        ParseTable.create(
+        EncodedParseTableCrewUtils.getEncodedParseTableCrew(
             mainProductions,
-            productionNames,
+            dummyTokens,
             this.precedences)
     {
         header = this.header
         rules = this.rules |> List.map Triple.ends
-        actions = parseTable.actions
+        actions = parseTable.encodedActions
         declarations = this.declarations
-        closures = parseTable.closures
+        closures = parseTable.encodedClosures
     }

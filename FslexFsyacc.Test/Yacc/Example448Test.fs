@@ -31,17 +31,27 @@ type Example448Test(output:ITestOutputHelper) =
         |> GrammarCrewUtils.getNullableCrew
         |> GrammarCrewUtils.getFirstLastCrew
 
-
     [<Fact>]
     member _.``closures``() =
-        let itemCores = 
-            ItemCoreFactory.make grammar.augmentedProductions
+        let grammar = 
+            mainProductions
+            |> GrammarCrewUtils.getProductionsCrew
+            |> GrammarCrewUtils.getNullableCrew
+            |> GrammarCrewUtils.getFirstLastCrew
+            |> GrammarCrewUtils.getFollowPrecedeCrew
+            |> GrammarCrewUtils.getItemCoresCrew
 
-        let itemCoreAttributes = 
-            ItemCoreAttributeFactory.make grammar.nonterminals grammar.nullables grammar.firsts itemCores
-   
+        //let itemCores = 
+        //    ItemCoreFactory.make grammar.augmentedProductions
+
+        //let itemCoreAttributes = 
+        //    ItemCoreAttributeFactory.make grammar.nonterminals grammar.nullables grammar.firsts itemCores
+            
+
         let closures = 
-            CollectionFactory.make itemCores itemCoreAttributes grammar.augmentedProductions
+            //CollectionFactory.make itemCores itemCoreAttributes grammar.augmentedProductions
+            grammar
+            |> GrammarCrewUtils.getClosureCollection 
             |> Set.map(fun (kernel,closure)->
                 let k = kernel |> Set.map(fun i -> i.production,i.dot)
                 let c = closure |> Set.map(fun (i,la)->(i.production,i.dot),la)
@@ -65,13 +75,13 @@ type Example448Test(output:ITestOutputHelper) =
     [<Fact>]
     member _.``goto factory``() =
         let itemCores = 
-            ItemCoreFactory.make grammar.augmentedProductions
+            ItemCoreUtils.make grammar.augmentedProductions
 
-        let itemCoreAttributes = 
-            ItemCoreAttributeFactory.make grammar.nonterminals grammar.nullables grammar.firsts itemCores
+        //let itemCoreAttributes = 
+        //    ItemCoreAttributeFactory.make grammar.nonterminals grammar.nullables grammar.firsts itemCores
    
-        let closures = 
-            CollectionFactory.make itemCores itemCoreAttributes grammar.augmentedProductions
+        //let closures = 
+        //    CollectionFactory.make itemCores itemCoreAttributes grammar.augmentedProductions
 
         //let gotos = 
         //    GotoFactory.make closures

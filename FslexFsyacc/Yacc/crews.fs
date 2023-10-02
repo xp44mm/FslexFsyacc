@@ -1,6 +1,5 @@
 ﻿namespace FslexFsyacc.Yacc
 open FslexFsyacc.Runtime
-
 // ProductionCrew(production,leftside,body)
 type ProductionCrew(production:list<string>,leftside:string,body:list<string>) =
     member _.production = production
@@ -45,17 +44,18 @@ type LALRCollectionCrew(prototype:ItemCoresCrew,kernels:Set<Set<ItemCore>>,closu
     member _.kernels = kernels
     member _.closures = closures
     member _.GOTOs = GOTOs
-// AmbiguousCollectionCrew(prototype,conflicts)
-type AmbiguousCollectionCrew(prototype:LALRCollectionCrew,conflicts:Map<int,Map<string,Set<ItemCore>>>) =
+// AmbiguousCollectionCrew(prototype,conflictedItemCores)
+type AmbiguousCollectionCrew(prototype:LALRCollectionCrew,conflictedItemCores:Map<int,Map<string,Set<ItemCore>>>) =
     inherit LALRCollectionCrew(ItemCoresCrew(FollowPrecedeCrew(FirstLastCrew(NullableCrew(ProductionsCrew(prototype.mainProductions,prototype.augmentedProductions),prototype.symbols,prototype.nonterminals,prototype.terminals,prototype.nullables),prototype.firsts,prototype.lasts),prototype.follows,prototype.precedes),prototype.itemCoreCrews),prototype.kernels,prototype.closures,prototype.GOTOs)
-    member _.conflicts = conflicts
-// ActionParseTableCrew(prototype,actions,resolvedClosures)
-type ActionParseTableCrew(prototype:AmbiguousCollectionCrew,actions:Map<int,Map<string,Action>>,resolvedClosures:Map<int,Map<ItemCore,Set<string>>>) =
-    inherit AmbiguousCollectionCrew(LALRCollectionCrew(ItemCoresCrew(FollowPrecedeCrew(FirstLastCrew(NullableCrew(ProductionsCrew(prototype.mainProductions,prototype.augmentedProductions),prototype.symbols,prototype.nonterminals,prototype.terminals,prototype.nullables),prototype.firsts,prototype.lasts),prototype.follows,prototype.precedes),prototype.itemCoreCrews),prototype.kernels,prototype.closures,prototype.GOTOs),prototype.conflicts)
+    member _.conflictedItemCores = conflictedItemCores
+// ActionParseTableCrew(prototype,unambiguousItemCores,actions,resolvedClosures)
+type ActionParseTableCrew(prototype:AmbiguousCollectionCrew,unambiguousItemCores:Map<int,Map<string,Set<ItemCore>>>,actions:Map<int,Map<string,Action>>,resolvedClosures:Map<int,Map<ItemCore,Set<string>>>) =
+    inherit AmbiguousCollectionCrew(LALRCollectionCrew(ItemCoresCrew(FollowPrecedeCrew(FirstLastCrew(NullableCrew(ProductionsCrew(prototype.mainProductions,prototype.augmentedProductions),prototype.symbols,prototype.nonterminals,prototype.terminals,prototype.nullables),prototype.firsts,prototype.lasts),prototype.follows,prototype.precedes),prototype.itemCoreCrews),prototype.kernels,prototype.closures,prototype.GOTOs),prototype.conflictedItemCores)
+    member _.unambiguousItemCores = unambiguousItemCores
     member _.actions = actions
     member _.resolvedClosures = resolvedClosures
 // EncodedParseTableCrew(prototype,encodedActions,encodedClosures)
 type EncodedParseTableCrew(prototype:ActionParseTableCrew,encodedActions:list<list<string*int>>,encodedClosures:list<list<int*int*list<string>>>) =
-    inherit ActionParseTableCrew(AmbiguousCollectionCrew(LALRCollectionCrew(ItemCoresCrew(FollowPrecedeCrew(FirstLastCrew(NullableCrew(ProductionsCrew(prototype.mainProductions,prototype.augmentedProductions),prototype.symbols,prototype.nonterminals,prototype.terminals,prototype.nullables),prototype.firsts,prototype.lasts),prototype.follows,prototype.precedes),prototype.itemCoreCrews),prototype.kernels,prototype.closures,prototype.GOTOs),prototype.conflicts),prototype.actions,prototype.resolvedClosures)
+    inherit ActionParseTableCrew(AmbiguousCollectionCrew(LALRCollectionCrew(ItemCoresCrew(FollowPrecedeCrew(FirstLastCrew(NullableCrew(ProductionsCrew(prototype.mainProductions,prototype.augmentedProductions),prototype.symbols,prototype.nonterminals,prototype.terminals,prototype.nullables),prototype.firsts,prototype.lasts),prototype.follows,prototype.precedes),prototype.itemCoreCrews),prototype.kernels,prototype.closures,prototype.GOTOs),prototype.conflictedItemCores),prototype.unambiguousItemCores,prototype.actions,prototype.resolvedClosures)
     member _.encodedActions = encodedActions
     member _.encodedClosures = encodedClosures

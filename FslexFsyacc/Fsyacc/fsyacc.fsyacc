@@ -1,5 +1,6 @@
 ﻿%{
 %}
+
 file :
     | HEADER rule+ "%%"? {
         {

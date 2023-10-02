@@ -108,7 +108,12 @@ type FslexParseTableTest(output: ITestOutputHelper) =
     member _.``03 - list all states``() =
         let collection = ambiguousCollection flatedFsyacc
         
-        let text = collection.render()
+        let text = 
+            AmbiguousCollectionUtils.render 
+                collection.terminals
+                collection.conflictedItemCores
+                (collection.kernels |> Seq.mapi(fun i k -> k,i) |> Map.ofSeq)
+
         output.WriteLine(text)
 
     [<Fact>]
@@ -116,11 +121,11 @@ type FslexParseTableTest(output: ITestOutputHelper) =
         let collection = ambiguousCollection flatedFsyacc
 
         let productions = 
-            collection.collectConflictedProductions()
+            AmbiguousCollectionUtils.collectConflictedProductions collection.conflictedItemCores
 
         // production -> %prec
         let pprods =
-            ProductionUtils.precedenceOfProductions collection.grammar.terminals productions
+            ProductionUtils.precedenceOfProductions collection.terminals productions
 
         //优先级应该据此结果给出，不能少，也不应该多。
         let y =
@@ -160,7 +165,7 @@ type FslexParseTableTest(output: ITestOutputHelper) =
 
         output.WriteLine(src)
 
-    [<Fact()>] // Skip="once for all!"
+    [<Fact(Skip="按需更新源代码")>] // 
     member _.``06 - generate ParseTable``() =
         let parseTbl = parseTbl flatedFsyacc
 

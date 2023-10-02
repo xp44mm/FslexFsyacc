@@ -1,5 +1,4 @@
 ﻿%{
-
 %}
 
 bounded:
@@ -14,13 +13,6 @@ band:
     | bounded {s0}
 
 %%
-
-// LEFT:int
-// RIGHT:int
-// TICK: string
-// bounded: Band
-// band: Band
-// bands: "Band list"
 
 %type<int> LEFT RIGHT
 %type<string> TICK

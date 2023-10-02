@@ -33,9 +33,8 @@ type ItemCoresCrew = {
 
 type LALRCollectionCrew = {
     prototype:ItemCoresCrew
-    /// kernel -> state
-    kernels : Set<Set<ItemCore>> // kernel -> index
-    closures: Map<int,Set<string*ItemCore>> // index -> lookahead*action
+    kernels : Set<Set<ItemCore>> // (kernel:Set<ItemCore>)
+    closures: Map<int,Set<string*ItemCore>> // index -> lookahead * action
 
     /// state -> (lookahead/leftside) -> kernel
     GOTOs: Map<int,Map<string,Set<ItemCore>>>
@@ -44,18 +43,19 @@ type LALRCollectionCrew = {
 type AmbiguousCollectionCrew = {
     prototype:LALRCollectionCrew
     /// state -> (lookahead/leftside) -> conflicts
-    conflicts: Map<int,Map<string,Set<ItemCore>>>
+    conflictedItemCores: Map<int,Map<string,Set<ItemCore>>>
     }
 
 type ActionParseTableCrew = {
-    prototype:AmbiguousCollectionCrew
-    actions : Map<int,Map<string,Action>>
+    prototype: AmbiguousCollectionCrew
+    unambiguousItemCores: Map<int,Map<string,Set<ItemCore>>>
+    actions: Map<int,Map<string,Action>>
     resolvedClosures: Map<int,Map<ItemCore,Set<string>>>
     }
 
 type EncodedParseTableCrew = {
-    prototype:ActionParseTableCrew
-    encodedActions : list<list<string*int>>
+    prototype: ActionParseTableCrew
+    encodedActions: list<list<string*int>>
     encodedClosures: list<list<int*int*string list>>
     }
 

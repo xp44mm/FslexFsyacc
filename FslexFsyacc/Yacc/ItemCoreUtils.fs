@@ -1,9 +1,7 @@
 ﻿module FslexFsyacc.Yacc.ItemCoreUtils
+open System
 
 open FslexFsyacc.Runtime
-
-open System.Collections.Concurrent
-open System
 
 ///前进一半，留一半
 let dichotomy (itemCore:ItemCore) =
@@ -45,3 +43,12 @@ let isKernel (itemCore:ItemCore) =
 let render (itemCore:ItemCore) =
     RenderUtils.renderItemCore itemCore.production itemCore.dot
 
+/// 语法中的所有ItemCore
+let make (productions:Set<string list>) =
+    productions
+    |> Seq.collect(fun prod ->
+        let body = prod.Tail
+        [0..body.Length]
+        |> Seq.map(fun i -> {production = prod; dot = i})
+    )
+    |> Set.ofSeq

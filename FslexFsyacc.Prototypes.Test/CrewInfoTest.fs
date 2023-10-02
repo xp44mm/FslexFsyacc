@@ -100,7 +100,7 @@ type CrewInfoTest(output:ITestOutputHelper) =
             output.WriteLine(def)
         )
 
-    [<Fact()>] // Skip="outfile"
+    [<Fact(Skip="按需生成类型定义")>] // 
     member _.``05 - output target file test``() =
         let asm = Assembly.LoadFrom(Dir.dllFilePath)
         let tps = asm.GetExportedTypes()

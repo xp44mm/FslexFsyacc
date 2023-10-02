@@ -24,11 +24,11 @@ type Section4_8_1Test(output:ITestOutputHelper) =
     [<Fact>]
     member _.``fig4-49: parsing table test``() =
 
-        let collection = AmbiguousCollection.create mainProductions
+        let collection = AmbiguousCollectionCrewUtils.newAmbiguousCollectionCrew mainProductions
 
         // 提取冲突的产生式
         let productions =
-            collection.collectConflictedProductions()
+            AmbiguousCollectionUtils.collectConflictedProductions collection.conflictedItemCores
 
         //show productions
         let y =set[
@@ -39,16 +39,16 @@ type Section4_8_1Test(output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``grammar 4-1: ProductionPrecedence``() =
-        let collection = AmbiguousCollection.create mainProductions
+        let collection = AmbiguousCollectionCrewUtils.newAmbiguousCollectionCrew mainProductions
 
         // 提取冲突的产生式
         let productions =
-            collection.collectConflictedProductions()
+            AmbiguousCollectionUtils.collectConflictedProductions collection.conflictedItemCores
 
         //产生式的优先级操作符
         let operators = 
             ProductionUtils.precedenceOfProductions 
-                collection.grammar.terminals 
+                collection.terminals 
                 productions
             
         //show operators

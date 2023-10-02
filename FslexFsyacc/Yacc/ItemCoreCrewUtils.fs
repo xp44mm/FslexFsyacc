@@ -1,17 +1,6 @@
 ﻿module FslexFsyacc.Yacc.ItemCoreCrewUtils
 open FslexFsyacc.Runtime
 
-let getProductionCrew(production:Production) =
-    let leftside = 
-        production 
-        |> List.head
-
-    let body = 
-        production 
-        |> List.tail
-
-    ProductionCrew(production,leftside,body) 
-
 // Simple LR 的
 let getItemCoreCrew(prototype:ProductionCrew,dot) =
     ///前进一半，留一半
@@ -35,7 +24,7 @@ let getItemCoreCrew(prototype:ProductionCrew,dot) =
 
 /// 点号紧左侧的符号，终结符，或者非终结符
 /// 可以删除吗？
-let getPrevSymbol (itemCore:ItemCoreCrew) = 
+let getPrevSymbol (itemCore:ItemCoreCrew) =
     itemCore.backwards
     |> List.head
 

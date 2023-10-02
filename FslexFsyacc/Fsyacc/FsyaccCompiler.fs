@@ -13,11 +13,6 @@ let parser = Parser<Position<FsyaccToken>>(
     FsyaccTokenUtils.getTag,
     FsyaccTokenUtils.getLexeme)
 
-//let parse(tokens:seq<Position<FsyaccToken2>>) =
-//    tokens
-//    |> parser.parse
-//    |> FsyaccParseTable.unboxRoot
-
 /// 解析文本为结构化数据
 let compile (input:string) =
     //let mutable tokens = []
@@ -36,10 +31,6 @@ let compile (input:string) =
 
         states <- parser.shift(states, postok)
     )
-
-    //match parser.tryReduce(states) with
-    //| Some x -> states <- x
-    //| None -> ()
 
     match parser.accept states with
     | [1,lxm; 0,null] ->

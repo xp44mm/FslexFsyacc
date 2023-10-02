@@ -109,3 +109,144 @@ let renderConflict
         itemcoresBlock |> Line.indentCodeBlock 4
     ]
     |> String.concat "\r\n"
+
+/// 过滤掉假冲突，保留真冲突
+let filterProperConflicts(conflicts: Map<int,Map<string,Set<ItemCore>>>) =
+    conflicts
+    |> Map.map(fun state conflicts ->
+        conflicts
+        |> Map.filter(fun la items ->
+            isConflict items
+        )
+    )
+    |> Map.filter(fun state conflicts ->
+        //内层空，外层也排除
+        not conflicts.IsEmpty
+    )
+
+/// 从冲突汇总产生式，以此得知哪些产生式必须指定优先级，以排除歧义。
+let collectConflictedProductions(conflicts: Map<int,Map<string,Set<ItemCore>>>) =
+    set [
+        for KeyValue(state,cnflcts) in filterProperConflicts(conflicts) do
+        for KeyValue(sym,st) in cnflcts do
+        for icore in st do
+        icore.production
+    ]
+
+/// 去重，即冲突项目仅保留一个，但是grammar,kernels,gotos仍然保持去重前的数值
+let getUnambiguousItemCores
+    (dummyTokens:Map<string list,string>)
+    (precedences:Map<string,int>)
+    (terminals:Set<string>)
+    (conflictedItemCores:Map<int,Map<string,Set<ItemCore>>>)
+    =
+
+    let eliminator =
+        {
+            terminals = terminals
+            dummyTokens = dummyTokens
+            precedences = precedences
+        }:AmbiguityEliminator
+
+    conflictedItemCores
+    |> Map.map(fun i closure ->
+        closure
+        |> Map.map(fun sym itemcores ->
+            if isSRConflict(itemcores) then
+                eliminator.disambiguate(itemcores)
+            else
+                itemcores
+        )
+        |> Map.filter(fun sym itemcores -> 
+            // empty is nonassoc, will be error
+            not itemcores.IsEmpty
+            )
+    )
+
+let render
+    (terminals)
+    (conflicts: Map<int,Map<string,Set<ItemCore>>>)
+    (kernels: Map<Set<ItemCore>,int>)
+    =
+    ///变换为(itemcore,lookaheads) list
+    let getItemcores (conflicts:Map<string,Set<ItemCore>>) = 
+        conflicts
+        |> getItemcores
+        |> sortItemsByKernel
+        |> List.mapi(fun i x -> i+1,x)
+
+    //过滤出点号在最后的产生式
+    let getReducedProductions (itemlist:list<int*(ItemCore*_)>) =
+        itemlist
+        |> List.choose(fun(i,(itemCore,_))->
+            if (ItemCoreUtils.dotmax itemCore) then
+                Some(itemCore.production,i)
+            else None
+        )
+        |> Map.ofList
+
+    let properConflicts = filterProperConflicts(conflicts)
+
+    //偏应用
+    let renderConflict = renderConflict kernels
+
+    let itemsBlock =
+        conflicts
+        |> Map.toList
+        |> List.map(fun (state,conflicts) ->
+            let properConflicts = 
+                if properConflicts.ContainsKey state then
+                    properConflicts.[state]
+                else Map.empty
+
+            let itemlist = getItemcores conflicts
+
+            let productions = getReducedProductions itemlist
+
+            let renderConflict = renderConflict productions
+
+            let itemsBlock =
+                itemlist
+                |> renderItems
+
+            let conflictsBlock =
+                properConflicts
+                |> Map.toList
+                |> List.map(fun(la,items)->
+                    renderConflict la items
+                )
+                |> String.concat "\r\n"
+
+            let errorLookaheads = 
+                terminals - Map.keys conflicts
+
+            let errorBlock =
+                errorLookaheads
+                |> Set.toList
+                |> List.map RenderUtils.renderSymbol
+                |> String.concat " "
+                |> fun ls -> $"else lookaheads: {ls}"
+            [
+                $"state {state}:"
+                itemsBlock |> Line.indentCodeBlock 4
+
+                if properConflicts.IsEmpty then () else
+                    conflictsBlock |> Line.indentCodeBlock 4
+
+                if errorLookaheads.IsEmpty then () else
+                    errorBlock |> Line.indentCodeBlock 4
+
+            ] |> String.concat "\r\n"
+        )
+        |> String.concat "\r\n\r\n"
+
+    let hh =
+        if properConflicts.IsEmpty then
+            ""
+        else
+            let ls = 
+                properConflicts.Keys 
+                |> Seq.map (fun i -> i.ToString())
+                |> String.concat ","
+            $"conflicted states: {ls}\r\n"
+    hh + itemsBlock

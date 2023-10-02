@@ -66,7 +66,7 @@ type ExprDataCrewTest (output:ITestOutputHelper) =
         Should.equal gotos ExprData.gotos
 
         let conflicts =
-            crew.conflicts
+            crew.conflictedItemCores
             |> Map.values
             |> Seq.toList
         Should.equal conflicts ExprData.conflicts
@@ -92,7 +92,24 @@ type ExprDataCrewTest (output:ITestOutputHelper) =
             |> Seq.toList
 
         Should.equal actions ExprData.actions
+        output.WriteLine($"let resolvedClosures = {stringify resolvedClosures}")
         Should.equal resolvedClosures ExprData.resolvedClosures
+
+    [<Fact>]
+    member _.``03 - getEncodedParseTableCrew Test``() =
+        let input = ExprData.inputProductionList
+        let dummyTokens = ExprData.productionNames
+        let precedences = ExprData.precedences
+
+        let crew = 
+            (input,dummyTokens,precedences)
+            |> EncodedParseTableCrewUtils.getEncodedParseTableCrew
+
+        //output.WriteLine($"let encodedActions = {stringify crew.encodedActions}")
+        Should.equal crew.encodedActions ExprData.encodedActions
+
+        //output.WriteLine($"let encodedClosures = {stringify crew.encodedClosures}")
+        Should.equal crew.encodedClosures ExprData.encodedClosures
 
 
 

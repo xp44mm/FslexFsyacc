@@ -31,7 +31,7 @@ type ParseTableEncoder =
         iprod,itemCore.dot
 
     /// return state -> symbol -> action, state等于list的index
-    member encoder.encodeActions(actions: Map<int,Map<string,Action>>) =
+    member encoder.getEncodedActions(actions: Map<int,Map<string,Action>>) =
         encoder.kernels
         |> Map.toList
         |> List.mapi(fun i (_,state) ->
@@ -48,7 +48,7 @@ type ParseTableEncoder =
             else []
         )
 
-    member encoder.encodeClosures(closures: Map<int,Map<ItemCore,Set<string>>>) =
+    member encoder.getEncodedClosures(closures: Map<int,Map<ItemCore,Set<string>>>) =
         encoder.kernels
         |> Map.toList
         |> List.mapi(fun i (_,state) ->

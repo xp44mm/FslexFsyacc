@@ -169,15 +169,20 @@ type Example427Test(output:ITestOutputHelper) =
             |> GrammarCrewUtils.getProductionsCrew
             |> GrammarCrewUtils.getNullableCrew
             |> GrammarCrewUtils.getFirstLastCrew
+            |> GrammarCrewUtils.getFollowPrecedeCrew
+            |> GrammarCrewUtils.getItemCoresCrew
 
-        let itemCores = 
-            ItemCoreFactory.make grammar.augmentedProductions
+        //let itemCores = 
+        //    ItemCoreFactory.make grammar.augmentedProductions
 
-        let itemCoreAttributes = 
-            ItemCoreAttributeFactory.make grammar.nonterminals grammar.nullables grammar.firsts itemCores
-   
+        //let itemCoreAttributes = 
+        //    ItemCoreAttributeFactory.make grammar.nonterminals grammar.nullables grammar.firsts itemCores
+            
+
         let closures = 
-            CollectionFactory.make itemCores itemCoreAttributes grammar.augmentedProductions
+            //CollectionFactory.make itemCores itemCoreAttributes grammar.augmentedProductions
+            grammar
+            |> GrammarCrewUtils.getClosureCollection 
             |> Set.map(fun (kernel,closure)->
                 let k = kernel |> Set.map(fun i -> i.production,i.dot)
                 let c = closure |> Set.map(fun (i,la)->(i.production,i.dot),la)
@@ -212,15 +217,21 @@ type Example427Test(output:ITestOutputHelper) =
             |> GrammarCrewUtils.getProductionsCrew
             |> GrammarCrewUtils.getNullableCrew
             |> GrammarCrewUtils.getFirstLastCrew
+            |> GrammarCrewUtils.getFollowPrecedeCrew
+            |> GrammarCrewUtils.getItemCoresCrew
 
-        let itemCores = 
-            ItemCoreFactory.make grammar.augmentedProductions
+        //let itemCores = 
+        //    ItemCoreFactory.make grammar.augmentedProductions
 
-        let itemCoreAttributes = 
-            ItemCoreAttributeFactory.make grammar.nonterminals grammar.nullables grammar.firsts itemCores
-   
+        //let itemCoreAttributes = 
+        //    ItemCoreAttributeFactory.make grammar.nonterminals grammar.nullables grammar.firsts itemCores
+            
+
         let closures = 
-            CollectionFactory.make itemCores itemCoreAttributes grammar.augmentedProductions
+            //CollectionFactory.make itemCores itemCoreAttributes grammar.augmentedProductions
+            grammar
+            |> GrammarCrewUtils.getClosureCollection 
+
         ()
 
         //let gotos = 

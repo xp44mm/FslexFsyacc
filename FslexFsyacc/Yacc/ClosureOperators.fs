@@ -3,14 +3,6 @@ open FslexFsyacc.Runtime
 
 open FSharp.Idioms
 
-/// 一个状态的闭包能goto的所有状态，以kernel表示新状态。
-[<System.ObsoleteAttribute("ClosureOperators.getNextKernelsByCrew")>]
-let getNextKernels(closure:Set<ItemCore*Set<string>>) =
-    closure
-    |> Set.filter(fun(itemCore,lookahead) -> not (ItemCoreUtils.dotmax itemCore))
-    |> Set.map(fun(itemCore,lookahead) -> (ItemCoreUtils.dotIncr itemCore),lookahead)
-    |> Set.groupBy(fun(itemCore,lookahead) -> (ItemCoreUtils.prevSymbol itemCore))
-
 /// 获取一个闭包的kernel
 let getKernel(closure:Set<(string list*int)*Set<string>>) =
     closure

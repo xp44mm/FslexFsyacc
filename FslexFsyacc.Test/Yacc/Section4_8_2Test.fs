@@ -24,18 +24,18 @@ type Section4_8_2Test(output:ITestOutputHelper) =
             [ S; a; ]
         ]
 
-        let collection = AmbiguousCollection.create mainProductions
+        let collection = AmbiguousCollectionCrewUtils.newAmbiguousCollectionCrew mainProductions
 
         // 提取冲突的产生式
         let productions =
-            collection.collectConflictedProductions()
+            AmbiguousCollectionUtils.collectConflictedProductions collection.conflictedItemCores
 
         show productions
 
         //产生式的优先级操作符: production -> symbol
         let productionSymbols = 
             ProductionUtils.precedenceOfProductions
-                collection.grammar.terminals
+                collection.terminals
                 productions
 
         show productionSymbols

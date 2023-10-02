@@ -21,9 +21,19 @@ let getAmbiguousCollectionCrew (crew:LALRCollectionCrew) =
         )
     AmbiguousCollectionCrew(crew,conflicts)
 
+let newAmbiguousCollectionCrew (mainProductions:Production list) =
+    mainProductions
+    |> GrammarCrewUtils.getProductionsCrew
+    |> GrammarCrewUtils.getNullableCrew
+    |> GrammarCrewUtils.getFirstLastCrew
+    |> GrammarCrewUtils.getFollowPrecedeCrew
+    |> GrammarCrewUtils.getItemCoresCrew
+    |> LALRCollectionCrewUtils.getLALRCollectionCrew
+    |> getAmbiguousCollectionCrew
+
 /// 过滤掉假冲突，保留真冲突
 let filterProperConflicts (this:AmbiguousCollectionCrew) =
-    this.conflicts
+    this.conflictedItemCores
     |> Map.map(fun state conflicts ->
         conflicts
         |> Map.filter(fun la items ->
@@ -44,34 +54,4 @@ let collectConflictedProductions (this:AmbiguousCollectionCrew) =
         icore.production
     ]
 
-/// 去重，即冲突项目仅保留一个，但是grammar,kernels,gotos仍然保持去重前的数值
-let toUnambiguousCollection
-    (prodTokens:Map<string list,string>)
-    (precedences:Map<string,int>) 
-    (this:AmbiguousCollectionCrew)
-    =
-
-    let eliminator =
-        {
-            terminals = this.terminals
-            prodTokens = prodTokens
-            precedences = precedences
-        }:AmbiguityEliminator
-
-    let unambiguousClosures =
-        this.conflicts
-        |> Map.map(fun i closure ->
-            closure
-            |> Map.map(fun sym itemcores ->
-                if AmbiguousCollectionUtils.isSRConflict(itemcores) then
-                    eliminator.disambiguate(itemcores)
-                else
-                    itemcores
-            )
-            |> Map.filter(fun sym itemcores -> 
-                // empty is nonassoc, will be error
-                not itemcores.IsEmpty
-                )
-        )
-    AmbiguousCollectionCrew(this,unambiguousClosures)
 

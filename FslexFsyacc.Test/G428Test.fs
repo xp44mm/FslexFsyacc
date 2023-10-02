@@ -58,70 +58,15 @@ type G428Test(output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``02 - data printer``() =
-        output.WriteLine($"let inputProductionList = {stringify inputProductionList}")
+        let ptbl =     
+            let mainProductions = FsyaccFileRules.getMainProductions flatedFsyacc.rules
+            let dummyTokens = FsyaccFileRules.getDummyTokens flatedFsyacc.rules
+            EncodedParseTableCrewUtils.getEncodedParseTableCrew(
+                mainProductions,
+                dummyTokens,
+                flatedFsyacc.precedences)
 
-        let grammar = Yacc.Grammar.from inputProductionList
-        output.WriteLine($"let mainProductions = {stringify grammar.mainProductions}")
-        output.WriteLine($"let augmentedProductions = {stringify grammar.productions}")
-        output.WriteLine($"let symbols = {stringify grammar.symbols}")
-        output.WriteLine($"let nonterminals = {stringify grammar.nonterminals}")
-        output.WriteLine($"let terminals = {stringify grammar.terminals}")
-        output.WriteLine($"let nullables = {stringify grammar.nullables}")
-        output.WriteLine($"let firsts = {stringify grammar.firsts}")
-        output.WriteLine($"let lasts = {stringify grammar.lasts}")
-        output.WriteLine($"let follows = {stringify grammar.follows}")
-        output.WriteLine($"let precedes = {stringify grammar.precedes}")
-
-        let itemCores = ItemCoreFactory.make grammar.productions
-        output.WriteLine($"let itemCores = {stringify itemCores}")
-
-        let itemCoreAttributes =
-            ItemCoreAttributeFactory.make grammar.nonterminals grammar.nullables grammar.firsts itemCores
-        output.WriteLine($"let itemCoreAttributes = {stringify itemCoreAttributes}")
-
-        let lalrCollection = Yacc.LALRCollection.create(inputProductionList)
-        let kernels = 
-            lalrCollection.kernels
-            |> FSharp.Idioms.Map.keys
-
-        output.WriteLine($"let kernels = {stringify kernels}")
-
-        let closures =
-            lalrCollection.closures
-            |> Map.values
-            |> Seq.toList
-
-        output.WriteLine($"let closures = {stringify closures}")
-
-        let gotos =
-            lalrCollection.getGOTOs()
-            |> Map.values
-            |> Seq.toList
-
-        output.WriteLine($"let gotos = {stringify gotos}")
-
-        let ambCollection = AmbiguousCollection.create inputProductionList
-
-        let conflicts =
-            ambCollection.conflicts
-            |> Map.values
-            |> Seq.toList
-        output.WriteLine($"let conflicts = {stringify conflicts}")
-
-        let parsingTable = 
-            let productionNames = FsyaccFileRules.getProductionNames flatedFsyacc.rules
-            
-            ParsingTable.create(inputProductionList,productionNames,flatedFsyacc.precedences)
-
-        let actions = 
-            parsingTable.actions
-            |> Map.values
-            |> Seq.toList
-        let resolvedClosures = 
-            parsingTable.closures
-            |> Map.values
-            |> Seq.toList
-        output.WriteLine($"let actions = {stringify actions}")
-        output.WriteLine($"let resolvedClosures = {stringify resolvedClosures}")
+        output.WriteLine($"let encodedActions = {stringify ptbl.encodedActions}")
+        output.WriteLine($"let encodedClosures = {stringify ptbl.encodedClosures}")
 
 

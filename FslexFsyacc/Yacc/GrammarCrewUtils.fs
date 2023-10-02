@@ -49,11 +49,11 @@ let getFollowPrecedeCrew(prototype:FirstLastCrew) =
 let getItemCoresCrew (prototype:FollowPrecedeCrew) =
     let itemCores = 
         prototype.augmentedProductions
-        |> ItemCoreFactory.make
+        |> ItemCoreUtils.make
         |> Seq.map(fun itemCore ->
             let prodCrew =
                 itemCore.production
-                |> ItemCoreCrewUtils.getProductionCrew
+                |> ProductionCrewUtils.getProductionCrew
             let itemCoreCrew =
                 ItemCoreCrewUtils.getItemCoreCrew(prodCrew,itemCore.dot)
             //let itemCoreLookaheadFactorCrew =
@@ -64,8 +64,10 @@ let getItemCoresCrew (prototype:FollowPrecedeCrew) =
     ItemCoresCrew(prototype,itemCores)
 
 let getClosure (prototype:ItemCoresCrew) =
+    let augmentedProductions = prototype.augmentedProductions
     let itemCores = prototype.itemCoreCrews
     let terminals = prototype.terminals
+    let firsts = prototype.firsts
     let nullables = prototype.nullables
 
     /// ItemCore*Set<lookahead:string> 返回Items
@@ -81,8 +83,8 @@ let getClosure (prototype:ItemCoresCrew) =
                     if nextSymbol |> terminals.Contains then
                         None
                     else
-                        let nullable = NullableFactory.nullable prototype.nullables
-                        let first = FirstFactory.first prototype.nullables prototype.firsts
+                        let nullable = NullableFactory.nullable nullables
+                        let first = FirstFactory.first nullables firsts
                         let beta = ItemCoreCrewUtils.getBeta itemCoreCrew
                         let lookaheads = 
                             if nullable beta then las else Set.empty
@@ -90,7 +92,7 @@ let getClosure (prototype:ItemCoresCrew) =
                         Some(nextSymbol, lookaheads)
             )
             |> Seq.map(fun(nextSymbol, lookaheads) -> //扩展闭包一次。找到所有nextSymbol的产生式
-                prototype.augmentedProductions
+                augmentedProductions
                 |> Set.filter(fun p -> p.Head = nextSymbol)
                 |> Set.map(fun p -> {production=p; dot=0}, lookaheads)
             )
@@ -137,7 +139,7 @@ let getClosureCollection (grammar:ItemCoresCrew) =
                 |> Set.map snd
                 )
             |> Set.unionMany
-            |> Set.filter(not << CollectionFactory.isSubsetOf fullKernels)
+            |> Set.filter(not << KernelUtils.isSubsetOf fullKernels)
 
         if Set.isEmpty newKernels then
             fullKernels
@@ -151,7 +153,7 @@ let getClosureCollection (grammar:ItemCoresCrew) =
                     slrKernel
                     )
                 |> Seq.map(fun(slrKernel:Set<ItemCore>,clrKernels:seq<Set<ItemCore*Set<string>>>)-> //合并同一slrkernel下的所有clrKernel
-                    CollectionFactory.mergeClrKernels slrKernel clrKernels
+                    KernelUtils.mergeClrKernels slrKernel clrKernels
                 )
                 |> Set.ofSeq
 

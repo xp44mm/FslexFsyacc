@@ -83,10 +83,10 @@ type TypeArgumentParseTableTest (output:ITestOutputHelper) =
         let collection = ambiguousCollection flatedFsyacc
 
         let terminals = 
-            collection.grammar.terminals
+            collection.terminals
 
         let productions =
-            collection.collectConflictedProductions()
+            AmbiguousCollectionUtils.collectConflictedProductions collection.conflictedItemCores
 
         let pprods = 
             ProductionUtils.precedenceOfProductions terminals productions
@@ -97,7 +97,11 @@ type TypeArgumentParseTableTest (output:ITestOutputHelper) =
     member _.``04 - list all states``() =
         let collection = ambiguousCollection flatedFsyacc
         
-        let text = collection.render()
+        let text = 
+            AmbiguousCollectionUtils.render 
+                collection.terminals
+                collection.conflictedItemCores
+                (collection.kernels |> Seq.mapi(fun i k -> k,i) |> Map.ofSeq)
         output.WriteLine(text)
 
     [<Fact>]

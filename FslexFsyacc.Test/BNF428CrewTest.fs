@@ -119,7 +119,7 @@ type BNF428CrewTest(output:ITestOutputHelper) =
             |> AmbiguousCollectionCrewUtils.getAmbiguousCollectionCrew
 
         let conflicts =
-            crew.conflicts
+            crew.conflictedItemCores
             |> Map.values
             |> Seq.toList
         Should.equal conflicts BNF428Data.conflicts
@@ -143,6 +143,21 @@ type BNF428CrewTest(output:ITestOutputHelper) =
 
         Should.equal actions BNF428Data.actions
         Should.equal resolvedClosures BNF428Data.resolvedClosures
+
+    [<Fact>]
+    member _.``07 - getEncodedParseTableCrew Test``() =
+        let input = BNF428Data.inputProductionList
+        let crew =             
+            EncodedParseTableCrewUtils.getEncodedParseTableCrew(input,Map [],Map [])
+
+        let encodedActions =
+            crew.encodedActions
+
+        let encodedClosures = 
+            crew.encodedClosures
+
+        Should.equal encodedActions BNF428Data.encodedActions
+        Should.equal encodedClosures BNF428Data.encodedClosures
 
 
 
