@@ -1,4 +1,4 @@
-﻿namespace FslexFsyacc.Prototypes
+﻿namespace FslexFsyacc.Prototypes.Yacc.ItemCoreCrews
 
 type ProductionCrew = {
     production:string list

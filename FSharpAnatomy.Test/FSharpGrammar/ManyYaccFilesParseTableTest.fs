@@ -39,7 +39,9 @@ type ManyYaccFilesParseTableTest(output:ITestOutputHelper) =
             ]
         FsyaccFileRules.removeErrorRules robust
 
-    [<Fact(Skip="no for verify")>]
+    [<Fact(
+    Skip="no for verify"
+    )>]
     member _.``001 - explicitMemberConstraint test``() =
 
         let s0 = "explicitMemberConstraint"
@@ -66,7 +68,7 @@ type ManyYaccFilesParseTableTest(output:ITestOutputHelper) =
             "attributes"
             "topTypeWithTypeConstraints"
         ]
-        let fsyacc = sumFsyacc.start(s0,terminals)
+        let fsyacc = sumFsyacc |> FlatFsyaccFileUtils.start(s0,terminals)
         //let txt = fsyacc.toRaw().render()
         let txt =
             fsyacc

@@ -10,4 +10,6 @@ let crewProjPath = Path.Combine(solutionPath, "FslexFsyacc.Prototypes")
 
 let dllFilePath = Path.Combine(crewProjPath,@"bin\Release\net6.0\FslexFsyacc.Prototypes.dll")
 
-let yaccFilePath = Path.Combine(solutionPath, @"FslexFsyacc\Yacc")
+let fslexFsyaccPath = Path.Combine(solutionPath, "FslexFsyacc")
+
+let yaccFilePath = Path.Combine(fslexFsyaccPath, "Yacc")

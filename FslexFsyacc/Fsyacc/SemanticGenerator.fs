@@ -34,6 +34,7 @@ let semanticBody (typeAnnotations:Map<string,string>) (prodSymbols:string list) 
     else
         mainLines 
 
+// 生成semantic函数的定义
 let decorateSemantic (typeAnnotations:Map<string,string>) (prodSymbols:string list) (semantic:string) =
     let body = semanticBody typeAnnotations prodSymbols semantic
     let funcDef =

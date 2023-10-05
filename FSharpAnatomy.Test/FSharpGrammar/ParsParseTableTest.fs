@@ -96,7 +96,9 @@ type ParsParseTableTest(output:ITestOutputHelper) =
             ]
         FsyaccFileRules.removeErrorRules robust
 
-    [<Fact(Skip="no for verify")>]
+    [<Fact(
+    Skip="no for verify"
+    )>]
     member _.``000 - unused symbol in decls test``() =
         let x = 
             fsyacc.precedences
@@ -124,14 +126,16 @@ type ParsParseTableTest(output:ITestOutputHelper) =
 
         output.WriteLine(outp)
 
-    [<Fact(Skip="no for verify")>]
+    [<Fact(
+    Skip="no for verify"
+    )>]
     member _.``001 - identOrOp test``() =
         let s0 = "identOrOp"
 
         //分解到关键字表达式（含）
         let terminals = set []
 
-        let flat = fsyacc.start(s0,terminals)
+        let flat = fsyacc |> FlatFsyaccFileUtils.start(s0,terminals)
 
         let flat =
             {
@@ -153,14 +157,16 @@ type ParsParseTableTest(output:ITestOutputHelper) =
         File.WriteAllText(outputDir,txt,Encoding.UTF8)
         output.WriteLine("output:\r\n" + outputDir)
 
-    [<Fact(Skip="no for verify")>]
+    [<Fact(
+    Skip="no for verify"
+    )>]
     member _.``002 - path test``() =
         let s0 = "path"
 
         //分解到关键字表达式（含）
         let terminals = set []
 
-        let flat = fsyacc.start(s0,terminals)
+        let flat = fsyacc |> FlatFsyaccFileUtils.start(s0,terminals)
 
         let flat =
             {
@@ -182,14 +188,16 @@ type ParsParseTableTest(output:ITestOutputHelper) =
         File.WriteAllText(outputDir,txt,Encoding.UTF8)
         output.WriteLine("output:\r\n" + outputDir)
 
-    [<Fact(Skip="no for verify")>]
+    [<Fact(
+    Skip="no for verify"
+    )>]
     member _.``003 - rawConstant test``() =
         let s0 = "rawConstant"
 
         //分解到关键字表达式（含）
         let terminals = set []
 
-        let flat = fsyacc.start(s0,terminals)
+        let flat = fsyacc |> FlatFsyaccFileUtils.start(s0,terminals)
 
         let flat =
             {
@@ -211,7 +219,9 @@ type ParsParseTableTest(output:ITestOutputHelper) =
         File.WriteAllText(outputDir,txt,Encoding.UTF8)
         output.WriteLine("output:\r\n" + outputDir)
 
-    [<Fact(Skip="no for verify")>]
+    [<Fact(
+    Skip="no for verify"
+    )>]
     member _.``004 - tyconDefn test``() =
         let s0 = "tyconDefn"
         let terminals = set [
@@ -221,7 +231,7 @@ type ParsParseTableTest(output:ITestOutputHelper) =
 
         ]
 
-        let flat = fsyacc.start(s0, terminals)
+        let flat = fsyacc |> FlatFsyaccFileUtils.start(s0, terminals)
 
         let flat =
             {
@@ -243,7 +253,9 @@ type ParsParseTableTest(output:ITestOutputHelper) =
         File.WriteAllText(outputDir,txt,Encoding.UTF8)
         output.WriteLine("output:\r\n"+outputDir)
 
-    [<Fact(Skip="no for verify")>]
+    [<Fact(
+    Skip="no for verify"
+    )>]
     member _.``005 - postfixTyparDecls test``() =
         let s0 = "postfixTyparDecls"
         let terminals = set [
@@ -251,7 +263,7 @@ type ParsParseTableTest(output:ITestOutputHelper) =
             "typeConstraints"
             ]
 
-        let flat = fsyacc.start(s0, terminals)
+        let flat = fsyacc |> FlatFsyaccFileUtils.start(s0, terminals)
 
         let flat =
             {

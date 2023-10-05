@@ -68,7 +68,7 @@ type PostfixTyparDeclsParseTableTest (output:ITestOutputHelper) =
             |> FlatFsyaccFileRule.getStartSymbol
 
         let src = 
-            fsyacc.start(s0, Set.empty)
+            fsyacc |> FlatFsyaccFileUtils.start(s0, Set.empty)
             |> RawFsyaccFileUtils.fromFlat
             |> RawFsyaccFileUtils.render
 
@@ -138,10 +138,12 @@ type PostfixTyparDeclsParseTableTest (output:ITestOutputHelper) =
 
         output.WriteLine(sourceCode)
 
-    [<Fact(Skip="once for all!")>] // 
+    [<Fact(
+    Skip="once for all!"
+    )>] // 
     member _.``06 - generate ParseTable``() =
         let parseTbl = parseTbl flatedFsyacc
-        let fsharpCode = parseTbl.generateModule(moduleName)
+        let fsharpCode = parseTbl|> FsyaccParseTableFileRender.generateModule(moduleName)
 
         File.WriteAllText(parseTblPath,fsharpCode,Encoding.UTF8)
         output.WriteLine("output fsyacc:"+parseTblPath)
@@ -165,7 +167,7 @@ type PostfixTyparDeclsParseTableTest (output:ITestOutputHelper) =
             FSharp.Compiler.SyntaxTreeX.Parser.getDecls("header.fsx",src.header)
 
         let semansFsyacc =
-            let mappers = src.generateMappers()
+            let mappers = src|> FsyaccParseTableFileRender.generateMappers
             FSharp.Compiler.SyntaxTreeX.SourceCodeParser.semansFromMappers mappers
 
         let header,semans =

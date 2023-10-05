@@ -54,16 +54,18 @@ type ExprParseTableTest(output:ITestOutputHelper) =
             |> FlatFsyaccFileRule.getStartSymbol
 
         let src = 
-            fsyacc.start(s0, Set.empty)
+            fsyacc |> FlatFsyaccFileUtils.start(s0, Set.empty)
             |> RawFsyaccFileUtils.fromFlat
             |> RawFsyaccFileUtils.render
 
         output.WriteLine(src)
 
-    [<Fact(Skip="按需更新源代码")>] // 
+    [<Fact(
+    Skip="按需更新源代码"
+    )>] // 
     member _.``02 - generate Parse Table``() =
         let parseTbl = parseTbl flatedFsyacc
-        let src = parseTbl.generateModule(parseTblModule)
+        let src = parseTbl|> FsyaccParseTableFileRender.generateModule(parseTblModule)
 
         File.WriteAllText(parseTblPath, src, Encoding.UTF8)
         output.WriteLine($"output yacc:\r\n{parseTblPath}")
@@ -89,7 +91,7 @@ type ExprParseTableTest(output:ITestOutputHelper) =
             FSharp.Compiler.SyntaxTreeX.Parser.getDecls("header.fsx",parseTbl.header)
 
         let semansFsyacc =
-            let mappers = parseTbl.generateMappers()
+            let mappers = parseTbl|> FsyaccParseTableFileRender.generateMappers
             FSharp.Compiler.SyntaxTreeX.SourceCodeParser.semansFromMappers mappers
 
         let header,semans =
@@ -99,7 +101,9 @@ type ExprParseTableTest(output:ITestOutputHelper) =
         Should.equal headerFromFsyacc header
         Should.equal semansFsyacc semans
 
-    //[<Fact(Skip="按需生成文件")>] // 
+    //[<Fact(
+    //Skip="按需生成文件"
+    //)>]
     //member _.``11 - data printer``() =
     //    let inputProductionList =
     //        flatedFsyacc.rules

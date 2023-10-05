@@ -63,7 +63,7 @@ type BoundedParseTableTest(output: ITestOutputHelper) =
             |> FlatFsyaccFileRule.getStartSymbol
 
         let src = 
-            fsyacc.start(s0, Set.empty)
+            fsyacc |> FlatFsyaccFileUtils.start(s0, Set.empty)
             |> RawFsyaccFileUtils.fromFlat
             |> RawFsyaccFileUtils.render
 
@@ -133,11 +133,13 @@ type BoundedParseTableTest(output: ITestOutputHelper) =
 
         output.WriteLine(src)
 
-    [<Fact(Skip="once for all!")>] // 
+    [<Fact(
+    Skip="once for all!"
+    )>] // 
     member _.``06 - generate ParseTable``() =
         let parseTbl = parseTbl flatedFsyacc
 
-        let fsharpCode = parseTbl.generateModule(parseTblModule)
+        let fsharpCode = parseTbl|> FsyaccParseTableFileRender.generateModule(parseTblModule)
         File.WriteAllText(parseTblPath, fsharpCode, Encoding.UTF8)
         output.WriteLine("output yacc:" + parseTblPath)
 
@@ -160,7 +162,7 @@ type BoundedParseTableTest(output: ITestOutputHelper) =
             FSharp.Compiler.SyntaxTreeX.Parser.getDecls("header.fsx",parseTbl.header)
 
         let semansFsyacc =
-            let mappers = parseTbl.generateMappers()
+            let mappers = parseTbl|> FsyaccParseTableFileRender.generateMappers
             FSharp.Compiler.SyntaxTreeX.SourceCodeParser.semansFromMappers mappers
 
         let header,semans =

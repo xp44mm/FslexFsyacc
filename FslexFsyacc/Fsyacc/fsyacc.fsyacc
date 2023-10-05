@@ -38,7 +38,7 @@ rule+ :
     | rule {[s0]}
     | rule+ rule {s1::s0}
 rule :
-    | symbol ":" "|"? body+ {RegularSymbol.innerSymbol s0,List.rev s3}
+    | symbol ":" "|"? body+ {RegularSymbolUtils.innerSymbol s0,List.rev s3}
 symbol :
     | atomic {Atomic s0}
     | repetition {
@@ -71,7 +71,7 @@ body+ :
     | body+ "|" body {s2::s0}
 body :
     | symbol* precToken? SEMANTIC {
-        let s0 = s0 |> List.map RegularSymbol.innerSymbol |> List.rev
+        let s0 = s0 |> List.map RegularSymbolUtils.innerSymbol |> List.rev
         s0,s1,s2
     }
 symbol* :
@@ -88,7 +88,7 @@ precedence+ :
     | precedence+ precedence {s1::s0}
 precedence :
     | assoc symbol+ {
-        let s1 = s1 |> List.map RegularSymbol.innerSymbol |> List.rev
+        let s1 = s1 |> List.map RegularSymbolUtils.innerSymbol |> List.rev
         s0,s1
     }
 assoc :
@@ -100,7 +100,7 @@ declaration+ :
     | declaration+ declaration {s1::s0}
 declaration :
     | "%type" TYPE_ARGUMENT symbol+ {
-        let symbols = s2 |> List.map RegularSymbol.innerSymbol |> List.rev
+        let symbols = s2 |> List.map RegularSymbolUtils.innerSymbol |> List.rev
         s1,symbols
     }
 

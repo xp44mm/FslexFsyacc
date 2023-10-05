@@ -24,6 +24,7 @@ let renderSymbol (sym:string) =
     then sym.[1..sym.Length-2]
     else sym |> FslexFsyacc.Runtime.RenderUtils.renderSymbol
 
+/// rhs
 let renderBody (body:string list) =
     if body.IsEmpty then
         "(*empty*)"
@@ -44,6 +45,7 @@ let renderSemantic(semantic:string) =
         "{}"
     else "{" + semantic + "}"
 
+/// 
 let renderComponent (body:string list, name:string, semantic:string) =
     [
         yield "|"

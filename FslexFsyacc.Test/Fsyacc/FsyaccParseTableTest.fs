@@ -63,7 +63,7 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
             |> FlatFsyaccFileRule.getStartSymbol
 
         let src = 
-            fsyacc.start(s0, Set.empty)
+            fsyacc |> FlatFsyaccFileUtils.start(s0, Set.empty)
             |> RawFsyaccFileUtils.fromFlat
             |> RawFsyaccFileUtils.render
 
@@ -132,11 +132,13 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
         output.WriteLine(sourceCode)
 
 
-    [<Fact(Skip="按需更新源代码")>] // 
+    [<Fact(
+    Skip="按需更新源代码"
+    )>]
     member _.``06 - generate FsyaccParseTable``() =
         let parseTbl = parseTbl (flatedFsyacc)
 
-        let fsharpCode = parseTbl.generateModule(parseTblModule)
+        let fsharpCode = parseTbl|> FsyaccParseTableFileRender.generateModule(parseTblModule)
         File.WriteAllText(parseTblPath,fsharpCode,Encoding.UTF8)
         output.WriteLine("output fsyacc:"+parseTblPath)
 
@@ -158,7 +160,7 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
             FSharp.Compiler.SyntaxTreeX.Parser.getDecls("header.fsx",parseTbl.header)
 
         let semansFsyacc =
-            let mappers = parseTbl.generateMappers()
+            let mappers = parseTbl|> FsyaccParseTableFileRender.generateMappers
             FSharp.Compiler.SyntaxTreeX.SourceCodeParser.semansFromMappers mappers
 
         let header,semans =

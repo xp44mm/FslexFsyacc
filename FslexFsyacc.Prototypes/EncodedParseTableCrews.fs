@@ -1,4 +1,5 @@
-﻿namespace FslexFsyacc.Prototypes
+﻿namespace FslexFsyacc.Prototypes.Yacc.EncodedParseTableCrews
+open FslexFsyacc.Prototypes.Yacc.ItemCoreCrews
 open FslexFsyacc.Runtime
 
 type ProductionsCrew = {

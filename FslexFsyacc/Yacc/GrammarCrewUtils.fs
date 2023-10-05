@@ -1,6 +1,6 @@
 ﻿module FslexFsyacc.Yacc.GrammarCrewUtils
-open FslexFsyacc.Runtime
 
+open FslexFsyacc.Runtime
 open FSharp.Idioms
 
 //从文法生成增广文法

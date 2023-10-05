@@ -300,7 +300,7 @@ Bison rules are basically BNF, with the punctuation simplified a little to make 
 
 Example 1-5. Simple calculator `fb1-5.y`
 
-```c
+```antlr
 /* simplest version of calculator */
 %{
 #include <stdio.h>

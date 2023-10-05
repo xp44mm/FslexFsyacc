@@ -66,7 +66,7 @@ let rules:(string list*(obj list->obj))list = [
         let s0 = unbox<RegularSymbol> ss.[0]
         let s3 = unbox<(string list*string*string)list> ss.[3]
         let result:string*((string list*string*string)list) =
-            RegularSymbol.innerSymbol s0,List.rev s3
+            RegularSymbolUtils.innerSymbol s0,List.rev s3
         box result
     ["symbol";"atomic"],fun(ss:obj list)->
         let s0 = unbox<string> ss.[0]
@@ -158,7 +158,7 @@ let rules:(string list*(obj list->obj))list = [
         let s1 = unbox<string> ss.[1]
         let s2 = unbox<string> ss.[2]
         let result:string list*string*string =
-            let s0 = s0 |> List.map RegularSymbol.innerSymbol |> List.rev
+            let s0 = s0 |> List.map RegularSymbolUtils.innerSymbol |> List.rev
             s0,s1,s2
         box result
     ["{symbol*}"],fun(ss:obj list)->
@@ -198,7 +198,7 @@ let rules:(string list*(obj list->obj))list = [
         let s0 = unbox<string> ss.[0]
         let s1 = unbox<RegularSymbol list> ss.[1]
         let result:string*string list =
-            let s1 = s1 |> List.map RegularSymbol.innerSymbol |> List.rev
+            let s1 = s1 |> List.map RegularSymbolUtils.innerSymbol |> List.rev
             s0,s1
         box result
     ["assoc";"%left"],fun(ss:obj list)->
@@ -228,7 +228,7 @@ let rules:(string list*(obj list->obj))list = [
         let s1 = unbox<string> ss.[1]
         let s2 = unbox<RegularSymbol list> ss.[2]
         let result:string*string list =
-            let symbols = s2 |> List.map RegularSymbol.innerSymbol |> List.rev
+            let symbols = s2 |> List.map RegularSymbolUtils.innerSymbol |> List.rev
             s1,symbols
         box result
 ]

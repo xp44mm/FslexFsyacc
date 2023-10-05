@@ -32,7 +32,8 @@
 		<Compile Include="Lex\PartitionDFA.fs" />
 		<Compile Include="Lex\DFATools.fs" />
 		<Compile Include="Lex\DFA.fs" />
-		<Compile Include="Yacc\crews.fs" />
+		<Compile Include="Yacc\ItemCoreCrews.fs" />
+		<Compile Include="Yacc\EncodedParseTableCrews.fs" />
 		<Compile Include="Yacc\ProductionUtils.fs" />
 		<Compile Include="Yacc\ProductionCrewUtils.fs" />
 		<Compile Include="Yacc\ItemCoreUtils.fs" />
@@ -79,20 +80,23 @@
 		<Compile Include="Fslex\FslexCompiler.fs" />
 		<Compile Include="Fslex\FslexDFAFile.fs" />
 		<Compile Include="Fslex\FslexFile.fs" />
+		<Compile Include="Fsyacc\FsyaccToken.fs" />
+		<Compile Include="Fsyacc\RegularSymbol.fs" />
+		<Compile Include="Fsyacc\RawFsyaccFile.fs" />
+		<Compile Include="Fsyacc\FlatFsyaccFile.fs" />
+		<Compile Include="Fsyacc\FsyaccParseTableFile.fs" />
 
 		<Compile Include="Fsyacc\SemanticGenerator.fs" />
-		<Compile Include="Fsyacc\RegularSymbol.fs" />
-		<Compile Include="Fsyacc\FsyaccParseTableFile.fs" />
+
+		<Compile Include="Fsyacc\FsyaccTokenUtils.fs" />
+		<Compile Include="Fsyacc\RegularSymbolUtils.fs" />
+		<Compile Include="Fsyacc\FsyaccParseTableFileRender.fs" />
 		<Compile Include="Fsyacc\FsyaccFileRender.fs" />
 		<Compile Include="Fsyacc\FsyaccFileRules.fs" />
 		<Compile Include="Fsyacc\FsyaccFileShaking.fs" />
 		<Compile Include="Fsyacc\FsyaccRules.fs" />
 		<Compile Include="Fsyacc\FsyaccFilePrecedences.fs" />
-		<Compile Include="Fsyacc\FlatFsyaccFile.fs" />
 		<Compile Include="Fsyacc\FlatFsyaccFileRule.fs" />
-		<Compile Include="Fsyacc\FsyaccToken.fs" />
-		<Compile Include="Fsyacc\FsyaccTokenUtils.fs" />
-		<Compile Include="Fsyacc\RawFsyaccFile.fs" />
 		<None Include="fsyacc\fsyacc.fsyacc" />
 		<Compile Include="Fsyacc\FsyaccParseTable.fs" />
 		<Compile Include="Fsyacc\FsyaccCompiler.fs" />

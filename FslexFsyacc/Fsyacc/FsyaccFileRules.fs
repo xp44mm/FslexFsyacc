@@ -28,6 +28,19 @@ let rawToFlatRules
         )
     )
 
+let getMainProductions (rules:list<string list*string*string>) =
+    rules |> List.map Triple.first
+
+let getDummyTokens(rules:list<string list*string*string>) =
+    rules
+    |> List.filter(fun(_,dummyToken,_) -> dummyToken > "")
+    |> List.map(fun(prod,dummyToken,_)-> prod,dummyToken)
+    |> Map.ofList
+
+
+
+
+
 let addRule
     (rule:string list*string*string)
     (rules:list<string list*string*string>)
@@ -94,15 +107,6 @@ let duplicateRule
     |> List.groupBy (fun(rule,_,_)->rule)
     |> List.map(fun(rule,group)->rule,group.Length)
     |> List.filter(fun(r,c)->c>1)
-
-let getMainProductions (rules:list<string list*string*string>) =
-    rules |> List.map Triple.first
-
-let getDummyTokens(rules:list<string list*string*string>) =
-    rules
-    |> List.filter(fun(_,dummyToken,_) -> dummyToken > "")
-    |> List.map(fun(prod,dummyToken,_)-> prod,dummyToken)
-    |> Map.ofList
 
 let removeErrorRules (robust:string Set) (rules:list<string list*string*string>) =
     let willBeRemoved (symbol: string) =

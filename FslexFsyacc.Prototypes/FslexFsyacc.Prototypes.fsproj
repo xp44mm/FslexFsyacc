@@ -7,11 +7,13 @@
 
   <ItemGroup>
     <Compile Include="ItemCoreCrews.fs" />
-    <Compile Include="BNFCrews.fs" />
+    <Compile Include="EncodedParseTableCrews.fs" />
+    <Compile Include="Rules.fs" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\FslexFsyacc.Runtime\FslexFsyacc.Runtime.fsproj" />
+    <ProjectReference Include="..\FslexFsyacc\FslexFsyacc.fsproj" />
   </ItemGroup>
 
   <ItemGroup>

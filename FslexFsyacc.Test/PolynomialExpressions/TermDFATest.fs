@@ -58,7 +58,9 @@ type TermDFATest(output:ITestOutputHelper) =
             |> Set.ofList
         show y
 
-    [<Fact(Skip="once and for all!")>] // 
+    [<Fact(
+    Skip="once and for all!"
+    )>] // 
     member _.``03 = generate DFA``() =
 
         let dfafile = fslex.toFslexDFAFile()
