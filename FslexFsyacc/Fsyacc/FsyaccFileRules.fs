@@ -37,9 +37,9 @@ let getDummyTokens(rules:list<string list*string*string>) =
     |> List.map(fun(prod,dummyToken,_)-> prod,dummyToken)
     |> Map.ofList
 
-
-
-
+let getSemanticRules (rules:list<string list*string*string>) = 
+    rules 
+    |> List.map Triple.ends
 
 let addRule
     (rule:string list*string*string)

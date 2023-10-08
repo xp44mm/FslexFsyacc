@@ -4,16 +4,18 @@ open FslexFsyacc.Runtime
 open FSharp.Idioms
 
 //从文法生成增广文法
-let getProductionsCrew(mainProductions:string list list) =
-    let startSymbol = mainProductions.[0].[0]
+let getProductionsCrew(inputProductionList:string list list) =
+    let startSymbol = inputProductionList.[0].[0]
 
-    let mainProductions = set mainProductions
+    let mainProductions = set inputProductionList
 
     let augmentedProductions =
             mainProductions
             |> Set.add ["";startSymbol]
 
     ProductionsCrew(
+        inputProductionList,
+        startSymbol,
         mainProductions,
         augmentedProductions
     )

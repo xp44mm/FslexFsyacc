@@ -31,7 +31,7 @@ type DFATest(output:ITestOutputHelper) =
         //nfa的接受状态
         let nfinals = [2u;6u;8u]
 
-        let y = dfa.getAcceptingStates nfinals
+        let y = dfa|>SubsetDFAUtils.getAcceptingStates nfinals
 
         //show y
         //列表顺序与nfinals相对应，每个nfa接受状态，可能是1个或几个dfa状态。

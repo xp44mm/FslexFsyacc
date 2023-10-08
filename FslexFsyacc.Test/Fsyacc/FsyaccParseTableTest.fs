@@ -39,13 +39,9 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
         rawFsyacc 
         |> RawFsyaccFileUtils.toFlated
 
-    let grammar (flatedFsyacc) =
-        flatedFsyacc
-        |> FlatFsyaccFileUtils.getFollowPrecedeCrew
-
     let ambiguousCollection (flatedFsyacc) =
         flatedFsyacc
-        |> FlatFsyaccFileUtils.toAmbiguousCollection
+        |> FlatFsyaccFileUtils.getAmbiguousCollectionCrew
 
     //解析表数据
     let parseTbl (flatedFsyacc) = 
@@ -71,7 +67,7 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``02 - list all tokens``() =
-        let grammar = grammar (flatedFsyacc)
+        let grammar = ambiguousCollection (flatedFsyacc)
         let y = set ["%%";"%left";"%nonassoc";"%prec";"%right";"%type";"(";")";"*";"+";":";"?";"HEADER";"ID";"LITERAL";"SEMANTIC";"TYPE_ARGUMENT";"[";"]";"|"]
         show grammar.terminals
         Should.equal y grammar.terminals
@@ -105,7 +101,7 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``05 - list declarations``() =
-        let grammar = grammar (flatedFsyacc)
+        let grammar = ambiguousCollection (flatedFsyacc)
 
         let terminals =
             grammar.terminals
@@ -138,7 +134,7 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
     member _.``06 - generate FsyaccParseTable``() =
         let parseTbl = parseTbl (flatedFsyacc)
 
-        let fsharpCode = parseTbl|> FsyaccParseTableFileRender.generateModule(parseTblModule)
+        let fsharpCode = parseTbl|> FsyaccParseTableFileUtils.generateModule(parseTblModule)
         File.WriteAllText(parseTblPath,fsharpCode,Encoding.UTF8)
         output.WriteLine("output fsyacc:"+parseTblPath)
 
@@ -160,7 +156,7 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
             FSharp.Compiler.SyntaxTreeX.Parser.getDecls("header.fsx",parseTbl.header)
 
         let semansFsyacc =
-            let mappers = parseTbl|> FsyaccParseTableFileRender.generateMappers
+            let mappers = parseTbl|> FsyaccParseTableFileUtils.generateMappers
             FSharp.Compiler.SyntaxTreeX.SourceCodeParser.semansFromMappers mappers
 
         let header,semans =

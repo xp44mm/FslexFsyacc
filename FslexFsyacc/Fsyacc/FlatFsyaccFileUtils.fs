@@ -73,15 +73,8 @@ let parse text =
     |> RawFsyaccFileUtils.parse
     |> fromRaw
 
-let getFollowPrecedeCrew (fsyacc:FlatFsyaccFile) =
-    fsyacc.rules
-    |> FsyaccFileRules.getMainProductions
-    |> GrammarCrewUtils.getProductionsCrew
-    |> GrammarCrewUtils.getNullableCrew
-    |> GrammarCrewUtils.getFirstLastCrew
-    |> GrammarCrewUtils.getFollowPrecedeCrew
-
-let toAmbiguousCollection (fsyacc:FlatFsyaccFile) =
+[<System.ObsoleteAttribute("getSemanticParseTableCrew")>]
+let getAmbiguousCollectionCrew (fsyacc:FlatFsyaccFile) =
     fsyacc.rules
     |> FsyaccFileRules.getMainProductions
     |> GrammarCrewUtils.getProductionsCrew
@@ -92,6 +85,7 @@ let toAmbiguousCollection (fsyacc:FlatFsyaccFile) =
     |> LALRCollectionCrewUtils.getLALRCollectionCrew
     |> AmbiguousCollectionCrewUtils.getAmbiguousCollectionCrew
 
+[<System.ObsoleteAttribute("getSemanticParseTableCrew")>]
 let toFsyaccParseTableFile (this:FlatFsyaccFile) =
     let mainProductions = FsyaccFileRules.getMainProductions this.rules
     let dummyTokens = FsyaccFileRules.getDummyTokens this.rules
@@ -102,8 +96,9 @@ let toFsyaccParseTableFile (this:FlatFsyaccFile) =
             this.precedences)
     {
         header = this.header
-        rules = this.rules |> List.map Triple.ends
+        rules = this.rules |> FsyaccFileRules.getSemanticRules 
+        declarations = Map.ofList this.declarations
         actions = parseTable.encodedActions
-        declarations = this.declarations
         closures = parseTable.encodedClosures
     }
+

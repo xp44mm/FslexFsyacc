@@ -20,20 +20,28 @@
 
 	<ItemGroup>
 		<Compile Include="Lex\RegularExpression.fs" />
-		<Compile Include="Lex\Transition.fs" />
 		<Compile Include="Lex\RegularNFA.fs" />
-		<Compile Include="Lex\NFACombine.fs" />
-		<Compile Include="Lex\RegularExpressionNFA.fs" />
 		<Compile Include="Lex\PatternNFA.fs" />
 		<Compile Include="Lex\AnalyzerNFA.fs" />
 		<Compile Include="Lex\NFAOperations.fs" />
-		<Compile Include="Lex\SubsetDFA.fs" />
-		<Compile Include="Lex\Partition.fs" />
 		<Compile Include="Lex\PartitionDFA.fs" />
-		<Compile Include="Lex\DFATools.fs" />
+		<Compile Include="Lex\SubsetDFA.fs" />
 		<Compile Include="Lex\DFA.fs" />
+		<Compile Include="Lex\RegularExpressionUtils.fs" />
+		<Compile Include="Lex\Transition.fs" />
+		<Compile Include="Lex\NFACombine.fs" />
+		<Compile Include="Lex\RegularNFAUtils.fs" />
+		<Compile Include="Lex\PatternNFAUtils.fs" />
+		<Compile Include="Lex\AnalyzerNFAUtils.fs" />
+		<Compile Include="Lex\NFAOperationsUtils.fs" />
+		<Compile Include="Lex\SubsetDFAUtils.fs" />
+		<Compile Include="Lex\Partition.fs" />
+		<Compile Include="Lex\PartitionDFAUtils.fs" />
+		<Compile Include="Lex\DFATools.fs" />
+		<Compile Include="Lex\DFAUtils.fs" />
 		<Compile Include="Yacc\ItemCoreCrews.fs" />
-		<Compile Include="Yacc\EncodedParseTableCrews.fs" />
+		<Compile Include="Yacc\AmbiguousCollectionCrews.fs" />
+		<Compile Include="Yacc\SemanticParseTableCrews.fs" />
 		<Compile Include="Yacc\ProductionUtils.fs" />
 		<Compile Include="Yacc\ProductionCrewUtils.fs" />
 		<Compile Include="Yacc\ItemCoreUtils.fs" />
@@ -69,28 +77,34 @@
 		
 		<Compile Include="VanillaFSharp\TypeArgumentAngleCompiler.fs" />
 		
+		<Compile Include="Fslex\FslexToken.fs" />
+		
+		<Compile Include="Fslex\FslexFile.fs" />
+		
+		<Compile Include="Fslex\FslexDFAFile.fs" />
+		
 		<Compile Include="Fslex\LexSemanticGenerator.fs" />
 		<Compile Include="Fslex\LexFileNormalization.fs" />
-		<Compile Include="Fslex\FslexToken.fs" />
 		<Compile Include="Fslex\FslexTokenUtils.fs" />
 		<None Include="Fslex\fslex.fslex" />
 		<Compile Include="Fslex\FslexDFA.fs" />
 		<None Include="Fslex\fslex.fsyacc" />
 		<Compile Include="Fslex\FslexParseTable.fs" />
 		<Compile Include="Fslex\FslexCompiler.fs" />
-		<Compile Include="Fslex\FslexDFAFile.fs" />
-		<Compile Include="Fslex\FslexFile.fs" />
+		<Compile Include="Fslex\FslexDFAFileUtils.fs" />
+		<Compile Include="Fslex\FslexFileUtils.fs" />
 		<Compile Include="Fsyacc\FsyaccToken.fs" />
 		<Compile Include="Fsyacc\RegularSymbol.fs" />
 		<Compile Include="Fsyacc\RawFsyaccFile.fs" />
 		<Compile Include="Fsyacc\FlatFsyaccFile.fs" />
 		<Compile Include="Fsyacc\FsyaccParseTableFile.fs" />
+		<Compile Include="Fsyacc\FlatedFsyaccFileCrews.fs" />
 
 		<Compile Include="Fsyacc\SemanticGenerator.fs" />
 
 		<Compile Include="Fsyacc\FsyaccTokenUtils.fs" />
 		<Compile Include="Fsyacc\RegularSymbolUtils.fs" />
-		<Compile Include="Fsyacc\FsyaccParseTableFileRender.fs" />
+		<Compile Include="Fsyacc\FsyaccParseTableFileUtils.fs" />
 		<Compile Include="Fsyacc\FsyaccFileRender.fs" />
 		<Compile Include="Fsyacc\FsyaccFileRules.fs" />
 		<Compile Include="Fsyacc\FsyaccFileShaking.fs" />
@@ -102,6 +116,8 @@
 		<Compile Include="Fsyacc\FsyaccCompiler.fs" />
 		<Compile Include="Fsyacc\RawFsyaccFileUtils.fs" />
 		<Compile Include="Fsyacc\FlatFsyaccFileUtils.fs" />
+		<Compile Include="Fsyacc\RawFsyaccFileCrewUtils.fs" />
+		<Compile Include="Fsyacc\FlatedFsyaccFileCrewUtils.fs" />
 		
 		<None Include="..\readme.md">
 		  <Pack>True</Pack>

@@ -1,10 +1,13 @@
-﻿namespace FslexFsyacc.Prototypes.Yacc.EncodedParseTableCrews
+﻿namespace FslexFsyacc.Prototypes.Yacc.AmbiguousCollectionCrews
 open FslexFsyacc.Prototypes.Yacc.ItemCoreCrews
 open FslexFsyacc.Runtime
 
+/// todo:only augmentedProductions
 type ProductionsCrew = {
-    mainProductions:Set<string list> 
-    augmentedProductions:Set<string list>
+    inputProductionList:list<list<string>>
+    startSymbol:string
+    mainProductions:Set<list<string>>
+    augmentedProductions:Set<list<string>>
     }
 
 type NullableCrew = {
@@ -45,19 +48,6 @@ type AmbiguousCollectionCrew = {
     prototype:LALRCollectionCrew
     /// state -> (lookahead/leftside) -> conflicts
     conflictedItemCores: Map<int,Map<string,Set<ItemCore>>>
-    }
-
-type ActionParseTableCrew = {
-    prototype: AmbiguousCollectionCrew
-    unambiguousItemCores: Map<int,Map<string,Set<ItemCore>>>
-    actions: Map<int,Map<string,Action>>
-    resolvedClosures: Map<int,Map<ItemCore,Set<string>>>
-    }
-
-type EncodedParseTableCrew = {
-    prototype: ActionParseTableCrew
-    encodedActions: list<list<string*int>>
-    encodedClosures: list<list<int*int*string list>>
     }
 
 

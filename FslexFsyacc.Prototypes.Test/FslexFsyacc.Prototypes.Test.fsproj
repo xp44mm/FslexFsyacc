@@ -13,6 +13,7 @@
     <Compile Include="CrewInfo.fs" />
     <Compile Include="CrewInfoUtils.fs" />
     <Compile Include="CrewInfoTest.fs" />
+    <Compile Include="CodeGenerators.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
@@ -28,6 +29,10 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FslexFsyacc.Prototypes\FslexFsyacc.Prototypes.fsproj" />
   </ItemGroup>
 
   <ItemGroup>

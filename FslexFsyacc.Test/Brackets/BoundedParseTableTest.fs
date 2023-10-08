@@ -30,39 +30,25 @@ type BoundedParseTableTest(output: ITestOutputHelper) =
     let text = File.ReadAllText(filePath,Encoding.UTF8)
 
     // 与fsyacc文件完全相对应的结构树
-    let rawFsyacc = 
+    let rawFsyacc =
         text
-        |> RawFsyaccFileUtils.parse 
+        |> RawFsyaccFileCrewUtils.parse
 
-    let flatedFsyacc = 
-        rawFsyacc 
-        |> RawFsyaccFileUtils.toFlated
-
-    let grammar (flatedFsyacc) =
-        flatedFsyacc
-        |> FlatFsyaccFileUtils.getFollowPrecedeCrew
-
-    let ambiguousCollection (flatedFsyacc) =
-        flatedFsyacc
-        |> FlatFsyaccFileUtils.toAmbiguousCollection
-
-    //解析表数据
-    let parseTbl (flatedFsyacc) = 
-        flatedFsyacc
-        //|> FlatFsyaccFileUtils.parse
-        |> FlatFsyaccFileUtils.toFsyaccParseTableFile
+    let flatedFsyacc =
+        rawFsyacc
+        |> FlatedFsyaccFileCrewUtils.getFlatedFsyaccFileCrew
 
     [<Fact>]
     member _.``01 - norm fsyacc file``() =
-        let fsyacc = 
+        let fsyacc =
             text
             |> FlatFsyaccFileUtils.parse
 
-        let s0 = 
+        let s0 =
             fsyacc.rules
             |> FlatFsyaccFileRule.getStartSymbol
 
-        let src = 
+        let src =
             fsyacc |> FlatFsyaccFileUtils.start(s0, Set.empty)
             |> RawFsyaccFileUtils.fromFlat
             |> RawFsyaccFileUtils.render
@@ -71,7 +57,9 @@ type BoundedParseTableTest(output: ITestOutputHelper) =
 
     [<Fact>]
     member _.``02 - list all tokens``() =
-        let grammar = grammar flatedFsyacc
+        let grammar =
+            flatedFsyacc
+            |> FlatedFsyaccFileCrewUtils.getSemanticParseTableCrew
         let e = set ["LEFT";"RIGHT";"TICK"]
 
         let y = grammar.symbols - grammar.nonterminals
@@ -80,9 +68,12 @@ type BoundedParseTableTest(output: ITestOutputHelper) =
 
     [<Fact>]
     member _.``03 - list all states``() =
-        let collection = ambiguousCollection flatedFsyacc
-        let src = 
-            AmbiguousCollectionUtils.render 
+        let collection =
+            flatedFsyacc
+            |> FlatedFsyaccFileCrewUtils.getSemanticParseTableCrew
+
+        let src =
+            AmbiguousCollectionUtils.render
                 collection.terminals
                 collection.conflictedItemCores
                 (collection.kernels |> Seq.mapi(fun i k -> k,i) |> Map.ofSeq)
@@ -91,9 +82,11 @@ type BoundedParseTableTest(output: ITestOutputHelper) =
 
     [<Fact>]
     member _.``04 - 汇总冲突的产生式``() =
-        let collection = ambiguousCollection flatedFsyacc
+        let collection =
+            flatedFsyacc
+            |> FlatedFsyaccFileCrewUtils.getSemanticParseTableCrew
 
-        let productions = 
+        let productions =
             AmbiguousCollectionUtils.collectConflictedProductions collection.conflictedItemCores
 
         // production -> %prec
@@ -107,8 +100,9 @@ type BoundedParseTableTest(output: ITestOutputHelper) =
 
     [<Fact>]
     member _.``05 - list declarations``() =
-        let grammar = grammar flatedFsyacc
-
+        let grammar =
+            flatedFsyacc
+            |> FlatedFsyaccFileCrewUtils.getSemanticParseTableCrew
         let terminals =
             grammar.terminals
             |> Seq.map RenderUtils.renderSymbol
@@ -128,32 +122,53 @@ type BoundedParseTableTest(output: ITestOutputHelper) =
                 ""
                 "// nonterminals"
                 "%type<> " + nonterminals
-            ] 
+            ]
             |> String.concat "\r\n"
 
         output.WriteLine(src)
 
     [<Fact(
     Skip="once for all!"
-    )>] // 
+    )>] //
     member _.``06 - generate ParseTable``() =
-        let parseTbl = parseTbl flatedFsyacc
+        let parseTbl =
+            flatedFsyacc
+            |> FlatedFsyaccFileCrewUtils.getSemanticParseTableCrew
+            |> FsyaccParseTableFileUtils.ofSemanticParseTableCrew
 
-        let fsharpCode = parseTbl|> FsyaccParseTableFileRender.generateModule(parseTblModule)
+        //let parseTbl = id<FsyaccParseTableFile> {
+        //    header = raw.header
+        //    rules = raw.rules
+        //    actions = raw.encodedActions
+        //    closures = raw.encodedClosures
+        //    declarations = raw.declarations
+        //}
+
+        let fsharpCode = parseTbl|> FsyaccParseTableFileUtils.generateModule(parseTblModule)
         File.WriteAllText(parseTblPath, fsharpCode, Encoding.UTF8)
         output.WriteLine("output yacc:" + parseTblPath)
 
     [<Fact>]
     member _.``07 - valid ParseTable``() =
-        let parseTbl = parseTbl flatedFsyacc
+        let raw =
+            flatedFsyacc
+            |> FlatedFsyaccFileCrewUtils.getSemanticParseTableCrew
+
+        let parseTbl = id<FsyaccParseTableFile> {
+            header = raw.header
+            rules = raw.rules
+            actions = raw.encodedActions
+            closures = raw.encodedClosures
+            declarations = raw.declarations
+        }
 
         Should.equal parseTbl.actions BoundedParseTable.actions
         Should.equal parseTbl.closures BoundedParseTable.closures
 
-        let prodsFsyacc = 
+        let prodsFsyacc =
             List.map fst parseTbl.rules
 
-        let prodsParseTable = 
+        let prodsParseTable =
             List.map fst BoundedParseTable.rules
 
         Should.equal prodsFsyacc prodsParseTable
@@ -162,7 +177,7 @@ type BoundedParseTableTest(output: ITestOutputHelper) =
             FSharp.Compiler.SyntaxTreeX.Parser.getDecls("header.fsx",parseTbl.header)
 
         let semansFsyacc =
-            let mappers = parseTbl|> FsyaccParseTableFileRender.generateMappers
+            let mappers = parseTbl|> FsyaccParseTableFileUtils.generateMappers
             FSharp.Compiler.SyntaxTreeX.SourceCodeParser.semansFromMappers mappers
 
         let header,semans =

@@ -33,9 +33,9 @@ type SubsetDFATest(output:ITestOutputHelper) =
             8u
             ]
 
-        let dfa = SubsetDFA<_,_>.create ntran
+        let dfa = SubsetDFAUtils.create ntran
 
-        let dfinals = dfa.getAcceptingStates nfinals
+        let dfinals = dfa|>SubsetDFAUtils.getAcceptingStates nfinals
             
         //show dfa.allStates
         //show dfinals
@@ -75,7 +75,7 @@ type SubsetDFATest(output:ITestOutputHelper) =
             (8u, Some 'b', 9u);
             (9u, Some 'b', 10u)
         ]
-        let y = SubsetDFA<_,_>.create ntran
+        let y = SubsetDFAUtils.create ntran
         //show y
         let dfa = {
             dtran=set [
@@ -111,7 +111,7 @@ type SubsetDFATest(output:ITestOutputHelper) =
                 ];
             }
         let nfinals = [3u;4u]
-        let dfinals = dfa.getAcceptingStates nfinals
+        let dfinals = dfa|>SubsetDFAUtils.getAcceptingStates nfinals
         //show dfinals
         let y = [
             set [set [1u;2u;3u;4u]];

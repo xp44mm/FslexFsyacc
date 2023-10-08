@@ -30,7 +30,7 @@ type NFAOperationsTest(output:ITestOutputHelper) =
             (9, Some 'b', 10)
         ]
 
-        let ops =  NFAOperations.create(ntran)
+        let ops =  NFAOperationsUtils.create(ntran)
 
         let closures = Map.ofList [
             (0,set [0;1;2;4;7]);

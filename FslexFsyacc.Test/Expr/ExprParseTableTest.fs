@@ -30,13 +30,9 @@ type ExprParseTableTest(output:ITestOutputHelper) =
         rawFsyacc 
         |> RawFsyaccFileUtils.toFlated
 
-    let grammar (flatedFsyacc) =
-        flatedFsyacc
-        |> FlatFsyaccFileUtils.getFollowPrecedeCrew
-
     let ambiguousCollection (flatedFsyacc) =
         flatedFsyacc
-        |> FlatFsyaccFileUtils.toAmbiguousCollection
+        |> FlatFsyaccFileUtils.getAmbiguousCollectionCrew
 
     //解析表数据
     let parseTbl (flatedFsyacc) = 
@@ -65,7 +61,7 @@ type ExprParseTableTest(output:ITestOutputHelper) =
     )>] // 
     member _.``02 - generate Parse Table``() =
         let parseTbl = parseTbl flatedFsyacc
-        let src = parseTbl|> FsyaccParseTableFileRender.generateModule(parseTblModule)
+        let src = parseTbl|> FsyaccParseTableFileUtils.generateModule(parseTblModule)
 
         File.WriteAllText(parseTblPath, src, Encoding.UTF8)
         output.WriteLine($"output yacc:\r\n{parseTblPath}")
@@ -91,7 +87,7 @@ type ExprParseTableTest(output:ITestOutputHelper) =
             FSharp.Compiler.SyntaxTreeX.Parser.getDecls("header.fsx",parseTbl.header)
 
         let semansFsyacc =
-            let mappers = parseTbl|> FsyaccParseTableFileRender.generateMappers
+            let mappers = parseTbl|> FsyaccParseTableFileUtils.generateMappers
             FSharp.Compiler.SyntaxTreeX.SourceCodeParser.semansFromMappers mappers
 
         let header,semans =

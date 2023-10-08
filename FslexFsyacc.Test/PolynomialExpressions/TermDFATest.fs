@@ -1,4 +1,6 @@
 ﻿namespace PolynomialExpressions
+open FslexFsyacc.Fslex
+open FslexFsyacc.Lex
 
 open System
 open System.IO
@@ -9,7 +11,6 @@ open Xunit.Abstractions
 
 open FSharp.Literals.Literal
 open FSharp.xUnit
-open FslexFsyacc.Fslex
 
 type TermDFATest(output:ITestOutputHelper) =
     let show res =
@@ -19,7 +20,7 @@ type TermDFATest(output:ITestOutputHelper) =
 
     let filePath = Path.Combine(__SOURCE_DIRECTORY__, @"term.fslex")
     let text = File.ReadAllText(filePath)
-    let fslex = FslexFile.parse text
+    let fslex = FslexFileUtils.parse text
 
     let name = "TermDFA"
     let moduleName = $"PolynomialExpressions.{name}"
@@ -43,18 +44,18 @@ type TermDFATest(output:ITestOutputHelper) =
         
     [<Fact>]
     member _.``01 = verify``() =
-        let y = fslex.verify()
+        let y = fslex|>FslexFileUtils.verify
 
         Assert.True(y.undeclared.IsEmpty)
         Assert.True(y.unused.IsEmpty)
 
     [<Fact>]
     member _.``02 = universal characters``() =
-        let res = fslex.getRegularExpressions()
+        let res = fslex|>FslexFileUtils.getRegularExpressions
 
         let y = 
             res
-            |> List.collect(fun re -> re.getCharacters())
+            |> List.collect(fun re -> re|>RegularExpressionUtils.getCharacters)
             |> Set.ofList
         show y
 
@@ -63,22 +64,22 @@ type TermDFATest(output:ITestOutputHelper) =
     )>] // 
     member _.``03 = generate DFA``() =
 
-        let dfafile = fslex.toFslexDFAFile()
-        let result = dfafile.generate(moduleName)
+        let dfafile = fslex|>FslexFileUtils.toFslexDFAFile
+        let result = dfafile|>FslexDFAFileUtils.generate(moduleName)
 
         File.WriteAllText(modulePath, result, Encoding.UTF8)
         output.WriteLine("output lex:" + modulePath)
 
     [<Fact>]
     member _.``10 - valid DFA``() =
-        let src = fslex.toFslexDFAFile()
+        let src = fslex|>FslexFileUtils.toFslexDFAFile
         Should.equal src.nextStates TermDFA.nextStates
 
         let headerFslex =
             FSharp.Compiler.SyntaxTreeX.Parser.getDecls("header.fsx",src.header)
 
         let semansFslex =
-            let mappers = src.generateMappers()
+            let mappers = src|>FslexDFAFileUtils.generateMappers
             FSharp.Compiler.SyntaxTreeX.SourceCodeParser.semansFromMappers mappers
 
         let header,semans =

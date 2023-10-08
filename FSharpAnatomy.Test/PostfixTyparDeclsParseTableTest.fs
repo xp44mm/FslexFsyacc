@@ -37,13 +37,9 @@ type PostfixTyparDeclsParseTableTest (output:ITestOutputHelper) =
         rawFsyacc 
         |> RawFsyaccFileUtils.toFlated
 
-    let grammar (flatedFsyacc) =
-        flatedFsyacc
-        |> FlatFsyaccFileUtils.getFollowPrecedeCrew
-
     let ambiguousCollection (flatedFsyacc) =
         flatedFsyacc
-        |> FlatFsyaccFileUtils.toAmbiguousCollection
+        |> FlatFsyaccFileUtils.getAmbiguousCollectionCrew
 
     //解析表数据
     let parseTbl (flatedFsyacc) = 
@@ -76,7 +72,7 @@ type PostfixTyparDeclsParseTableTest (output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``02 - list all tokens``() =
-        let grammar = grammar flatedFsyacc
+        let grammar = ambiguousCollection flatedFsyacc
 
         let tokens = grammar.terminals
         let res = set ["#";"(";")";"*";",";"->";".";":";":>";";";"<";">";"ARRAY_TYPE_SUFFIX";"HTYPAR";"IDENT";"OPERATOR_NAME";"QTYPAR";"_";"and";"comparison";"delegate";"enum";"equality";"member";"new";"not";"null";"or";"static";"struct";"unmanaged";"when";"{|";"|}"]
@@ -112,7 +108,7 @@ type PostfixTyparDeclsParseTableTest (output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``05 - list the type annotaitions``() =
-        let grammar = grammar flatedFsyacc
+        let grammar = ambiguousCollection flatedFsyacc
 
         let terminals =
             grammar.terminals
@@ -143,7 +139,7 @@ type PostfixTyparDeclsParseTableTest (output:ITestOutputHelper) =
     )>] // 
     member _.``06 - generate ParseTable``() =
         let parseTbl = parseTbl flatedFsyacc
-        let fsharpCode = parseTbl|> FsyaccParseTableFileRender.generateModule(moduleName)
+        let fsharpCode = parseTbl|> FsyaccParseTableFileUtils.generateModule(moduleName)
 
         File.WriteAllText(parseTblPath,fsharpCode,Encoding.UTF8)
         output.WriteLine("output fsyacc:"+parseTblPath)
@@ -167,7 +163,7 @@ type PostfixTyparDeclsParseTableTest (output:ITestOutputHelper) =
             FSharp.Compiler.SyntaxTreeX.Parser.getDecls("header.fsx",src.header)
 
         let semansFsyacc =
-            let mappers = src|> FsyaccParseTableFileRender.generateMappers
+            let mappers = src|> FsyaccParseTableFileUtils.generateMappers
             FSharp.Compiler.SyntaxTreeX.SourceCodeParser.semansFromMappers mappers
 
         let header,semans =

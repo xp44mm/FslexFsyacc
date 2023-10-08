@@ -21,7 +21,7 @@ type AnalyzerNFATest(output:ITestOutputHelper) =
                [Both(Natural(Atomic 'a'),Plural(Atomic 'b'))]
             ]
 
-        let nfa = AnalyzerNFA.fromRgx(lookaheads)
+        let nfa = AnalyzerNFAUtils.fromRgx(lookaheads)
 
         let y = {
             transition=set [
@@ -51,7 +51,7 @@ type AnalyzerNFATest(output:ITestOutputHelper) =
                 [Plural(Atomic 'b')]
             ]
 
-        let nfa = AnalyzerNFA.fromRgx patterns
+        let nfa = AnalyzerNFAUtils.fromRgx patterns
 
         //show nfa
         let y = {

@@ -7,8 +7,9 @@
 
   <ItemGroup>
     <Compile Include="ItemCoreCrews.fs" />
-    <Compile Include="EncodedParseTableCrews.fs" />
-    <Compile Include="Rules.fs" />
+    <Compile Include="AmbiguousCollectionCrews.fs" />
+    <Compile Include="SemanticParseTableCrews.fs" />
+    <Compile Include="FlatedFsyaccFileCrews.fs" />
   </ItemGroup>
 
   <ItemGroup>

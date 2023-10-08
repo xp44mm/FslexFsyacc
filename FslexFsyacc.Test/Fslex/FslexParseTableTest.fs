@@ -45,13 +45,9 @@ type FslexParseTableTest(output: ITestOutputHelper) =
         rawFsyacc 
         |> RawFsyaccFileUtils.toFlated
 
-    let grammar (flatedFsyacc) =
-        flatedFsyacc
-        |> FlatFsyaccFileUtils.getFollowPrecedeCrew
-
     let ambiguousCollection (flatedFsyacc) =
         flatedFsyacc
-        |> FlatFsyaccFileUtils.toAmbiguousCollection
+        |> FlatFsyaccFileUtils.getAmbiguousCollectionCrew
 
     //解析表数据
     let parseTbl (flatedFsyacc) = 
@@ -78,7 +74,7 @@ type FslexParseTableTest(output: ITestOutputHelper) =
 
     [<Fact>]
     member _.``02 - list all tokens``() =
-        let grammar = grammar flatedFsyacc
+        let grammar = ambiguousCollection flatedFsyacc
 
         let y = set [ 
             "%%"
@@ -139,7 +135,7 @@ type FslexParseTableTest(output: ITestOutputHelper) =
 
     [<Fact>]
     member _.``05 - list the type annotaitions``() =
-        let grammar = grammar flatedFsyacc
+        let grammar = ambiguousCollection flatedFsyacc
 
         let terminals =
             grammar.terminals
@@ -171,7 +167,7 @@ type FslexParseTableTest(output: ITestOutputHelper) =
     member _.``06 - generate ParseTable``() =
         let parseTbl = parseTbl flatedFsyacc
 
-        let fsharpCode = parseTbl|> FsyaccParseTableFileRender.generateModule(parseTblModule)
+        let fsharpCode = parseTbl|> FsyaccParseTableFileUtils.generateModule(parseTblModule)
         File.WriteAllText(parseTblPath, fsharpCode, Encoding.UTF8)
         output.WriteLine("output yacc:" + parseTblPath)
 
@@ -194,7 +190,7 @@ type FslexParseTableTest(output: ITestOutputHelper) =
             FSharp.Compiler.SyntaxTreeX.Parser.getDecls("header.fsx",src.header)
 
         let semansFsyacc =
-            let mappers = src|> FsyaccParseTableFileRender.generateMappers
+            let mappers = src|> FsyaccParseTableFileUtils.generateMappers
             FSharp.Compiler.SyntaxTreeX.SourceCodeParser.semansFromMappers mappers
 
         let header,semans =
@@ -206,7 +202,7 @@ type FslexParseTableTest(output: ITestOutputHelper) =
 
     [<Fact>]
     member _.``08 - regex first or last token test``() =
-        let grammar = grammar flatedFsyacc
+        let grammar = ambiguousCollection flatedFsyacc
 
         let lastsOfExpr = grammar.lasts.["expr"]
         let firstsOfExpr = grammar.firsts.["expr"]

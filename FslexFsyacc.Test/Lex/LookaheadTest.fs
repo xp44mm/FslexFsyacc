@@ -33,7 +33,7 @@ type LookaheadTest(output:ITestOutputHelper) =
             maxState = 5u
             }
 
-        let nfa = PatternNFA.lookahead(n1, n2)
+        let nfa = PatternNFAUtils.lookahead(n1, n2)
         //show nfa
         let y = {
             transition=set [

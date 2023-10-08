@@ -1,9 +1,19 @@
-﻿module FslexFsyacc.Fsyacc.FsyaccParseTableFileRender
+﻿module FslexFsyacc.Fsyacc.FsyaccParseTableFileUtils
 
 open System
 open FSharp.Idioms
 open FSharp.Literals
 open FslexFsyacc.Runtime
+open FslexFsyacc.Yacc
+
+let ofSemanticParseTableCrew (crew:SemanticParseTableCrew) = 
+    id<FsyaccParseTableFile> {
+        header = crew.header
+        rules = crew.rules
+        actions = crew.encodedActions
+        closures = crew.encodedClosures
+        declarations = crew.declarations
+    }
 
 ///闭包就是状态
 let printClosures (this:FsyaccParseTableFile) =
@@ -40,7 +50,7 @@ let printClosures (this:FsyaccParseTableFile) =
 /// 输入模块带名字空间的全名
 /// 删除Parse代码
 let generateModule (moduleName:string) (this:FsyaccParseTableFile) =
-    let types = Map.ofList this.declarations // symbol -> type of symbol
+    let types = this.declarations 
         
     let rules =
         this.rules
@@ -77,7 +87,7 @@ let generateModule (moduleName:string) (this:FsyaccParseTableFile) =
 
 /// 单独生成action code的源代码module
 let generateMappers (this:FsyaccParseTableFile) =
-    let types = Map.ofList this.declarations // symbol -> type of symbol
+    let types = this.declarations // symbol -> type of symbol
 
     this.rules
     |> List.map(fun(prod, semantic) ->

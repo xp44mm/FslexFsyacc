@@ -34,7 +34,7 @@ type NFAtoDFATest(output:ITestOutputHelper) =
             10u, None
             ]
 
-        let dfa = SubsetDFA<_,_>.create(ntran)
+        let dfa = SubsetDFAUtils.create(ntran)
         let nfinals = 
             nfinalLexemes
             |> List.map fst
@@ -66,7 +66,7 @@ type NFAtoDFATest(output:ITestOutputHelper) =
             10u, 10u
             ]
 
-        let dfa = DFA.fromNFA(ntran, nfinalLexemes)
+        let dfa = DFAUtils.fromNFA(ntran, nfinalLexemes)
 
         //fig 3-36
         let dtran = set [
@@ -103,7 +103,7 @@ type NFAtoDFATest(output:ITestOutputHelper) =
 
         let nfinalLexemes = [4u,4u]
 
-        let dfa = DFA.fromNFA(n3, nfinalLexemes)
+        let dfa = DFAUtils.fromNFA(n3, nfinalLexemes)
 
         let dtran = set [
             0u,'a',0u;
@@ -139,7 +139,7 @@ type NFAtoDFATest(output:ITestOutputHelper) =
             8u,8u
             ]
 
-        let dfa = DFA.fromNFA(ntran, finalLexemes)
+        let dfa = DFAUtils.fromNFA(ntran, finalLexemes)
 
         // fig 3-54
         let dtran =set [

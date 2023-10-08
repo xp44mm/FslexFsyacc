@@ -37,8 +37,8 @@ type PartitionTest(output:ITestOutputHelper) =
             dfinals = dfinals
         }
 
-        let encodeDfa, decodes,_ = pdfa.encode()
-        let mdfa = encodeDfa.minimize(decodes)
+        let encodeDfa, decodes,_ = pdfa|>PartitionDFAUtils.encode
+        let mdfa = encodeDfa|>PartitionDFAUtils.minimize(decodes)
 
         //最小化的結果
         //let y = Partition.minimize dtran dfinals
@@ -123,8 +123,8 @@ type PartitionTest(output:ITestOutputHelper) =
             dfinals = dfinals
         }
 
-        let encodeDfa, decodes,_ = pdfa.encode()
-        let mdfa = encodeDfa.minimize(decodes)
+        let encodeDfa, decodes,_ = pdfa|>PartitionDFAUtils.encode
+        let mdfa = encodeDfa|>PartitionDFAUtils.minimize(decodes)
 
 
         ////最小化的結果

@@ -1,12 +1,13 @@
 ﻿module FslexFsyacc.Fsyacc.RawFsyaccFileUtils
 
 ///从`*.fsyacc`文件中解析成本类型的数据
+[<System.ObsoleteAttribute("FsyaccCompiler.compile2")>]
 let parse text =
     text
     |> FsyaccCompiler.compile
 
 let toFlated (raw:RawFsyaccFile) =
-    let rules =
+    let flatedRules =
         raw.rules
         |> FsyaccFileRules.rawToFlatRules
 
@@ -33,7 +34,7 @@ let toFlated (raw:RawFsyaccFile) =
 
     id<FlatFsyaccFile> {
         header = raw.header
-        rules = rules
+        rules = flatedRules
         precedences = precedences
         declarations = declarations
     }

@@ -52,4 +52,4 @@ let getActionParseTableCrew
             AmbiguousCollectionUtils.getItemcores cnflcts
         )
 
-    ActionParseTableCrew(collection,unambiguousItemCores,actions,resolvedClosures)
+    ActionParseTableCrew(collection,dummyTokens,precedences,unambiguousItemCores,actions,resolvedClosures)
