@@ -11,6 +11,7 @@ let getSemanticParseTableCrew (this:FlatedFsyaccFileCrew) =
     SemanticParseTableCrew(parseTable,this.header,this.semanticList,this.flatedDeclarations)
 
 let getFlatedFsyaccFileCrew (raw:RawFsyaccFileCrew) =
+    let startSymbol,_ = raw.rules.[0]
     let flatedRules =
         raw.rules
         |> FsyaccFileRules.rawToFlatRules
@@ -41,7 +42,12 @@ let getFlatedFsyaccFileCrew (raw:RawFsyaccFileCrew) =
     let dummyTokens = FsyaccFileRules.getDummyTokens flatedRules
     let semanticList = flatedRules |> FsyaccFileRules.getSemanticRules
 
-    FlatedFsyaccFileCrew(raw,flatedRules,flatedPrecedences,flatedDeclarations,mainProductionList,dummyTokens,semanticList)
+    FlatedFsyaccFileCrew(raw,startSymbol,dummyTokens,flatedRules,flatedPrecedences,flatedDeclarations,mainProductionList,semanticList)
 
-
-
+let toFlatFsyaccFile(this:FlatedFsyaccFileCrew) =
+    id<FlatFsyaccFile> {
+        header = this.header
+        rules = this.flatedRules
+        precedences = this.flatedPrecedences
+        declarations = this.flatedDeclarations
+    }

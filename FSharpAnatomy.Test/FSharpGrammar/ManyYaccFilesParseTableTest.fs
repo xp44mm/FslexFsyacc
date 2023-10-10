@@ -25,11 +25,10 @@ type ManyYaccFilesParseTableTest(output:ITestOutputHelper) =
     let readYacc filename =
         let filePath = Path.Combine(sourcePath, $"{filename}.fsyacc")
         let text = File.ReadAllText(filePath,Encoding.UTF8)
-
-        //let rawFsyacc = RawFsyaccFile.parse text
-        //FlatFsyaccFile.fromRaw rawFsyacc
-        FlatFsyaccFileUtils.parse text
-
+        text
+        |> RawFsyaccFileCrewUtils.parse
+        |> FlatedFsyaccFileCrewUtils.getFlatedFsyaccFileCrew
+        |> FlatedFsyaccFileCrewUtils.toFlatFsyaccFile
     let removeErrorRules =
         let robust = set [
             "error";
@@ -48,6 +47,8 @@ type ManyYaccFilesParseTableTest(output:ITestOutputHelper) =
         let typeAnnotWhenConstraintsFsyacc = readYacc s0
 
         let parsFsyacc = readYacc "pars"
+
+
 
         let sumFsyacc =
             {
@@ -68,8 +69,10 @@ type ManyYaccFilesParseTableTest(output:ITestOutputHelper) =
             "attributes"
             "topTypeWithTypeConstraints"
         ]
-        let fsyacc = sumFsyacc |> FlatFsyaccFileUtils.start(s0,terminals)
-        //let txt = fsyacc.toRaw().render()
+        let fsyacc = 
+            sumFsyacc 
+            |> FlatFsyaccFileUtils.start(s0,terminals)
+
         let txt =
             fsyacc
             |> RawFsyaccFileUtils.fromFlat

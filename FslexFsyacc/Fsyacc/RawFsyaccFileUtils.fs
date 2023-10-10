@@ -31,6 +31,7 @@ let toFlated (raw:RawFsyaccFile) =
     let declarations = 
         raw.declarations
         |> List.collect(fun (tp,symbols)->symbols|>List.map(fun sym -> sym,tp))
+        |> Map.ofList
 
     id<FlatFsyaccFile> {
         header = raw.header
@@ -50,6 +51,7 @@ let fromFlat (flat:FlatFsyaccFile) =
 
     let declarations = 
         flat.declarations
+        |> Map.toList
         |> List.groupBy(fun (sym,tp)->tp)
         |> List.map(fun (tp,groups) ->
             let symbols =

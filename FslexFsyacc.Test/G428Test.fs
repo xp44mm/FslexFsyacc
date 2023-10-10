@@ -26,31 +26,25 @@ type G428Test(output:ITestOutputHelper) =
     let filePath = Path.Combine(__SOURCE_DIRECTORY__, @"428.fsyacc")
     let text = File.ReadAllText(filePath,Encoding.UTF8)
 
-    // 与fsyacc文件完全相对应的结构树
-    let rawFsyacc = 
+    let fsyaccCrew =
         text
-        |> RawFsyaccFileUtils.parse 
+        |> RawFsyaccFileCrewUtils.parse
+        |> FlatedFsyaccFileCrewUtils.getFlatedFsyaccFileCrew
 
-    let flatedFsyacc = 
-        rawFsyacc 
-        |> RawFsyaccFileUtils.toFlated
-
-    let inputProductionList =
-        flatedFsyacc.rules
-        |> FsyaccFileRules.getMainProductions
+    let tblCrew =
+        fsyaccCrew
+        |> FlatedFsyaccFileCrewUtils.getSemanticParseTableCrew
 
     [<Fact>]
     member _.``01 - norm fsyacc file``() =
-        let fsyacc = 
-            text
-            |> FlatFsyaccFileUtils.parse
-        // the start symbol of bnf 
-        let s0 = 
-            fsyacc.rules
-            |> FlatFsyaccFileRule.getStartSymbol
+        let s0 = tblCrew.startSymbol
+        let flatedFsyacc =
+            fsyaccCrew
+            |> FlatedFsyaccFileCrewUtils.toFlatFsyaccFile
 
         let src = 
-            fsyacc |> FlatFsyaccFileUtils.start(s0, Set.empty)
+            flatedFsyacc 
+            |> FlatFsyaccFileUtils.start(s0, Set.empty)
             |> RawFsyaccFileUtils.fromFlat
             |> RawFsyaccFileUtils.render
 
@@ -59,12 +53,12 @@ type G428Test(output:ITestOutputHelper) =
     [<Fact>]
     member _.``02 - data printer``() =
         let ptbl =     
-            let mainProductions = FsyaccFileRules.getMainProductions flatedFsyacc.rules
-            let dummyTokens = FsyaccFileRules.getDummyTokens flatedFsyacc.rules
+            let mainProductions = FsyaccFileRules.getMainProductions fsyaccCrew.flatedRules
+            let dummyTokens = FsyaccFileRules.getDummyTokens fsyaccCrew.flatedRules
             EncodedParseTableCrewUtils.getEncodedParseTableCrew(
                 mainProductions,
                 dummyTokens,
-                flatedFsyacc.precedences)
+                fsyaccCrew.flatedPrecedences)
 
         output.WriteLine($"let encodedActions = {stringify ptbl.encodedActions}")
         output.WriteLine($"let encodedClosures = {stringify ptbl.encodedClosures}")

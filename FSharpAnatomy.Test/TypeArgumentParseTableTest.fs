@@ -27,42 +27,25 @@ type TypeArgumentParseTableTest (output:ITestOutputHelper) =
     let parseTblPath = Path.Combine(Dir.FSharpAnatomyPath, $"{parseTblName}.fs")
 
     let text = File.ReadAllText(filePath,Encoding.UTF8)
-
-    // 与fsyacc文件完全相对应的结构树
-    let rawFsyacc = 
+    let fsyaccCrew =
         text
-        |> RawFsyaccFileUtils.parse 
+        |> RawFsyaccFileCrewUtils.parse
+        |> FlatedFsyaccFileCrewUtils.getFlatedFsyaccFileCrew
 
-    let flatedFsyacc = 
-        rawFsyacc 
-        |> RawFsyaccFileUtils.toFlated
+    let tblCrew =
+        fsyaccCrew
+        |> FlatedFsyaccFileCrewUtils.getSemanticParseTableCrew
 
-    //let grammar (flatedFsyacc) =
-    //    flatedFsyacc
-    //    |> FlatFsyaccFileUtils.getFollowPrecedeCrew
-
-    let ambiguousCollection (flatedFsyacc) =
-        flatedFsyacc
-        |> FlatFsyaccFileUtils.getAmbiguousCollectionCrew
-
-    //解析表数据
-    let parseTbl (flatedFsyacc) = 
-        flatedFsyacc
-        //|> FlatFsyaccFileUtils.parse
-        |> FlatFsyaccFileUtils.toFsyaccParseTableFile
-
-    [<Fact>] // 
+    [<Fact>]
     member _.``01 - norm fsyacc file``() =
-        let fsyacc = 
-            text
-            |> FlatFsyaccFileUtils.parse
-
-        let s0 = 
-            fsyacc.rules
-            |> FlatFsyaccFileRule.getStartSymbol
+        let s0 = tblCrew.startSymbol
+        let flatedFsyacc =
+            fsyaccCrew
+            |> FlatedFsyaccFileCrewUtils.toFlatFsyaccFile
 
         let src = 
-            fsyacc |> FlatFsyaccFileUtils.start(s0, Set.empty)
+            flatedFsyacc 
+            |> FlatFsyaccFileUtils.start(s0, Set.empty)
             |> RawFsyaccFileUtils.fromFlat
             |> RawFsyaccFileUtils.render
 
@@ -70,9 +53,7 @@ type TypeArgumentParseTableTest (output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``02 - list all tokens``() =
-        let grammar = ambiguousCollection flatedFsyacc
-
-        let tokens = grammar.terminals
+        let tokens = tblCrew.terminals
         let res = set ["#";"(";")";"*";",";"->";".";":";":>";";";"<";">";"IDENT";"HTYPAR";"QTYPAR";"_";"ARRAY_TYPE_SUFFIX";"struct";"{|";"|}"]
 
         show tokens
@@ -80,13 +61,11 @@ type TypeArgumentParseTableTest (output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``03 - precedence Of Productions``() =
-        let collection = ambiguousCollection flatedFsyacc
-
         let terminals = 
-            collection.terminals
+            tblCrew.terminals
 
         let productions =
-            AmbiguousCollectionUtils.collectConflictedProductions collection.conflictedItemCores
+            AmbiguousCollectionUtils.collectConflictedProductions tblCrew.conflictedItemCores
 
         let pprods = 
             ProductionUtils.precedenceOfProductions terminals productions
@@ -94,26 +73,25 @@ type TypeArgumentParseTableTest (output:ITestOutputHelper) =
         Should.equal [] pprods
 
     [<Fact>]
-    member _.``04 - list all states``() =
-        let collection = ambiguousCollection flatedFsyacc
-        
+    member _.``04 - list all states``() =        
         let text = 
-            AmbiguousCollectionUtils.render 
-                collection.terminals
-                collection.conflictedItemCores
-                (collection.kernels |> Seq.mapi(fun i k -> k,i) |> Map.ofSeq)
+            tblCrew.kernels 
+            |> Seq.mapi(fun i k -> k,i) 
+            |> Map.ofSeq
+            |> AmbiguousCollectionUtils.render 
+                tblCrew.terminals
+                tblCrew.conflictedItemCores
         output.WriteLine(text)
 
     [<Fact>]
     member _.``05 - list the type annotaitions``() =
-        let grammar = ambiguousCollection flatedFsyacc
         let terminals =
-            grammar.terminals
+            tblCrew.terminals
             |> Seq.map RenderUtils.renderSymbol
             |> String.concat " "
 
         let nonterminals =
-            grammar.nonterminals
+            tblCrew.nonterminals
             |> Seq.map RenderUtils.renderSymbol
             |> String.concat " "
 
@@ -135,22 +113,21 @@ type TypeArgumentParseTableTest (output:ITestOutputHelper) =
     Skip="once for all!"
     )>] // 
     member _.``06 - generate ParseTable``() =
-        let parseTbl = parseTbl flatedFsyacc
-
-        let fsrc = parseTbl|> FsyaccParseTableFileUtils.generateModule(parseTblModule)
+        let fsrc = 
+            tblCrew
+            |> FsyaccParseTableFileUtils.ofSemanticParseTableCrew
+            |> FsyaccParseTableFileUtils.generateModule(parseTblModule)
 
         File.WriteAllText(parseTblPath,fsrc,Encoding.UTF8)
         output.WriteLine("output fsyacc:"+parseTblPath)
 
     [<Fact>]
     member _.``10 - valid ParseTable``() =
-        let src = parseTbl flatedFsyacc
-
-        Should.equal src.actions TypeArgumentParseTable.actions
-        Should.equal src.closures TypeArgumentParseTable.closures
+        Should.equal tblCrew.encodedActions  TypeArgumentParseTable.actions
+        Should.equal tblCrew.encodedClosures TypeArgumentParseTable.closures
 
         let prodsFsyacc =
-            List.map fst src.rules
+            List.map fst tblCrew.rules
 
         let prodsParseTable =
             List.map fst TypeArgumentParseTable.rules
@@ -158,10 +135,13 @@ type TypeArgumentParseTableTest (output:ITestOutputHelper) =
         Should.equal prodsFsyacc prodsParseTable
 
         let headerFromFsyacc =
-            FSharp.Compiler.SyntaxTreeX.Parser.getDecls("header.fsx",src.header)
+            FSharp.Compiler.SyntaxTreeX.Parser.getDecls("header.fsx",tblCrew.header)
 
         let semansFsyacc =
-            let mappers = src|> FsyaccParseTableFileUtils.generateMappers
+            let mappers = 
+                tblCrew
+                |> FsyaccParseTableFileUtils.ofSemanticParseTableCrew
+                |> FsyaccParseTableFileUtils.generateMappers
             FSharp.Compiler.SyntaxTreeX.SourceCodeParser.semansFromMappers mappers
 
         let header,semans =
@@ -173,8 +153,7 @@ type TypeArgumentParseTableTest (output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``08 - typeArgument follows test``() =
-        let grammar = ambiguousCollection flatedFsyacc
-        grammar.follows.["typeArgument"]
+        tblCrew.follows.["typeArgument"]
         |> Seq.iter(fun tok -> output.WriteLine(stringify tok))
 
 

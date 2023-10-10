@@ -46,7 +46,7 @@ let start(startSymbol:string, terminals:Set<string>) (this:FlatFsyaccFile) =
 
     let declarations =
         this.declarations
-        |> List.filter(fst>>symbols.Contains)
+        |> Map.filter(fun sym _ -> symbols.Contains sym)
 
     {
         this with
@@ -97,7 +97,7 @@ let toFsyaccParseTableFile (this:FlatFsyaccFile) =
     {
         header = this.header
         rules = this.rules |> FsyaccFileRules.getSemanticRules 
-        declarations = Map.ofList this.declarations
+        declarations = this.declarations
         actions = parseTable.encodedActions
         closures = parseTable.encodedClosures
     }

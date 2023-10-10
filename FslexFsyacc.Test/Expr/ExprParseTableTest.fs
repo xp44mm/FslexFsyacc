@@ -20,37 +20,25 @@ type ExprParseTableTest(output:ITestOutputHelper) =
     let parseTblPath = Path.Combine(__SOURCE_DIRECTORY__, $"{parseTblName}.fs")
 
     let text = File.ReadAllText(filePath,Encoding.UTF8)
-
-    // 与fsyacc文件完全相对应的结构树
-    let rawFsyacc = 
+    let fsyaccCrew =
         text
-        |> RawFsyaccFileUtils.parse 
+        |> RawFsyaccFileCrewUtils.parse
+        |> FlatedFsyaccFileCrewUtils.getFlatedFsyaccFileCrew
 
-    let flatedFsyacc = 
-        rawFsyacc 
-        |> RawFsyaccFileUtils.toFlated
-
-    let ambiguousCollection (flatedFsyacc) =
-        flatedFsyacc
-        |> FlatFsyaccFileUtils.getAmbiguousCollectionCrew
-
-    //解析表数据
-    let parseTbl (flatedFsyacc) = 
-        flatedFsyacc
-        |> FlatFsyaccFileUtils.toFsyaccParseTableFile
+    let tblCrew =
+        fsyaccCrew
+        |> FlatedFsyaccFileCrewUtils.getSemanticParseTableCrew
 
     [<Fact>]
     member _.``01 - norm fsyacc file``() =
-        let fsyacc = 
-            text
-            |> FlatFsyaccFileUtils.parse
-
-        let s0 = 
-            fsyacc.rules
-            |> FlatFsyaccFileRule.getStartSymbol
+        let s0 = tblCrew.startSymbol
+        let flatedFsyacc =
+            fsyaccCrew
+            |> FlatedFsyaccFileCrewUtils.toFlatFsyaccFile
 
         let src = 
-            fsyacc |> FlatFsyaccFileUtils.start(s0, Set.empty)
+            flatedFsyacc 
+            |> FlatFsyaccFileUtils.start(s0, Set.empty)
             |> RawFsyaccFileUtils.fromFlat
             |> RawFsyaccFileUtils.render
 
@@ -60,22 +48,22 @@ type ExprParseTableTest(output:ITestOutputHelper) =
     Skip="按需更新源代码"
     )>] // 
     member _.``02 - generate Parse Table``() =
-        let parseTbl = parseTbl flatedFsyacc
-        let src = parseTbl|> FsyaccParseTableFileUtils.generateModule(parseTblModule)
+        let src =
+            tblCrew
+            |> FsyaccParseTableFileUtils.ofSemanticParseTableCrew
+            |> FsyaccParseTableFileUtils.generateModule(parseTblModule)
 
         File.WriteAllText(parseTblPath, src, Encoding.UTF8)
         output.WriteLine($"output yacc:\r\n{parseTblPath}")
 
     [<Fact>]
     member _.``10 - valid ParseTable``() =
-        let parseTbl = parseTbl flatedFsyacc
-
-        Should.equal parseTbl.actions ExprParseTable.actions
-        Should.equal parseTbl.closures ExprParseTable.closures
+        Should.equal tblCrew.encodedActions  ExprParseTable.actions
+        Should.equal tblCrew.encodedClosures ExprParseTable.closures
 
         //产生式比较
         let prodsFsyacc = 
-            List.map fst parseTbl.rules
+            List.map fst tblCrew.rules
 
         let prodsParseTable = 
             List.map fst ExprParseTable.rules
@@ -84,10 +72,13 @@ type ExprParseTableTest(output:ITestOutputHelper) =
 
         //header,semantic代码比较
         let headerFromFsyacc =
-            FSharp.Compiler.SyntaxTreeX.Parser.getDecls("header.fsx",parseTbl.header)
+            FSharp.Compiler.SyntaxTreeX.Parser.getDecls("header.fsx",tblCrew.header)
 
         let semansFsyacc =
-            let mappers = parseTbl|> FsyaccParseTableFileUtils.generateMappers
+            let mappers = 
+                tblCrew
+                |> FsyaccParseTableFileUtils.ofSemanticParseTableCrew
+                |> FsyaccParseTableFileUtils.generateMappers
             FSharp.Compiler.SyntaxTreeX.SourceCodeParser.semansFromMappers mappers
 
         let header,semans =

@@ -95,7 +95,6 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\FSharp.Compiler.SyntaxTreeX\FSharp.Compiler.SyntaxTreeX.fsproj" />
-	  <ProjectReference Include="..\FslexFsyacc.Prototypes\FslexFsyacc.Prototypes.fsproj" />
 	  <ProjectReference Include="..\FslexFsyacc.Runtime\FslexFsyacc.Runtime.fsproj" />
 	  <ProjectReference Include="..\FslexFsyacc\FslexFsyacc.fsproj" />
 	</ItemGroup>

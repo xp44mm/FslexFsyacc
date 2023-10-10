@@ -40,16 +40,21 @@ type BoundedParseTableTest(output: ITestOutputHelper) =
 
     [<Fact>]
     member _.``01 - norm fsyacc file``() =
+        let tbl =
+            flatedFsyacc
+            |> FlatedFsyaccFileCrewUtils.getSemanticParseTableCrew
+
+        let s0 = tbl.startSymbol
         let fsyacc =
-            text
-            |> FlatFsyaccFileUtils.parse
-
-        let s0 =
-            fsyacc.rules
-            |> FlatFsyaccFileRule.getStartSymbol
-
+            id<FlatFsyaccFile>{
+                header = flatedFsyacc.header
+                rules = flatedFsyacc.flatedRules
+                precedences = flatedFsyacc.flatedPrecedences
+                declarations = flatedFsyacc.flatedDeclarations
+            }
         let src =
-            fsyacc |> FlatFsyaccFileUtils.start(s0, Set.empty)
+            fsyacc
+            |> FlatFsyaccFileUtils.start(s0, Set.empty)
             |> RawFsyaccFileUtils.fromFlat
             |> RawFsyaccFileUtils.render
 

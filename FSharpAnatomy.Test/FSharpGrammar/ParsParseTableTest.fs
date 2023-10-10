@@ -81,11 +81,14 @@ type ParsParseTableTest(output:ITestOutputHelper) =
 
     let text = File.ReadAllText(filePath,Encoding.UTF8)
 
-    //let rawFsyacc = RawFsyaccFile.parse text
-    //let fsyacc = FlatFsyaccFile.fromRaw rawFsyacc
-    let fsyacc = 
+    let fsyaccCrew =
         text
-        |> FlatFsyaccFileUtils.parse
+        |> RawFsyaccFileCrewUtils.parse
+        |> FlatedFsyaccFileCrewUtils.getFlatedFsyaccFileCrew
+
+    let tblCrew =
+        fsyaccCrew
+        |> FlatedFsyaccFileCrewUtils.getSemanticParseTableCrew
 
     let removeErrorRules =
         let robust = set [
@@ -101,11 +104,11 @@ type ParsParseTableTest(output:ITestOutputHelper) =
     )>]
     member _.``000 - unused symbol in decls test``() =
         let x = 
-            fsyacc.precedences
+            fsyaccCrew.flatedPrecedences
             |> Map.keys
 
         let y = 
-            fsyacc.rules
+            fsyaccCrew.flatedRules
             |> List.collect(fun(p,t,_)->t::p)
             |> Set.ofList
 
@@ -134,8 +137,13 @@ type ParsParseTableTest(output:ITestOutputHelper) =
 
         //分解到关键字表达式（含）
         let terminals = set []
+        let flatedFsyacc =
+            fsyaccCrew
+            |> FlatedFsyaccFileCrewUtils.toFlatFsyaccFile
 
-        let flat = fsyacc |> FlatFsyaccFileUtils.start(s0,terminals)
+        let flat = 
+            flatedFsyacc 
+            |> FlatFsyaccFileUtils.start(s0,terminals)
 
         let flat =
             {
@@ -147,7 +155,6 @@ type ParsParseTableTest(output:ITestOutputHelper) =
                         |> List.map (fun(prod,nm,ac)->prod,"","")
             }
 
-        //let txt = flat.toRaw().render()
         let txt =
             flat
             |> RawFsyaccFileUtils.fromFlat
@@ -166,7 +173,13 @@ type ParsParseTableTest(output:ITestOutputHelper) =
         //分解到关键字表达式（含）
         let terminals = set []
 
-        let flat = fsyacc |> FlatFsyaccFileUtils.start(s0,terminals)
+        let flatedFsyacc =
+            fsyaccCrew
+            |> FlatedFsyaccFileCrewUtils.toFlatFsyaccFile
+
+        let flat = 
+            flatedFsyacc 
+            |> FlatFsyaccFileUtils.start(s0,terminals)
 
         let flat =
             {
@@ -178,7 +191,6 @@ type ParsParseTableTest(output:ITestOutputHelper) =
                         |> List.map (fun(prod,nm,ac)->prod,"","")
             }
 
-        //let txt = flat.toRaw().render()
         let txt =
             flat
             |> RawFsyaccFileUtils.fromFlat
@@ -197,7 +209,13 @@ type ParsParseTableTest(output:ITestOutputHelper) =
         //分解到关键字表达式（含）
         let terminals = set []
 
-        let flat = fsyacc |> FlatFsyaccFileUtils.start(s0,terminals)
+        let flatedFsyacc =
+            fsyaccCrew
+            |> FlatedFsyaccFileCrewUtils.toFlatFsyaccFile
+
+        let flat = 
+            flatedFsyacc 
+            |> FlatFsyaccFileUtils.start(s0,terminals)
 
         let flat =
             {
@@ -209,7 +227,6 @@ type ParsParseTableTest(output:ITestOutputHelper) =
                         |> List.map (fun(prod,nm,ac)->prod,"","")
             }
 
-        //let txt = flat.toRaw().render()
         let txt =
             flat
             |> RawFsyaccFileUtils.fromFlat
@@ -231,7 +248,13 @@ type ParsParseTableTest(output:ITestOutputHelper) =
 
         ]
 
-        let flat = fsyacc |> FlatFsyaccFileUtils.start(s0, terminals)
+        let flatedFsyacc =
+            fsyaccCrew
+            |> FlatedFsyaccFileCrewUtils.toFlatFsyaccFile
+
+        let flat = 
+            flatedFsyacc 
+            |> FlatFsyaccFileUtils.start(s0,terminals)
 
         let flat =
             {
@@ -243,7 +266,6 @@ type ParsParseTableTest(output:ITestOutputHelper) =
                         |> List.map (fun(prod,nm,ac)->prod,"","")
             }
 
-        //let txt = flat.toRaw().render()
         let txt =
             flat
             |> RawFsyaccFileUtils.fromFlat
@@ -263,7 +285,13 @@ type ParsParseTableTest(output:ITestOutputHelper) =
             "typeConstraints"
             ]
 
-        let flat = fsyacc |> FlatFsyaccFileUtils.start(s0, terminals)
+        let flatedFsyacc =
+            fsyaccCrew
+            |> FlatedFsyaccFileCrewUtils.toFlatFsyaccFile
+
+        let flat = 
+            flatedFsyacc 
+            |> FlatFsyaccFileUtils.start(s0,terminals)
 
         let flat =
             {
@@ -275,7 +303,7 @@ type ParsParseTableTest(output:ITestOutputHelper) =
                         |> List.map (fun(prod,nm,ac)->prod,"","")
             }
 
-        let txt = // flat.toRaw().render()
+        let txt =
             flat
             |> RawFsyaccFileUtils.fromFlat
             |> RawFsyaccFileUtils.render

@@ -6,15 +6,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="..\FslexFsyacc\Fsyacc\FsyaccToken.fs" />    
     <Compile Include="ItemCoreCrews.fs" />
     <Compile Include="AmbiguousCollectionCrews.fs" />
     <Compile Include="SemanticParseTableCrews.fs" />
     <Compile Include="FlatedFsyaccFileCrews.fs" />
+    
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\FslexFsyacc.Runtime\FslexFsyacc.Runtime.fsproj" />
-    <ProjectReference Include="..\FslexFsyacc\FslexFsyacc.fsproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -36,37 +36,25 @@ type FslexParseTableTest(output: ITestOutputHelper) =
 
     let text = File.ReadAllText(filePath,Encoding.UTF8)
 
-    // 与fsyacc文件完全相对应的结构树
-    let rawFsyacc = 
+    let fsyaccCrew =
         text
-        |> RawFsyaccFileUtils.parse 
+        |> RawFsyaccFileCrewUtils.parse
+        |> FlatedFsyaccFileCrewUtils.getFlatedFsyaccFileCrew
 
-    let flatedFsyacc = 
-        rawFsyacc 
-        |> RawFsyaccFileUtils.toFlated
-
-    let ambiguousCollection (flatedFsyacc) =
-        flatedFsyacc
-        |> FlatFsyaccFileUtils.getAmbiguousCollectionCrew
-
-    //解析表数据
-    let parseTbl (flatedFsyacc) = 
-        flatedFsyacc
-        //|> FlatFsyaccFileUtils.parse
-        |> FlatFsyaccFileUtils.toFsyaccParseTableFile
+    let tblCrew =
+        fsyaccCrew
+        |> FlatedFsyaccFileCrewUtils.getSemanticParseTableCrew
 
     [<Fact>]
     member _.``01 - norm fsyacc file``() =
-        let fsyacc = 
-            text
-            |> FlatFsyaccFileUtils.parse
-
-        let startSymbol = 
-            fsyacc.rules
-            |> FlatFsyaccFileRule.getStartSymbol
+        let startSymbol = tblCrew.startSymbol
+        let flatedFsyacc =
+            fsyaccCrew
+            |> FlatedFsyaccFileCrewUtils.toFlatFsyaccFile
 
         let txt = 
-            fsyacc |> FlatFsyaccFileUtils.start(startSymbol, Set.empty)
+            flatedFsyacc 
+            |> FlatFsyaccFileUtils.start(startSymbol, Set.empty)
             |> RawFsyaccFileUtils.fromFlat
             |> RawFsyaccFileUtils.render
 
@@ -74,8 +62,6 @@ type FslexParseTableTest(output: ITestOutputHelper) =
 
     [<Fact>]
     member _.``02 - list all tokens``() =
-        let grammar = ambiguousCollection flatedFsyacc
-
         let y = set [ 
             "%%"
             "&"
@@ -97,31 +83,27 @@ type FslexParseTableTest(output: ITestOutputHelper) =
             "|" 
             ]
 
-        let tokens = grammar.symbols - grammar.nonterminals
+        let tokens = tblCrew.symbols - tblCrew.nonterminals
         show tokens
 
     [<Fact>]
-    member _.``03 - list all states``() =
-        let collection = ambiguousCollection flatedFsyacc
-        
+    member _.``03 - list all states``() =       
         let text = 
             AmbiguousCollectionUtils.render 
-                collection.terminals
-                collection.conflictedItemCores
-                (collection.kernels |> Seq.mapi(fun i k -> k,i) |> Map.ofSeq)
+                tblCrew.terminals
+                tblCrew.conflictedItemCores
+                (tblCrew.kernels |> Seq.mapi(fun i k -> k,i) |> Map.ofSeq)
 
         output.WriteLine(text)
 
     [<Fact>]
     member _.``04 - 汇总冲突的产生式``() =
-        let collection = ambiguousCollection flatedFsyacc
-
         let productions = 
-            AmbiguousCollectionUtils.collectConflictedProductions collection.conflictedItemCores
+            AmbiguousCollectionUtils.collectConflictedProductions tblCrew.conflictedItemCores
 
         // production -> %prec
         let pprods =
-            ProductionUtils.precedenceOfProductions collection.terminals productions
+            ProductionUtils.precedenceOfProductions tblCrew.terminals productions
 
         //优先级应该据此结果给出，不能少，也不应该多。
         let y =
@@ -135,15 +117,13 @@ type FslexParseTableTest(output: ITestOutputHelper) =
 
     [<Fact>]
     member _.``05 - list the type annotaitions``() =
-        let grammar = ambiguousCollection flatedFsyacc
-
         let terminals =
-            grammar.terminals
+            tblCrew.terminals
             |> Seq.map RenderUtils.renderSymbol
             |> String.concat " "
 
         let nonterminals =
-            grammar.nonterminals
+            tblCrew.nonterminals
             |> Seq.map RenderUtils.renderSymbol
             |> String.concat " "
 
@@ -165,16 +145,18 @@ type FslexParseTableTest(output: ITestOutputHelper) =
     Skip="按需更新源代码"
     )>] // 
     member _.``06 - generate ParseTable``() =
-        let parseTbl = parseTbl flatedFsyacc
-
-        let fsharpCode = parseTbl|> FsyaccParseTableFileUtils.generateModule(parseTblModule)
+        let fsharpCode = 
+            tblCrew
+            |> FsyaccParseTableFileUtils.ofSemanticParseTableCrew
+            |> FsyaccParseTableFileUtils.generateModule(parseTblModule)
         File.WriteAllText(parseTblPath, fsharpCode, Encoding.UTF8)
         output.WriteLine("output yacc:" + parseTblPath)
 
     [<Fact>]
     member _.``07 - valid ParseTable``() =
-        let src = parseTbl flatedFsyacc
-
+        let src = 
+            tblCrew
+            |> FsyaccParseTableFileUtils.ofSemanticParseTableCrew
         Should.equal src.actions FslexParseTable.actions
         Should.equal src.closures FslexParseTable.closures
 
@@ -202,10 +184,8 @@ type FslexParseTableTest(output: ITestOutputHelper) =
 
     [<Fact>]
     member _.``08 - regex first or last token test``() =
-        let grammar = ambiguousCollection flatedFsyacc
-
-        let lastsOfExpr = grammar.lasts.["expr"]
-        let firstsOfExpr = grammar.firsts.["expr"]
+        let lastsOfExpr = tblCrew.lasts.["expr"]
+        let firstsOfExpr = tblCrew.firsts.["expr"]
 
         show lastsOfExpr
         show firstsOfExpr
