@@ -50,6 +50,7 @@ type G428Test(output:ITestOutputHelper) =
 
         output.WriteLine(src)
 
+
     [<Fact>]
     member _.``02 - data printer``() =
         let ptbl =     
@@ -62,5 +63,6 @@ type G428Test(output:ITestOutputHelper) =
 
         output.WriteLine($"let encodedActions = {stringify ptbl.encodedActions}")
         output.WriteLine($"let encodedClosures = {stringify ptbl.encodedClosures}")
+
 
 

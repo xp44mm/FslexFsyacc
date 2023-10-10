@@ -3,6 +3,7 @@
 let leftside (production:string list) = 
         production 
         |> List.head
+
 let body (production:string list) = 
         production 
         |> List.tail
@@ -142,3 +143,5 @@ let getNodes (productions:list<string list>) =
         lhs,children
     )
     |> Map.ofList
+
+

@@ -25,7 +25,7 @@ type Example454Test(output:ITestOutputHelper) =
 
     let grammar = 
         mainProductions
-        |> GrammarCrewUtils.getProductionsCrew
+        |> ProductionsCrewUtils.getProductionsCrew
         |> GrammarCrewUtils.getNullableCrew
         |> GrammarCrewUtils.getFirstLastCrew
 
@@ -33,7 +33,7 @@ type Example454Test(output:ITestOutputHelper) =
     member _.``closures``() =
         let grammar = 
             mainProductions
-            |> GrammarCrewUtils.getProductionsCrew
+            |> ProductionsCrewUtils.getProductionsCrew
             |> GrammarCrewUtils.getNullableCrew
             |> GrammarCrewUtils.getFirstLastCrew
             |> GrammarCrewUtils.getFollowPrecedeCrew

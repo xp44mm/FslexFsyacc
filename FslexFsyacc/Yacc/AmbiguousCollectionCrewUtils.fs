@@ -23,7 +23,7 @@ let getAmbiguousCollectionCrew (crew:LALRCollectionCrew) =
 
 let newAmbiguousCollectionCrew (mainProductions:Production list) =
     mainProductions
-    |> GrammarCrewUtils.getProductionsCrew
+    |> ProductionsCrewUtils.getProductionsCrew
     |> GrammarCrewUtils.getNullableCrew
     |> GrammarCrewUtils.getFirstLastCrew
     |> GrammarCrewUtils.getFollowPrecedeCrew

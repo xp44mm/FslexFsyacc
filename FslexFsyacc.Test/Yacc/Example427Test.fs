@@ -46,7 +46,7 @@ type Example427Test(output:ITestOutputHelper) =
             ["T'";"*";"F";"T'"]]
         let grammar = 
             mainProductions
-            |> GrammarCrewUtils.getProductionsCrew
+            |> ProductionsCrewUtils.getProductionsCrew
 
         Should.equal y grammar.augmentedProductions 
 
@@ -57,7 +57,7 @@ type Example427Test(output:ITestOutputHelper) =
         let y = set ["(";")";"*";"+";"E";"E'";"F";"T";"T'";"id"]
         let grammar = 
             mainProductions
-            |> GrammarCrewUtils.getProductionsCrew
+            |> ProductionsCrewUtils.getProductionsCrew
             |> GrammarCrewUtils.getNullableCrew
 
         Should.equal y grammar.symbols
@@ -69,7 +69,7 @@ type Example427Test(output:ITestOutputHelper) =
         let y = set ["E";"E'";"F";"T";"T'"]
         let grammar = 
             mainProductions
-            |> GrammarCrewUtils.getProductionsCrew
+            |> ProductionsCrewUtils.getProductionsCrew
             |> GrammarCrewUtils.getNullableCrew
 
         Should.equal y grammar.nonterminals
@@ -80,7 +80,7 @@ type Example427Test(output:ITestOutputHelper) =
         let y = set ["E'";"T'"]
         let grammar = 
             mainProductions
-            |> GrammarCrewUtils.getProductionsCrew
+            |> ProductionsCrewUtils.getProductionsCrew
             |> GrammarCrewUtils.getNullableCrew
 
         Should.equal y grammar.nullables
@@ -89,7 +89,7 @@ type Example427Test(output:ITestOutputHelper) =
     member _.``0301 firsts``() =
         let grammar = 
             mainProductions
-            |> GrammarCrewUtils.getProductionsCrew
+            |> ProductionsCrewUtils.getProductionsCrew
             |> GrammarCrewUtils.getNullableCrew
             |> GrammarCrewUtils.getFirstLastCrew
 
@@ -108,7 +108,7 @@ type Example427Test(output:ITestOutputHelper) =
     member _.``0302 lasts``() =
         let grammar = 
             mainProductions
-            |> GrammarCrewUtils.getProductionsCrew
+            |> ProductionsCrewUtils.getProductionsCrew
             |> GrammarCrewUtils.getNullableCrew
             |> GrammarCrewUtils.getFirstLastCrew
 
@@ -127,7 +127,7 @@ type Example427Test(output:ITestOutputHelper) =
     member _.``0303 follows``() =
         let grammar = 
             mainProductions
-            |> GrammarCrewUtils.getProductionsCrew
+            |> ProductionsCrewUtils.getProductionsCrew
             |> GrammarCrewUtils.getNullableCrew
             |> GrammarCrewUtils.getFirstLastCrew
             |> GrammarCrewUtils.getFollowPrecedeCrew
@@ -147,7 +147,7 @@ type Example427Test(output:ITestOutputHelper) =
     member _.``0304 precedes``() =
         let grammar = 
             mainProductions
-            |> GrammarCrewUtils.getProductionsCrew
+            |> ProductionsCrewUtils.getProductionsCrew
             |> GrammarCrewUtils.getNullableCrew
             |> GrammarCrewUtils.getFirstLastCrew
             |> GrammarCrewUtils.getFollowPrecedeCrew
@@ -166,7 +166,7 @@ type Example427Test(output:ITestOutputHelper) =
     member _.``closures``() =
         let grammar = 
             mainProductions
-            |> GrammarCrewUtils.getProductionsCrew
+            |> ProductionsCrewUtils.getProductionsCrew
             |> GrammarCrewUtils.getNullableCrew
             |> GrammarCrewUtils.getFirstLastCrew
             |> GrammarCrewUtils.getFollowPrecedeCrew
@@ -214,7 +214,7 @@ type Example427Test(output:ITestOutputHelper) =
     member _.``goto factory``() =
         let grammar = 
             mainProductions
-            |> GrammarCrewUtils.getProductionsCrew
+            |> ProductionsCrewUtils.getProductionsCrew
             |> GrammarCrewUtils.getNullableCrew
             |> GrammarCrewUtils.getFirstLastCrew
             |> GrammarCrewUtils.getFollowPrecedeCrew

@@ -21,7 +21,7 @@ type ExprDataCrewTest (output:ITestOutputHelper) =
 
         let crew = 
             input
-            |> GrammarCrewUtils.getProductionsCrew
+            |> ProductionsCrewUtils.getProductionsCrew
             |> GrammarCrewUtils.getNullableCrew
             |> GrammarCrewUtils.getFirstLastCrew
             |> GrammarCrewUtils.getFollowPrecedeCrew

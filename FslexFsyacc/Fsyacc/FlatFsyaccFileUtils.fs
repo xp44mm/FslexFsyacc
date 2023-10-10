@@ -77,7 +77,7 @@ let parse text =
 let getAmbiguousCollectionCrew (fsyacc:FlatFsyaccFile) =
     fsyacc.rules
     |> FsyaccFileRules.getMainProductions
-    |> GrammarCrewUtils.getProductionsCrew
+    |> ProductionsCrewUtils.getProductionsCrew
     |> GrammarCrewUtils.getNullableCrew
     |> GrammarCrewUtils.getFirstLastCrew
     |> GrammarCrewUtils.getFollowPrecedeCrew

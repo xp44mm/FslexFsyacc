@@ -20,7 +20,7 @@ type BNF428CrewTest(output:ITestOutputHelper) =
     [<Fact>]
     member _.``01 - getProductionsCrew test``() =
         let input = BNF428Data.inputProductionList
-        let crew = GrammarCrewUtils.getProductionsCrew input
+        let crew = ProductionsCrewUtils.getProductionsCrew input
         Should.equal crew.mainProductions BNF428Data.mainProductions
         Should.equal crew.augmentedProductions BNF428Data.augmentedProductions
 
@@ -29,7 +29,7 @@ type BNF428CrewTest(output:ITestOutputHelper) =
         let input = BNF428Data.inputProductionList
         let crew = 
             input
-            |> GrammarCrewUtils.getProductionsCrew
+            |> ProductionsCrewUtils.getProductionsCrew
             |> GrammarCrewUtils.getNullableCrew
 
         Should.equal crew.symbols BNF428Data.symbols
@@ -42,7 +42,7 @@ type BNF428CrewTest(output:ITestOutputHelper) =
         let input = BNF428Data.inputProductionList
         let crew = 
             input
-            |> GrammarCrewUtils.getProductionsCrew
+            |> ProductionsCrewUtils.getProductionsCrew
             |> GrammarCrewUtils.getNullableCrew
             |> GrammarCrewUtils.getFirstLastCrew
 
@@ -54,7 +54,7 @@ type BNF428CrewTest(output:ITestOutputHelper) =
         let input = BNF428Data.inputProductionList
         let crew = 
             input
-            |> GrammarCrewUtils.getProductionsCrew
+            |> ProductionsCrewUtils.getProductionsCrew
             |> GrammarCrewUtils.getNullableCrew
             |> GrammarCrewUtils.getFirstLastCrew
             |> GrammarCrewUtils.getFollowPrecedeCrew
@@ -67,7 +67,7 @@ type BNF428CrewTest(output:ITestOutputHelper) =
         let input = BNF428Data.inputProductionList
         let crew = 
             input
-            |> GrammarCrewUtils.getProductionsCrew
+            |> ProductionsCrewUtils.getProductionsCrew
             |> GrammarCrewUtils.getNullableCrew
             |> GrammarCrewUtils.getFirstLastCrew
             |> GrammarCrewUtils.getFollowPrecedeCrew
@@ -84,7 +84,7 @@ type BNF428CrewTest(output:ITestOutputHelper) =
         let input = BNF428Data.inputProductionList
         let crew = 
             input
-            |> GrammarCrewUtils.getProductionsCrew
+            |> ProductionsCrewUtils.getProductionsCrew
             |> GrammarCrewUtils.getNullableCrew
             |> GrammarCrewUtils.getFirstLastCrew
             |> GrammarCrewUtils.getFollowPrecedeCrew
@@ -110,7 +110,7 @@ type BNF428CrewTest(output:ITestOutputHelper) =
         let input = BNF428Data.inputProductionList
         let crew = 
             input
-            |> GrammarCrewUtils.getProductionsCrew
+            |> ProductionsCrewUtils.getProductionsCrew
             |> GrammarCrewUtils.getNullableCrew
             |> GrammarCrewUtils.getFirstLastCrew
             |> GrammarCrewUtils.getFollowPrecedeCrew

@@ -57,6 +57,7 @@
 		<Compile Include="Yacc\AmbiguityEliminator.fs" />
 		<Compile Include="Yacc\AmbiguousCollectionUtils.fs" />
 		<Compile Include="Yacc\ParseTableEncoder.fs" />
+		<Compile Include="Yacc\ProductionsCrewUtils.fs" />
 		<Compile Include="Yacc\GrammarCrewUtils.fs" />
 		<Compile Include="Yacc\LALRCollectionCrewUtils.fs" />
 		<Compile Include="Yacc\AmbiguousCollectionCrewUtils.fs" />

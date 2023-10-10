@@ -28,6 +28,10 @@ type ExprParseTableTest(output:ITestOutputHelper) =
     let tblCrew =
         fsyaccCrew
         |> FlatedFsyaccFileCrewUtils.getSemanticParseTableCrew
+    [<Fact>]
+    member _.``00 - print rules``() =
+        for r in fsyaccCrew.rules do
+        output.WriteLine($"{stringify r}")
 
     [<Fact>]
     member _.``01 - norm fsyacc file``() =

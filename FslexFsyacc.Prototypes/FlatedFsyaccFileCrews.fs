@@ -6,14 +6,15 @@ type RawFsyaccFileCrew = {
     inputText:string
     tokens: list<Position<FsyaccToken>>
     header:string
-    inputRuleList:(string*((string list*string*string)list))list
+    rules:(string*((string list*string*string)list))list
     precedenceLines:list<string*list<string>>
     declarationLines:list<string*list<string>>
 }
 
 type FlatedFsyaccFileCrew = {
     prototype: RawFsyaccFileCrew
-    augmentedRules:Map<string list,string*string>
-    precedences:Map<string,int> // symbol -> prec level
-    declarations:Map<string,string> // symbol,type
+
+    flatedRules:Map<string list,string*string>
+    flatedPrecedences:Map<string,int> // symbol -> prec level
+    flatedDeclarations:Map<string,string> // symbol,type
 }
