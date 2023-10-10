@@ -108,7 +108,7 @@ type CodeGenerators(output:ITestOutputHelper) =
         output.WriteLine(path)
 
     [<Fact(
-    Skip="按需生成类型定义"
+    //Skip="按需生成类型定义"
     )>]
     member _.``04 - Fsyacc FlatedFsyaccFileCrews Output Test``() =
         let foldPath = "Fsyacc"

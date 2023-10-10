@@ -1,22 +1,18 @@
 ﻿namespace FslexFsyacc.Fsyacc
 open FslexFsyacc.Runtime
 
-// RawFsyaccFileCrew(inputText,tokens,header,rules,precedences,declarations)
-type RawFsyaccFileCrew(inputText:string,tokens:list<Position<FsyaccToken>>,header:string,rules:list<string*list<list<string>*string*string>>,precedences:list<string*list<string>>,declarations:list<string*list<string>>) =
+// RawFsyaccFileCrew(inputText,tokens,header,rules,precedenceLines,declarationLines)
+type RawFsyaccFileCrew(inputText:string,tokens:list<Position<FsyaccToken>>,header:string,rules:list<string*list<list<string>*string*string>>,precedenceLines:list<string*list<string>>,declarationLines:list<string*list<string>>) =
     member _.inputText = inputText
     member _.tokens = tokens
     member _.header = header
     member _.rules = rules
-    member _.precedences = precedences
-    member _.declarations = declarations
+    member _.precedenceLines = precedenceLines
+    member _.declarationLines = declarationLines
 
-// FlatedFsyaccFileCrew(prototype,startSymbol,dummyTokens,flatedRules,flatedPrecedences,flatedDeclarations,mainProductionList,semanticList)
-type FlatedFsyaccFileCrew(prototype:RawFsyaccFileCrew,startSymbol:string,dummyTokens:Map<list<string>,string>,flatedRules:list<list<string>*string*string>,flatedPrecedences:Map<string,int>,flatedDeclarations:Map<string,string>,mainProductionList:list<list<string>>,semanticList:list<list<string>*string>) =
-    inherit RawFsyaccFileCrew(prototype.inputText,prototype.tokens,prototype.header,prototype.rules,prototype.precedences,prototype.declarations)
-    member _.startSymbol = startSymbol
-    member _.dummyTokens = dummyTokens
+// FlatedFsyaccFileCrew(prototype,flatedRules,flatedPrecedences,flatedDeclarations)
+type FlatedFsyaccFileCrew(prototype:RawFsyaccFileCrew,flatedRules:list<list<string>*string*string>,flatedPrecedences:Map<string,int>,flatedDeclarations:Map<string,string>) =
+    inherit RawFsyaccFileCrew(prototype.inputText,prototype.tokens,prototype.header,prototype.rules,prototype.precedenceLines,prototype.declarationLines)
     member _.flatedRules = flatedRules
     member _.flatedPrecedences = flatedPrecedences
     member _.flatedDeclarations = flatedDeclarations
-    member _.mainProductionList = mainProductionList
-    member _.semanticList = semanticList

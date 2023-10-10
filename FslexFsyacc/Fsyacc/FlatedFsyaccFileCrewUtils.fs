@@ -3,12 +3,23 @@
 open FslexFsyacc.Yacc
 
 let getSemanticParseTableCrew (this:FlatedFsyaccFileCrew) =
+    let mainProductionList = 
+        this.flatedRules
+        |> FsyaccFileRules.getMainProductions
+    let dummyTokens = 
+        this.flatedRules
+        |> FsyaccFileRules.getDummyTokens 
+    let semanticList = 
+        this.flatedRules 
+        |> FsyaccFileRules.getSemanticRules
+
     let parseTable =
-        EncodedParseTableCrewUtils.getEncodedParseTableCrew(
-            this.mainProductionList,
-            this.dummyTokens,
-            this.flatedPrecedences)
-    SemanticParseTableCrew(parseTable,this.header,this.semanticList,this.flatedDeclarations)
+        EncodedParseTableCrewUtils.getEncodedParseTableCrew (
+            mainProductionList,
+            dummyTokens,
+            this.flatedPrecedences
+            )
+    SemanticParseTableCrew(parseTable,this.header,semanticList,this.flatedDeclarations)
 
 let getFlatedFsyaccFileCrew (raw:RawFsyaccFileCrew) =
     let startSymbol,_ = raw.rules.[0]
@@ -17,7 +28,7 @@ let getFlatedFsyaccFileCrew (raw:RawFsyaccFileCrew) =
         |> FsyaccFileRules.rawToFlatRules
 
     let flatedPrecedences =
-        raw.precedences
+        raw.precedenceLines
         |> List.mapi(fun i (assoc,symbols) ->
             let assocoffset =
                 match assoc with
@@ -34,16 +45,10 @@ let getFlatedFsyaccFileCrew (raw:RawFsyaccFileCrew) =
         |> Map.ofList
 
     let flatedDeclarations = 
-        raw.declarations
+        raw.declarationLines
         |> List.collect(fun (tp,symbols)->symbols|>List.map(fun sym -> sym,tp))
         |> Map.ofList
-
-    let mainProductionList = FsyaccFileRules.getMainProductions flatedRules
-    let dummyTokens = FsyaccFileRules.getDummyTokens flatedRules
-    let semanticList = flatedRules |> FsyaccFileRules.getSemanticRules
-
-    FlatedFsyaccFileCrew(raw,startSymbol,dummyTokens,flatedRules,flatedPrecedences,flatedDeclarations,mainProductionList,semanticList)
-
+    FlatedFsyaccFileCrew(raw,flatedRules,flatedPrecedences,flatedDeclarations)
 let toFlatFsyaccFile(this:FlatedFsyaccFileCrew) =
     id<FlatFsyaccFile> {
         header = this.header

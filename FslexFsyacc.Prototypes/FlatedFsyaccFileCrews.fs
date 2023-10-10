@@ -14,7 +14,7 @@ type RawFsyaccFileCrew = {
 type FlatedFsyaccFileCrew = {
     prototype: RawFsyaccFileCrew
 
-    flatedRules:Map<string list,string*string>
+    flatedRules:list<list<string>*string*string>
     flatedPrecedences:Map<string,int> // symbol -> prec level
     flatedDeclarations:Map<string,string> // symbol,type
 }
