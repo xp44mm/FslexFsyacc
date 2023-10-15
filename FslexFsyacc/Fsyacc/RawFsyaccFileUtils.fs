@@ -1,41 +1,35 @@
 ﻿module FslexFsyacc.Fsyacc.RawFsyaccFileUtils
 
 ///从`*.fsyacc`文件中解析成本类型的数据
-[<System.ObsoleteAttribute("FsyaccCompiler.compile2")>]
 let parse text =
     text
     |> FsyaccCompiler.compile
 
 let toFlated (raw:RawFsyaccFile) =
+    let startSymbol,_ = raw.rules.[0]
     let flatedRules =
         raw.rules
-        |> FsyaccFileRules.rawToFlatRules
+        |> RuleListUtils.ofRaw
+
+    let augRule = ["";startSymbol],"","s0"
+
+    //let augmentRules =
+    //    augRule::flatedRules
+    //    |> List.map(fun(prod,dummy,semantic)-> prod,(dummy,semantic))
+    //    |> Map.ofList
 
     let precedences =
         raw.precedences
-        |> List.mapi(fun i (assoc,symbols) ->
-            let assocoffset =
-                match assoc with
-                | "left" -> -1
-                | "right" -> 1
-                | "nonassoc" -> 0
-                | _ -> failwith assoc
-
-            let prec = (i+1) * 100 // 索引大，则优先级高
-            symbols
-            |> List.map(fun symbol -> symbol, prec + assocoffset)
-        )
-        |> List.concat
-        |> Map.ofList
+        |> PrecedenceLinesUtils.toMap
 
     let declarations = 
         raw.declarations
-        |> List.collect(fun (tp,symbols)->symbols|>List.map(fun sym -> sym,tp))
-        |> Map.ofList
+        |> DeclarationLinesUtils.toMap
 
     id<FlatFsyaccFile> {
         header = raw.header
         rules = flatedRules
+        //augmentRules = augmentRules
         precedences = precedences
         declarations = declarations
     }
@@ -43,21 +37,16 @@ let toFlated (raw:RawFsyaccFile) =
 let fromFlat (flat:FlatFsyaccFile) =
     let rules =
         flat.rules
-        |> FsyaccFileRules.flatToRawRules
+        |> RuleListUtils.toRaw
 
     let precedences =
         flat.precedences
-        |> FsyaccFilePrecedences.normToRawPrecedences
+        |> PrecedenceLinesUtils.ofMap
 
     let declarations = 
         flat.declarations
-        |> Map.toList
-        |> List.groupBy(fun (sym,tp)->tp)
-        |> List.map(fun (tp,groups) ->
-            let symbols =
-                groups |> List.map fst
-            tp,symbols
-        )
+        |> DeclarationLinesUtils.ofMap
+
     id<RawFsyaccFile>{
         rules = rules
         precedences = precedences
@@ -69,21 +58,21 @@ let fromFlat (flat:FlatFsyaccFile) =
 let render (fsyacc:RawFsyaccFile) =
     let h = 
         fsyacc.header
-        |> FsyaccFileRender.renderHeader 
+        |> RawFsyaccFileRender.renderHeader 
 
     let r =
         fsyacc.rules
-        |> List.map FsyaccFileRender.renderRule
+        |> List.map RawFsyaccFileRender.renderRule
         |> String.concat "\r\n"
 
     let p() =
         fsyacc.precedences
-        |> List.map FsyaccFileRender.renderPrecedenceLine
+        |> List.map RawFsyaccFileRender.renderPrecedenceLine
         |> String.concat "\r\n"
 
     let d() =
         fsyacc.declarations
-        |> List.map FsyaccFileRender.renderTypeLine
+        |> List.map RawFsyaccFileRender.renderTypeLine
         |> String.concat "\r\n"
 
     // rule+prec+decl

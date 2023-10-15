@@ -14,7 +14,7 @@ let parser = Parser<Position<FsyaccToken>>(
     FsyaccTokenUtils.getLexeme)
 
 /// 解析文本为结构化数据
-[<System.ObsoleteAttribute("compile2")>]
+//[<System.ObsoleteAttribute("compile2")>]
 let compile (input:string) =
     //let mutable tokens = []
     let mutable states = [0,null]

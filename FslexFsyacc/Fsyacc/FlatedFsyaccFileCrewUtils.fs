@@ -1,17 +1,21 @@
 ﻿module FslexFsyacc.Fsyacc.FlatedFsyaccFileCrewUtils
 
 open FslexFsyacc.Yacc
+open FSharp.Idioms
 
 let getSemanticParseTableCrew (this:FlatedFsyaccFileCrew) =
     let mainProductionList = 
         this.flatedRules
-        |> FsyaccFileRules.getMainProductions
+        |> List.map Triple.first
+
     let dummyTokens = 
         this.flatedRules
-        |> FsyaccFileRules.getDummyTokens 
+        |> RuleListUtils.filterDummyProductions
+        |> Map.ofList
+
     let semanticList = 
         this.flatedRules 
-        |> FsyaccFileRules.getSemanticRules
+        |> RuleListUtils.getSemanticRules
 
     let parseTable =
         EncodedParseTableCrewUtils.getEncodedParseTableCrew (
@@ -22,10 +26,16 @@ let getSemanticParseTableCrew (this:FlatedFsyaccFileCrew) =
     SemanticParseTableCrew(parseTable,this.header,semanticList,this.flatedDeclarations)
 
 let getFlatedFsyaccFileCrew (raw:RawFsyaccFileCrew) =
-    let startSymbol,_ = raw.rules.[0]
+    let startSymbol,_ = raw.inputRuleList.[0]
+    let startRule = ["";startSymbol],"","s0"
     let flatedRules =
-        raw.rules
-        |> FsyaccFileRules.rawToFlatRules
+        raw.inputRuleList
+        |> RuleListUtils.ofRaw
+
+    let augmentRules =
+        startRule::flatedRules
+        |> List.map(fun(prod,dummy,semantic)-> prod,(dummy,semantic))
+        |> Map.ofList
 
     let flatedPrecedences =
         raw.precedenceLines
@@ -48,7 +58,8 @@ let getFlatedFsyaccFileCrew (raw:RawFsyaccFileCrew) =
         raw.declarationLines
         |> List.collect(fun (tp,symbols)->symbols|>List.map(fun sym -> sym,tp))
         |> Map.ofList
-    FlatedFsyaccFileCrew(raw,flatedRules,flatedPrecedences,flatedDeclarations)
+    FlatedFsyaccFileCrew(raw,flatedRules,augmentRules,flatedPrecedences,flatedDeclarations)
+
 let toFlatFsyaccFile(this:FlatedFsyaccFileCrew) =
     id<FlatFsyaccFile> {
         header = this.header

@@ -52,6 +52,7 @@
 		<Compile Include="Yacc\LastFactory.fs" />
 		<Compile Include="Yacc\FollowFactory.fs" />
 		<Compile Include="Yacc\PrecedeFactory.fs" />
+		<Compile Include="Yacc\ProductionListUtils.fs" />
 		<Compile Include="Yacc\ClosureOperators.fs" />
 		<Compile Include="Yacc\KernelUtils.fs" />
 		<Compile Include="Yacc\AmbiguityEliminator.fs" />
@@ -63,8 +64,6 @@
 		<Compile Include="Yacc\AmbiguousCollectionCrewUtils.fs" />
 		<Compile Include="Yacc\ActionParseTableCrewUtils.fs" />
 		<Compile Include="Yacc\EncodedParseTableCrewUtils.fs" />
-		<Compile Include="Yacc\BNF.fs" />
-		<Compile Include="Yacc\ParseTable.fs" />
 		
 		<Compile Include="Brackets\Band.fs" />
 		
@@ -106,15 +105,14 @@
 		<Compile Include="Fsyacc\FsyaccTokenUtils.fs" />
 		<Compile Include="Fsyacc\RegularSymbolUtils.fs" />
 		<Compile Include="Fsyacc\FsyaccParseTableFileUtils.fs" />
-		<Compile Include="Fsyacc\FsyaccFileRender.fs" />
-		<Compile Include="Fsyacc\FsyaccFileRules.fs" />
-		<Compile Include="Fsyacc\FsyaccFileShaking.fs" />
-		<Compile Include="Fsyacc\FsyaccRules.fs" />
-		<Compile Include="Fsyacc\FsyaccFilePrecedences.fs" />
-		<Compile Include="Fsyacc\FlatFsyaccFileRule.fs" />
+		<Compile Include="Fsyacc\RuleListUtils.fs" />
+		<Compile Include="Fsyacc\RuleSetUtils.fs" />
+		<Compile Include="Fsyacc\PrecedenceLinesUtils.fs" />
+		<Compile Include="Fsyacc\DeclarationLinesUtils.fs" />
 		<None Include="fsyacc\fsyacc.fsyacc" />
 		<Compile Include="Fsyacc\FsyaccParseTable.fs" />
 		<Compile Include="Fsyacc\FsyaccCompiler.fs" />
+		<Compile Include="Fsyacc\RawFsyaccFileRender.fs" />
 		<Compile Include="Fsyacc\RawFsyaccFileUtils.fs" />
 		<Compile Include="Fsyacc\FlatFsyaccFileUtils.fs" />
 		<Compile Include="Fsyacc\RawFsyaccFileCrewUtils.fs" />

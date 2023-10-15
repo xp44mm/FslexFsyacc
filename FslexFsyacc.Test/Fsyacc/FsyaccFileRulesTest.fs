@@ -18,7 +18,7 @@ type FsyaccFileRulesTest(output:ITestOutputHelper) =
             "AsyncArrowFunction",[
                 ["async";"AsyncArrowBindingIdentifier";"=>";"AsyncConciseBody"],"","";
                 ["CoverCallExpressionAndAsyncArrowHead";"=>";"AsyncConciseBody"],"",""]]
-        let y = FsyaccFileRules.rawToFlatRules rawRules
+        let y = RuleListUtils.ofRaw rawRules
         let e = [
             ["AsyncArrowFunction";"async";"AsyncArrowBindingIdentifier";"=>";"AsyncConciseBody"],"","";
             ["AsyncArrowFunction";"CoverCallExpressionAndAsyncArrowHead";"=>";"AsyncConciseBody"],"",""
@@ -32,7 +32,7 @@ type FsyaccFileRulesTest(output:ITestOutputHelper) =
             ["AsyncArrowFunction";"async";"AsyncArrowBindingIdentifier";"=>";"AsyncConciseBody"],"","";
             ["AsyncArrowFunction";"CoverCallExpressionAndAsyncArrowHead";"=>";"AsyncConciseBody"],"",""
             ]
-        let y = FsyaccFileRules.flatToRawRules x
+        let y = RuleListUtils.toRaw x
 
         let z = [
             "AsyncArrowFunction",[
@@ -48,7 +48,7 @@ type FsyaccFileRulesTest(output:ITestOutputHelper) =
             ["AsyncArrowFunction";"CoverCallExpressionAndAsyncArrowHead";"=>";"AsyncConciseBody"],"",""
             ]
         let y = ["AsyncArrowFunction";"async";"ArrowFormalParameters";"=>";"AsyncConciseBody"]
-        let z = x |> FsyaccFileRules.addRule(y,"","")
+        let z = x |> RuleListUtils.addRule(y,"","")
 
         let e = [
             ["AsyncArrowFunction";"async";"AsyncArrowBindingIdentifier";"=>";"AsyncConciseBody"],"","";
@@ -72,7 +72,7 @@ type FsyaccFileRulesTest(output:ITestOutputHelper) =
 
         let y = 
             e 
-            |> FsyaccFileRules.removeRule oldProd
+            |> RuleListUtils.removeRule oldProd
 
         //show y
         let x = [
@@ -94,7 +94,7 @@ type FsyaccFileRulesTest(output:ITestOutputHelper) =
 
         let y = 
             rules 
-            |> FsyaccFileRules.replaceRule oldProd (newProd,"","")
+            |> RuleListUtils.replaceRule oldProd (newProd,"","")
         //show y
         let e = [
             ["AsyncArrowFunction";"async";"AsyncArrowBindingIdentifier";"=>";"AsyncConciseBody"],"",""
@@ -112,7 +112,7 @@ type FsyaccFileRulesTest(output:ITestOutputHelper) =
         let oldProd = ["AsyncArrowFunction";"CoverCallExpressionAndAsyncArrowHead";"=>";"AsyncConciseBody"]
         let y = 
             rules
-            |> FsyaccFileRules.findRuleIndex oldProd
+            |> RuleListUtils.findRuleIndex oldProd
 
         Should.equal y 1
 
@@ -125,7 +125,7 @@ type FsyaccFileRulesTest(output:ITestOutputHelper) =
 
         let y = 
             rules
-            |> FsyaccFileRules.findRuleByName "cover"
+            |> RuleListUtils.findRuleByName "cover"
 
         Should.equal y rules.[1]
 

@@ -29,14 +29,13 @@ type ManyYaccFilesParseTableTest(output:ITestOutputHelper) =
         |> RawFsyaccFileCrewUtils.parse
         |> FlatedFsyaccFileCrewUtils.getFlatedFsyaccFileCrew
         |> FlatedFsyaccFileCrewUtils.toFlatFsyaccFile
-    let removeErrorRules =
-        let robust = set [
-            "error";
-            "recover";
-            "coming_soon";"COMING_SOON";
-            "_IS_HERE"
-            ]
-        FsyaccFileRules.removeErrorRules robust
+
+    let robust = set [
+        "error";
+        "recover";
+        "coming_soon";"COMING_SOON";
+        "_IS_HERE"
+        ]
 
     [<Fact(
     Skip="no for verify"
@@ -48,20 +47,40 @@ type ManyYaccFilesParseTableTest(output:ITestOutputHelper) =
 
         let parsFsyacc = readYacc "pars"
 
+        //let mergedRules =
+        //    [
+        //        for KeyValue(k,v) in typeAnnotWhenConstraintsFsyacc.augmentRules do
+        //            k,v
+        //        for KeyValue(k,v) in parsFsyacc.augmentRules do
+        //            k,v
+        //    ]
+        //    |> Map.ofList
 
+        //let augmentRules = 
+        //    mergedRules
+        //    |> Map.filter(fun prod _ -> 
+        //        prod 
+        //        |> ProductionUtils.isWithoutError robust)
+        //    |> RuleSetUtils.eliminateChomsky
+        //    |> Map.map (fun prod (nm,ac) ->"","")
+
+        //let sumFsyacc =
+        //    {
+        //        parsFsyacc with
+        //            augmentRules = augmentRules
+        //    }
+        let rules = 
+            typeAnnotWhenConstraintsFsyacc.rules @ parsFsyacc.rules
+            |> List.filter(fun (prod,_,_) -> 
+                prod 
+                |> ProductionUtils.isWithoutError robust)
+            |> RuleListUtils.eliminateChomsky
+            |> List.map (fun (prod,_,_) ->prod,"","")
 
         let sumFsyacc =
             {
                 parsFsyacc with
-                    rules =
-                        [
-                            yield! typeAnnotWhenConstraintsFsyacc.rules
-                            yield! parsFsyacc.rules;
-                        ]
-                        |> removeErrorRules
-                        |> FsyaccFileRules.eliminateChomsky
-                        |> List.map (fun(prod,nm,ac)->prod,"","")
-
+                    rules = rules
             }
 
         //分解到关键字表达式（含）
@@ -70,8 +89,13 @@ type ManyYaccFilesParseTableTest(output:ITestOutputHelper) =
             "topTypeWithTypeConstraints"
         ]
         let fsyacc = 
-            sumFsyacc 
-            |> FlatFsyaccFileUtils.start(s0,terminals)
+            {
+                sumFsyacc with
+                    rules = 
+                    sumFsyacc.rules
+                    |> RuleListUtils.removeNonterminals terminals
+            }
+            |> FlatFsyaccFileUtils.start s0
 
         let txt =
             fsyacc

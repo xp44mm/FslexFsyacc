@@ -44,7 +44,7 @@ type G428Test(output:ITestOutputHelper) =
 
         let src = 
             flatedFsyacc 
-            |> FlatFsyaccFileUtils.start(s0, Set.empty)
+            |> FlatFsyaccFileUtils.start s0
             |> RawFsyaccFileUtils.fromFlat
             |> RawFsyaccFileUtils.render
 
@@ -54,8 +54,11 @@ type G428Test(output:ITestOutputHelper) =
     [<Fact>]
     member _.``02 - data printer``() =
         let ptbl =     
-            let mainProductions = FsyaccFileRules.getMainProductions fsyaccCrew.flatedRules
-            let dummyTokens = FsyaccFileRules.getDummyTokens fsyaccCrew.flatedRules
+            let mainProductions = RuleListUtils.getMainProductions fsyaccCrew.flatedRules
+            let dummyTokens = 
+                fsyaccCrew.flatedRules
+                |> RuleListUtils.filterDummyProductions
+                |> Map.ofList
             EncodedParseTableCrewUtils.getEncodedParseTableCrew(
                 mainProductions,
                 dummyTokens,

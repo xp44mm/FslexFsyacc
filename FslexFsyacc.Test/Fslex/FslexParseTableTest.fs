@@ -54,7 +54,7 @@ type FslexParseTableTest(output: ITestOutputHelper) =
 
         let txt = 
             flatedFsyacc 
-            |> FlatFsyaccFileUtils.start(startSymbol, Set.empty)
+            |> FlatFsyaccFileUtils.start startSymbol
             |> RawFsyaccFileUtils.fromFlat
             |> RawFsyaccFileUtils.render
 

@@ -8,6 +8,7 @@ type FlatFsyaccFile =
     {
         header:string
         rules:list<string list*string*string>
+        //augmentRules:Map<list<string>,string*string>
         precedences:Map<string,int> // symbol -> prec level
         declarations:Map<string,string> // symbol,type
     }

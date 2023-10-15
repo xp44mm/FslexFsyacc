@@ -1,6 +1,4 @@
-﻿module FslexFsyacc.Fsyacc.FsyaccFileRender
-
-open FslexFsyacc.Runtime.RenderUtils
+﻿module FslexFsyacc.Fsyacc.RawFsyaccFileRender
 
 open System
 open System.Text.RegularExpressions
@@ -88,36 +86,3 @@ let renderTypeLine (typeArg:string, symbols:string list) =
         |> List.map renderSymbol
         |> String.concat " "
     $"%%type<{typeArg}> {symbols}"
-
-let renderFsyacc
-    (header:string                                       )
-    (rules:(string*((string list*string*string)list))list)
-    (precedences:(string*string list)list                )
-    (declarations:(string*string)list                    )
-    =
-    let h = renderHeader header
-    let r =
-        rules
-        |> List.map renderRule
-        |> String.concat "\r\n"
-
-    let p() =
-        precedences
-        |> List.map renderPrecedenceLine
-        |> String.concat "\r\n"
-
-    let d() =
-        declarations
-        |> List.map renderDec
-        |> String.concat "\r\n"
-
-    let main =
-        [
-            r
-            if precedences.IsEmpty then () else p()
-            if declarations.IsEmpty then () else d()
-        ]
-        |> String.concat "\r\n%%\r\n"
-
-    [h;main]
-    |>String.concat "\r\n"

@@ -103,7 +103,7 @@ type ProductionUtilsTest(output:ITestOutputHelper) =
             [ "(";")"]
             [ "[";"]"]
             ]
-        let y = ProductionUtils.eliminateSymbol symbol bodies body
+        let y = ProductionUtils.eliminateSymbol(symbol, bodies) body
 
         let e = [
             ["let";"{";"}";"=";"expr"];

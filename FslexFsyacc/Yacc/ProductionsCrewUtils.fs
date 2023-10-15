@@ -4,7 +4,7 @@ open FslexFsyacc.Runtime
 open FSharp.Idioms
 
 //从文法生成增广文法
-let getProductionsCrew(inputProductionList:string list list) =
+let getProductionsCrew(inputProductionList:list<Production>) =
     let startSymbol = inputProductionList.[0].[0]
 
     let mainProductions = set inputProductionList
@@ -20,10 +20,11 @@ let getProductionsCrew(inputProductionList:string list list) =
         augmentedProductions
     )
 
-let ofAugmentedProductions (augmentedProductions:Set<list<string>>) =
+let ofAugmentedProductions (augmentedProductions:Set<Production>) =
     let augProd = 
         augmentedProductions
         |> Set.minElement
+
     let startSymbol = augProd.[1]
 
     let mainProductions = 

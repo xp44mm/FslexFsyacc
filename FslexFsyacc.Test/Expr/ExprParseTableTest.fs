@@ -30,7 +30,7 @@ type ExprParseTableTest(output:ITestOutputHelper) =
         |> FlatedFsyaccFileCrewUtils.getSemanticParseTableCrew
     [<Fact>]
     member _.``00 - print rules``() =
-        for r in fsyaccCrew.rules do
+        for r in fsyaccCrew.inputRuleList do
         output.WriteLine($"{stringify r}")
 
     [<Fact>]
@@ -42,7 +42,7 @@ type ExprParseTableTest(output:ITestOutputHelper) =
 
         let src = 
             flatedFsyacc 
-            |> FlatFsyaccFileUtils.start(s0, Set.empty)
+            |> FlatFsyaccFileUtils.start s0
             |> RawFsyaccFileUtils.fromFlat
             |> RawFsyaccFileUtils.render
 

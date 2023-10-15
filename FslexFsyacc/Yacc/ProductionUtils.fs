@@ -99,7 +99,8 @@ let crosspower n (body:'a list):'a list list =
     |> List.map(fun a -> [a])
     |> loop n
 
-let eliminateSymbol (symbol:string) (bodiesOfSymbol:string list list) (body:string list) =
+/// 要消除的一个产生式
+let eliminateSymbol (symbol:string, bodiesOfSymbol:string list list) (body:string list) =
     let splitedBody = 
         split body symbol
         |> List.mapi(fun i ls -> i,ls)
@@ -145,3 +146,11 @@ let getNodes (productions:list<string list>) =
     |> Map.ofList
 
 
+/// 是否产生式包含robust中定义的符号，这些符号是错误符号
+let isWithoutError (robust:Set<string>) prod =
+    let willBeRemoved (symbol: string) =
+        robust
+        |> Set.exists(fun kw -> symbol.Contains kw)
+
+    prod 
+    |> List.forall(fun (symbol:string) -> not(willBeRemoved symbol))

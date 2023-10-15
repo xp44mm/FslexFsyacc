@@ -48,7 +48,7 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
         
         let src = 
             flatedFsyacc 
-            |> FlatFsyaccFileUtils.start(s0, Set.empty)
+            |> FlatFsyaccFileUtils.start s0
             |> RawFsyaccFileUtils.fromFlat
             |> RawFsyaccFileUtils.render
 

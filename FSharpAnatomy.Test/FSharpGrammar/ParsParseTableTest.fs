@@ -90,14 +90,14 @@ type ParsParseTableTest(output:ITestOutputHelper) =
         fsyaccCrew
         |> FlatedFsyaccFileCrewUtils.getSemanticParseTableCrew
 
-    let removeErrorRules =
-        let robust = set [
-            "error";
-            "recover";
-            "coming_soon";"COMING_SOON";
-            "_IS_HERE"
-            ]
-        FsyaccFileRules.removeErrorRules robust
+    //let removeErrorRules =
+    let robust = set [
+        "error";
+        "recover";
+        "coming_soon";"COMING_SOON";
+        "_IS_HERE"
+        ]
+    //ProductionUtils.isWithoutError robust
 
     [<Fact(
     Skip="no for verify"
@@ -135,24 +135,24 @@ type ParsParseTableTest(output:ITestOutputHelper) =
     member _.``001 - identOrOp test``() =
         let s0 = "identOrOp"
 
-        //分解到关键字表达式（含）
-        let terminals = set []
         let flatedFsyacc =
             fsyaccCrew
             |> FlatedFsyaccFileCrewUtils.toFlatFsyaccFile
 
         let flat = 
-            flatedFsyacc 
-            |> FlatFsyaccFileUtils.start(s0,terminals)
+            flatedFsyacc
+            |> FlatFsyaccFileUtils.start s0
 
         let flat =
             {
                 flat with
                     rules = 
                         flat.rules
-                        |> removeErrorRules
-                        |> FsyaccFileRules.eliminateChomsky
-                        |> List.map (fun(prod,nm,ac)->prod,"","")
+                        |> List.filter(fun (prod,_,_) -> 
+                            prod 
+                            |> ProductionUtils.isWithoutError robust)
+                        |> RuleListUtils.eliminateChomsky
+                        |> List.map (fun (prod,_,_) ->prod,"","")
             }
 
         let txt =
@@ -170,25 +170,33 @@ type ParsParseTableTest(output:ITestOutputHelper) =
     member _.``002 - path test``() =
         let s0 = "path"
 
-        //分解到关键字表达式（含）
-        let terminals = set []
-
         let flatedFsyacc =
             fsyaccCrew
             |> FlatedFsyaccFileCrewUtils.toFlatFsyaccFile
 
         let flat = 
             flatedFsyacc 
-            |> FlatFsyaccFileUtils.start(s0,terminals)
+            |> FlatFsyaccFileUtils.start s0
+
+        //let augmentRules = 
+        //    flat.augmentRules
+        //    |> Map.filter(fun prod _ -> 
+        //        prod 
+        //        |> ProductionUtils.isWithoutError robust)
+        //    |> RuleSetUtils.eliminateChomsky
+        //    |> Map.map (fun prod (nm,ac) ->"","")
+        let rules = 
+            flat.rules
+            |> List.filter(fun (prod,_,_) -> 
+                prod 
+                |> ProductionUtils.isWithoutError robust)
+            |> RuleListUtils.eliminateChomsky
+            |> List.map (fun (prod,_,_) ->prod,"","")
 
         let flat =
             {
                 flat with
-                    rules = 
-                        flat.rules
-                        |> removeErrorRules
-                        |> FsyaccFileRules.eliminateChomsky
-                        |> List.map (fun(prod,nm,ac)->prod,"","")
+                    rules = rules
             }
 
         let txt =
@@ -206,25 +214,33 @@ type ParsParseTableTest(output:ITestOutputHelper) =
     member _.``003 - rawConstant test``() =
         let s0 = "rawConstant"
 
-        //分解到关键字表达式（含）
-        let terminals = set []
-
         let flatedFsyacc =
             fsyaccCrew
             |> FlatedFsyaccFileCrewUtils.toFlatFsyaccFile
 
         let flat = 
             flatedFsyacc 
-            |> FlatFsyaccFileUtils.start(s0,terminals)
+            |> FlatFsyaccFileUtils.start s0
+
+        //let augmentRules = 
+        //    flat.augmentRules
+        //    |> Map.filter(fun prod _ -> 
+        //        prod 
+        //        |> ProductionUtils.isWithoutError robust)
+        //    |> RuleSetUtils.eliminateChomsky
+        //    |> Map.map (fun prod (nm,ac) ->"","")
+        let rules = 
+            flat.rules
+            |> List.filter(fun (prod,_,_) -> 
+                prod 
+                |> ProductionUtils.isWithoutError robust)
+            |> RuleListUtils.eliminateChomsky
+            |> List.map (fun (prod,_,_) ->prod,"","")
 
         let flat =
             {
                 flat with
-                    rules = 
-                        flat.rules
-                        |> removeErrorRules
-                        |> FsyaccFileRules.eliminateChomsky
-                        |> List.map (fun(prod,nm,ac)->prod,"","")
+                    rules = rules
             }
 
         let txt =
@@ -253,17 +269,34 @@ type ParsParseTableTest(output:ITestOutputHelper) =
             |> FlatedFsyaccFileCrewUtils.toFlatFsyaccFile
 
         let flat = 
-            flatedFsyacc 
-            |> FlatFsyaccFileUtils.start(s0,terminals)
+            {
+                flatedFsyacc with
+                    rules = 
+                        flatedFsyacc.rules 
+                        |> RuleListUtils.removeNonterminals terminals
+            }
+            |> FlatFsyaccFileUtils.start s0
+
+        //let augmentRules = 
+        //    flat.augmentRules
+        //    |> Map.filter(fun prod _ -> 
+        //        prod 
+        //        |> ProductionUtils.isWithoutError robust)
+        //    |> RuleSetUtils.eliminateChomsky
+        //    |> Map.map (fun prod (nm,ac) ->"","")
+
+        let rules = 
+            flat.rules
+            |> List.filter(fun (prod,_,_) -> 
+                prod 
+                |> ProductionUtils.isWithoutError robust)
+            |> RuleListUtils.eliminateChomsky
+            |> List.map (fun (prod,_,_) ->prod,"","")
 
         let flat =
             {
                 flat with
-                    rules = 
-                        flat.rules
-                        |> removeErrorRules
-                        |> FsyaccFileRules.eliminateChomsky
-                        |> List.map (fun(prod,nm,ac)->prod,"","")
+                    rules = rules
             }
 
         let txt =
@@ -290,17 +323,39 @@ type ParsParseTableTest(output:ITestOutputHelper) =
             |> FlatedFsyaccFileCrewUtils.toFlatFsyaccFile
 
         let flat = 
-            flatedFsyacc 
-            |> FlatFsyaccFileUtils.start(s0,terminals)
+            {
+                flatedFsyacc with
+                    rules = 
+                    flatedFsyacc.rules
+                    |> RuleListUtils.removeNonterminals terminals
+            }
+            |> FlatFsyaccFileUtils.start s0
+
+        //let augmentRules = 
+        //    flat.augmentRules
+        //    |> Map.filter(fun prod _ -> 
+        //        prod 
+        //        |> ProductionUtils.isWithoutError robust)
+        //    |> RuleSetUtils.eliminateChomsky
+        //    |> Map.map (fun prod (nm,ac) ->"","")
+
+        //let flat =
+        //    {
+        //        flat with
+        //            augmentRules = augmentRules
+        //    }
+        let rules = 
+            flat.rules
+            |> List.filter(fun (prod,_,_) -> 
+                prod 
+                |> ProductionUtils.isWithoutError robust)
+            |> RuleListUtils.eliminateChomsky
+            |> List.map (fun (prod,_,_) ->prod,"","")
 
         let flat =
             {
                 flat with
-                    rules = 
-                        flat.rules
-                        |> removeErrorRules
-                        |> FsyaccFileRules.eliminateChomsky
-                        |> List.map (fun(prod,nm,ac)->prod,"","")
+                    rules = rules
             }
 
         let txt =
