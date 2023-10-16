@@ -7,85 +7,52 @@ open FSharp.Idioms
 open FSharp.Literals.Literal
 open System
 
-/////
-//let ofRaw (rules:(string*(list<list<string>*string*string>))list) =
-//    rules
-//    |> List.collect(fun(lhs,bodies)->
-//        bodies
-//        |> List.map(fun (body,name,semantic)->
-//            lhs::body,name,semantic
-//        )
-//    )
-//    |> Set.ofList
+/// get Augment Rules
+let ofFlat (rules:list<list<string>*string*string>) =
+    let p0,_,_ = rules.[0]
+    let augmentRule = ["";p0.Head],"","s0"
 
-///// 对相同lhs的rule合并，仅此
-//let toRaw (rules:Set<list<string>*string*string>) =
-//    rules
-//    |> Seq.groupBy(fun(prod,_,_)->prod.Head) //lhs
-//    |> Seq.map(fun(lhs,groups)->
-//        let rhs =
-//            groups
-//            |> Seq.map(fun(prod,name,sem) ->
-//                prod.Tail,name,sem
-//            )
-//            |> Seq.toList
-//        lhs,rhs
-//    )
-//    |> Seq.toList
+    rules
+    |> Set.ofList
+    |> Set.add augmentRule
 
-//let ofMainRules (mainRules:list<Production*string*string>) =
-//    let p0,_,_ = mainRules.[0]
-//    let startSymbol = p0.[0]
+/// get Augment Rules
+let ofRaw (rules:(string*(list<list<string>*string*string>))list) =
+    rules
+    |> RuleListUtils.ofRaw
+    |> ofFlat
 
-//    mainRules
-//    |> List.map(fun (p,d,s) -> p,(d,s))
-//    |> Map.ofList
-//    |> Map.add ["";startSymbol] ("","s0")
+/// 不行，用start然后在RuleListUtils中toRaw，问题是Rule的顺序
+let toRaw (rules:Set<list<string>*string*string>) =
+    let augmentRule = rules |> Set.minElement
+    
+    rules
+    |> Set.remove augmentRule
+    |> Set.groupBy(fun(prod,_,_)->prod.Head) //lhs
+    |> Set.map(fun(lhs,groups)->
+        let rhs =
+            groups
+            |> Set.map(fun(prod,name,sem) ->
+                prod.Tail,name,sem
+            )
+        lhs,rhs
+    )
 
-//let getMainRules (augmentRules:Map<Production,string*string>) =
-//    let augProds = 
-//        augmentRules
-//        |> Map.keys
+let getDummyTokens (augmentRules:Set<Production*string*string>) =
+    augmentRules
+    |> Set.filter(fun (prod,dummy,act) -> dummy > "")
+    |> Set.map(Triple.firstTwo)
+    |> Map.ofSeq
 
-//    let crew = 
-//        augProds
-//        |> ProductionsCrewUtils.ofAugmentedProductions
+let getStartSymbol (augmentRules:Set<Production*string*string>) =
+    augmentRules.MinimumElement
+    |> Triple.first
+    |> List.find(fun s -> s > "")
 
-//    let rules =
-//        crew.inputProductionList
-//        |> List.map(fun prod -> 
-//            let dummy,semantic = augmentRules.[prod]
-//            prod,dummy,semantic)
-//    rules
-
-//let filterDummyProductions (augmentRules:Map<Production,string*string>) =
-//    augmentRules
-//    |> Map.filter(fun prod (dummy,act) -> dummy > "")
-//    |> Map.map (fun prod (dummy,act) -> dummy)
-
-//let getSemanticRules (augmentRules:Map<Production,string*string>) = 
-//    augmentRules 
-//    |> Map.filter(fun prod _ -> prod.[0] > "")
-//    |> Map.map (fun _ (_,s) -> s)
-
-//let removeErrorRules (robust:Set<string>) (rules:Map<Production,string*string>) =
-//    rules
-//    |> Map.filter(fun prod _ -> ProductionUtils.isWithoutError robust prod)
-
-//let eliminateChomsky (augmentRules:Map<Production,string*string>) =
-//    let productions =
-//        augmentRules
-//        |> Map.keys
-//        |> Set.toList
-
-//    let newProductions =
-//        productions
-//        |> ProductionListUtils.eliminateChomsky
-
-//    newProductions
-//    |> List.map(fun prod -> prod,augmentRules.[prod])
-//    |> Map.ofList
-
-
-
+let findRuleByDummyToken
+    (dummyToken:string)
+    (augmentRules:Set<list<string>*string*string>)
+    =
+    augmentRules
+    |> Seq.find(fun(_,tok,_)->tok=dummyToken)
 

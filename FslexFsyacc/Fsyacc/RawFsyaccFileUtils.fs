@@ -6,9 +6,9 @@ let parse text =
     |> FsyaccCompiler.compile
 
 let toFlated (raw:RawFsyaccFile) =
-    let startSymbol,_ = raw.rules.[0]
+    let startSymbol,_ = raw.inputRules.[0]
     let flatedRules =
-        raw.rules
+        raw.inputRules
         |> RuleListUtils.ofRaw
 
     let augRule = ["";startSymbol],"","s0"
@@ -19,11 +19,11 @@ let toFlated (raw:RawFsyaccFile) =
     //    |> Map.ofList
 
     let precedences =
-        raw.precedences
+        raw.precedenceLines
         |> PrecedenceLinesUtils.toMap
 
     let declarations = 
-        raw.declarations
+        raw.declarationLines
         |> DeclarationLinesUtils.toMap
 
     id<FlatFsyaccFile> {
@@ -48,10 +48,10 @@ let fromFlat (flat:FlatFsyaccFile) =
         |> DeclarationLinesUtils.ofMap
 
     id<RawFsyaccFile>{
-        rules = rules
-        precedences = precedences
+        inputRules = rules
+        precedenceLines = precedences
         header = flat.header
-        declarations = declarations
+        declarationLines = declarations
     }
 
 ///打印`*.fsyacc`文件
@@ -61,17 +61,17 @@ let render (fsyacc:RawFsyaccFile) =
         |> RawFsyaccFileRender.renderHeader 
 
     let r =
-        fsyacc.rules
+        fsyacc.inputRules
         |> List.map RawFsyaccFileRender.renderRule
         |> String.concat "\r\n"
 
     let p() =
-        fsyacc.precedences
+        fsyacc.precedenceLines
         |> List.map RawFsyaccFileRender.renderPrecedenceLine
         |> String.concat "\r\n"
 
     let d() =
-        fsyacc.declarations
+        fsyacc.declarationLines
         |> List.map RawFsyaccFileRender.renderTypeLine
         |> String.concat "\r\n"
 
@@ -79,8 +79,8 @@ let render (fsyacc:RawFsyaccFile) =
     let rpd =
         [
             r
-            if fsyacc.precedences.IsEmpty then () else p()
-            if fsyacc.declarations.IsEmpty then () else d()
+            if fsyacc.precedenceLines.IsEmpty then () else p()
+            if fsyacc.declarationLines.IsEmpty then () else d()
         ]
         |> String.concat "\r\n%%\r\n"
 

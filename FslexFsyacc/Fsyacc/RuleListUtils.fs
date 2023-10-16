@@ -31,23 +31,14 @@ let toRaw (rules:list<list<string>*string*string>) =
         lhs,rhs
     )
 
-/// 排序
-let normRules (rules:list<list<string>*string*string>) =
-    rules
-    |> Set.ofList
-    |> Set.toList
-
-let filterDummyProductions (rules:list<list<string>*string*string>) =
+let getDummyTokens (rules:list<list<string>*string*string>) =
     rules
     |> List.filter(fun (prod,dummy,act) -> dummy > "")
     |> List.map(Triple.firstTwo)
-
-let getMainProductions (rules:list<list<string>*string*string>) =
-    rules 
-    |> List.map Triple.first
+    |> Map.ofList
 
 let getSemanticRules (rules:list<list<string>*string*string>) = 
-    rules 
+    rules
     |> List.map Triple.ends
 
 let getStartSymbol (rules:list<list<string>*string*string>) =
@@ -68,12 +59,12 @@ let removeRule
     rules
     |> List.filter(fun(x,_,_) -> x<>production)
 
-let findRuleIndex
-    (production:list<string>)
+let findRuleByDummyToken
+    (dummyToken:string)
     (rules:list<list<string>*string*string>)
     =
     rules
-    |> List.findIndex(fun(p,_,_)->p=production)
+    |> List.find(fun(_,tok,_)->tok=dummyToken)
 
 /// 保持替换的位置
 let replaceRule
@@ -105,22 +96,6 @@ let replaceRule
         newRule
         yield! y.Tail
     ]
-
-let findRuleByName
-    (name:string)
-    (rules:list<list<string>*string*string>)
-    =
-    rules
-    |> List.find(fun(_,x,_)->x=name)
-
-///检查rules中是否有重复的规则
-let duplicateRule
-    (rules:list<list<string>*string*string>)
-    =
-    rules
-    |> List.groupBy (fun(rule,_,_)->rule)
-    |> List.map(fun(rule,group)->rule,group.Length)
-    |> List.filter(fun(r,c)->c>1)
 
 let removeErrorRules (robust:Set<string>) (rules:list<list<string>*string*string>) =
     let willBeRemoved (symbol: string) =
@@ -201,3 +176,12 @@ let removeNonterminals
             prod.Head
             |> excludeSymbols.Contains
             |> not)
+///检查rules中是否有重复的规则
+let duplicateRule
+    (rules:list<list<string>*string*string>)
+    =
+    rules
+    |> List.groupBy (fun(rule,_,_)->rule)
+    |> List.map(fun(rule,group)->rule,group.Length)
+    |> List.filter(fun(r,c)->c>1)
+

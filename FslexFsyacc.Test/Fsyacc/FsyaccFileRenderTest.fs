@@ -39,6 +39,6 @@ rec? :
 
         let outp = fsyacc |> RawFsyaccFileUtils.render
 
-        output.WriteLine(stringify fsyacc.rules)
+        output.WriteLine(stringify fsyacc.inputRules)
         output.WriteLine(outp)
         //()

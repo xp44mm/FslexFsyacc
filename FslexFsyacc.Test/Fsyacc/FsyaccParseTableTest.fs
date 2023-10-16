@@ -76,7 +76,7 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
 
         // production -> %prec
         let pprods =
-            ProductionUtils.precedenceOfProductions tblCrew.terminals productions
+            ProductionListUtils.precedenceOfProductions tblCrew.terminals productions
 
         //优先级应该据此结果给出，不能少，也不应该多。
         let y = []
@@ -133,8 +133,14 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
             List.map fst FsyaccParseTable.rules
         Should.equal prodsFsyacc prodsParseTable
 
+        let header,semans =
+            File.ReadAllText(parseTblPath, Encoding.UTF8)
+            |> FSharp.Compiler.SyntaxTreeX.SourceCodeParser.getHeaderSemansFromFSharp 2
+
         let headerFromFsyacc =
             FSharp.Compiler.SyntaxTreeX.Parser.getDecls("header.fsx",tblCrew.header)
+
+        Should.equal headerFromFsyacc header
 
         let semansFsyacc =
             let mappers = 
@@ -143,10 +149,5 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
                 |> FsyaccParseTableFileUtils.generateMappers
             FSharp.Compiler.SyntaxTreeX.SourceCodeParser.semansFromMappers mappers
 
-        let header,semans =
-            File.ReadAllText(parseTblPath, Encoding.UTF8)
-            |> FSharp.Compiler.SyntaxTreeX.SourceCodeParser.getHeaderSemansFromFSharp 2
-
-        Should.equal headerFromFsyacc header
         Should.equal semansFsyacc semans
 

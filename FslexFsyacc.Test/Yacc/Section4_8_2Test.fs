@@ -34,7 +34,7 @@ type Section4_8_2Test(output:ITestOutputHelper) =
 
         //产生式的优先级操作符: production -> symbol
         let productionSymbols = 
-            ProductionUtils.precedenceOfProductions
+            ProductionListUtils.precedenceOfProductions
                 collection.terminals
                 productions
 

@@ -13,6 +13,7 @@ open System.Text
 open System.Text.RegularExpressions
 
 open FSharp.xUnit
+open FSharp.Idioms
 open FSharp.Literals
 open FSharp.Literals.Literal
 
@@ -54,11 +55,14 @@ type G428Test(output:ITestOutputHelper) =
     [<Fact>]
     member _.``02 - data printer``() =
         let ptbl =     
-            let mainProductions = RuleListUtils.getMainProductions fsyaccCrew.flatedRules
+            let mainProductions = 
+                fsyaccCrew.flatedRules
+                |> List.map Triple.first
+
             let dummyTokens = 
                 fsyaccCrew.flatedRules
-                |> RuleListUtils.filterDummyProductions
-                |> Map.ofList
+                |> RuleListUtils.getDummyTokens
+
             EncodedParseTableCrewUtils.getEncodedParseTableCrew(
                 mainProductions,
                 dummyTokens,

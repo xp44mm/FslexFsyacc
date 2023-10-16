@@ -21,52 +21,6 @@ let revTerminalsOfProduction (terminals:Set<string>) (production:string list) =
             else loop revls t
     loop [] production.Tail
 
-/// 产生式优先级%prec命名的提示
-let precedenceOfProductions (terminals:Set<string>) (productions:Set<string list>) =
-    let productions =
-        productions
-        |> Set.map(fun prod ->
-            match
-                revTerminalsOfProduction terminals prod
-                |> List.truncate 1
-            with rightmost -> prod,rightmost
-        )
-    let nonterminalProductions,terminalProductions =
-        productions
-        |> Seq.toList
-        |> List.partition(fun(prod, maybeTerminal)->
-            maybeTerminal.IsEmpty
-        )
-    let nonterminalProductions =
-        nonterminalProductions
-        |> List.map(fun(prod,_)-> 
-            // head space be used to sort first
-            prod," %prec is required!")
-        |> Set.ofList
-    let terminalProductions =
-        terminalProductions
-        |> List.map(fun(prod,maybeTerminal)-> prod,maybeTerminal.[0])
-        |> List.groupBy(fun(prod,terminal)-> terminal)
-        |> List.map(fun(terminal,items)->
-            match items.Length with
-            | 1 ->
-                items
-            | len ->
-                items
-                |> List.mapi(fun i (prod,term) -> 
-                    let tip = 
-                        // head space be used to sort first
-                        $" {term} ({i+1} of {len})"
-                    prod,tip
-                    )
-        )
-        |> List.concat
-    let productions = [
-        yield! nonterminalProductions;
-        yield! terminalProductions]
-    productions
-    |> List.sortBy snd
-
 let split (prodBody:'a list) (symbol:'a):'a list list =
     let newGroups groups group =
         match group with
@@ -145,8 +99,8 @@ let getNodes (productions:list<string list>) =
     )
     |> Map.ofList
 
-
 /// 是否产生式包含robust中定义的符号，这些符号是错误符号
+[<System.ObsoleteAttribute("without")>]
 let isWithoutError (robust:Set<string>) prod =
     let willBeRemoved (symbol: string) =
         robust
@@ -154,3 +108,11 @@ let isWithoutError (robust:Set<string>) prod =
 
     prod 
     |> List.forall(fun (symbol:string) -> not(willBeRemoved symbol))
+
+///产生式prod不带有symbols中的任何元素
+let without (symbols:Set<string>) prod =
+    prod
+    |> Set.ofList
+    |> Set.intersect symbols
+    |> Set.isEmpty
+

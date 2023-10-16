@@ -10,8 +10,7 @@ let getSemanticParseTableCrew (this:FlatedFsyaccFileCrew) =
 
     let dummyTokens = 
         this.flatedRules
-        |> RuleListUtils.filterDummyProductions
-        |> Map.ofList
+        |> RuleListUtils.getDummyTokens
 
     let semanticList = 
         this.flatedRules 
@@ -27,13 +26,13 @@ let getSemanticParseTableCrew (this:FlatedFsyaccFileCrew) =
 
 let getFlatedFsyaccFileCrew (raw:RawFsyaccFileCrew) =
     let startSymbol,_ = raw.inputRuleList.[0]
-    let startRule = ["";startSymbol],"","s0"
+    let augmentRule = ["";startSymbol],"","s0"
     let flatedRules =
         raw.inputRuleList
         |> RuleListUtils.ofRaw
 
     let augmentRules =
-        startRule::flatedRules
+        augmentRule::flatedRules
         |> List.map(fun(prod,dummy,semantic)-> prod,(dummy,semantic))
         |> Map.ofList
 

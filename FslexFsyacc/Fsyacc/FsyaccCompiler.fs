@@ -65,4 +65,4 @@ let compile2 (inputText:string) =
             FsyaccParseTable.unboxRoot lxm
         | _ ->
             failwith $"{stringify states}"
-    RawFsyaccFileCrew(inputText,tokens,fsyacc.header,fsyacc.rules,fsyacc.precedences,fsyacc.declarations)
+    RawFsyaccFileCrew(inputText,tokens,fsyacc.header,fsyacc.inputRules,fsyacc.precedenceLines,fsyacc.declarationLines)

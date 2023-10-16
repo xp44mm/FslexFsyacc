@@ -70,7 +70,7 @@ type PostfixTyparDeclsParseTableTest (output:ITestOutputHelper) =
             AmbiguousCollectionUtils.collectConflictedProductions tblCrew.conflictedItemCores
 
         let pprods = 
-            ProductionUtils.precedenceOfProductions terminals productions
+            ProductionListUtils.precedenceOfProductions terminals productions
 
         Should.equal [] pprods
 

@@ -103,7 +103,7 @@ type FslexParseTableTest(output: ITestOutputHelper) =
 
         // production -> %prec
         let pprods =
-            ProductionUtils.precedenceOfProductions tblCrew.terminals productions
+            ProductionListUtils.precedenceOfProductions tblCrew.terminals productions
 
         //优先级应该据此结果给出，不能少，也不应该多。
         let y =

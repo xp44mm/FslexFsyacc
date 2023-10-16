@@ -94,6 +94,53 @@ let extractSymbols (start:string) (productions:list<list<string>>) =
         ||> List.depthFirstSort
     symbols
 
+/// 产生式优先级%prec命名的提示
+let precedenceOfProductions (terminals:Set<string>) (productions:Set<string list>) =
+    let productions =
+        productions
+        |> Set.map(fun prod ->
+            match
+                prod
+                |> ProductionUtils.revTerminalsOfProduction terminals 
+                |> List.truncate 1
+            with rightmost -> prod,rightmost
+        )
+    let nonterminalProductions,terminalProductions =
+        productions
+        |> Seq.toList
+        |> List.partition(fun(prod, maybeTerminal)->
+            maybeTerminal.IsEmpty
+        )
+    let nonterminalProductions =
+        nonterminalProductions
+        |> List.map(fun(prod,_)-> 
+            // head space be used to sort first
+            prod," %prec is required!")
+        |> Set.ofList
+    let terminalProductions =
+        terminalProductions
+        |> List.map(fun(prod,maybeTerminal)-> prod,maybeTerminal.[0])
+        |> List.groupBy(fun(prod,terminal)-> terminal)
+        |> List.map(fun(terminal,items)->
+            match items.Length with
+            | 1 ->
+                items
+            | len ->
+                items
+                |> List.mapi(fun i (prod,term) -> 
+                    let tip = 
+                        // head space be used to sort first
+                        $" {term} ({i+1} of {len})"
+                    prod,tip
+                    )
+        )
+        |> List.concat
+    let productions = [
+        yield! nonterminalProductions;
+        yield! terminalProductions]
+    productions
+    |> List.sortBy snd
+
 
 
 

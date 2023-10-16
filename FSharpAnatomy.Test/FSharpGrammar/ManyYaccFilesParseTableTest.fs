@@ -73,7 +73,7 @@ type ManyYaccFilesParseTableTest(output:ITestOutputHelper) =
             typeAnnotWhenConstraintsFsyacc.rules @ parsFsyacc.rules
             |> List.filter(fun (prod,_,_) -> 
                 prod 
-                |> ProductionUtils.isWithoutError robust)
+                |> ProductionUtils.without robust)
             |> RuleListUtils.eliminateChomsky
             |> List.map (fun (prod,_,_) ->prod,"","")
 

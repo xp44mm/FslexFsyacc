@@ -47,7 +47,7 @@ type Section4_8_1Test(output:ITestOutputHelper) =
 
         //产生式的优先级操作符
         let operators = 
-            ProductionUtils.precedenceOfProductions 
+            ProductionListUtils.precedenceOfProductions 
                 collection.terminals 
                 productions
             

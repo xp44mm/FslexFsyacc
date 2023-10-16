@@ -3,8 +3,8 @@
 type RawFsyaccFile = 
     {
         header:string
-        rules:(string*((string list*string*string)list))list
-        precedences:(string*string list)list
-        declarations:(string*string list)list
+        inputRules:(string*((string list*string*string)list))list
+        precedenceLines:(string*string list)list
+        declarationLines:(string*string list)list
     }
 

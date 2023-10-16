@@ -18,8 +18,6 @@ let semansFromMappers mappers =
         )
     bodies
 
-//let skip_count = 2
-
 let fromFSharp skip_count decls =
     let rec loop acc inps =
         match inps with

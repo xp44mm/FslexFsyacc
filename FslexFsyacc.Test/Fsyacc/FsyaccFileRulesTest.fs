@@ -103,20 +103,6 @@ type FsyaccFileRulesTest(output:ITestOutputHelper) =
         Should.equal e y
 
     [<Fact>]
-    member _.``15 - findRule``() =
-        let rules = [
-            ["AsyncArrowFunction";"async";"AsyncArrowBindingIdentifier";"=>";"AsyncConciseBody"],"","";
-            ["AsyncArrowFunction";"CoverCallExpressionAndAsyncArrowHead";"=>";"AsyncConciseBody"],"",""
-            ]
-
-        let oldProd = ["AsyncArrowFunction";"CoverCallExpressionAndAsyncArrowHead";"=>";"AsyncConciseBody"]
-        let y = 
-            rules
-            |> RuleListUtils.findRuleIndex oldProd
-
-        Should.equal y 1
-
-    [<Fact>]
     member _.``16 - findRuleByName``() =
         let rules = [
             ["AsyncArrowFunction";"async";"AsyncArrowBindingIdentifier";"=>";"AsyncConciseBody"],"","";
@@ -125,7 +111,7 @@ type FsyaccFileRulesTest(output:ITestOutputHelper) =
 
         let y = 
             rules
-            |> RuleListUtils.findRuleByName "cover"
+            |> RuleListUtils.findRuleByDummyToken "cover"
 
         Should.equal y rules.[1]
 

@@ -92,7 +92,7 @@ type BoundedParseTableTest(output: ITestOutputHelper) =
 
         // production -> %prec
         let pprods =
-            ProductionUtils.precedenceOfProductions collection.terminals productions
+            ProductionListUtils.precedenceOfProductions collection.terminals productions
 
         //优先级应该据此结果给出，不能少，也不应该多。
         let y = []

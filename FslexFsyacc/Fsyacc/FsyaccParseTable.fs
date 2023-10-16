@@ -9,9 +9,9 @@ let rules:(string list*(obj list->obj))list = [
         let result:RawFsyaccFile =
             {
                 header= s0;
-                rules= List.rev s1;
-                precedences= [];
-                declarations= []
+                inputRules= List.rev s1;
+                precedenceLines= [];
+                declarationLines= []
             }
         box result
     ["file";"HEADER";"{rule+}";"%%";"{precedence+}";"{\"%%\"?}"],fun(ss:obj list)->
@@ -21,9 +21,9 @@ let rules:(string list*(obj list->obj))list = [
         let result:RawFsyaccFile =
             {
                 header= s0;
-                rules= List.rev s1;
-                precedences= List.rev s3;
-                declarations= []
+                inputRules= List.rev s1;
+                precedenceLines= List.rev s3;
+                declarationLines= []
             }
         box result
     ["file";"HEADER";"{rule+}";"%%";"{declaration+}";"{\"%%\"?}"],fun(ss:obj list)->
@@ -33,9 +33,9 @@ let rules:(string list*(obj list->obj))list = [
         let result:RawFsyaccFile =
             {
                 header= s0;
-                rules= List.rev s1;
-                precedences= [];
-                declarations= List.rev s3
+                inputRules= List.rev s1;
+                precedenceLines= [];
+                declarationLines= List.rev s3
             }
         box result
     ["file";"HEADER";"{rule+}";"%%";"{precedence+}";"%%";"{declaration+}";"{\"%%\"?}"],fun(ss:obj list)->
@@ -46,9 +46,9 @@ let rules:(string list*(obj list->obj))list = [
         let result:RawFsyaccFile =
             {
                 header= s0;
-                rules= List.rev s1;
-                precedences= List.rev s3;
-                declarations= List.rev s5
+                inputRules= List.rev s1;
+                precedenceLines= List.rev s3;
+                declarationLines= List.rev s5
             }
         box result
     ["{rule+}";"rule"],fun(ss:obj list)->
