@@ -4,34 +4,34 @@
 file :
     | HEADER rule+ "%%"? {
         {
-            header= s0;
-            rules= List.rev s1;
-            precedences= [];
-            declarations= []
+            header = s0
+            inputRules = List.rev s1
+            precedenceLines = []
+            declarationLines = []
         }
     }
     | HEADER rule+ "%%" precedence+ "%%"? {
         {
-            header= s0;
-            rules= List.rev s1;
-            precedences= List.rev s3;
-            declarations= []
+            header = s0
+            inputRules = List.rev s1
+            precedenceLines = List.rev s3
+            declarationLines = []
         }
     }
     | HEADER rule+ "%%" declaration+ "%%"? {
         {
-            header= s0;
-            rules= List.rev s1;
-            precedences= [];
-            declarations= List.rev s3
+            header = s0
+            inputRules = List.rev s1
+            precedenceLines = []
+            declarationLines = List.rev s3
         }
     }
     | HEADER rule+ "%%" precedence+ "%%" declaration+ "%%"? {
         {
-            header= s0;
-            rules= List.rev s1;
-            precedences= List.rev s3;
-            declarations= List.rev s5
+            header = s0
+            inputRules = List.rev s1
+            precedenceLines = List.rev s3
+            declarationLines = List.rev s5
         }
     }
 rule+ :

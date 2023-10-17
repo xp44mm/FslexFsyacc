@@ -8,10 +8,10 @@ let rules:(string list*(obj list->obj))list = [
         let s1 = unbox<(string*((string list*string*string)list))list> ss.[1]
         let result:RawFsyaccFile =
             {
-                header= s0;
-                inputRules= List.rev s1;
-                precedenceLines= [];
-                declarationLines= []
+                header = s0
+                inputRules = List.rev s1
+                precedenceLines = []
+                declarationLines = []
             }
         box result
     ["file";"HEADER";"{rule+}";"%%";"{precedence+}";"{\"%%\"?}"],fun(ss:obj list)->
@@ -20,10 +20,10 @@ let rules:(string list*(obj list->obj))list = [
         let s3 = unbox<(string*string list)list> ss.[3]
         let result:RawFsyaccFile =
             {
-                header= s0;
-                inputRules= List.rev s1;
-                precedenceLines= List.rev s3;
-                declarationLines= []
+                header = s0
+                inputRules = List.rev s1
+                precedenceLines = List.rev s3
+                declarationLines = []
             }
         box result
     ["file";"HEADER";"{rule+}";"%%";"{declaration+}";"{\"%%\"?}"],fun(ss:obj list)->
@@ -32,10 +32,10 @@ let rules:(string list*(obj list->obj))list = [
         let s3 = unbox<(string*string list)list> ss.[3]
         let result:RawFsyaccFile =
             {
-                header= s0;
-                inputRules= List.rev s1;
-                precedenceLines= [];
-                declarationLines= List.rev s3
+                header = s0
+                inputRules = List.rev s1
+                precedenceLines = []
+                declarationLines = List.rev s3
             }
         box result
     ["file";"HEADER";"{rule+}";"%%";"{precedence+}";"%%";"{declaration+}";"{\"%%\"?}"],fun(ss:obj list)->
@@ -45,10 +45,10 @@ let rules:(string list*(obj list->obj))list = [
         let s5 = unbox<(string*string list)list> ss.[5]
         let result:RawFsyaccFile =
             {
-                header= s0;
-                inputRules= List.rev s1;
-                precedenceLines= List.rev s3;
-                declarationLines= List.rev s5
+                header = s0
+                inputRules = List.rev s1
+                precedenceLines = List.rev s3
+                declarationLines = List.rev s5
             }
         box result
     ["{rule+}";"rule"],fun(ss:obj list)->

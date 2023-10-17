@@ -99,16 +99,6 @@ let getNodes (productions:list<string list>) =
     )
     |> Map.ofList
 
-/// 是否产生式包含robust中定义的符号，这些符号是错误符号
-[<System.ObsoleteAttribute("without")>]
-let isWithoutError (robust:Set<string>) prod =
-    let willBeRemoved (symbol: string) =
-        robust
-        |> Set.exists(fun kw -> symbol.Contains kw)
-
-    prod 
-    |> List.forall(fun (symbol:string) -> not(willBeRemoved symbol))
-
 ///产生式prod不带有symbols中的任何元素
 let without (symbols:Set<string>) prod =
     prod
