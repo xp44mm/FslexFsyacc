@@ -53,6 +53,7 @@
 		<Compile Include="Yacc\FollowFactory.fs" />
 		<Compile Include="Yacc\PrecedeFactory.fs" />
 		<Compile Include="Yacc\ProductionListUtils.fs" />
+		<Compile Include="Yacc\ProductionSetUtils.fs" />
 		<Compile Include="Yacc\ClosureOperators.fs" />
 		<Compile Include="Yacc\KernelUtils.fs" />
 		<Compile Include="Yacc\AmbiguityEliminator.fs" />

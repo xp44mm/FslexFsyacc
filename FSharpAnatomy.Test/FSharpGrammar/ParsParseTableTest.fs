@@ -273,7 +273,7 @@ type ParsParseTableTest(output:ITestOutputHelper) =
                 flatedFsyacc with
                     rules = 
                         flatedFsyacc.rules 
-                        |> RuleListUtils.removeNonterminals terminals
+                        |> RuleListUtils.removeHeads terminals
             }
             |> FlatFsyaccFileUtils.start s0
 
@@ -327,7 +327,7 @@ type ParsParseTableTest(output:ITestOutputHelper) =
                 flatedFsyacc with
                     rules = 
                     flatedFsyacc.rules
-                    |> RuleListUtils.removeNonterminals terminals
+                    |> RuleListUtils.removeHeads terminals
             }
             |> FlatFsyaccFileUtils.start s0
 

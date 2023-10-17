@@ -47,12 +47,39 @@ let getDummyTokens (augmentRules:Set<Production*string*string>) =
 let getStartSymbol (augmentRules:Set<Production*string*string>) =
     augmentRules.MinimumElement
     |> Triple.first
-    |> List.find(fun s -> s > "")
+    |> List.last
 
-let findRuleByDummyToken
-    (dummyToken:string)
+let findRuleByDummyToken (dummyToken:string) (augmentRules:Set<list<string>*string*string>) =
+    augmentRules
+    |> Seq.find(fun(_,tok,_)->tok = dummyToken )
+
+//删除包含符号的规则
+let removeSymbols (symbols:Set<string>) (augmentRules:Set<list<string>*string*string>) =
+    augmentRules
+    |> Set.filter(fun (prod,nm,act) -> 
+        prod 
+        |> ProductionUtils.without symbols)
+
+// 在excludeSymbols中的符号，位于规则左手边，此规则将被删除
+let removeHeads
+    (excludeSymbols:Set<string>)
     (augmentRules:Set<list<string>*string*string>)
     =
     augmentRules
-    |> Seq.find(fun(_,tok,_)->tok=dummyToken)
+    |> Set.filter(fun (prod,_,_) ->
+        prod.Head
+        |> excludeSymbols.Contains
+        |> not)
 
+///检查rules中是否有重复的规则
+let duplicateRule (augmentRules:Set<list<string>*string*string>) =
+    augmentRules
+    |>Set.groupBy (fun(rule,_,_)->rule)
+    |>Set.map(fun(rule,group)->rule,group.Count)
+    |>Set.filter(fun(r,c)->c>1)
+
+/////
+//let getChomsky (augmentRules:Set<list<string>*string*string>) =
+//    augmentRules
+//    |> Set.map Triple.first // rule -> prod
+//    |> ProductionListUtils.getChomsky

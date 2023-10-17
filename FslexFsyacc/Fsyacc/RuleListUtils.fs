@@ -98,18 +98,10 @@ let replaceRule
     ]
 
 let removeErrorRules (robust:Set<string>) (rules:list<list<string>*string*string>) =
-    let willBeRemoved (symbol: string) =
-        robust
-        |> Set.exists(fun kw -> symbol.Contains kw)
-
-    let reserve prod =
-        prod 
-        |> List.forall(fun (symbol:string) -> not(willBeRemoved symbol))
-
     rules
-    |> List.filter(fun(prod,nm,act)->reserve prod)
+    |> List.filter(fun (prod,nm,act) -> ProductionUtils.without robust prod )
 
-/// 消除规则集的被removed符号，生成新的规则集。
+/// 消除规则集的被removed符号，生成新的规则集。新旧规则集等价。
 let eliminateSymbol (removed:string) (rules:list<list<string>*string*string>) =
     //保存名字，和行为
     let keeps =
@@ -167,15 +159,15 @@ let extractRules (start:string) (rules:list<list<string>*string*string>) =
     |> ofRaw
 
 // 在excludeSymbols中的符号，位于规则左手边，此规则将被删除
-let removeNonterminals
+let removeHeads
     (excludeSymbols:Set<string>)
     (rules:list<list<string>*string*string>)
     =
     rules
-        |> List.filter(fun (prod,_,_) ->
-            prod.Head
-            |> excludeSymbols.Contains
-            |> not)
+    |> List.filter(fun (prod,_,_) ->
+        prod.Head
+        |> excludeSymbols.Contains
+        |> not)
 ///检查rules中是否有重复的规则
 let duplicateRule
     (rules:list<list<string>*string*string>)

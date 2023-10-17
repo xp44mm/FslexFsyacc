@@ -34,11 +34,12 @@ let getStartSymbol (augmentedProductions:Set<Production>) =
     augProduction.[1]
 
 //productions是一个非终结符的所有产生式集合，仅有一个产生式，这个产生式或者为空，或者只有一个符号
-let tryChomsky (productions:list<Production>) =
-    match productions with
-    | [[_] as prod] 
-    | [[_;_] as prod]
-        -> Some prod
+let tryChomsky (productions:#seq<Production>) =
+    match 
+        productions
+        |> Seq.tryExactlyOne
+    with
+    | Some ([_] | [_;_]) as maybe -> maybe
     | _ -> None
 
 /// 

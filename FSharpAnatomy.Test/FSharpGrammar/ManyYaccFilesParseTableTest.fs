@@ -93,7 +93,7 @@ type ManyYaccFilesParseTableTest(output:ITestOutputHelper) =
                 sumFsyacc with
                     rules = 
                     sumFsyacc.rules
-                    |> RuleListUtils.removeNonterminals terminals
+                    |> RuleListUtils.removeHeads terminals
             }
             |> FlatFsyaccFileUtils.start s0
 
