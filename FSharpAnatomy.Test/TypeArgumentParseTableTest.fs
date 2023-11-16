@@ -12,7 +12,7 @@ open System.Text
 open System.Text.RegularExpressions
 
 open FSharp.xUnit
-open FSharp.Literals.Literal
+open FSharp.Idioms.Literal
 open FSharp.Idioms
 
 type TypeArgumentParseTableTest (output:ITestOutputHelper) =
@@ -30,7 +30,7 @@ type TypeArgumentParseTableTest (output:ITestOutputHelper) =
     let fsyaccCrew =
         text
         |> RawFsyaccFileCrewUtils.parse
-        |> FlatedFsyaccFileCrewUtils.getFlatedFsyaccFileCrew
+        |> FlatedFsyaccFileCrewUtils.fromRawFsyaccFileCrew
 
     let tblCrew =
         fsyaccCrew
@@ -68,7 +68,7 @@ type TypeArgumentParseTableTest (output:ITestOutputHelper) =
             AmbiguousCollectionUtils.collectConflictedProductions tblCrew.conflictedItemCores
 
         let pprods = 
-            ProductionListUtils.precedenceOfProductions terminals productions
+            ProductionSetUtils.precedenceOfProductions terminals productions
 
         Should.equal [] pprods
 

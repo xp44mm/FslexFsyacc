@@ -12,7 +12,7 @@ open System.Text
 open System.Text.RegularExpressions
 
 open FSharp.xUnit
-open FSharp.Literals
+open FSharp.Idioms
 open FSharp.Idioms
 
 type PostfixTyparDeclsParseTableTest (output:ITestOutputHelper) =
@@ -31,7 +31,7 @@ type PostfixTyparDeclsParseTableTest (output:ITestOutputHelper) =
     let fsyaccCrew =
         text
         |> RawFsyaccFileCrewUtils.parse
-        |> FlatedFsyaccFileCrewUtils.getFlatedFsyaccFileCrew
+        |> FlatedFsyaccFileCrewUtils.fromRawFsyaccFileCrew
 
     let tblCrew =
         fsyaccCrew
@@ -70,7 +70,7 @@ type PostfixTyparDeclsParseTableTest (output:ITestOutputHelper) =
             AmbiguousCollectionUtils.collectConflictedProductions tblCrew.conflictedItemCores
 
         let pprods = 
-            ProductionListUtils.precedenceOfProductions terminals productions
+            ProductionSetUtils.precedenceOfProductions terminals productions
 
         Should.equal [] pprods
 

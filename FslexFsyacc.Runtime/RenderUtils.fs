@@ -2,7 +2,7 @@
 
 open System
 open System.Text.RegularExpressions
-open FSharp.Literals
+open FSharp.Idioms
 
 let renderSymbol (sym:string) =
     if Regex.IsMatch(sym,@"^_*$") then

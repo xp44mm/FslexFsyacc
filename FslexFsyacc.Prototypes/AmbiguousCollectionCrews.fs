@@ -38,15 +38,16 @@ type ItemCoresCrew = {
 type LALRCollectionCrew = {
     prototype:ItemCoresCrew
     kernels : Set<Set<ItemCore>> // (kernel:Set<ItemCore>)
-    closures: Map<int,Set<string*ItemCore>> // index -> lookahead * action
+    // flatClosures
+    closures: Map<int,Set<string*ItemCore>> // kernel index -> lookahead * action
 
-    /// state -> (lookahead/leftside) -> kernel
+    /// kernel index -> (lookahead/leftside) -> kernel
     GOTOs: Map<int,Map<string,Set<ItemCore>>>
     }
 
 type AmbiguousCollectionCrew = {
     prototype:LALRCollectionCrew
-    /// state -> (lookahead/leftside) -> conflicts
+    /// kernel index -> (lookahead/leftside) -> conflicts
     conflictedItemCores: Map<int,Map<string,Set<ItemCore>>>
     }
 

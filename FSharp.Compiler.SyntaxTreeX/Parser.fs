@@ -3,7 +3,6 @@ module FSharp.Compiler.SyntaxTreeX.Parser
 open FSharp.Compiler.Text
 open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.Syntax
-open FSharp.Literals.Literal
 open FSharp.Compiler.SyntaxTreeX.Readers
 
 let getResults (filename, input: string) =

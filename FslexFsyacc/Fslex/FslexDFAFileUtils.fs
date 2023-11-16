@@ -1,7 +1,6 @@
 ﻿module FslexFsyacc.Fslex.FslexDFAFileUtils
 
 open System
-open FSharp.Literals
 open FSharp.Idioms
 
 let generate(moduleName:string) (this:FslexDFAFile) =

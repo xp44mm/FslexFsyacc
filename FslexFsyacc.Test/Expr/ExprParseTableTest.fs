@@ -3,8 +3,10 @@
 open Xunit
 open Xunit.Abstractions
 
+open FSharp.Idioms
+
 open FSharp.xUnit
-open FSharp.Literals.Literal
+open FSharp.Idioms.Literal
 
 open System.IO
 open System.Text
@@ -12,7 +14,7 @@ open System.Text
 open FslexFsyacc.Fsyacc
 open FslexFsyacc.Yacc
 open FslexFsyacc.Runtime
-
+open FslexFsyacc
 type ExprParseTableTest(output:ITestOutputHelper) =
     let parseTblName = "ExprParseTable"
     let parseTblModule = $"FslexFsyacc.Expr.{parseTblName}"
@@ -20,14 +22,24 @@ type ExprParseTableTest(output:ITestOutputHelper) =
     let parseTblPath = Path.Combine(__SOURCE_DIRECTORY__, $"{parseTblName}.fs")
 
     let text = File.ReadAllText(filePath,Encoding.UTF8)
+
     let fsyaccCrew =
         text
         |> RawFsyaccFileCrewUtils.parse
-        |> FlatedFsyaccFileCrewUtils.getFlatedFsyaccFileCrew
+        |> FlatedFsyaccFileCrewUtils.fromRawFsyaccFileCrew
+
+    let inputProductionList =
+        fsyaccCrew.flatedRules
+        |> List.map Triple.first
+
+    let collectionCrew = 
+        inputProductionList
+        |> AmbiguousCollectionCrewUtils.newAmbiguousCollectionCrew
 
     let tblCrew =
         fsyaccCrew
         |> FlatedFsyaccFileCrewUtils.getSemanticParseTableCrew
+
     [<Fact>]
     member _.``00 - print rules``() =
         for r in fsyaccCrew.inputRuleList do
@@ -92,90 +104,55 @@ type ExprParseTableTest(output:ITestOutputHelper) =
         Should.equal headerFromFsyacc header
         Should.equal semansFsyacc semans
 
-    //[<Fact(
-    //Skip="按需生成文件"
-    //)>]
-    //member _.``11 - data printer``() =
-    //    let inputProductionList =
-    //        flatedFsyacc.rules
-    //        |> FsyaccFileRules.getMainProductions
+    [<Fact(
+    Skip="按需生成文件"
+    )>]
+    member _.``11 - data printer``() =
+        let itemCoreCrews = 
+            collectionCrew.itemCoreCrews
+            |> Map.values
+            //|> Seq.map(fun crew -> ItemCoreCrewUtils.recurItemCoreCrew crew)
+            |> List.ofSeq
 
-    //    let grammar = Grammar.from inputProductionList
+        let filename = "ExprData"
+        let lines =
+            [
+                $"module FslexFsyacc.Expr.{filename}"
+                "open FslexFsyacc.Runtime"
+                $"let inputProductionList = {stringify inputProductionList}"
+                $"let mainProductions = {stringify collectionCrew.mainProductions}"
+                $"let augmentedProductions = {stringify collectionCrew.augmentedProductions}"
+                $"let symbols = {stringify collectionCrew.symbols}"
+                $"let nonterminals = {stringify collectionCrew.nonterminals}"
+                $"let terminals = {stringify collectionCrew.terminals}"
+                $"let nullables = {stringify collectionCrew.nullables}"
+                $"let firsts = {stringify collectionCrew.firsts}"
+                $"let lasts = {stringify collectionCrew.lasts}"
+                $"let follows = {stringify collectionCrew.follows}"
+                $"let precedes = {stringify collectionCrew.precedes}"
+                $"let itemCoreCrews = {stringify itemCoreCrews}"
 
-    //    let itemCores = ItemCoreFactory.make grammar.productions
+                $"let kernels = {stringify collectionCrew.kernels}"
+                $"let closures = {stringify collectionCrew.closures}"
+                $"let GOTOs = {stringify collectionCrew.GOTOs}"
+                $"let conflictedItemCores = {stringify collectionCrew.conflictedItemCores}"
 
-    //    let itemCoreAttributes =
-    //        ItemCoreAttributeFactory.make grammar.nonterminals grammar.nullables grammar.firsts itemCores
+                $"let dummyTokens = {stringify tblCrew.dummyTokens}"
+                $"let precedences = {stringify tblCrew.precedences}"
 
-    //    let lalrCollection = LALRCollection.create(inputProductionList)
-    //    let kernels = 
-    //        lalrCollection.kernels
-    //        |> FSharp.Idioms.Map.keys
 
-    //    let closures =
-    //        lalrCollection.closures
-    //        |> Map.values
-    //        |> Seq.toList
+                $"let unambiguousItemCores = {stringify tblCrew.unambiguousItemCores}"
 
-    //    let gotos =
-    //        lalrCollection.getGOTOs()
-    //        |> Map.values
-    //        |> Seq.toList
+                $"let actions = {stringify tblCrew.actions}"
+                $"let resolvedClosures = {stringify tblCrew.resolvedClosures}"
+                $"let encodedActions = {stringify tblCrew.encodedActions}"
+                $"let encodedClosures = {stringify tblCrew.encodedClosures}"
 
-    //    let ambCollection = AmbiguousCollection.create inputProductionList
+            ] 
+            |> String.concat "\r\n"
 
-    //    let conflicts =
-    //        ambCollection.conflicts
-    //        |> Map.values
-    //        |> Seq.toList
-    //    let productionNames = FsyaccFileRules.getProductionNames flatedFsyacc.rules
-    //    let precedences = flatedFsyacc.precedences
-
-    //    let parsingTable = 
-    //        ParsingTable.create(inputProductionList,productionNames,precedences)
-
-    //    let actions = 
-    //        parsingTable.actions
-    //        |> Map.values
-    //        |> Seq.toList
-
-    //    let resolvedClosures = 
-    //        parsingTable.closures
-    //        |> Map.values
-    //        |> Seq.toList
-
-    //    let filename = "ExprData"
-    //    let lines =
-    //        [
-    //            $"module FslexFsyacc.Expr.{filename}"
-    //            "open FslexFsyacc.Runtime"
-    //            $"let inputProductionList = {stringify inputProductionList}"
-    //            $"let mainProductions = {stringify grammar.mainProductions}"
-    //            $"let augmentedProductions = {stringify grammar.productions}"
-    //            $"let symbols = {stringify grammar.symbols}"
-    //            $"let nonterminals = {stringify grammar.nonterminals}"
-    //            $"let terminals = {stringify grammar.terminals}"
-    //            $"let nullables = {stringify grammar.nullables}"
-    //            $"let firsts = {stringify grammar.firsts}"
-    //            $"let lasts = {stringify grammar.lasts}"
-    //            $"let follows = {stringify grammar.follows}"
-    //            $"let precedes = {stringify grammar.precedes}"
-    //            $"let itemCores = {stringify itemCores}"
-    //            $"let itemCoreAttributes = {stringify itemCoreAttributes}"
-    //            $"let kernels = {stringify kernels}"
-    //            $"let closures = {stringify closures}"
-    //            $"let gotos = {stringify gotos}"
-    //            $"let conflicts = {stringify conflicts}"
-
-    //            $"let productionNames = {stringify productionNames}"
-    //            $"let precedences = {stringify precedences}"
-
-    //            $"let actions = {stringify actions}"
-    //            $"let resolvedClosures = {stringify resolvedClosures}"
-    //        ] 
-    //        |> String.concat "\r\n"
-    //    let datapath = Path.Combine(__SOURCE_DIRECTORY__,$"{filename}.fs")
-    //    File.WriteAllText(datapath, lines, Encoding.UTF8)
-    //    output.WriteLine($"文件输出完成:\r\n{datapath}")
+        let datapath = Path.Combine(__SOURCE_DIRECTORY__,$"{filename}.fs")
+        File.WriteAllText(datapath, lines, Encoding.UTF8)
+        output.WriteLine($"文件输出完成:\r\n{datapath}")
 
 

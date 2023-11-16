@@ -8,7 +8,7 @@ open System.Text
 open System.Text.RegularExpressions
 
 open FSharp.xUnit
-open FSharp.Literals
+open FSharp.Idioms
 
 type DirTest(output:ITestOutputHelper) =
     let show res =

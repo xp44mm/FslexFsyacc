@@ -1,7 +1,7 @@
 ﻿module FSharpAnatomy.TypeArgumentCompiler
 
 open FslexFsyacc.Runtime
-open FSharp.Literals.Literal
+open FSharp.Idioms.Literal
 
 //let analyze (posTokens:seq<Position<FSharpToken>>) = 
 //    posTokens

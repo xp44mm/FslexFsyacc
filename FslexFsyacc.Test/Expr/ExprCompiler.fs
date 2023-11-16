@@ -4,7 +4,7 @@ open System.IO
 open System.Text
 
 open FSharp.Idioms
-open FSharp.Literals.Literal
+open FSharp.Idioms.Literal
 
 open FslexFsyacc.Runtime
 

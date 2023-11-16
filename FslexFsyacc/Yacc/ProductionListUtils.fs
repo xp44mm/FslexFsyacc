@@ -33,21 +33,20 @@ let getStartSymbol (augmentedProductions:Set<Production>) =
         |> Set.minElement
     augProduction.[1]
 
-//productions是一个非终结符的所有产生式集合，仅有一个产生式，这个产生式或者为空，或者只有一个符号
-let tryChomsky (productions:#seq<Production>) =
+// Single 是一个非终结符的所有产生式集合，仅有一个产生式，这个产生式或者为空，或者只有一个符号
+let trySingle (productions:#seq<Production>) =
     match 
-        productions
-        |> Seq.tryExactlyOne
+        productions |> Seq.tryExactlyOne
     with
     | Some ([_] | [_;_]) as maybe -> maybe
     | _ -> None
 
 /// 
-let getChomsky (productions:list<Production>) =
+let getSingle (productions:list<Production>) =
     productions
     |> List.groupBy List.head
     |> List.map snd
-    |> List.choose tryChomsky
+    |> List.choose trySingle
 
 /// 用symbol的所有产生式推导，等价消去symbol从productions中
 let eliminateSymbol (symbol:string) (productions:list<string list>) =
@@ -73,74 +72,43 @@ let eliminateSymbol (symbol:string) (productions:list<string list>) =
         else [prod]
     )
 
-let eliminateChomsky (productions:List<Production>) =
+let eliminateSingles (productions:List<Production>) =
     let nonterminals =
         productions
-        |> getChomsky
+        |> getSingle
         |> Seq.map List.head
 
     nonterminals
     |> Seq.fold(fun productions sym -> eliminateSymbol sym productions) productions
+
+/// 每个产生式的头，与导出符号
+let getDerivations (productions:list<string list>) =
+    productions
+    |> List.groupBy List.head
+    |> List.map(fun (lhs,rules) ->
+        //同一符号下，先出现的先列出
+        let children =
+            rules
+            |> List.collect List.tail // prod's body
+            |> List.distinct
+            |> List.filter( (<>) lhs)
+
+        lhs,children
+    )
+    |> Map.ofList
 
 ///以start提取产生式，顺序是深度优先。
 let extractSymbols (start:string) (productions:list<list<string>>) =
     //跟在一个符号后面的符号
     let follows =
         productions
-        |> ProductionUtils.getNodes
+        |> getDerivations
 
     //深度优先排序的符号
     let symbols =
         (follows,start)
         ||> List.depthFirstSort
     symbols
-
-/// 产生式优先级%prec命名的提示
-let precedenceOfProductions (terminals:Set<string>) (productions:Set<string list>) =
-    let productions =
-        productions
-        |> Set.map(fun prod ->
-            match
-                prod
-                |> ProductionUtils.revTerminalsOfProduction terminals 
-                |> List.truncate 1
-            with rightmost -> prod,rightmost
-        )
-    let nonterminalProductions,terminalProductions =
-        productions
-        |> Seq.toList
-        |> List.partition(fun(prod, maybeTerminal)->
-            maybeTerminal.IsEmpty
-        )
-    let nonterminalProductions =
-        nonterminalProductions
-        |> List.map(fun(prod,_)-> 
-            // head space be used to sort first
-            prod," %prec is required!")
-        |> Set.ofList
-    let terminalProductions =
-        terminalProductions
-        |> List.map(fun(prod,maybeTerminal)-> prod,maybeTerminal.[0])
-        |> List.groupBy(fun(prod,terminal)-> terminal)
-        |> List.map(fun(terminal,items)->
-            match items.Length with
-            | 1 ->
-                items
-            | len ->
-                items
-                |> List.mapi(fun i (prod,term) -> 
-                    let tip = 
-                        // head space be used to sort first
-                        $" {term} ({i+1} of {len})"
-                    prod,tip
-                    )
-        )
-        |> List.concat
-    let productions = [
-        yield! nonterminalProductions;
-        yield! terminalProductions]
-    productions
-    |> List.sortBy snd
 
 
 

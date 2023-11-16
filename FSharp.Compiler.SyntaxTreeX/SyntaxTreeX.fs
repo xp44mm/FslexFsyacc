@@ -342,7 +342,7 @@ type XPat =
     | OptionalVal of ident: Ident
     | IsInst of pat: XType
     | QuoteExpr of expr: XExpr
-    | DeprecatedCharRange of startChar: char * endChar: char
+    //| DeprecatedCharRange of startChar: char * endChar: char
     | InstanceMember of
         thisId: Ident *
         memberId: Ident *

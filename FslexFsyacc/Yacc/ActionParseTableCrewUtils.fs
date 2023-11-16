@@ -3,24 +3,13 @@
 open FslexFsyacc.Runtime
 
 open FSharp.Idioms
-open FSharp.Literals.Literal
+open FSharp.Idioms.Literal
 
-let getActionParseTableCrew
-    (mainProductions:string list list)
+let fromAmbiguousCollectionCrew
+    (collection:AmbiguousCollectionCrew)
     (dummyTokens:Map<string list,string>)
     (precedences:Map<string,int>)
     =
-
-    let collection =
-        mainProductions
-        |> ProductionsCrewUtils.getProductionsCrew
-        |> GrammarCrewUtils.getNullableCrew
-        |> GrammarCrewUtils.getFirstLastCrew
-        |> GrammarCrewUtils.getFollowPrecedeCrew
-        |> GrammarCrewUtils.getItemCoresCrew
-        |> LALRCollectionCrewUtils.getLALRCollectionCrew
-        |> AmbiguousCollectionCrewUtils.getAmbiguousCollectionCrew
-
     let unambiguousItemCores =
         collection.conflictedItemCores
         |> AmbiguousCollectionUtils.getUnambiguousItemCores
@@ -53,3 +42,21 @@ let getActionParseTableCrew
         )
 
     ActionParseTableCrew(collection,dummyTokens,precedences,unambiguousItemCores,actions,resolvedClosures)
+
+let getActionParseTableCrew
+    (mainProductions:string list list)
+    (dummyTokens:Map<string list,string>)
+    (precedences:Map<string,int>)
+    =
+
+    let collection =
+        mainProductions
+        |> ProductionsCrewUtils.getProductionsCrew
+        |> GrammarCrewUtils.getNullableCrew
+        |> GrammarCrewUtils.getFirstLastCrew
+        |> GrammarCrewUtils.getFollowPrecedeCrew
+        |> GrammarCrewUtils.getItemCoresCrew
+        |> LALRCollectionCrewUtils.getLALRCollectionCrew
+        |> AmbiguousCollectionCrewUtils.getAmbiguousCollectionCrew
+
+    fromAmbiguousCollectionCrew collection dummyTokens precedences

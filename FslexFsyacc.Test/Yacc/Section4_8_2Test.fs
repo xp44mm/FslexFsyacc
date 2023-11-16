@@ -2,7 +2,7 @@
 
 open Xunit
 open Xunit.Abstractions
-open FSharp.Literals
+open FSharp.Idioms
 open FSharp.xUnit
 
 type Section4_8_2Test(output:ITestOutputHelper) =
@@ -34,7 +34,7 @@ type Section4_8_2Test(output:ITestOutputHelper) =
 
         //产生式的优先级操作符: production -> symbol
         let productionSymbols = 
-            ProductionListUtils.precedenceOfProductions
+            ProductionSetUtils.precedenceOfProductions
                 collection.terminals
                 productions
 

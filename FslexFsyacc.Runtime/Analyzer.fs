@@ -1,7 +1,6 @@
 ﻿namespace FslexFsyacc.Runtime
 
 open FSharp.Idioms
-open FSharp.Literals.Literal
 
 /// 解析带数据的对象
 type Analyzer<'tok,'u>

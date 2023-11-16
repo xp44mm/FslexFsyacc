@@ -2,15 +2,14 @@ namespace PolynomialExpressions
 
 open Xunit
 open Xunit.Abstractions
-open FSharp.Literals
+open FSharp.Idioms
 open FSharp.xUnit
 open PolynomialExpressions.Tokenizer
-open FSharp.Idioms
 
 type TokenizerTest(output:ITestOutputHelper) =
     let show res = 
         res 
-        |> Render.stringify
+        |> Literal.stringify
         |> output.WriteLine
 
     [<Fact>]

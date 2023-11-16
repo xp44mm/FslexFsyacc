@@ -1,7 +1,7 @@
 ﻿namespace FslexFsyacc.Yacc
 open FslexFsyacc.Runtime
 
-open FSharp.Literals.Literal
+open FSharp.Idioms.Literal
 
 type AmbiguityEliminator = 
     {

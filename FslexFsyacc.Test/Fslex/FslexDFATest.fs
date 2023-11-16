@@ -7,7 +7,7 @@ open System.Text
 open Xunit
 open Xunit.Abstractions
 
-open FSharp.Literals
+open FSharp.Idioms
 open FSharp.xUnit
 
 type FslexDFATest(output:ITestOutputHelper) =

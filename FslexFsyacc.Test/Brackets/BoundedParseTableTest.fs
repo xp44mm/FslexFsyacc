@@ -9,7 +9,7 @@ open Xunit
 open Xunit.Abstractions
 
 open FSharp.Idioms
-open FSharp.Literals
+open FSharp.Idioms
 open FSharp.xUnit
 
 open FslexFsyacc
@@ -36,7 +36,7 @@ type BoundedParseTableTest(output: ITestOutputHelper) =
 
     let flatedFsyacc =
         rawFsyacc
-        |> FlatedFsyaccFileCrewUtils.getFlatedFsyaccFileCrew
+        |> FlatedFsyaccFileCrewUtils.fromRawFsyaccFileCrew
 
     [<Fact>]
     member _.``01 - norm fsyacc file``() =
@@ -92,7 +92,7 @@ type BoundedParseTableTest(output: ITestOutputHelper) =
 
         // production -> %prec
         let pprods =
-            ProductionListUtils.precedenceOfProductions collection.terminals productions
+            ProductionSetUtils.precedenceOfProductions collection.terminals productions
 
         //优先级应该据此结果给出，不能少，也不应该多。
         let y = []

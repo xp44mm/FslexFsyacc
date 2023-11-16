@@ -2,7 +2,6 @@
 
 open System
 open FSharp.Idioms
-open FSharp.Literals
 open FslexFsyacc.Runtime
 open FslexFsyacc.Yacc
 

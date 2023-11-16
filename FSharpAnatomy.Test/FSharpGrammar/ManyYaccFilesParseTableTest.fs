@@ -7,7 +7,7 @@ open Xunit
 open Xunit.Abstractions
 open FSharp.xUnit
 
-open FSharp.Literals.Literal
+open FSharp.Idioms.Literal
 open FSharp.Idioms
 
 open System.IO
@@ -27,7 +27,7 @@ type ManyYaccFilesParseTableTest(output:ITestOutputHelper) =
         let text = File.ReadAllText(filePath,Encoding.UTF8)
         text
         |> RawFsyaccFileCrewUtils.parse
-        |> FlatedFsyaccFileCrewUtils.getFlatedFsyaccFileCrew
+        |> FlatedFsyaccFileCrewUtils.fromRawFsyaccFileCrew
         |> FlatedFsyaccFileCrewUtils.toFlatFsyaccFile
 
     let robust = set [
@@ -74,7 +74,7 @@ type ManyYaccFilesParseTableTest(output:ITestOutputHelper) =
             |> List.filter(fun (prod,_,_) -> 
                 prod 
                 |> ProductionUtils.without robust)
-            |> RuleListUtils.eliminateChomsky
+            |> FlatRulesUtils.eliminateChomsky
             |> List.map (fun (prod,_,_) ->prod,"","")
 
         let sumFsyacc =
@@ -93,7 +93,7 @@ type ManyYaccFilesParseTableTest(output:ITestOutputHelper) =
                 sumFsyacc with
                     rules = 
                     sumFsyacc.rules
-                    |> RuleListUtils.removeHeads terminals
+                    |> FlatRulesUtils.removeHeads terminals
             }
             |> FlatFsyaccFileUtils.start s0
 

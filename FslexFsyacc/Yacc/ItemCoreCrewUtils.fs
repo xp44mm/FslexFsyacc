@@ -1,5 +1,6 @@
 ﻿module FslexFsyacc.Yacc.ItemCoreCrewUtils
 open FslexFsyacc.Runtime
+open FSharp.Idioms.Literal
 
 // Simple LR 的
 let getItemCoreCrew(prototype:ProductionCrew,dot) =
@@ -43,9 +44,4 @@ let dotIncr(itemCore:ItemCoreCrew) =
     let nextDichotomy (backwards:string list,forwards:string list) =
         forwards.Head::backwards, forwards.Tail
     nextDichotomy (itemCore.backwards,itemCore.forwards)
-
-open FslexFsyacc.Runtime
-
-let render(itemCore:ItemCoreCrew) =
-    RenderUtils.renderItemCore itemCore.production itemCore.dot
 

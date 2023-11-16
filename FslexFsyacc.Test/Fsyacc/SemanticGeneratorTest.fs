@@ -3,7 +3,6 @@
 open Xunit
 open Xunit.Abstractions
 open FSharp.xUnit
-open FSharp.Literals
 open FSharp.Idioms
 
 type SemanticGeneratorTest(output:ITestOutputHelper) =

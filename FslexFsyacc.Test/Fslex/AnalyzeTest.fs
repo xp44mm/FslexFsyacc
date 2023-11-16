@@ -6,7 +6,7 @@ open System.IO
 open Xunit
 open Xunit.Abstractions
 
-open FSharp.Literals.Literal
+open FSharp.Idioms.Literal
 open FSharp.xUnit
 open FSharp.Idioms
 

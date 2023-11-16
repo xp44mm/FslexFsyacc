@@ -1,4 +1,5 @@
 ﻿module FslexFsyacc.Yacc.ProductionUtils
+open FSharp.Idioms
 
 let leftside (production:string list) = 
         production 
@@ -21,42 +22,11 @@ let revTerminalsOfProduction (terminals:Set<string>) (production:string list) =
             else loop revls t
     loop [] production.Tail
 
-let split (prodBody:'a list) (symbol:'a):'a list list =
-    let newGroups groups group =
-        match group with
-        | [] -> groups
-        | _ -> (List.rev group)::groups
-
-    let rec loop (groups:'a list list) (group:'a list) (body:'a list) =
-        match body with
-        | [] ->
-            List.rev (newGroups groups group)
-        | h::t ->
-            if h = symbol then
-                let groups = [h]::newGroups groups group
-                loop groups [] t
-            else
-                loop groups (h::group) t
-
-    loop [] [] prodBody
-
-let crosspower n (body:'a list):'a list list =
-    let rec loop n (acc:'a list list) =
-        if n > 1 then
-            let acc = 
-                List.allPairs acc body
-                |> List.map(fun (ls, a) -> ls @ [a])
-            loop (n-1) acc
-        else
-            acc
-    body
-    |> List.map(fun a -> [a])
-    |> loop n
-
-/// 要消除的一个产生式
+/// 通过derive，消除产生式中的符号，产生式不能递归。
 let eliminateSymbol (symbol:string, bodiesOfSymbol:string list list) (body:string list) =
     let splitedBody = 
-        split body symbol
+        body
+        |> List.splitBy symbol
         |> List.mapi(fun i ls -> i,ls)
 
     let holes =
@@ -68,7 +38,8 @@ let eliminateSymbol (symbol:string, bodiesOfSymbol:string list list) (body:strin
         |> List.map fst
 
     let holeArgsRows = 
-        crosspower holes.Length bodiesOfSymbol
+        bodiesOfSymbol
+        |> List.crosspower holes.Length 
         |> List.map(fun row ->
             row
             |> List.zip indexesOfHoles
@@ -85,19 +56,42 @@ let eliminateSymbol (symbol:string, bodiesOfSymbol:string list list) (body:strin
         )
     )
 
-/// 符号的孩子符号
-let getNodes (productions:list<string list>) =
-    productions
-    |> List.groupBy List.head
-    |> List.map(fun (lhs,rules) ->
-        let children =
-            rules
-            |> List.collect List.tail // prod's body
-            |> List.filter( (<>) lhs)
-            |> List.distinct
-        lhs,children
+
+/// 通过derive，消除产生式中的符号，产生式不能递归。
+let eliminateSymbol2 (symbol:string, bodiesOfSymbol:Set<string list>) (body:string list) =
+    //分隔产生式体，并为其编号
+    let splitedBody = 
+        body
+        |> List.splitBy symbol
+        |> List.mapi(fun i ls -> i,ls)
+
+    let holes =
+        splitedBody
+        |> List.filter(fun(i,ls)->ls=[symbol])
+
+    let indexesOfHoles =
+        holes 
+        |> List.map fst
+
+    let holeArgsRows = 
+        bodiesOfSymbol
+        |> Set.crosspower holes.Length 
+        |> Set.map(fun row ->
+            row
+            |> List.zip indexesOfHoles
+            |> Map.ofList)
+
+    holeArgsRows
+    |> Set.map(fun holeArgs ->
+        splitedBody
+        |> List.collect(fun(i,ls)->
+            if holeArgs.ContainsKey i then
+                holeArgs.[i]
+            else
+                ls
+        )
     )
-    |> Map.ofList
+
 
 ///产生式prod不带有symbols中的任何元素
 let without (symbols:Set<string>) prod =

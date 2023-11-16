@@ -3,7 +3,7 @@
 open Xunit
 open Xunit.Abstractions
 
-open FSharp.Literals
+open FSharp.Idioms
 open FSharp.xUnit
 
 type FsyaccFileRulesTest(output:ITestOutputHelper) =
@@ -18,7 +18,7 @@ type FsyaccFileRulesTest(output:ITestOutputHelper) =
             "AsyncArrowFunction",[
                 ["async";"AsyncArrowBindingIdentifier";"=>";"AsyncConciseBody"],"","";
                 ["CoverCallExpressionAndAsyncArrowHead";"=>";"AsyncConciseBody"],"",""]]
-        let y = RuleListUtils.ofRaw rawRules
+        let y = FlatRulesUtils.ofRaw rawRules
         let e = [
             ["AsyncArrowFunction";"async";"AsyncArrowBindingIdentifier";"=>";"AsyncConciseBody"],"","";
             ["AsyncArrowFunction";"CoverCallExpressionAndAsyncArrowHead";"=>";"AsyncConciseBody"],"",""
@@ -32,7 +32,7 @@ type FsyaccFileRulesTest(output:ITestOutputHelper) =
             ["AsyncArrowFunction";"async";"AsyncArrowBindingIdentifier";"=>";"AsyncConciseBody"],"","";
             ["AsyncArrowFunction";"CoverCallExpressionAndAsyncArrowHead";"=>";"AsyncConciseBody"],"",""
             ]
-        let y = RuleListUtils.toRaw x
+        let y = FlatRulesUtils.toRaw x
 
         let z = [
             "AsyncArrowFunction",[
@@ -48,7 +48,7 @@ type FsyaccFileRulesTest(output:ITestOutputHelper) =
             ["AsyncArrowFunction";"CoverCallExpressionAndAsyncArrowHead";"=>";"AsyncConciseBody"],"",""
             ]
         let y = ["AsyncArrowFunction";"async";"ArrowFormalParameters";"=>";"AsyncConciseBody"]
-        let z = x |> RuleListUtils.addRule(y,"","")
+        let z = x |> FlatRulesUtils.addRule(y,"","")
 
         let e = [
             ["AsyncArrowFunction";"async";"AsyncArrowBindingIdentifier";"=>";"AsyncConciseBody"],"","";
@@ -72,7 +72,7 @@ type FsyaccFileRulesTest(output:ITestOutputHelper) =
 
         let y = 
             e 
-            |> RuleListUtils.removeRule oldProd
+            |> FlatRulesUtils.removeRule oldProd
 
         //show y
         let x = [
@@ -94,7 +94,7 @@ type FsyaccFileRulesTest(output:ITestOutputHelper) =
 
         let y = 
             rules 
-            |> RuleListUtils.replaceRule oldProd (newProd,"","")
+            |> FlatRulesUtils.replaceRule oldProd (newProd,"","")
         //show y
         let e = [
             ["AsyncArrowFunction";"async";"AsyncArrowBindingIdentifier";"=>";"AsyncConciseBody"],"",""
@@ -102,17 +102,5 @@ type FsyaccFileRulesTest(output:ITestOutputHelper) =
             ]
         Should.equal e y
 
-    [<Fact>]
-    member _.``16 - findRuleByName``() =
-        let rules = [
-            ["AsyncArrowFunction";"async";"AsyncArrowBindingIdentifier";"=>";"AsyncConciseBody"],"","";
-            ["AsyncArrowFunction";"CoverCallExpressionAndAsyncArrowHead";"=>";"AsyncConciseBody"],"cover",""
-            ]
-
-        let y = 
-            rules
-            |> RuleListUtils.findRuleByDummyToken "cover"
-
-        Should.equal y rules.[1]
 
 

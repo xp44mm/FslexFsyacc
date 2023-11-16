@@ -7,7 +7,7 @@ open System.IO
 open System.Text
 
 open FSharp.xUnit
-open FSharp.Literals.Literal
+open FSharp.Idioms.Literal
 open FSharp.Idioms
 
 open FslexFsyacc.Runtime
@@ -19,7 +19,7 @@ type ExprDataCrewTest (output:ITestOutputHelper) =
     member _.``01 - getAmbiguousCollectionCrew Test``() =
         let input = ExprData.inputProductionList
 
-        let crew = 
+        let collectionCrew = 
             input
             |> ProductionsCrewUtils.getProductionsCrew
             |> GrammarCrewUtils.getNullableCrew
@@ -28,45 +28,43 @@ type ExprDataCrewTest (output:ITestOutputHelper) =
             |> GrammarCrewUtils.getItemCoresCrew
             |> LALRCollectionCrewUtils.getLALRCollectionCrew
             |> AmbiguousCollectionCrewUtils.getAmbiguousCollectionCrew
-        Should.equal crew.mainProductions ExprData.mainProductions
-        Should.equal crew.augmentedProductions ExprData.augmentedProductions
 
-        Should.equal crew.symbols ExprData.symbols
-        Should.equal crew.nonterminals ExprData.nonterminals
-        Should.equal crew.terminals ExprData.terminals
-        Should.equal crew.nullables ExprData.nullables
+        Should.equal collectionCrew.mainProductions ExprData.mainProductions
+        Should.equal collectionCrew.augmentedProductions ExprData.augmentedProductions
 
-
-        Should.equal crew.firsts ExprData.firsts
-        Should.equal crew.lasts ExprData.lasts
+        Should.equal collectionCrew.symbols ExprData.symbols
+        Should.equal collectionCrew.nonterminals ExprData.nonterminals
+        Should.equal collectionCrew.terminals ExprData.terminals
+        Should.equal collectionCrew.nullables ExprData.nullables
 
 
-        Should.equal crew.follows ExprData.follows
-        Should.equal crew.precedes ExprData.precedes
+        Should.equal collectionCrew.firsts ExprData.firsts
+        Should.equal collectionCrew.lasts ExprData.lasts
 
 
-        let items = crew.itemCoreCrews
+        Should.equal collectionCrew.follows ExprData.follows
+        Should.equal collectionCrew.precedes ExprData.precedes
 
-        let itemCores = items |> Map.keys |> Set.ofSeq
+        let itemCores = collectionCrew.itemCoreCrews |> Map.keys |> Set.ofSeq
 
         Should.equal itemCores ExprData.itemCores
 
-        Should.equal crew.kernels ExprData.kernels
+        Should.equal collectionCrew.kernels ExprData.kernels
         let closures =
-            crew.closures
+            collectionCrew.closures
             |> Map.values
             |> Seq.toList
 
         Should.equal closures ExprData.closures
 
         let gotos =
-            crew.GOTOs
+            collectionCrew.GOTOs
             |> Map.values
             |> Seq.toList
         Should.equal gotos ExprData.gotos
 
         let conflicts =
-            crew.conflictedItemCores
+            collectionCrew.conflictedItemCores
             |> Map.values
             |> Seq.toList
         Should.equal conflicts ExprData.conflicts

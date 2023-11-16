@@ -3,7 +3,7 @@
 open Xunit
 open Xunit.Abstractions
 
-open FSharp.Literals
+open FSharp.Idioms
 open FSharp.xUnit
 
 type PositionTest(output:ITestOutputHelper) =

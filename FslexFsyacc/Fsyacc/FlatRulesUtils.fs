@@ -1,11 +1,11 @@
-﻿module FslexFsyacc.Fsyacc.RuleListUtils
+﻿module FslexFsyacc.Fsyacc.FlatRulesUtils
 
 open FSharp.Idioms
 open System
 open FslexFsyacc.Yacc
 
 open FSharp.Idioms
-open FSharp.Literals.Literal
+open FSharp.Idioms.Literal
 open System
 
 ///分配左手边到右手边，保持规则顺序不变
@@ -31,16 +31,6 @@ let toRaw (rules:list<list<string>*string*string>) =
         lhs,rhs
     )
 
-let getDummyTokens (rules:list<list<string>*string*string>) =
-    rules
-    |> List.filter(fun (prod,dummy,act) -> dummy > "")
-    |> List.map(Triple.firstTwo)
-    |> Map.ofList
-
-let getSemanticRules (rules:list<list<string>*string*string>) = 
-    rules
-    |> List.map Triple.ends
-
 let getStartSymbol (rules:list<list<string>*string*string>) =
     rules.[0]
     |> Triple.first
@@ -58,13 +48,6 @@ let removeRule
     =
     rules
     |> List.filter(fun(x,_,_) -> x<>production)
-
-let findRuleByDummyToken
-    (dummyToken:string)
-    (rules:list<list<string>*string*string>)
-    =
-    rules
-    |> List.find(fun(_,tok,_)->tok=dummyToken)
 
 /// 保持替换的位置
 let replaceRule
@@ -126,7 +109,7 @@ let eliminateSymbol (removed:string) (rules:list<list<string>*string*string>) =
 let getChomsky (rules:list<list<string>*string*string>) =
     rules
     |> List.map Triple.first // rule -> prod
-    |> ProductionListUtils.getChomsky
+    |> ProductionListUtils.getSingle
 
 let eliminateChomsky (rules:list<list<string>*string*string>) =
     let nonterminals = 
@@ -138,6 +121,26 @@ let eliminateChomsky (rules:list<list<string>*string*string>) =
         nonterminals
         |> List.fold(fun rules sym -> eliminateSymbol sym rules) rules
     rules
+
+// 在excludeSymbols中的符号，位于规则左手边，此规则将被删除
+let removeHeads
+    (excludeSymbols:Set<string>)
+    (rules:list<list<string>*string*string>)
+    =
+    rules
+    |> List.filter(fun (prod,_,_) ->
+        prod.Head
+        |> excludeSymbols.Contains
+        |> not)
+
+///检查rules中是否有重复的规则
+let duplicateRule
+    (rules:list<list<string>*string*string>)
+    =
+    rules
+    |> List.groupBy (fun(rule,_,_)->rule)
+    |> List.map(fun(rule,group)->rule,group.Length)
+    |> List.filter(fun(r,c)->c>1)
 
 let extractRules (start:string) (rules:list<list<string>*string*string>) =
     //每个符号对应的产生式体
@@ -157,23 +160,4 @@ let extractRules (start:string) (rules:list<list<string>*string*string>) =
             Some(s,mp.[s])
         else None)
     |> ofRaw
-
-// 在excludeSymbols中的符号，位于规则左手边，此规则将被删除
-let removeHeads
-    (excludeSymbols:Set<string>)
-    (rules:list<list<string>*string*string>)
-    =
-    rules
-    |> List.filter(fun (prod,_,_) ->
-        prod.Head
-        |> excludeSymbols.Contains
-        |> not)
-///检查rules中是否有重复的规则
-let duplicateRule
-    (rules:list<list<string>*string*string>)
-    =
-    rules
-    |> List.groupBy (fun(rule,_,_)->rule)
-    |> List.map(fun(rule,group)->rule,group.Length)
-    |> List.filter(fun(r,c)->c>1)
 

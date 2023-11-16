@@ -4,15 +4,15 @@ open FslexFsyacc.Runtime
 open FSharp.Idioms
 
 let getNullableCrew(prototype:ProductionsCrew) =
+    let nonterminals = 
+        prototype.mainProductions
+        |> Set.map List.head 
+    
     let symbols =
         prototype.mainProductions 
         |> List.concat 
         |> Set.ofList
 
-    let nonterminals = 
-        prototype.mainProductions
-        |> Set.map List.head 
-    
     let terminals = Set.difference symbols nonterminals
 
     let nullables = 
@@ -20,6 +20,7 @@ let getNullableCrew(prototype:ProductionsCrew) =
         |> NullableFactory.make 
 
     NullableCrew(prototype,symbols,nonterminals,terminals,nullables)
+
 
 let getFirstLastCrew(prototype:NullableCrew) =
     let firsts = FirstFactory.make prototype.nullables prototype.mainProductions
@@ -41,8 +42,6 @@ let getItemCoresCrew (prototype:FollowPrecedeCrew) =
                 |> ProductionCrewUtils.getProductionCrew
             let itemCoreCrew =
                 ItemCoreCrewUtils.getItemCoreCrew(prodCrew,itemCore.dot)
-            //let itemCoreLookaheadFactorCrew =
-            //    ItemCoreCrewUtils.getItemCoreLookaheadFactorCrew (prototype) itemCoreCrew
             itemCore,itemCoreCrew
         )
         |> Map.ofSeq
@@ -109,7 +108,7 @@ let getNextKernels (collection:ItemCoresCrew) (closure:Set<ItemCore*Set<string>>
 let getClosureCollection (grammar:ItemCoresCrew) =
     // kernel -> closure
     let getClosure = getClosure grammar
-    let itemCores = grammar.itemCoreCrews |> Map.keys
+    let itemCores = grammar.itemCoreCrews |> Map.keys |> Set.ofSeq
 
     // 获取语法集合中所有的kernels
     let rec loop (oldKernels:Set<Set<ItemCore*Set<string>>>) (newKernels:Set<Set<ItemCore*Set<string>>>) =

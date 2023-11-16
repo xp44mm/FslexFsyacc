@@ -9,8 +9,6 @@ open System.Reflection
 
 open FSharp.Reflection
 open FSharp.Idioms
-open FSharp.Literals
-open FSharp.Literals.Literal
 
 type CodeGenerators(output:ITestOutputHelper) =
 

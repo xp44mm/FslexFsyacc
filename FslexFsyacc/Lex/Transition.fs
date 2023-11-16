@@ -6,7 +6,7 @@ open FSharp.Idioms
 ///自動機的所有狀態
 let allStates (transitions:#seq<'state*'a*'state>) =
     transitions
-    |> Seq.map(Triple.ends)
+    |> Seq.map(fun(x,y,z) -> x,z)
     |> Seq.map(fun(s,t)-> [s;t])
     |> List.concat
     |> Set.ofList

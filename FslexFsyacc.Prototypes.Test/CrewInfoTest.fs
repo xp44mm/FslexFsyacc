@@ -9,8 +9,7 @@ open System.Reflection
 
 open FSharp.Reflection
 open FSharp.Idioms
-open FSharp.Literals
-open FSharp.Literals.Literal
+open FSharp.Idioms.Literal
 
 type CrewInfoTest(output:ITestOutputHelper) =
 
@@ -81,3 +80,7 @@ type CrewInfoTest(output:ITestOutputHelper) =
         |> Seq.iter(fun def ->
             output.WriteLine(def)
         )
+
+
+
+

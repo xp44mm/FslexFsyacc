@@ -4,10 +4,8 @@ open System
 open System.Text.RegularExpressions
 
 open FSharp.Idioms
-open FSharp.Idioms.StringOps
+open FSharp.Idioms.Line
 open FSharp.Idioms.RegularExpressions
-
-open FSharp.Literals.Literal
 
 let tryWS =
     Regex @"^\s+"
@@ -84,7 +82,7 @@ let tries =
         )
 
 let tryPercentRBrace = 
-    tryStartsWith "%}" 
+    StringOps.tryStartsWith "%}" 
     // 1代表终止循环标记，%}出现的次数
     >> Option.map(fun capt -> 1,capt) // capt = "%}"
 
@@ -104,9 +102,9 @@ let getHeaderLength (inp:string) =
             len
     loop 0
 
-let tryLBrace = tryFirst '{' >> Option.map(fun capt -> -1,string capt)
+let tryLBrace = StringOps.tryFirst '{' >> Option.map(fun capt -> -1,string capt)
 
-let tryRBrace = tryFirst '}' >> Option.map(fun capt -> 1,string capt)
+let tryRBrace = StringOps.tryFirst '}' >> Option.map(fun capt -> 1,string capt)
 
 let trySemanticTokens = tryLBrace :: tryRBrace :: tries
 
@@ -130,7 +128,7 @@ let getSemanticLength(inp:string) =
 
 let tryHeader(inp:string) =
     inp 
-    |> tryStartsWith "%{"
+    |> StringOps.tryStartsWith "%{"
     |> Option.map(fun capt ->
         let rest = inp.[capt.Length..]
         let len = capt.Length+getHeaderLength rest
@@ -140,7 +138,7 @@ let tryHeader(inp:string) =
 
 let trySemantic(inp:string) =
     inp 
-    |> tryStartsWith "{"
+    |> StringOps.tryStartsWith "{"
     |> Option.map(fun capt ->
         let rest = inp.[capt.Length..]
         let len = capt.Length+getSemanticLength rest
@@ -152,7 +150,8 @@ let trySemantic(inp:string) =
 // code 不带开括号，也不带闭括号
 let formatNestedCode (spaceCount:int) (code:string) =
     let lines =
-        space spaceCount + code //补齐首行
+        code
+        |> space spaceCount //补齐首行
         |> Line.splitLines //分行
         |> Seq.map(fun (i,line) -> line.TrimEnd()) //去掉行尾空格
         |> Seq.filter(fun line -> line > "") // 删除空行

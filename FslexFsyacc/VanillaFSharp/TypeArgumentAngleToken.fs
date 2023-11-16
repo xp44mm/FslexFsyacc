@@ -30,7 +30,7 @@ open FSharp.Idioms
 
 open FSharp.Idioms.ActivePatterns
 open FSharp.Idioms.StringOps
-open FSharp.Literals.Literal
+open FSharp.Idioms.Literal
 
 open System
 open System.Text.RegularExpressions

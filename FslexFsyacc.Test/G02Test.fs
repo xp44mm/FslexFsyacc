@@ -14,23 +14,23 @@ open System.Text.RegularExpressions
 
 open FSharp.xUnit
 open FSharp.Idioms
-open FSharp.Literals
-open FSharp.Literals.Literal
+open FSharp.Idioms
+open FSharp.Idioms.Literal
 
-type G428Test(output:ITestOutputHelper) =
+type G02Test(output:ITestOutputHelper) =
     let show res =
         res
         |> Literal.stringify
         |> output.WriteLine
 
     // ** input **
-    let filePath = Path.Combine(__SOURCE_DIRECTORY__, @"428.fsyacc")
+    let filePath = Path.Combine(__SOURCE_DIRECTORY__, @"g02.fsyacc")
     let text = File.ReadAllText(filePath,Encoding.UTF8)
 
     let fsyaccCrew =
         text
         |> RawFsyaccFileCrewUtils.parse
-        |> FlatedFsyaccFileCrewUtils.getFlatedFsyaccFileCrew
+        |> FlatedFsyaccFileCrewUtils.fromRawFsyaccFileCrew
 
     let tblCrew =
         fsyaccCrew
@@ -61,7 +61,9 @@ type G428Test(output:ITestOutputHelper) =
 
             let dummyTokens = 
                 fsyaccCrew.flatedRules
-                |> RuleListUtils.getDummyTokens
+                |> List.filter(fun (prod,dummy,act) -> dummy > "")
+                |> List.map(Triple.firstTwo)
+                |> Map.ofList
 
             EncodedParseTableCrewUtils.getEncodedParseTableCrew(
                 mainProductions,

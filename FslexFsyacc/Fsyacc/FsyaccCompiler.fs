@@ -3,7 +3,7 @@
 open FslexFsyacc.Runtime
 open FslexFsyacc.Fsyacc
 
-open FSharp.Literals.Literal
+open FSharp.Idioms.Literal
 
 let parser = Parser<Position<FsyaccToken>>(
     FsyaccParseTable.rules,

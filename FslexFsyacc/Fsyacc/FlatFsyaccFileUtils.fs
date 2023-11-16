@@ -7,13 +7,13 @@ open System.Text.RegularExpressions
 open System.IO
 
 open FSharp.Idioms
-open FSharp.Literals.Literal
+open FSharp.Idioms.Literal
 
 ///根据startSymbol提取相关规则，无用规则被无视忽略。
 let start (startSymbol:string) (fsyacc:FlatFsyaccFile) =
     let rules =
         fsyacc.rules
-        |> RuleListUtils.extractRules startSymbol
+        |> FlatRulesUtils.extractRules startSymbol
 
     let symbols =
         rules

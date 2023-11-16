@@ -3,7 +3,7 @@
 open Xunit
 open Xunit.Abstractions
 open FSharp.xUnit
-open FSharp.Literals.Literal
+open FSharp.Idioms.Literal
 open FslexFsyacc.Runtime
 open FslexFsyacc
 open System.IO

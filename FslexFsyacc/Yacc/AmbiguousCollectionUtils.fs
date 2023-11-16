@@ -4,7 +4,7 @@ open FslexFsyacc.Runtime
 open System
 
 open FSharp.Idioms
-open FSharp.Literals.Literal
+open FSharp.Idioms.Literal
 
 /// from ambiguous collection to (itemcore,lookahead)
 let getItemcores (conflicts:Map<string,Set<ItemCore>>) =
@@ -218,7 +218,10 @@ let render
                 |> String.concat "\r\n"
 
             let errorLookaheads = 
-                terminals - Map.keys conflicts
+                conflicts
+                |> Map.keys 
+                |> Set.ofSeq
+                |> Set.difference terminals
 
             let errorBlock =
                 errorLookaheads

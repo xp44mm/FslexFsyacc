@@ -9,14 +9,14 @@ let toFlated (raw:RawFsyaccFile) =
     let startSymbol,_ = raw.inputRules.[0]
     let flatedRules =
         raw.inputRules
-        |> RuleListUtils.ofRaw
+        |> FlatRulesUtils.ofRaw
 
     let augRule = ["";startSymbol],"","s0"
 
-    //let augmentRules =
-    //    augRule::flatedRules
-    //    |> List.map(fun(prod,dummy,semantic)-> prod,(dummy,semantic))
-    //    |> Map.ofList
+    let augmentRules =
+        flatedRules
+        |> Set.ofList
+        |> Set.add augRule
 
     let precedences =
         raw.precedenceLines
@@ -29,7 +29,7 @@ let toFlated (raw:RawFsyaccFile) =
     id<FlatFsyaccFile> {
         header = raw.header
         rules = flatedRules
-        //augmentRules = augmentRules
+        augmentRules = augmentRules
         precedences = precedences
         declarations = declarations
     }
@@ -37,7 +37,7 @@ let toFlated (raw:RawFsyaccFile) =
 let fromFlat (flat:FlatFsyaccFile) =
     let rules =
         flat.rules
-        |> RuleListUtils.toRaw
+        |> FlatRulesUtils.toRaw
 
     let precedences =
         flat.precedences

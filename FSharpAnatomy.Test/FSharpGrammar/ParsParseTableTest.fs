@@ -7,7 +7,7 @@ open Xunit
 open Xunit.Abstractions
 open FSharp.xUnit
 
-open FSharp.Literals.Literal
+open FSharp.Idioms.Literal
 open FSharp.Idioms
 
 open System.IO
@@ -84,7 +84,7 @@ type ParsParseTableTest(output:ITestOutputHelper) =
     let fsyaccCrew =
         text
         |> RawFsyaccFileCrewUtils.parse
-        |> FlatedFsyaccFileCrewUtils.getFlatedFsyaccFileCrew
+        |> FlatedFsyaccFileCrewUtils.fromRawFsyaccFileCrew
 
     let tblCrew =
         fsyaccCrew
@@ -106,7 +106,7 @@ type ParsParseTableTest(output:ITestOutputHelper) =
         let x = 
             fsyaccCrew.flatedPrecedences
             |> Map.keys
-
+            |> Set.ofSeq
         let y = 
             fsyaccCrew.flatedRules
             |> List.collect(fun(p,t,_)->t::p)
@@ -151,7 +151,7 @@ type ParsParseTableTest(output:ITestOutputHelper) =
                         |> List.filter(fun (prod,_,_) -> 
                             prod 
                             |> ProductionUtils.without robust)
-                        |> RuleListUtils.eliminateChomsky
+                        |> FlatRulesUtils.eliminateChomsky
                         |> List.map (fun (prod,_,_) ->prod,"","")
             }
 
@@ -190,7 +190,7 @@ type ParsParseTableTest(output:ITestOutputHelper) =
             |> List.filter(fun (prod,_,_) -> 
                 prod 
                 |> ProductionUtils.without robust)
-            |> RuleListUtils.eliminateChomsky
+            |> FlatRulesUtils.eliminateChomsky
             |> List.map (fun (prod,_,_) ->prod,"","")
 
         let flat =
@@ -234,7 +234,7 @@ type ParsParseTableTest(output:ITestOutputHelper) =
             |> List.filter(fun (prod,_,_) -> 
                 prod 
                 |> ProductionUtils.without robust)
-            |> RuleListUtils.eliminateChomsky
+            |> FlatRulesUtils.eliminateChomsky
             |> List.map (fun (prod,_,_) ->prod,"","")
 
         let flat =
@@ -273,7 +273,7 @@ type ParsParseTableTest(output:ITestOutputHelper) =
                 flatedFsyacc with
                     rules = 
                         flatedFsyacc.rules 
-                        |> RuleListUtils.removeHeads terminals
+                        |> FlatRulesUtils.removeHeads terminals
             }
             |> FlatFsyaccFileUtils.start s0
 
@@ -290,7 +290,7 @@ type ParsParseTableTest(output:ITestOutputHelper) =
             |> List.filter(fun (prod,_,_) -> 
                 prod 
                 |> ProductionUtils.without robust)
-            |> RuleListUtils.eliminateChomsky
+            |> FlatRulesUtils.eliminateChomsky
             |> List.map (fun (prod,_,_) ->prod,"","")
 
         let flat =
@@ -327,7 +327,7 @@ type ParsParseTableTest(output:ITestOutputHelper) =
                 flatedFsyacc with
                     rules = 
                     flatedFsyacc.rules
-                    |> RuleListUtils.removeHeads terminals
+                    |> FlatRulesUtils.removeHeads terminals
             }
             |> FlatFsyaccFileUtils.start s0
 
@@ -349,7 +349,7 @@ type ParsParseTableTest(output:ITestOutputHelper) =
             |> List.filter(fun (prod,_,_) -> 
                 prod 
                 |> ProductionUtils.without robust)
-            |> RuleListUtils.eliminateChomsky
+            |> FlatRulesUtils.eliminateChomsky
             |> List.map (fun (prod,_,_) ->prod,"","")
 
         let flat =

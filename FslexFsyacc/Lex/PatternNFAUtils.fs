@@ -1,6 +1,6 @@
 ﻿module FslexFsyacc.Lex.PatternNFAUtils
 
-open FSharp.Literals.Literal
+open FSharp.Idioms.Literal
 
 //Ordinary and Exotic
 /// s/t: an s but only if it is followed by an t. The t is not part of the matched text.

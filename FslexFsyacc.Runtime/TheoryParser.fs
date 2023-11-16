@@ -1,7 +1,6 @@
 ﻿namespace FslexFsyacc.Runtime
 
 open FSharp.Idioms
-open FSharp.Literals
 
 /// without getTag, getLexeme
 type TheoryParser =

@@ -13,8 +13,8 @@ open System.Text
 open System.Text.RegularExpressions
 
 open FSharp.xUnit
-open FSharp.Literals
-open FSharp.Literals.Literal
+open FSharp.Idioms
+open FSharp.Idioms.Literal
 
 type BNF428CrewTest(output:ITestOutputHelper) =
     [<Fact>]

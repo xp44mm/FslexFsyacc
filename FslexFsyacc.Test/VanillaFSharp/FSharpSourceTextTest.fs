@@ -8,8 +8,8 @@ open Xunit.Abstractions
 
 open FSharp.xUnit
 open FSharp.Idioms
-open FSharp.Literals
-open FSharp.Literals.Literal
+open FSharp.Idioms
+open FSharp.Idioms.Literal
 
 open System.IO
 open System.Text.RegularExpressions

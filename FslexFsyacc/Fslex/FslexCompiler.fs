@@ -3,7 +3,7 @@
 open FslexFsyacc.Runtime
 open FslexFsyacc.Lex
 open FslexFsyacc.Fslex.FslexTokenUtils
-open FSharp.Literals.Literal
+open FSharp.Idioms.Literal
 
 let analyze (tokens:seq<Position<FslexToken>>) = 
     FslexDFA.analyzer.analyze(tokens,FslexTokenUtils.getTag)

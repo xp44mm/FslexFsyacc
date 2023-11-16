@@ -13,7 +13,7 @@ open System.Text
 open System.Text.RegularExpressions
 
 open FSharp.xUnit
-open FSharp.Literals
+open FSharp.Idioms
 
 type FsyaccParseTableTest(output:ITestOutputHelper) =
     let show res =
@@ -33,7 +33,7 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
     let fsyaccCrew =
         text
         |> RawFsyaccFileCrewUtils.parse
-        |> FlatedFsyaccFileCrewUtils.getFlatedFsyaccFileCrew
+        |> FlatedFsyaccFileCrewUtils.fromRawFsyaccFileCrew
 
     let tblCrew =
         fsyaccCrew
@@ -76,7 +76,7 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
 
         // production -> %prec
         let pprods =
-            ProductionListUtils.precedenceOfProductions tblCrew.terminals productions
+            ProductionSetUtils.precedenceOfProductions tblCrew.terminals productions
 
         //优先级应该据此结果给出，不能少，也不应该多。
         let y = []

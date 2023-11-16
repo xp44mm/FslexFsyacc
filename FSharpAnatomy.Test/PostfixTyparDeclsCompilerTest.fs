@@ -7,14 +7,14 @@ open System.Text
 open Xunit
 open Xunit.Abstractions
 
-open FSharp.Literals
+open FSharp.Idioms
 open FSharp.xUnit
 open FSharpAnatomy
 
 type PostfixTyparDeclsCompilerTest (output:ITestOutputHelper) =
     let show res =
         res
-        |> Render.stringify
+        |> Literal.stringify
         |> output.WriteLine
 
     static let source = SingleDataSource [

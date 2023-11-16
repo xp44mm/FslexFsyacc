@@ -6,6 +6,8 @@ open FSharp.Compiler.Xml
 open FSharp.Compiler.Text
 open FSharp.Compiler
 
+open System
+
 let getIdent (ident:SynIdent) =
     match ident with SynIdent (ident,_) ->
     ident.idText
@@ -137,7 +139,8 @@ let getAttribute(attribute: SynAttribute) =
 
 let getExpr (expr:SynExpr) =
     match expr with
-    
+    | SynExpr.WhileBang _
+    | SynExpr.DotLambda _ -> NotImplementedException() |> raise
     | SynExpr.Paren( expr: SynExpr, leftParenRange: range, rightParenRange: range option, range: range) ->
         XExpr.Paren(
             getExpr expr
@@ -490,6 +493,7 @@ let getTupleTypeSegment (x:SynTupleTypeSegment) =
 
 let getType(tp:SynType) =
     match tp with
+    | SynType.Intersection _ -> NotImplementedException() |> raise
 
     | SynType.LongIdent ( longDotId) ->
         XType.LongIdent (getLongIdent longDotId.LongIdent)
@@ -603,7 +607,7 @@ let getConst (c: SynConst) =
         XConst.Bytes ( bytes ,getByteStringKind synByteStringKind)
     | SynConst.UInt16s (x: uint16[]) ->
         XConst.UInt16s (x)
-    | SynConst.Measure ( constant: SynConst , constantRange: range, ms: SynMeasure) ->
+    | SynConst.Measure ( constant: SynConst , constantRange: range, ms: SynMeasure, _ ) ->
         XConst.Measure (getConst constant ,getMeasure ms)
     | SynConst.SourceIdentifier ( constant: string , value: string , range: range) ->
         XConst.SourceIdentifier ( constant , value)
@@ -705,7 +709,7 @@ let getPat(src: SynPat) =
         XPat.Paren(getPat pat)
     | SynPat.ArrayOrList( isArray: bool , elementPats: SynPat list , range: range) ->
         XPat.ArrayOrList( isArray ,List.map getPat elementPats)
-    | SynPat.Record( fieldPats: ((LongIdent * Ident) * range * SynPat) list , range: range) ->
+    | SynPat.Record( fieldPats: ((LongIdent * Ident) * range option * SynPat) list , range: range) ->
         XPat.Record( 
             fieldPats
             |> List.map(fun((lid,id),_,pat)->
@@ -720,8 +724,8 @@ let getPat(src: SynPat) =
         XPat.IsInst(getType pat)
     | SynPat.QuoteExpr( expr: SynExpr , range: range) ->
         XPat.QuoteExpr(getExpr expr)
-    | SynPat.DeprecatedCharRange( startChar: char , endChar: char , range: range) ->
-        XPat.DeprecatedCharRange( startChar, endChar)
+    //| SynPat.DeprecatedCharRange( startChar: char , endChar: char , range: range) ->
+    //    XPat.DeprecatedCharRange( startChar, endChar)
     | SynPat.InstanceMember(
         thisId: Ident ,
         memberId: Ident ,
@@ -1158,30 +1162,31 @@ let getTypeConstraint(src:SynTypeConstraint) =
 
 let getRationalConst(src:SynRationalConst)=
     match src with
-    | SynRationalConst.Integer ( value: int32) ->
+    | SynRationalConst.Paren _ -> NotImplementedException() |> raise
+    | SynRationalConst.Integer ( value: int32,_) ->
         XRationalConst.Integer ( value)
     | SynRationalConst.Rational ( 
-        numerator: int32 , 
-        denominator: int32 , 
+        numerator: int32 , _,_,
+        denominator: int32 , _,
         range: FSharp.Compiler.Text.range
         ) ->
         XRationalConst.Rational (numerator,denominator)
-    | SynRationalConst.Negate (x: SynRationalConst) ->
+    | SynRationalConst.Negate (x: SynRationalConst,_) ->
         XRationalConst.Negate (getRationalConst x)
 
 let getMeasure(src:SynMeasure)=
     match src with
     | SynMeasure.Named ( longId: LongIdent , range: FSharp.Compiler.Text.range)->
         XMeasure.Named (getLongIdent longId)
-    | SynMeasure.Product ( measure1: SynMeasure , measure2: SynMeasure , range: FSharp.Compiler.Text.range)->
+    | SynMeasure.Product ( measure1: SynMeasure , _, measure2: SynMeasure , range: FSharp.Compiler.Text.range)->
         XMeasure.Product (getMeasure measure1  ,getMeasure measure2 )
     | SynMeasure.Seq ( measures: SynMeasure list , range: FSharp.Compiler.Text.range)->
         XMeasure.Seq (List.map getMeasure measures)
-    | SynMeasure.Divide ( measure1: SynMeasure , measure2: SynMeasure , range: FSharp.Compiler.Text.range)->
-        XMeasure.Divide (getMeasure measure1 ,getMeasure measure2)
-    | SynMeasure.Power ( measure: SynMeasure , power: SynRationalConst , range: FSharp.Compiler.Text.range)->
+    | SynMeasure.Divide ( measure1: SynMeasure option, _, measure2: SynMeasure , range: FSharp.Compiler.Text.range)->
+        XMeasure.Divide (getMeasure measure1.Value ,getMeasure measure2)
+    | SynMeasure.Power ( measure: SynMeasure , _, power: SynRationalConst , range: FSharp.Compiler.Text.range)->
         XMeasure.Power (getMeasure measure ,getRationalConst power)
-    | SynMeasure.One ->
+    | SynMeasure.One _ ->
         XMeasure.One
     | SynMeasure.Anon ( range: FSharp.Compiler.Text.range)->
         XMeasure.Anon 
@@ -1193,7 +1198,7 @@ let getValData (src:SynValData)=
     | SynValData (
         memberFlags: SynMemberFlags option ,
         valInfo: SynValInfo , 
-        thisIdOpt: Ident option
+        thisIdOpt: Ident option,_
         ) ->
         XValData (
             Option.map getMemberFlags memberFlags ,
@@ -1359,7 +1364,7 @@ let getValInfo(src:SynValInfo) =
 
 let getTyparDecl(src:SynTyparDecl) =
     match src with
-    | SynTyparDecl (attributes: SynAttributes,ty: SynTypar) ->
+    | SynTyparDecl (attributes: SynAttributes,ty: SynTypar,_,_) ->
         XTyparDecl (getAttributes attributes , getTypar ty)
 
 let getTypeDefnKind(src:SynTypeDefnKind) =

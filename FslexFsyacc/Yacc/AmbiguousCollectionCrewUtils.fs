@@ -1,5 +1,6 @@
 ﻿module FslexFsyacc.Yacc.AmbiguousCollectionCrewUtils
 open FslexFsyacc.Runtime
+open FSharp.Idioms.Literal
 
 let getConflictsOfClosure (closure:Set<string*ItemCore>) =
     closure
@@ -54,4 +55,23 @@ let collectConflictedProductions (this:AmbiguousCollectionCrew) =
         icore.production
     ]
 
+let renderMembers (collectionCrew:AmbiguousCollectionCrew) =
+    [
+        $"let mainProductions = {stringify collectionCrew.mainProductions}"
+        $"let augmentedProductions = {stringify collectionCrew.augmentedProductions}"
+        $"let symbols = {stringify collectionCrew.symbols}"
+        $"let nonterminals = {stringify collectionCrew.nonterminals}"
+        $"let terminals = {stringify collectionCrew.terminals}"
+        $"let nullables = {stringify collectionCrew.nullables}"
+        $"let firsts = {stringify collectionCrew.firsts}"
+        $"let lasts = {stringify collectionCrew.lasts}"
+        $"let follows = {stringify collectionCrew.follows}"
+        $"let precedes = {stringify collectionCrew.precedes}"
+
+        $"let kernels = {stringify collectionCrew.kernels}"
+        $"let closures = {stringify collectionCrew.closures}"
+        $"let GOTOs = {stringify collectionCrew.GOTOs}"
+        $"let conflictedItemCores = {stringify collectionCrew.conflictedItemCores}"
+
+    ]
 

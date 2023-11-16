@@ -4,7 +4,7 @@ open FSharp.Idioms
 open FSharp.Idioms.StringOps
 open FSharp.Idioms.RegularExpressions
 open FSharp.Idioms.ActivePatterns
-open FSharp.Literals.Literal
+open FSharp.Idioms.Literal
 
 open System.Text.RegularExpressions
 open FslexFsyacc.VanillaFSharp.FSharpSourceText

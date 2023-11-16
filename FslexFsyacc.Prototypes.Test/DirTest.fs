@@ -9,8 +9,7 @@ open FSharp.Reflection
 open FSharp.xUnit
 
 open FSharp.Idioms
-open FSharp.Literals
-open FSharp.Literals.Literal
+open FSharp.Idioms.Literal
 
 type DirTest(output:ITestOutputHelper) =
     let show res =

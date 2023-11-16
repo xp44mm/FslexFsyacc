@@ -9,7 +9,7 @@ open System.Text
 open Xunit
 open Xunit.Abstractions
 
-open FSharp.Literals.Literal
+open FSharp.Idioms.Literal
 open FSharp.xUnit
 
 type TermDFATest(output:ITestOutputHelper) =

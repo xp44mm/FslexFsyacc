@@ -46,6 +46,7 @@
 		<Compile Include="Yacc\ProductionCrewUtils.fs" />
 		<Compile Include="Yacc\ItemCoreUtils.fs" />
 		<Compile Include="Yacc\ItemCoreCrewUtils.fs" />
+		<Compile Include="Yacc\ItemCoreCrewRecurs.fs" />
 		<Compile Include="Yacc\ActionUtils.fs" />
 		<Compile Include="Yacc\NullableFactory.fs" />
 		<Compile Include="Yacc\FirstFactory.fs" />
@@ -63,6 +64,8 @@
 		<Compile Include="Yacc\GrammarCrewUtils.fs" />
 		<Compile Include="Yacc\LALRCollectionCrewUtils.fs" />
 		<Compile Include="Yacc\AmbiguousCollectionCrewUtils.fs" />
+		<Compile Include="Yacc\AmbiguousCollectionCrewRecurs.fs" />
+		<Compile Include="Yacc\AmbiguousCollectionCrewsRenderMembers.fs" />
 		<Compile Include="Yacc\ActionParseTableCrewUtils.fs" />
 		<Compile Include="Yacc\EncodedParseTableCrewUtils.fs" />
 		
@@ -106,8 +109,8 @@
 		<Compile Include="Fsyacc\FsyaccTokenUtils.fs" />
 		<Compile Include="Fsyacc\RegularSymbolUtils.fs" />
 		<Compile Include="Fsyacc\FsyaccParseTableFileUtils.fs" />
-		<Compile Include="Fsyacc\RuleListUtils.fs" />
-		<Compile Include="Fsyacc\RuleSetUtils.fs" />
+		<Compile Include="Fsyacc\FlatRulesUtils.fs" />
+		<Compile Include="Fsyacc\AugmentRulesUtils.fs" />
 		<Compile Include="Fsyacc\PrecedenceLinesUtils.fs" />
 		<Compile Include="Fsyacc\DeclarationLinesUtils.fs" />
 		<None Include="fsyacc\fsyacc.fsyacc" />
@@ -127,8 +130,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="FSharp.Idioms" Version="1.3.2" />
-		<PackageReference Include="FSharp.Literals" Version="2.2.14" />
+		<PackageReference Include="FSharp.Idioms" Version="1.4.8" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -136,7 +138,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Update="FSharp.Core" Version="7.0.400" />
+		<PackageReference Update="FSharp.Core" Version="8.0.100" />
 	</ItemGroup>
 
 </Project>

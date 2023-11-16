@@ -8,6 +8,7 @@
 
 	<ItemGroup>
 		<Compile Include="Dir.fs" />
+		<Compile Include="ItemCoreCrewFlat.fs" />
 		<Compile Include="Runtime\PositionTest.fs" />
 		<Compile Include="Runtime\RenderUtilsTest.fs" />    
 		<Compile Include="Lex\NFACombineTest.fs" />
@@ -51,16 +52,6 @@
 		<Compile Include="Fsyacc\FsyaccFileRulesTest.fs" />
 		<Compile Include="Fsyacc\FsyaccTokenTest.fs" />
 		<Compile Include="Fsyacc\FsyaccParseTableTest.fs" />
-    
-		<Compile Include="Expr\ExprToken.fs" />
-		<None Include="expr\expr.fsyacc" />
-		<Compile Include="Expr\ExprParseTable.fs" />
-		<Compile Include="Expr\ExprParseTableTest.fs" />
-		<Compile Include="Expr\ExprData.fs" />
-		<Compile Include="Expr\ExprDataCrewTest.fs" />
-		<Compile Include="Expr\ExprCompiler.fs" />
-		<Compile Include="Expr\ExprCompilerTest.fs" />
-		
 		<Compile Include="PolynomialExpressions\Polynomials.fs" />
 		<Compile Include="PolynomialExpressions\Tokenizer.fs" />
 		<Compile Include="PolynomialExpressions\TokenizerTest.fs" />
@@ -70,8 +61,20 @@
 		<Compile Include="PolynomialExpressions\Parser.fs" />
 		<Compile Include="PolynomialExpressions\ParserTest.fs" />
 		<Compile Include="PolynomialExpressions\AnalyzerTest.fs" />
-		<None Include="428.fsyacc" />
-		<Compile Include="G428Test.fs" />
+    
+		<Compile Include="Expr\ExprToken.fs" />
+		<None Include="expr\expr.fsyacc" />
+		<Compile Include="Expr\ExprParseTable.fs" />
+		<Compile Include="Expr\ExprParseTableTest.fs" />
+		<Compile Include="Expr\ExprData.fs" />
+		<Compile Include="Expr\ExprDataCrewTest.fs" />
+		<Compile Include="Expr\ExprCompiler.fs" />
+		<Compile Include="Expr\ExprCompilerTest.fs" />
+		<None Include="g01.fsyacc" />
+		<Compile Include="G01Test.fs" />
+		<Compile Include="G01Data.fs" />
+		<None Include="g02.fsyacc" />
+		<Compile Include="G02Test.fs" />
 		<Compile Include="BNF428Data.fs" />
 		<Compile Include="BNF428CrewTest.fs" />
 
@@ -80,9 +83,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="FSharp.xUnit" Version="1.2.11" />
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
-		<PackageReference Include="xunit" Version="2.5.2" />
+		<PackageReference Include="FSharp.xUnit" Version="1.2.20" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+		<PackageReference Include="xunit" Version="2.6.1" />
 		<PackageReference Include="xunit.runner.visualstudio" Version="2.5.3">
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -100,7 +103,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Update="FSharp.Core" Version="7.0.400" />
+	  <PackageReference Update="FSharp.Core" Version="8.0.100" />
 	</ItemGroup>
 
 </Project>

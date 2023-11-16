@@ -9,7 +9,7 @@ open Xunit
 open Xunit.Abstractions
 
 open FSharp.Idioms
-open FSharp.Literals.Literal
+open FSharp.Idioms.Literal
 open FSharp.xUnit
 
 open FslexFsyacc.Yacc
@@ -39,7 +39,7 @@ type FslexParseTableTest(output: ITestOutputHelper) =
     let fsyaccCrew =
         text
         |> RawFsyaccFileCrewUtils.parse
-        |> FlatedFsyaccFileCrewUtils.getFlatedFsyaccFileCrew
+        |> FlatedFsyaccFileCrewUtils.fromRawFsyaccFileCrew
 
     let tblCrew =
         fsyaccCrew
@@ -103,7 +103,7 @@ type FslexParseTableTest(output: ITestOutputHelper) =
 
         // production -> %prec
         let pprods =
-            ProductionListUtils.precedenceOfProductions tblCrew.terminals productions
+            ProductionSetUtils.precedenceOfProductions tblCrew.terminals productions
 
         //优先级应该据此结果给出，不能少，也不应该多。
         let y =
