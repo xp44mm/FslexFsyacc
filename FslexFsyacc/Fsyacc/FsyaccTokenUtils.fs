@@ -86,7 +86,7 @@ let tokenize (offset:int) (input:string) =
 
             | On trySingleQuoteString x ->
                 let len = x.Length
-                yield Position.from(pos,len,LITERAL(JsonString.unquote x.Value))
+                yield Position.from(pos,len,LITERAL(Json.unquote x.Value))
                 yield! loop (lpos,lrest) (pos+len,rest.[len..])
 
             | On trySemantic x ->

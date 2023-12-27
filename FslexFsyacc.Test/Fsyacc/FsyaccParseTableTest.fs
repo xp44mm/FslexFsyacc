@@ -63,7 +63,7 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
     [<Fact>]
     member _.``03 - list all states``() =        
         let src = 
-            AmbiguousCollectionUtils.render 
+            AmbiguousCollectionUtils.render
                 tblCrew.terminals
                 tblCrew.conflictedItemCores
                 (tblCrew.kernels |> Seq.mapi(fun i k -> k,i) |> Map.ofSeq)

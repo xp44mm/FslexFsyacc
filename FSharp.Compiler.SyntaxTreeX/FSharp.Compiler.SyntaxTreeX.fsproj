@@ -17,7 +17,7 @@
     <IsPublishable>True</IsPublishable>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Copyright>xp44mm</Copyright>
-    <Version>43.7.400</Version>
+    <Version>43.8.100</Version>
 
 
   </PropertyGroup>

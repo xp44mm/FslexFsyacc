@@ -52,10 +52,10 @@ type FslexDFATest(output:ITestOutputHelper) =
 
     [<Fact(
     Skip="once and for all!"
-    )>] // 
+    )>]
     member _.``04 - generate DFA``() =
-        let y = fslex|>FslexFileUtils.toFslexDFAFile
-        let result = y|>FslexDFAFileUtils.generate(moduleName)
+        let y = fslex |> FslexFileUtils.toFslexDFAFile
+        let result = y |> FslexDFAFileUtils.generate(moduleName)
 
         File.WriteAllText(modulePath, result, Encoding.UTF8)
         output.WriteLine("output lex:" + modulePath)

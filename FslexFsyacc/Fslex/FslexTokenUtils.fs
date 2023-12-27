@@ -2,6 +2,7 @@
 
 open FSharp.Idioms
 open FSharp.Idioms.StringOps
+
 open FSharp.Idioms.RegularExpressions
 open FSharp.Idioms.ActivePatterns
 open FSharp.Idioms.Literal
@@ -103,7 +104,7 @@ let tokenize (offset:int) (input:string) =
 
             | On trySingleQuoteString m ->
                 let len = m.Length
-                yield Position.from(pos,len,LITERAL(JsonString.unquote m.Value))
+                yield Position.from(pos,len,LITERAL(Json.unquote m.Value))
                 yield! loop (lpos,lrest) (pos+len,rest.[len..])
 
             | On trySemantic capt ->
