@@ -6,7 +6,7 @@
     <Authors>cuishengli</Authors>
     <Description>`FSharp.Compiler.SyntaxTreeX` is a subtree of `FSharp.Compiler.SyntaxTree`.</Description>
     <PackageReadmeFile>readme.md</PackageReadmeFile>
-    <PackageReleaseNotes>update FSharp.Compiler.Service for 43.7.400</PackageReleaseNotes>
+    <PackageReleaseNotes>update FSharp.Compiler.Service for 43.8.200</PackageReleaseNotes>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
 
@@ -17,7 +17,7 @@
     <IsPublishable>True</IsPublishable>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Copyright>xp44mm</Copyright>
-    <Version>43.8.100</Version>
+    <Version>43.8.200</Version>
 
 
   </PropertyGroup>
@@ -38,11 +38,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FSharp.Compiler.Service" Version="43.8.101" />
+    <PackageReference Include="FSharp.Compiler.Service" Version="43.8.200" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="8.0.101" />
+    <PackageReference Update="FSharp.Core" Version="8.0.200" />
   </ItemGroup>
 
 </Project>

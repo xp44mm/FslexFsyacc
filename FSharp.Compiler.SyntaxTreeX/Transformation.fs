@@ -1198,7 +1198,7 @@ let getValData (src:SynValData)=
     | SynValData (
         memberFlags: SynMemberFlags option ,
         valInfo: SynValInfo , 
-        thisIdOpt: Ident option,_
+        thisIdOpt: Ident option
         ) ->
         XValData (
             Option.map getMemberFlags memberFlags ,
