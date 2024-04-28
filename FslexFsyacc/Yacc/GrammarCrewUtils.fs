@@ -21,7 +21,6 @@ let getNullableCrew(prototype:ProductionsCrew) =
 
     NullableCrew(prototype,symbols,nonterminals,terminals,nullables)
 
-
 let getFirstLastCrew(prototype:NullableCrew) =
     let firsts = FirstFactory.make prototype.nullables prototype.mainProductions
     let lasts  = LastFactory.make prototype.nullables prototype.mainProductions
@@ -105,7 +104,7 @@ let getNextKernels (collection:ItemCoresCrew) (closure:Set<ItemCore*Set<string>>
         ItemCoreCrewUtils.getPrevSymbol itemCoreCrew)
 
 /// the collection of sets of items
-let getClosureCollection (grammar:ItemCoresCrew) =
+let getKernelCollection (grammar:ItemCoresCrew) =
     // kernel -> closure
     let getClosure = getClosure grammar
     let itemCores = grammar.itemCoreCrews |> Map.keys |> Set.ofSeq
@@ -156,11 +155,19 @@ let getClosureCollection (grammar:ItemCoresCrew) =
             loop oldKernels newKernels
 
     let k0 = Set.singleton (itemCores.MinimumElement, Set.singleton "")
-    /// kernel*closure的集合
+    ///// kernel*closure的集合
     let result = 
         loop Set.empty (Set.singleton k0)
-        |> Set.map(fun kernel ->
-            ClosureOperators.getCore kernel, getClosure kernel
-            )
+        //|> Set.map(fun kernel ->
+        //    ClosureOperators.getCore kernel, getClosure kernel
+        //    )
     result
+
+/// the collection of sets of items
+let getClosureCollection (grammar:ItemCoresCrew) =
+    grammar
+    |> getKernelCollection
+    |> Set.map(fun kernel ->
+        ClosureOperators.getCore kernel, getClosure grammar kernel
+        )
 

@@ -1,7 +1,8 @@
 ﻿module FslexFsyacc.Yacc.LALRCollectionCrewUtils
 open FSharp.Idioms
+open FslexFsyacc.Runtime
 
-let getLALRCollectionCrew(grammar:ItemCoresCrew) =
+let getLALRCollectionCrew (grammar:ItemCoresCrew) =
 
     let closures =
         GrammarCrewUtils.getClosureCollection grammar
@@ -11,6 +12,7 @@ let getLALRCollectionCrew(grammar:ItemCoresCrew) =
         closures
         |> Set.map fst
 
+    // kernel -> closure
     let closures =
         closures
         |> Set.toList
@@ -37,7 +39,7 @@ let getLALRCollectionCrew(grammar:ItemCoresCrew) =
             i,spreadedClosure
         )
         |> Map.ofList
-
+    // kernel -> string -> kernel
     let gotos =
         closures
         |> Map.map(fun i closure ->

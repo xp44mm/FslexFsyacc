@@ -25,15 +25,16 @@ let mergeClrKernels (slrKernel:Set<ItemCore>) (clrKernels:seq<Set<ItemCore*Set<s
     //clrKernels
     //|> Set.unionMany
     //|> Set.unionByKey
-
-    /// 直接按次序合并集合
-    let lookaheadsArray =
+    let x =
         clrKernels
         |> Seq.map ClosureOperators.getLookaheads
+    /// 直接按次序合并集合
+    let lookaheadsList =
+        x
         |> List.transpose
         |> List.map Set.unionMany
 
     slrKernel
     |> Set.toList
-    |> List.zip <| lookaheadsArray
+    |> List.zip <| lookaheadsList
     |> Set.ofList

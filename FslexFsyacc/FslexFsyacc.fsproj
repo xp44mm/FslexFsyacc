@@ -40,6 +40,24 @@
 		<Compile Include="Lex\PartitionDFAUtils.fs" />
 		<Compile Include="Lex\DFATools.fs" />
 		<Compile Include="Lex\DFAUtils.fs" />
+		<Compile Include="Grammars\NullableUtils.fs" />
+		<Compile Include="Grammars\FirstUtils.fs" />
+		<Compile Include="Grammars\LastUtils.fs" />
+		<Compile Include="Grammars\FollowUtils.fs" />
+		<Compile Include="Grammars\PrecedeUtils.fs" />
+		<Compile Include="Grammars\GrammarRow.fs" />
+		<Compile Include="Grammars\GrammarRowUtils.fs" />
+		<Compile Include="Grammars\Grammar.fs" />
+    
+		<Compile Include="ItemCores\ItemCoreRow.fs" />
+		<Compile Include="ItemCores\ItemCoreRowUtils.fs" />
+		<Compile Include="ItemCores\ItemCore.fs" />
+		<Compile Include="LALRs\LALR.fs" />
+		<Compile Include="LALRs\LALRCollection.fs" />
+		<Compile Include="LALRs\Grammar.fs" />
+		<Compile Include="LALRs\SpreadClosure.fs" />
+		<Compile Include="LALRs\GOTO.fs" />
+    
 		<Compile Include="Yacc\ItemCoreCrews.fs" />
 		<Compile Include="Yacc\AmbiguousCollectionCrews.fs" />
 		<Compile Include="Yacc\SemanticParseTableCrews.fs" />
@@ -131,7 +149,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="FSharp.Idioms" Version="1.4.17" />
+		<PackageReference Include="FSharp.Idioms" Version="1.4.19" />
 	</ItemGroup>
 
 	<ItemGroup>

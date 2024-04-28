@@ -2,6 +2,7 @@
 open FslexFsyacc.Lex
 let clazz s = s |> List.rev |> List.reduce(fun a b -> Either(a,b))
 %}
+
 file :
     | HEADER definition+ "%%" rule+ {s0,List.rev s1,List.rev s3}
     | HEADER rule+ {s0,[],List.rev s1}
@@ -40,21 +41,6 @@ rule :
 %nonassoc "*" "+" "?"
 
 %%
-
-// HEADER : string
-// ID : string
-// CAP : string
-// LITERAL : string
-// SEMANTIC : string
-// HOLE : string
-// atomic : "RegularExpression<string>"
-// atomic+ : "RegularExpression<string> list"
-// definition : "string*RegularExpression<string>"
-// definition+ : "(string*RegularExpression<string>)list"
-// expr : "RegularExpression<string>"
-// rule : "RegularExpression<string>list*string"
-// rule+ : "(RegularExpression<string>list*string)list"
-// file : "string*(string*RegularExpression<string>)list*(RegularExpression<string>list*string)list"
 
 %type<string> HEADER ID CAP LITERAL SEMANTIC HOLE
 %type<RegularExpression<string>> atomic expr

@@ -60,7 +60,7 @@ let sortItemsByKernel (items:Map<ItemCore,Set<string>>) =
 let isSRConflict(itemcores:Set<ItemCore>) =
     let reduces =
         itemcores
-        |> Set.filter((ItemCoreUtils.dotmax))
+        |> Set.filter(ItemCoreUtils.dotmax)
     itemcores.Count > 1 && reduces.Count = 1
 
 let isConflict (itemcores:Set<ItemCore>) =
@@ -141,12 +141,12 @@ let getUnambiguousItemCores
     (conflictedItemCores:Map<int,Map<string,Set<ItemCore>>>)
     =
 
-    let eliminator =
+    let eliminator: AmbiguityEliminator =
         {
             terminals = terminals
             dummyTokens = dummyTokens
             precedences = precedences
-        }:AmbiguityEliminator
+        }
 
     conflictedItemCores
     |> Map.map(fun i closure ->

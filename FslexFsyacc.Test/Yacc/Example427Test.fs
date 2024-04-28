@@ -5,6 +5,7 @@ open Xunit.Abstractions
 open FSharp.Idioms
 open FSharp.xUnit
 open FSharp.Idioms
+open FSharp.Idioms.Literal
 
 type Example427Test(output:ITestOutputHelper) =
     let show res = 
@@ -31,6 +32,27 @@ type Example427Test(output:ITestOutputHelper) =
         [ F   ; id ]
         ]
 
+    let grammar = 
+        mainProductions
+        |> ProductionsCrewUtils.getProductionsCrew
+        |> GrammarCrewUtils.getNullableCrew
+        |> GrammarCrewUtils.getFirstLastCrew
+        |> GrammarCrewUtils.getFollowPrecedeCrew
+
+    [<Fact>]
+    member _.``grammar collections``() =
+        output.WriteLine($"let productions = {stringify grammar.augmentedProductions}")
+        output.WriteLine($"let startSymbol = {stringify grammar.startSymbol}")
+        output.WriteLine($"let symbols = {stringify grammar.symbols}")
+        output.WriteLine($"let nonterminals = {stringify grammar.nonterminals}")
+        output.WriteLine($"let terminals = {stringify grammar.terminals}")
+        output.WriteLine($"let nullables = {stringify grammar.nullables}")
+        output.WriteLine($"let firsts = {stringify grammar.firsts}")
+        output.WriteLine($"let lasts = {stringify grammar.lasts}")
+        output.WriteLine($"let follows = {stringify grammar.follows}")
+        output.WriteLine($"let precedes = {stringify grammar.precedes}")
+
+
     [<Fact>]
     member _.``0101 - augment grammar productions``() =
         //show grammar.productions
@@ -44,6 +66,7 @@ type Example427Test(output:ITestOutputHelper) =
             ["T";"F";"T'"];
             ["T'"];
             ["T'";"*";"F";"T'"]]
+
         let grammar = 
             mainProductions
             |> ProductionsCrewUtils.getProductionsCrew
@@ -93,7 +116,7 @@ type Example427Test(output:ITestOutputHelper) =
             |> GrammarCrewUtils.getNullableCrew
             |> GrammarCrewUtils.getFirstLastCrew
 
-        show grammar.firsts
+        //show grammar.firsts
         let y = Map.ofList [
             "E",set ["(";"id"];
             "E'",set ["+"];
@@ -152,7 +175,7 @@ type Example427Test(output:ITestOutputHelper) =
             |> GrammarCrewUtils.getFirstLastCrew
             |> GrammarCrewUtils.getFollowPrecedeCrew
 
-        show grammar.precedes
+        //show grammar.precedes
         ////空字符串代表BOF
         let y = Map [
             "(",set ["";"(";"*";"+"];")",set [")";"id"];

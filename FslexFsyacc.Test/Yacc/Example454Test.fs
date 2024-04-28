@@ -2,14 +2,13 @@
 
 open Xunit
 open Xunit.Abstractions
-open FSharp.Idioms
 open FSharp.xUnit
 
-type Example454Test(output:ITestOutputHelper) =
-    let show res =
-        res
-        |> Literal.stringify
-        |> output.WriteLine
+open FslexFsyacc.Runtime
+open FSharp.Idioms
+open FSharp.Idioms.Literal
+
+type Example454Test(output: ITestOutputHelper) =
 
     // grammar 4.55
     let S = "S"
@@ -28,58 +27,64 @@ type Example454Test(output:ITestOutputHelper) =
         |> ProductionsCrewUtils.getProductionsCrew
         |> GrammarCrewUtils.getNullableCrew
         |> GrammarCrewUtils.getFirstLastCrew
+        |> GrammarCrewUtils.getFollowPrecedeCrew
+        |> GrammarCrewUtils.getItemCoresCrew
+
+    [<Fact>]
+    member _.``kernels``() =
+        let kernels = 
+            grammar
+            |> GrammarCrewUtils.getKernelCollection
+            
+        for i, kernel in Seq.indexed kernels do
+        let kernel =
+            kernel 
+            |> Set.toList
+            |> List.map(fun (ic,la) -> ic.production, ic.dot, Set.toList la)
+
+        output.WriteLine($"let kernel_{i} = {stringify kernel}")
 
     [<Fact>]
     member _.``closures``() =
-        let grammar = 
-            mainProductions
-            |> ProductionsCrewUtils.getProductionsCrew
-            |> GrammarCrewUtils.getNullableCrew
-            |> GrammarCrewUtils.getFirstLastCrew
-            |> GrammarCrewUtils.getFollowPrecedeCrew
-            |> GrammarCrewUtils.getItemCoresCrew
-
-        //let itemCores = 
-        //    ItemCoreFactory.make grammar.augmentedProductions
-
-        //let itemCoreAttributes = 
-        //    ItemCoreAttributeFactory.make grammar.nonterminals grammar.nullables grammar.firsts itemCores
-            
-
         let closures = 
-            //CollectionFactory.make itemCores itemCoreAttributes grammar.augmentedProductions
             grammar
-            |> GrammarCrewUtils.getClosureCollection 
-            |> Set.map(fun (kernel,closure)->
-                let k = kernel |> Set.map(fun i -> i.production,i.dot)
-                let c = closure |> Set.map(fun (i,la)->(i.production,i.dot),la)
-                k,c
-            )
-
-        //show closures
-        let y = set [
-            set [
-                ["";"S"],0],set [
-                    (["";"S"],0),set [""];
-                    (["C";"c";"C"],0),set ["c";"d"];
-                    (["C";"d"],0),set ["c";"d"];(["S";"C";"C"],0),set [""]];
-            set [["";"S"],1],set [(["";"S"],1),set [""]];
-            set [["C";"c";"C"],1],set [(["C";"c";"C"],0),set ["";"c";"d"];(["C";"c";"C"],1),set ["";"c";"d"];(["C";"d"],0),set ["";"c";"d"]];
-            set [["C";"c";"C"],2],set [(["C";"c";"C"],2),set ["";"c";"d"]];
-            set [["C";"d"],1],set [(["C";"d"],1),set ["";"c";"d"]];
-            set [["S";"C";"C"],1],set [(["C";"c";"C"],0),set [""];(["C";"d"],0),set [""];(["S";"C";"C"],1),set [""]];
-            set [["S";"C";"C"],2],set [(["S";"C";"C"],2),set [""]]]
-        Should.equal y closures
+            |> GrammarCrewUtils.getClosureCollection
+            
+        for i,(knl,cls) in Seq.indexed closures do
+        let cls =
+            cls 
+            |> Set.map(fun (i,la) -> i.production, i.dot, Set.toList la)
+            |> Set.toList
+        output.WriteLine($"let closure_{i} = {stringify cls}")
 
     [<Fact>]
-    member _.``goto factory``() =
-        let itemCores = 
-            ItemCoreUtils.make grammar.augmentedProductions
+    member _.``spread closures``() =
+        let crew =
+            grammar
+            |> LALRCollectionCrewUtils.getLALRCollectionCrew
 
-        //let itemCoreAttributes = 
-        //    ItemCoreAttributeFactory.make grammar.nonterminals grammar.nullables grammar.firsts itemCores
-   
-        //let closures = 
-        //    CollectionFactory.make itemCores itemCoreAttributes grammar.augmentedProductions
+        for KeyValue(i, cls) in crew.closures do
+        let cls =
+            cls 
+            |> Set.toList
+            |> List.map(fun (la,ic) -> la, ic.production, ic.dot )
+        
+        output.WriteLine($"let spreadClosure_{i} = {stringify cls}")
 
-        ()
+    [<Fact>]
+    member _.``goto``() =
+        let crew =
+            grammar
+            |> LALRCollectionCrewUtils.getLALRCollectionCrew
+
+        let ik = 
+            crew.kernels
+            |> Seq.mapi(fun i k -> k,i)
+            |> Map.ofSeq
+
+        for KeyValue(src, mp) in crew.GOTOs do
+        for KeyValue(sym, tgt) in mp do
+        let tgt = ik.[tgt]
+        output.WriteLine($"{stringify (src,sym,tgt)}")
+
+

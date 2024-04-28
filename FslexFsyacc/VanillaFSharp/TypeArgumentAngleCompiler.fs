@@ -38,7 +38,7 @@ let compile (offset) (input:string) =
             yield tokenIterator.tryNext().Value
     }
     //|> Seq.map(fun tok ->
-    //    tokens <- tok::tokens
+    //    tokens <- tok::tokens // 记录当前tokens
     //    tok
     //)
     |> Seq.filter(fun tok ->
@@ -53,9 +53,8 @@ let compile (offset) (input:string) =
     match parser.accept states with
     | [1,lxm; 0,null] -> BoundedParseTable.unboxRoot lxm
     | _ -> failwith $"{stringify states}"
-
-    
-let getRange (offset) (input:string) =
+        
+let getRange (offset:int) (input:string) =
     match compile offset input with
     | FslexFsyacc.Brackets.Band.Bounded(i,_,j) ->
         Diagnostics.Debug.Assert((i=offset))
