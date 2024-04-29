@@ -6,10 +6,12 @@ type ItemCore =
     production : string list
     dot        : int
     }
+
     static member just(production,dot) = { production = production; dot = dot }
 
-    static member left(production) = ItemCore.just(production,0)
+    static member start(production) = ItemCore.just(production,0)
 
+    // dotIncr
     member this.advance() = 
         if this.dotmax then
             invalidOp "ItemCore.dotmax is true"

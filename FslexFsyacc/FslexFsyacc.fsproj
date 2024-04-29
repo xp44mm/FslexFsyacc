@@ -52,28 +52,32 @@
 		<Compile Include="ItemCores\ItemCoreRow.fs" />
 		<Compile Include="ItemCores\ItemCoreRowUtils.fs" />
 		<Compile Include="ItemCores\ItemCore.fs" />
+    
 		<Compile Include="LALRs\LALR.fs" />
 		<Compile Include="LALRs\LALRCollection.fs" />
 		<Compile Include="LALRs\Grammar.fs" />
 		<Compile Include="LALRs\SpreadClosure.fs" />
 		<Compile Include="LALRs\GOTO.fs" />
+		<Compile Include="LALRs\SLR.fs" />
     
 		<Compile Include="Yacc\ItemCoreCrews.fs" />
 		<Compile Include="Yacc\AmbiguousCollectionCrews.fs" />
 		<Compile Include="Yacc\SemanticParseTableCrews.fs" />
-		<Compile Include="Yacc\ProductionUtils.fs" />
+    
+    <Compile Include="Yacc\ProductionUtils.fs" />
 		<Compile Include="Yacc\ProductionCrewUtils.fs" />
+		<Compile Include="Yacc\ProductionListUtils.fs" />
+		<Compile Include="Yacc\ProductionSetUtils.fs" />
+    <Compile Include="Yacc\NullableFactory.fs" />
+    <Compile Include="Yacc\FirstFactory.fs" />
+    <Compile Include="Yacc\LastFactory.fs" />
+    <Compile Include="Yacc\FollowFactory.fs" />
+    <Compile Include="Yacc\PrecedeFactory.fs" />
+
 		<Compile Include="Yacc\ItemCoreUtils.fs" />
 		<Compile Include="Yacc\ItemCoreCrewUtils.fs" />
 		<Compile Include="Yacc\ItemCoreCrewRecurs.fs" />
 		<Compile Include="Yacc\ActionUtils.fs" />
-		<Compile Include="Yacc\NullableFactory.fs" />
-		<Compile Include="Yacc\FirstFactory.fs" />
-		<Compile Include="Yacc\LastFactory.fs" />
-		<Compile Include="Yacc\FollowFactory.fs" />
-		<Compile Include="Yacc\PrecedeFactory.fs" />
-		<Compile Include="Yacc\ProductionListUtils.fs" />
-		<Compile Include="Yacc\ProductionSetUtils.fs" />
 		<Compile Include="Yacc\ClosureOperators.fs" />
 		<Compile Include="Yacc\KernelUtils.fs" />
 		<Compile Include="Yacc\AmbiguityEliminator.fs" />

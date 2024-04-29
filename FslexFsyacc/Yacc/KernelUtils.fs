@@ -25,9 +25,11 @@ let mergeClrKernels (slrKernel:Set<ItemCore>) (clrKernels:seq<Set<ItemCore*Set<s
     //clrKernels
     //|> Set.unionMany
     //|> Set.unionByKey
+
     let x =
         clrKernels
         |> Seq.map ClosureOperators.getLookaheads
+
     /// 直接按次序合并集合
     let lookaheadsList =
         x

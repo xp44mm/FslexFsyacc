@@ -28,8 +28,8 @@ let fromAmbiguousCollectionCrew
                         |> ActionUtils.from
                         |> Set.toList
                     with
-                    | [x] -> x
                     | [] -> failwith $"nonassoc error."
+                    | [x] -> x
                     | acts -> failwith $"there is a conflict: {stringify acts}"
                 )
             actions

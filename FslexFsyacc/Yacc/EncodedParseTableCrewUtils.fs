@@ -15,7 +15,6 @@ let fromActionParseTableCrew (tbl:ActionParseTableCrew) =
     let encodedClosures = encoder.getEncodedClosures tbl.resolvedClosures
     EncodedParseTableCrew(tbl,encodedActions,encodedClosures)
 
-
 let getEncodedParseTableCrew(
     mainProductions:string list list,
     dummyTokens:Map<string list,string>, // %prec dummy-token
