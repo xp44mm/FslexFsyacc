@@ -21,20 +21,20 @@ let ofRaw (rawProductions:list<string*list<list<string>>>) =
     )
 
 //从文法生成增广文法
-let ofMainProductions (inputProductionList:list<Production>) =
+let ofMainProductions (inputProductionList:list<list<string>>) =
     let startSymbol = inputProductionList.[0].[0]
     let mainProductions = set inputProductionList
     mainProductions
     |> Set.add ["";startSymbol]
 
-let getStartSymbol (augmentedProductions:Set<Production>) =
+let getStartSymbol (augmentedProductions:Set<list<string>>) =
     let augProduction = 
         augmentedProductions
         |> Set.minElement
     augProduction.[1]
 
 // Single 是一个非终结符的所有产生式集合，仅有一个产生式，这个产生式或者为空，或者只有一个符号
-let trySingle (productions:#seq<Production>) =
+let trySingle (productions:#seq<list<string>>) =
     match 
         productions |> Seq.tryExactlyOne
     with
@@ -42,7 +42,7 @@ let trySingle (productions:#seq<Production>) =
     | _ -> None
 
 /// 
-let getSingle (productions:list<Production>) =
+let getSingle (productions:list<list<string>>) =
     productions
     |> List.groupBy List.head
     |> List.map snd
@@ -72,7 +72,7 @@ let eliminateSymbol (symbol:string) (productions:list<string list>) =
         else [prod]
     )
 
-let eliminateSingles (productions:List<Production>) =
+let eliminateSingles (productions:List<list<string>>) =
     let nonterminals =
         productions
         |> getSingle

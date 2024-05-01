@@ -16,7 +16,7 @@ let ofFlat (rules:list<list<string>*string*string>) =
     |> Set.ofList
     |> Set.add augmentRule
 
-let toFlat (augmentRules:Set<Production*string*string>) =
+let toFlat (augmentRules:Set<list<string>*string*string>) =
     augmentRules
     |> Set.minElement
     |> Set.remove <| augmentRules
@@ -28,13 +28,13 @@ let ofRaw (rules:(string*(list<list<string>*string*string>))list) =
     |> FlatRulesUtils.ofRaw
     |> ofFlat
 
-let getDummyTokens (augmentRules:Set<Production*string*string>) =
+let getDummyTokens (augmentRules:Set<list<string>*string*string>) =
     augmentRules
     |> Set.filter(fun (prod,dummy,act) -> dummy > "")
     |> Set.map(Triple.firstTwo)
     |> Map.ofSeq
 
-let getStartSymbol (augmentRules:Set<Production*string*string>) =
+let getStartSymbol (augmentRules:Set<list<string>*string*string>) =
     augmentRules.MinimumElement
     |> Triple.first
     |> List.last

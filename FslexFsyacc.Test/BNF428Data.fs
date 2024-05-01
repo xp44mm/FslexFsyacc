@@ -1,6 +1,8 @@
 ﻿namespace FslexFsyacc
 
 open FslexFsyacc.Runtime
+open FslexFsyacc.Runtime.ItemCores
+open FslexFsyacc.Runtime.LALRs
 
 /// 文法 4.28 推导的数据集合
 module BNF428Data =

@@ -1,7 +1,7 @@
-﻿module FslexFsyacc.LALRs.BNF4_55
+﻿module FslexFsyacc.Runtime.LALRs.BNF4_55
 
-open FslexFsyacc.Grammars
-open FslexFsyacc.ItemCores
+open FslexFsyacc.Runtime.Grammars
+open FslexFsyacc.Runtime.ItemCores
 
 // grammar 4.55
 let S = "S"

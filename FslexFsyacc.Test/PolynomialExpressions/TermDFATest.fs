@@ -1,6 +1,8 @@
 ﻿namespace PolynomialExpressions
+
+open FslexFsyacc.Runtime.Lex
+
 open FslexFsyacc.Fslex
-open FslexFsyacc.Lex
 
 open System
 open System.IO

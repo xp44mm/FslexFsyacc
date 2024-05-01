@@ -1,5 +1,7 @@
 ﻿module FslexFsyacc.Yacc.KernelUtils
 open FslexFsyacc.Runtime
+open FslexFsyacc.Runtime.ItemCores
+open FslexFsyacc.Runtime.LALRs
 
 open FSharp.Idioms
 

@@ -1,5 +1,7 @@
 ﻿module FslexFsyacc.G01Data
 open FslexFsyacc.Runtime
+open FslexFsyacc.Runtime.ItemCores
+open FslexFsyacc.Runtime.LALRs
 let inputProductionList = [["E";"E";"+";"T"];["E";"T"];["T";"T";"*";"F"];["T";"F"];["F";"(";"E";")"];["F";"id"]]
 let mainProductions = set [["E";"E";"+";"T"];["E";"T"];["F";"(";"E";")"];["F";"id"];["T";"F"];["T";"T";"*";"F"]]
 let augmentedProductions = set [["";"E"];["E";"E";"+";"T"];["E";"T"];["F";"(";"E";")"];["F";"id"];["T";"F"];["T";"T";"*";"F"]]

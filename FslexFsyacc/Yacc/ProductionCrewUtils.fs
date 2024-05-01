@@ -2,7 +2,7 @@
 
 open FslexFsyacc.Runtime
 
-let getProductionCrew(production:Production) =
+let getProductionCrew(production:string list) =
     let leftside =
         production
         |> List.head

@@ -1,5 +1,5 @@
 ﻿namespace FslexFsyacc.Yacc
-open FslexFsyacc.Runtime
+open FslexFsyacc.Runtime.ItemCores
 
 // ProductionsCrew(inputProductionList,startSymbol,mainProductions,augmentedProductions)
 type ProductionsCrew(inputProductionList:list<list<string>>,startSymbol:string,mainProductions:Set<list<string>>,augmentedProductions:Set<list<string>>) =

@@ -1,5 +1,6 @@
 ﻿namespace FslexFsyacc.Yacc
-open FslexFsyacc.Runtime
+open FslexFsyacc.Runtime.ItemCores
+open FslexFsyacc.Runtime.LALRs
 
 // ActionParseTableCrew(prototype,dummyTokens,precedences,unambiguousItemCores,actions,resolvedClosures)
 type ActionParseTableCrew(prototype:AmbiguousCollectionCrew,dummyTokens:Map<list<string>,string>,precedences:Map<string,int>,unambiguousItemCores:Map<int,Map<string,Set<ItemCore>>>,actions:Map<int,Map<string,Action>>,resolvedClosures:Map<int,Map<ItemCore,Set<string>>>) =

@@ -1,5 +1,7 @@
 ﻿module FslexFsyacc.Yacc.AmbiguousCollectionCrewUtils
 open FslexFsyacc.Runtime
+open FslexFsyacc.Runtime.ItemCores
+open FslexFsyacc.Runtime.LALRs
 open FSharp.Idioms.Literal
 
 let getConflictsOfClosure (closure:Set<string*ItemCore>) =
@@ -22,7 +24,7 @@ let getAmbiguousCollectionCrew (crew:LALRCollectionCrew) =
         )
     AmbiguousCollectionCrew(crew,conflicts)
 
-let newAmbiguousCollectionCrew (mainProductions:Production list) =
+let newAmbiguousCollectionCrew (mainProductions:list<list<string>>) =
     mainProductions
     |> ProductionsCrewUtils.getProductionsCrew
     |> GrammarCrewUtils.getNullableCrew

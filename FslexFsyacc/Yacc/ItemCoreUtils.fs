@@ -2,6 +2,7 @@
 open System
 
 open FslexFsyacc.Runtime
+open FslexFsyacc.Runtime.ItemCores
 
 ///前进一半，留一半
 let dichotomy (itemCore:ItemCore) =

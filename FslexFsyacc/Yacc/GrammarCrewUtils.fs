@@ -1,6 +1,8 @@
 ﻿module FslexFsyacc.Yacc.GrammarCrewUtils
 
 open FslexFsyacc.Runtime
+open FslexFsyacc.Runtime.ItemCores
+open FslexFsyacc.Runtime.LALRs
 open FSharp.Idioms
 
 let getNullableCrew(prototype:ProductionsCrew) =

@@ -1,4 +1,4 @@
-﻿namespace FslexFsyacc.LALRs
+﻿namespace FslexFsyacc.Runtime.LALRs
 
 open Xunit
 open Xunit.Abstractions
@@ -7,8 +7,8 @@ open FSharp.xUnit
 open FSharp.Idioms
 open FSharp.Idioms.Literal
 
-open FslexFsyacc.Grammars
-open FslexFsyacc.ItemCores
+open FslexFsyacc.Runtime.Grammars
+open FslexFsyacc.Runtime.ItemCores
 
 type GrammarForLalrTest(output: ITestOutputHelper) =
 
@@ -62,11 +62,7 @@ type GrammarForLalrTest(output: ITestOutputHelper) =
         let closures = 
             kc.collection
             |> Set.toArray
-            |> Array.map(fun k ->
-                let lr = LALR.just k
-                lr.items
-                |> toclosure
-            )
+            |> Array.map( toclosure )
 
         let render (scls:Set<ItemCore*Set<string>>) =
             scls
@@ -102,8 +98,7 @@ type GrammarForLalrTest(output: ITestOutputHelper) =
             kc.collection
             |> Set.toArray
             |> Array.map(fun k ->
-                let lr = LALR.just k
-                lr.items
+                k
                 |> toclosure
                 |> SpreadClosure.from
             )
@@ -143,8 +138,7 @@ type GrammarForLalrTest(output: ITestOutputHelper) =
             kc.collection
             |> Set.toArray
             |> Array.map(fun k ->
-                let lr = LALR.just k
-                lr.items
+                k
                 |> toclosure
                 |> SpreadClosure.from
             )

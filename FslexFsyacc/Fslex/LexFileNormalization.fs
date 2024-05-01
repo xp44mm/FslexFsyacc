@@ -1,5 +1,7 @@
 ﻿/// 扩展正则表达式转化为正常的正则表达式
-module FslexFsyacc.Lex.LexFileNormalization
+module FslexFsyacc.Runtime.Lex.LexFileNormalization
+open FslexFsyacc.Runtime
+open FslexFsyacc.Runtime.Lex
 
 /// 代入正则定义
 let substitute 

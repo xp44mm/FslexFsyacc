@@ -1,5 +1,7 @@
 ﻿module FslexFsyacc.Yacc.ActionUtils
 open FslexFsyacc.Runtime
+open FslexFsyacc.Runtime.ItemCores
+open FslexFsyacc.Runtime.LALRs
 
 let from (conflicts:Set<ItemCore>) =
     let reduces,shifts =

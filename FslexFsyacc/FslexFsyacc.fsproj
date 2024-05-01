@@ -20,46 +20,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Compile Include="Lex\RegularExpression.fs" />
-		<Compile Include="Lex\RegularNFA.fs" />
-		<Compile Include="Lex\PatternNFA.fs" />
-		<Compile Include="Lex\AnalyzerNFA.fs" />
-		<Compile Include="Lex\NFAOperations.fs" />
-		<Compile Include="Lex\PartitionDFA.fs" />
-		<Compile Include="Lex\SubsetDFA.fs" />
-		<Compile Include="Lex\DFA.fs" />
-		<Compile Include="Lex\RegularExpressionUtils.fs" />
-		<Compile Include="Lex\Transition.fs" />
-		<Compile Include="Lex\NFACombine.fs" />
-		<Compile Include="Lex\RegularNFAUtils.fs" />
-		<Compile Include="Lex\PatternNFAUtils.fs" />
-		<Compile Include="Lex\AnalyzerNFAUtils.fs" />
-		<Compile Include="Lex\NFAOperationsUtils.fs" />
-		<Compile Include="Lex\SubsetDFAUtils.fs" />
-		<Compile Include="Lex\Partition.fs" />
-		<Compile Include="Lex\PartitionDFAUtils.fs" />
-		<Compile Include="Lex\DFATools.fs" />
-		<Compile Include="Lex\DFAUtils.fs" />
-		<Compile Include="Grammars\NullableUtils.fs" />
-		<Compile Include="Grammars\FirstUtils.fs" />
-		<Compile Include="Grammars\LastUtils.fs" />
-		<Compile Include="Grammars\FollowUtils.fs" />
-		<Compile Include="Grammars\PrecedeUtils.fs" />
-		<Compile Include="Grammars\GrammarRow.fs" />
-		<Compile Include="Grammars\GrammarRowUtils.fs" />
-		<Compile Include="Grammars\Grammar.fs" />
-    
-		<Compile Include="ItemCores\ItemCoreRow.fs" />
-		<Compile Include="ItemCores\ItemCoreRowUtils.fs" />
-		<Compile Include="ItemCores\ItemCore.fs" />
-    
-		<Compile Include="LALRs\LALR.fs" />
-		<Compile Include="LALRs\LALRCollection.fs" />
-		<Compile Include="LALRs\Grammar.fs" />
-		<Compile Include="LALRs\SpreadClosure.fs" />
-		<Compile Include="LALRs\GOTO.fs" />
-		<Compile Include="LALRs\SLR.fs" />
-    
 		<Compile Include="Yacc\ItemCoreCrews.fs" />
 		<Compile Include="Yacc\AmbiguousCollectionCrews.fs" />
 		<Compile Include="Yacc\SemanticParseTableCrews.fs" />

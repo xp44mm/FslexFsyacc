@@ -1,6 +1,6 @@
 ﻿namespace FslexFsyacc.Fslex
-
-open FslexFsyacc.Lex
+open FslexFsyacc.Runtime
+open FslexFsyacc.Runtime.Lex
 
 type FslexFile = 
     {

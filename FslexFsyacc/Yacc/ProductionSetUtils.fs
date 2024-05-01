@@ -4,7 +4,7 @@ open FslexFsyacc.Runtime
 open FSharp.Idioms
 
 /// 用symbol的所有产生式推导，等价消去symbol从productions中
-let eliminateSymbol (symbol:string) (productions:Set<string list>) =
+let eliminateSymbol (symbol:string) (productions:Set<list<string>>) =
     let removedProds,keepedProds =
         productions
         |> Set.partition(fun prod ->
@@ -48,7 +48,7 @@ let getDerivations (productions:Set<string list>) =
     )
 
 /// 
-let getSingles (productions:Set<Production>) =
+let getSingles (productions:Set<list<string>>) =
     productions
     |> Set.groupBy List.head
     |> Seq.map snd
@@ -102,7 +102,7 @@ let precedenceOfProductions (terminals:Set<string>) (productions:Set<string list
     productions
     |> List.sortBy snd
 
-let eliminateChomsky (productions:Set<Production>) =
+let eliminateChomsky (productions:Set<list<string>>) =
     let nonterminals =
         productions
         |> getSingles

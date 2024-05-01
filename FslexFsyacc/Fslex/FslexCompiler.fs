@@ -1,7 +1,8 @@
 ﻿module FslexFsyacc.Fslex.FslexCompiler
 
 open FslexFsyacc.Runtime
-open FslexFsyacc.Lex
+open FslexFsyacc.Runtime.Lex
+
 open FslexFsyacc.Fslex.FslexTokenUtils
 open FSharp.Idioms.Literal
 

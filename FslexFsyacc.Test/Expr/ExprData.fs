@@ -1,5 +1,8 @@
 ﻿module FslexFsyacc.Expr.ExprData
 open FslexFsyacc.Runtime
+open FslexFsyacc.Runtime.ItemCores
+open FslexFsyacc.Runtime.LALRs
+
 let inputProductionList = [["expr";"expr";"+";"expr"];["expr";"expr";"-";"expr"];["expr";"expr";"*";"expr"];["expr";"expr";"/";"expr"];["expr";"(";"expr";")"];["expr";"-";"expr"];["expr";"NUMBER"]]
 let mainProductions = set [["expr";"(";"expr";")"];["expr";"-";"expr"];["expr";"NUMBER"];["expr";"expr";"*";"expr"];["expr";"expr";"+";"expr"];["expr";"expr";"-";"expr"];["expr";"expr";"/";"expr"]]
 let augmentedProductions = set [["";"expr"];["expr";"(";"expr";")"];["expr";"-";"expr"];["expr";"NUMBER"];["expr";"expr";"*";"expr"];["expr";"expr";"+";"expr"];["expr";"expr";"-";"expr"];["expr";"expr";"/";"expr"]]

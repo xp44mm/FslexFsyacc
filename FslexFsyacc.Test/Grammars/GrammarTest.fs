@@ -1,4 +1,4 @@
-﻿namespace FslexFsyacc.Grammars
+﻿namespace FslexFsyacc.Runtime.Grammars
 
 open Xunit
 open Xunit.Abstractions

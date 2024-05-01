@@ -1,6 +1,6 @@
 ﻿module FslexFsyacc.Fslex.FslexFileUtils
 
-open FslexFsyacc.Lex
+open FslexFsyacc.Runtime.Lex
 open FSharp.Idioms
 
 let getRegularExpressions (this:FslexFile) =
