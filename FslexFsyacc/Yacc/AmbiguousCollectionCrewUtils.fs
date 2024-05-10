@@ -1,9 +1,10 @@
 ﻿module FslexFsyacc.Yacc.AmbiguousCollectionCrewUtils
 open FslexFsyacc.Runtime
 open FslexFsyacc.Runtime.ItemCores
-open FslexFsyacc.Runtime.LALRs
+open FslexFsyacc.Runtime.BNFs
 open FSharp.Idioms.Literal
 
+// ok
 let getConflictsOfClosure (closure:Set<string*ItemCore>) =
     closure
     |> Seq.groupBy fst
@@ -14,6 +15,7 @@ let getConflictsOfClosure (closure:Set<string*ItemCore>) =
         |> Set.ofSeq
     )
 
+// ok
 ///此函数的结果数据是焦点，交通要道。
 let getAmbiguousCollectionCrew (crew:LALRCollectionCrew) =
     let conflicts =

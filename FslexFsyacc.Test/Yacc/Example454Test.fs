@@ -4,6 +4,7 @@ open Xunit
 open Xunit.Abstractions
 open FSharp.xUnit
 
+open FslexFsyacc.Runtime.ItemCores
 open FslexFsyacc.Runtime
 open FSharp.Idioms
 open FSharp.Idioms.Literal
@@ -72,19 +73,32 @@ type Example454Test(output: ITestOutputHelper) =
         output.WriteLine($"let spreadClosure_{i} = {stringify cls}")
 
     [<Fact>]
-    member _.``goto``() =
+    member _.``conflicts``() =
         let crew =
             grammar
             |> LALRCollectionCrewUtils.getLALRCollectionCrew
 
-        let ik = 
-            crew.kernels
-            |> Seq.mapi(fun i k -> k,i)
-            |> Map.ofSeq
+        let conflicts =
+            crew.closures
+            |> Map.map(fun i closure ->
+                closure
+                |> Seq.groupBy(fun (la,_) -> la)
+                |> Seq.map(fun(la,pairs)->
+                    let kernel =
+                        pairs
+                        |> Seq.map snd
+                        |> Set.ofSeq
+                    la, kernel
+                )
+                |> Map.ofSeq
+            )
 
-        for KeyValue(src, mp) in crew.GOTOs do
+        for KeyValue(src, mp) in conflicts do
         for KeyValue(sym, tgt) in mp do
-        let tgt = ik.[tgt]
+        let tgt =
+            tgt
+            |> List.ofSeq
+            |> List.map(fun i -> i.production,i.dot)
         output.WriteLine($"{stringify (src,sym,tgt)}")
 
 

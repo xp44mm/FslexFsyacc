@@ -15,6 +15,9 @@ type ItemCore =
         else
             ItemCore.just(this.production, this.dot+1)
 
+    member this.dotDecr() = 
+        ItemCore.just(this.production, this.dot-1)
+
     member this.backwards =
         let row = ItemCoreRowUtils.getRow this.production this.dot
         row.backwards

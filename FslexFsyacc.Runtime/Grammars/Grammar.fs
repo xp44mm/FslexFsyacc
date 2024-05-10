@@ -9,11 +9,8 @@ type Grammar =
 
     //从文法生成增广文法
     static member from (input:list<list<string>>) =
-        let startSymbol = input.[0].[0]
-        let p0 = ["";startSymbol]
-
-        (p0::input)
-        |> Set.ofList
+        input
+        |> ProductionUtils.augment
         |> Grammar.just
 
     member this.symbols =

@@ -1,7 +1,8 @@
 ﻿module FslexFsyacc.Yacc.ActionUtils
 open FslexFsyacc.Runtime
 open FslexFsyacc.Runtime.ItemCores
-open FslexFsyacc.Runtime.LALRs
+open FslexFsyacc.Runtime.BNFs
+open FslexFsyacc.Runtime.ParseTables
 
 let from (conflicts:Set<ItemCore>) =
     let reduces,shifts =

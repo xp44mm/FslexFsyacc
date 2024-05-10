@@ -1,4 +1,4 @@
-﻿namespace FslexFsyacc.Runtime.LALRs
+﻿namespace FslexFsyacc.Runtime.BNFs
 
 open FslexFsyacc.Runtime.Grammars
 open FslexFsyacc.Runtime.ItemCores
@@ -40,7 +40,7 @@ type LALRCollection =
                 kernel
                 |> toClosure
                 |> LALR.just
-            clr.goto()
+            clr.getNextKernels()
             )
         |> Set.unionMany
 

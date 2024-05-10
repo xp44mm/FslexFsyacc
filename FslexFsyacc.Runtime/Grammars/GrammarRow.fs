@@ -27,18 +27,23 @@ type GrammarRow =
             | ["";s0] as p -> s0, Set.remove p productions
             | _ -> raise(System.ArgumentException("S'->S"))
 
+        //带扩展开始符号
+        let symbols =
+            productions
+            |> Set.map Set.ofList
+            |> Set.unionMany
+            //|> Set.remove ""
+
+        //不带扩展开始符号
         let nonterminals = 
             productions
             |> Set.map List.head
             |> Set.remove ""
     
-        let symbols =
-            productions
-            |> Set.map Set.ofList
-            |> Set.unionMany
+        //不带扩展开始符号
+        let terminals = 
+            Set.difference symbols nonterminals
             |> Set.remove ""
-
-        let terminals = Set.difference symbols nonterminals
 
         let nullables = 
             mainProductions

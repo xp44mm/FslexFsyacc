@@ -2,7 +2,7 @@
 
 open FslexFsyacc.Runtime
 open FslexFsyacc.Runtime.ItemCores
-open FslexFsyacc.Runtime.LALRs
+open FslexFsyacc.Runtime.BNFs
 
 open FSharp.Idioms
 open FSharp.Idioms.Literal
@@ -13,28 +13,28 @@ type ParseTableEncoder =
         kernels    : Map<Set<ItemCore>,int>
     }
     /// 产生式编码为负
-    static member getProductions(productions:Set<string list>)=
+    static member getProductions (productions:Set<string list>) =
         productions
         |> Set.toList
         |> List.mapi(fun i p -> p,-i)
         |> Map.ofList
 
     /// 具体数据编码成整数的表
-    member this.encodeAction(action:Action) =
+    member this.encodeAction (action:Action) =
         match action with
         | Shift j -> this.kernels.[j]
         | Reduce p -> this.productions.[p]
 
-    member this.encodeProduction(production:string list) =
+    member this.encodeProduction (production:string list) =
             this.productions.[production]
 
-    member this.encodeItemCore(itemCore: ItemCore) =
+    member this.encodeItemCore (itemCore: ItemCore) =
         let iprod = 
             this.productions.[itemCore.production]
         iprod,itemCore.dot
 
     /// return state -> symbol -> action, state等于list的index
-    member encoder.getEncodedActions(actions: Map<int,Map<string,Action>>) =
+    member encoder.getEncodedActions (actions: Map<int,Map<string,Action>>) =
         encoder.kernels
         |> Map.toList
         |> List.mapi(fun i (_,state) ->
@@ -51,7 +51,21 @@ type ParseTableEncoder =
             else []
         )
 
-    member encoder.getEncodedClosures(closures: Map<int,Map<ItemCore,Set<string>>>) =
+    member encoder.getEncodedActions (actions: Map< Set<ItemCore>, Map<string,Action>> ) =
+        encoder.kernels
+        |> Map.toList
+        |> List.map(fun (kernel,state) ->
+            if actions.ContainsKey kernel then
+                actions.[kernel]
+                |> Map.toList
+                |> List.map(fun(sym,action)->
+                    let iaction = encoder.encodeAction action
+                    sym,iaction
+                )
+            else []
+        )
+
+    member encoder.getEncodedClosures (closures: Map<int,Map<ItemCore,Set<string>>>) =
         encoder.kernels
         |> Map.toList
         |> List.mapi(fun i (_,state) ->

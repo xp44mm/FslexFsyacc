@@ -37,9 +37,9 @@
 		<Compile Include="Yacc\ItemCoreUtils.fs" />
 		<Compile Include="Yacc\ItemCoreCrewUtils.fs" />
 		<Compile Include="Yacc\ItemCoreCrewRecurs.fs" />
-		<Compile Include="Yacc\ActionUtils.fs" />
 		<Compile Include="Yacc\ClosureOperators.fs" />
 		<Compile Include="Yacc\KernelUtils.fs" />
+		<Compile Include="Yacc\ActionUtils.fs" />
 		<Compile Include="Yacc\AmbiguityEliminator.fs" />
 		<Compile Include="Yacc\AmbiguousCollectionUtils.fs" />
 		<Compile Include="Yacc\ParseTableEncoder.fs" />
@@ -113,7 +113,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="FSharp.Idioms" Version="1.4.19" />
+		<PackageReference Include="FSharp.Idioms" Version="1.4.20" />
 	</ItemGroup>
 
 	<ItemGroup>

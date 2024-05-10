@@ -1,7 +1,8 @@
 ﻿namespace FslexFsyacc.Yacc
 open FslexFsyacc.Runtime
 open FslexFsyacc.Runtime.ItemCores
-open FslexFsyacc.Runtime.LALRs
+open FslexFsyacc.Runtime.ParseTables
+open FslexFsyacc.Runtime.BNFs
 
 open FSharp.Idioms
 open FSharp.Idioms.Literal

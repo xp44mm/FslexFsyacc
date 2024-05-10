@@ -1,4 +1,4 @@
-﻿module FslexFsyacc.Runtime.LALRs.Grammar
+﻿module FslexFsyacc.Runtime.BNFs.Grammar
 
 open FslexFsyacc.Runtime.Grammars
 open FslexFsyacc.Runtime.ItemCores

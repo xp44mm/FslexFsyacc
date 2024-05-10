@@ -22,7 +22,7 @@ let mainProductions = [
 
 let productions = set [["";"E"];["E";"T";"E'"];["E'"];["E'";"+";"T";"E'"];["F";"(";"E";")"];["F";"id"];["T";"F";"T'"];["T'"];["T'";"*";"F";"T'"]]
 let startSymbol = "E"
-let symbols = set ["(";")";"*";"+";"E";"E'";"F";"T";"T'";"id"]
+let symbols = set ["";"(";")";"*";"+";"E";"E'";"F";"T";"T'";"id"]
 let nonterminals = set ["E";"E'";"F";"T";"T'"]
 let terminals = set ["(";")";"*";"+";"id"]
 let nullables = set ["E'";"T'"]

@@ -2,7 +2,8 @@
 
 open FslexFsyacc.Runtime
 open FslexFsyacc.Runtime.ItemCores
-open FslexFsyacc.Runtime.LALRs
+open FslexFsyacc.Runtime.ParseTables
+open FslexFsyacc.Runtime.BNFs
 
 /// 文法 4.28 推导的数据集合
 module BNF428Data =

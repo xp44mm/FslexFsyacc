@@ -21,19 +21,23 @@
 		<Compile Include="Lex\PartitionTest.fs" />
 		<Compile Include="Lex\NFAtoDFATest.fs" />
 		<Compile Include="Lex\LexFileNormalizationTest.fs" />
+		<Compile Include="ItemCores\ItemCoreRowTest.fs" />
+		<Compile Include="ItemCores\ItemCoreRowUtilsTest.fs" />
+		<Compile Include="ItemCores\ItemCoreTest.fs" />
     
 		<Compile Include="Grammars\Grammar4_1.fs" />
 		<Compile Include="Grammars\Grammar4_28.fs" />
 		<Compile Include="Grammars\GrammarRowTest.fs" />
 		<Compile Include="Grammars\GrammarTest.fs" />
     
-		<Compile Include="ItemCores\ItemCoreRowTest.fs" />
-		<Compile Include="ItemCores\ItemCoreRowUtilsTest.fs" />
-		<Compile Include="ItemCores\ItemCoreTest.fs" />
-    
-		<Compile Include="LALRs\BNF4_55.fs" />
-    
-		<Compile Include="LALRs\GrammarForLalrTest.fs" />
+		<Compile Include="BNFs\BNF4_55.fs" />
+		<Compile Include="BNFs\BNF4_3.fs" />
+		<Compile Include="BNFs\BNF4_67.fs" />
+		<Compile Include="BNFs\BNF4_55Test.fs" />
+		<Compile Include="BNFs\BNF4_3Test.fs" />
+		<Compile Include="BNFs\BNF4_67Test.fs" />
+		<Compile Include="ParseTables\ParseTableRowTest.fs" />
+		<Compile Include="ParseTables\EncodeActionsTest.fs" />
     
 		<Compile Include="Yacc\Example427Test.fs" />
 		<Compile Include="Yacc\Example440Test.fs" />
@@ -96,10 +100,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="FSharp.xUnit" Version="1.2.26" />
+		<PackageReference Include="FSharp.xUnit" Version="1.2.27" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
-		<PackageReference Include="xunit" Version="2.7.1" />
-		<PackageReference Include="xunit.runner.visualstudio" Version="2.5.8">
+		<PackageReference Include="xunit" Version="2.8.0" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="2.8.0">
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>

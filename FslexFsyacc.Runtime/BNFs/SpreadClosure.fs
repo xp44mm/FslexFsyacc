@@ -1,4 +1,4 @@
-﻿namespace FslexFsyacc.Runtime.LALRs
+﻿namespace FslexFsyacc.Runtime.BNFs
 
 open FslexFsyacc.Runtime.Grammars
 open FslexFsyacc.Runtime.ItemCores
@@ -35,11 +35,11 @@ type SpreadClosure =
 
     member this.getConflicts () =
         this.items
-        |> Seq.groupBy fst // lookahead
+        |> Seq.groupBy fst
         |> Map.ofSeq
-        |> Map.map(fun lookahead sq ->
-            sq
-            |> Seq.map snd // itemcore
+        |> Map.map(fun lookahead itemcores ->
+            itemcores
+            |> Seq.map snd
             |> Set.ofSeq
         )
 

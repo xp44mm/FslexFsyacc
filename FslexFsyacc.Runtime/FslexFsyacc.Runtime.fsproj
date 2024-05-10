@@ -39,6 +39,10 @@
     <Compile Include="Lex\PartitionDFAUtils.fs" />
     <Compile Include="Lex\DFATools.fs" />
     <Compile Include="Lex\DFAUtils.fs" />
+    <Compile Include="ItemCores\ItemCoreRow.fs" />
+    <Compile Include="ItemCores\ItemCoreRowUtils.fs" />
+    <Compile Include="ItemCores\ItemCore.fs" />
+    <Compile Include="Grammars\ProductionUtils.fs" />
     
     <Compile Include="Grammars\NullableUtils.fs" />
     <Compile Include="Grammars\FirstUtils.fs" />
@@ -49,21 +53,22 @@
     <Compile Include="Grammars\GrammarRowUtils.fs" />
     <Compile Include="Grammars\Grammar.fs" />
 
-    <Compile Include="ItemCores\ItemCoreRow.fs" />
-    <Compile Include="ItemCores\ItemCoreRowUtils.fs" />
-    <Compile Include="ItemCores\ItemCore.fs" />
-
-    <Compile Include="LALRs\LALR.fs" />
-    <Compile Include="LALRs\LALRCollection.fs" />
-    <Compile Include="LALRs\Grammar.fs" />
-    <Compile Include="LALRs\SpreadClosure.fs" />
-    <Compile Include="LALRs\GOTO.fs" />
-    <Compile Include="LALRs\SLR.fs" />
-    <Compile Include="LALRs\Action.fs" />
-    <Compile Include="LALRs\BNFRow.fs" />
-    <Compile Include="ParseTables\ProductionUtils.fs" />
+    <Compile Include="BNFs\LALR.fs" />
+    <Compile Include="BNFs\LALRCollection.fs" />
+    <Compile Include="BNFs\Grammar.fs" />
+    <Compile Include="BNFs\SpreadClosure.fs" />
+    <Compile Include="BNFs\Action.fs" />
+    <Compile Include="BNFs\SLR.fs" />
+    <Compile Include="BNFs\BNFRow.fs" />
+    <Compile Include="BNFs\BNFRowUtils.fs" />
+    <Compile Include="BNFs\BNF.fs" />
+    <Compile Include="ParseTables\Precedence.fs" />
+    <Compile Include="ParseTables\Action.fs" />
     <Compile Include="ParseTables\AmbiguityEliminator.fs" />
     <Compile Include="ParseTables\ParseTableEncoder.fs" />
+    <Compile Include="ParseTables\Conflict.fs" />
+    <Compile Include="ParseTables\ParseTableRow.fs" />
+    <Compile Include="ParseTables\Yacc.fs" />
     
     
     <Compile Include="ParserTableAction.fs" />
@@ -83,7 +88,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FSharp.Idioms" Version="1.4.19" />
+    <PackageReference Include="FSharp.Idioms" Version="1.4.20" />
   </ItemGroup>
 
   <ItemGroup>

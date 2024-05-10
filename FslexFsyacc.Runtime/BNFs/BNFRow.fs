@@ -1,4 +1,4 @@
-﻿namespace FslexFsyacc.Runtime.LALRs
+﻿namespace FslexFsyacc.Runtime.BNFs
 
 open FslexFsyacc.Runtime.Grammars
 open FslexFsyacc.Runtime.ItemCores
@@ -14,14 +14,14 @@ type BNFRow =
     /// (kernel:Set<ItemCore>)
     kernels: Set<Set<ItemCore>>
 
+    // kernel -> closure
     closures: Map<Set<ItemCore>,Set<ItemCore*Set<string>>>
 
-    /// kernel -> symbol(T/N) -> Actions
     actions: Map<Set<ItemCore>,Map<string,Set<Action>>>
 
     }
 
-    static member from(productions: Set<list<string>>) =
+    static member from (productions: Set<list<string>>) =
         let grammar = Grammar.just productions
 
         let collection =
@@ -35,27 +35,23 @@ type BNFRow =
 
         let closures = 
             collection
-            |> Set.toSeq
-            |> Seq.map(toclosure)
-            |> Seq.zip kernels
+            |> Set.map(fun k -> SLR.from(k).items, toclosure k)
             |> Map.ofSeq
 
-        let actions =
+        let conflicts =
             closures
-            |> Seq.map(fun (KeyValue(kernel,closure)) -> 
-                SpreadClosure.from(closure).items
-                |> Seq.groupBy fst
-                |> Seq.map(fun (la,sq) ->
-                    sq
-                    |> Seq.map snd
-                    |> Set.ofSeq
-                    |> Action.from
-                    |> Pair.prepend la
-                )
-                |> Map.ofSeq
-                |> Pair.prepend kernel
+            |> Map.map( fun _ closure ->
+                SpreadClosure.from(closure).getConflicts()
             )
-            |> Map.ofSeq
+
+        let actions =
+            conflicts
+            |> Map.map( fun _ mp ->
+                mp
+                |> Map.map(fun _ items ->
+                    SLR.just(items).toActions()
+                )
+            )
         {
         productions = productions
         grammar = grammar

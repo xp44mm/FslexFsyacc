@@ -10,7 +10,7 @@ let fromActionParseTableCrew (tbl:ActionParseTableCrew) =
             kernels = tbl.kernels |> Seq.mapi(fun i k -> k,i) |> Map.ofSeq
         } : ParseTableEncoder
 
-    let encoder  = encoder
+    //let encoder  = encoder
     let encodedActions = encoder.getEncodedActions tbl.actions
     let encodedClosures = encoder.getEncodedClosures tbl.resolvedClosures
     EncodedParseTableCrew(tbl,encodedActions,encodedClosures)

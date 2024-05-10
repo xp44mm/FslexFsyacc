@@ -1,4 +1,4 @@
-﻿namespace FslexFsyacc.Runtime.LALRs
+﻿namespace FslexFsyacc.Runtime.BNFs
 
 open FslexFsyacc.Runtime.Grammars
 open FslexFsyacc.Runtime.ItemCores
@@ -51,6 +51,7 @@ type LALR =
         itemCore.prevSymbol
 
     /// 从当前closure，返回下一组kernels
+    // 循环的时候不需要记住路径
     member closure.getNextKernels () =
         closure.items
         |> Seq.filter(fun (itemCore, _) -> not itemCore.dotmax )
@@ -58,15 +59,12 @@ type LALR =
             { itemCore with dot = itemCore.dot + 1 }, lookaheads
             )
         |> Seq.groupBy(fun(itemCore,_) -> itemCore.prevSymbol )
-        |> Seq.map(fun (symbol,sq) ->
-            symbol, Set.ofSeq sq
-        )
-
-    // 循环的时候不需要记住路径
-    member closure.goto() =
-        closure.getNextKernels()
-        |> Seq.map snd
+        |> Seq.map( snd >> Set.ofSeq )
         |> Set.ofSeq
+
+    //member closure.goto() =
+    //    closure.getNextKernels()
+    //    |> Seq.map snd
 
 
 

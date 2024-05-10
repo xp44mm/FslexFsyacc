@@ -17,7 +17,7 @@ let mainProductions = [
 
 let productions = set [["";"E"];["E";"E";"+";"T"];["E";"T"];["F";"(";"E";")"];["F";"id"];["T";"F"];["T";"T";"*";"F"]]
 let startSymbol = "E"
-let symbols = set ["(";")";"*";"+";"E";"F";"T";"id"]
+let symbols = set ["";"(";")";"*";"+";"E";"F";"T";"id"]
 let nonterminals = set ["E";"F";"T"]
 let terminals = set ["(";")";"*";"+";"id"]
 let nullables:Set<string> = set []
