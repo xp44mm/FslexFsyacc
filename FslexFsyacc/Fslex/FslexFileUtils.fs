@@ -22,7 +22,10 @@ let parse(fslex:string) =
     }
 
 let verify (this:FslexFile) =
-    let uninameset = this.definitions |> List.map fst |> Set.ofList
+    let uninameset = 
+        this.definitions 
+        |> List.map fst 
+        |> Set.ofList
     let usednames = FslexCompiler.getUsedNames(this.definitions,this.rules)
     let unused = uninameset - usednames
     let undeclared = usednames - uninameset

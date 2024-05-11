@@ -30,8 +30,8 @@ type EncodeActionsTest (output: ITestOutputHelper) =
         let precedences:Map<string,int> = Map []
 
         let tbl = ParseTableRow.from bnf dummyTokens precedences
-        Should.equal BNF4_3.encodeActions tbl.encodeActions
         //output.WriteLine("let encodeActions = " + stringify tbl.encodeActions)
+        Should.equal BNF4_3.encodeActions tbl.encodeActions
 
     [<Fact>]
     member _.``BNF4_67``() =
@@ -40,8 +40,8 @@ type EncodeActionsTest (output: ITestOutputHelper) =
         let precedences:Map<string,int> = Map []
 
         let tbl = ParseTableRow.from bnf dummyTokens precedences
-        Should.equal BNF4_67.encodeActions tbl.encodeActions
         //output.WriteLine("let encodeActions = " + stringify tbl.encodeActions)
+        Should.equal BNF4_67.encodeActions tbl.encodeActions
 
 
 

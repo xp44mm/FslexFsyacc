@@ -47,7 +47,7 @@ let removeRule
     (rules:list<list<string>*string*string>)
     =
     rules
-    |> List.filter(fun(x,_,_) -> x<>production)
+    |> List.filter(fun(x,_,_) -> x <> production)
 
 /// 保持替换的位置
 let replaceRule

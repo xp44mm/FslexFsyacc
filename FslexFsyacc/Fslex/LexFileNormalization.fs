@@ -5,8 +5,8 @@ open FslexFsyacc.Runtime.Lex
 
 /// 代入正则定义
 let substitute 
-    (definitions:Map<string,RegularExpression<_>>) 
-    (expr:RegularExpression<_>) 
+    (definitions: Map<string,RegularExpression<_>>) 
+    (expr: RegularExpression<_>) 
     =
 
     let rec loop = function

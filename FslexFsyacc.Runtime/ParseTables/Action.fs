@@ -1,9 +1,11 @@
 ﻿module FslexFsyacc.Runtime.ParseTables.Action
 
+open System
 open FSharp.Idioms.Literal
 open FslexFsyacc.Runtime.ItemCores
 open FslexFsyacc.Runtime.BNFs
 
+[<Obsolete("未使用")>]
 let getExactlyOneAction (actions:Action list) =
     match actions with
     | [] -> failwith $"nonassoc error."

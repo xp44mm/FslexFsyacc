@@ -36,6 +36,7 @@
 		<Compile Include="BNFs\BNF4_55Test.fs" />
 		<Compile Include="BNFs\BNF4_3Test.fs" />
 		<Compile Include="BNFs\BNF4_67Test.fs" />
+		<Compile Include="ParseTables\PrecedenceTest.fs" />
 		<Compile Include="ParseTables\ParseTableRowTest.fs" />
 		<Compile Include="ParseTables\EncodeActionsTest.fs" />
     

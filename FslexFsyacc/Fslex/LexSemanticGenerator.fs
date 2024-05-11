@@ -5,7 +5,7 @@ open FSharp.Idioms
 
 let decorateSemantic (semantic:string) =
     [
-        "fun (lexbuf:list<_>) ->"
+        "fun (lexbuf: list<_>) ->"
         semantic 
         |> Line.indentCodeBlock 4
     ] 
