@@ -2,8 +2,19 @@
 
 open System
 open FSharp.Idioms
-open FslexFsyacc.Runtime
 open FslexFsyacc.Yacc
+
+open FslexFsyacc.Runtime
+open FslexFsyacc.Runtime.ParseTables
+
+let from (fsyacc:FlatFsyaccFile) (crew:ParseTableRow) =
+    id<FsyaccParseTableFile>{
+        header = fsyacc.header
+        rules = fsyacc.rules |> Set.map(fun rule -> rule.production,rule.reducer) |> Set.toList
+        actions = crew.encodeActions
+        closures = crew.encodeClosures
+        declarations = fsyacc.declarations
+    }
 
 let ofSemanticParseTableCrew (crew:SemanticParseTableCrew) = 
     id<FsyaccParseTableFile> {

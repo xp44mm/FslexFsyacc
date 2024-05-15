@@ -12,17 +12,27 @@ type ParseTableRow =
     bnf: BNF
     dummyTokens:Map<string list,string>
     precedences:Map<string,int>
-    //unambiguousItemCores: Map<Set<ItemCore>,Map<string,Set<ItemCore>>>
     actions: Map<Set<ItemCore>,Map<string,Action>>
-    //resolvedClosures: Map<int,Map<ItemCore,Set<string>>>
     encodeActions: list<list<string*int>>
-    //encodedClosures: list<list<int*int*string list>>
+
+    unambiguousItemCores: Map<Set<ItemCore>,Map<string,Set<ItemCore>>>
+    resolvedClosures: Map<Set<ItemCore>,Map<ItemCore,Set<string>>>
+    encodeClosures: list<list<int*int*string list>>
     }
 
-    static member from (bnf:BNF) (dummyTokens:Map<string list,string>) (precedences:Map<string,int>) =
+    static member from (productions:Set<string list>, dummyTokens:Map<string list,string>, precedences:Map<string,int>) =
+        let bnf = BNF.just productions
         let tryGetDummy = Precedence.tryGetDummy dummyTokens bnf.grammar.terminals
 
         let tryGetPrecedenceCode = Precedence.tryGetPrecedenceCode tryGetDummy precedences
+
+        let unambiguousItemCores =
+            bnf.conflictedItemCores
+            |> Map.map(fun k mp ->
+                mp
+                |> Map.map(fun s ics -> 
+                    SLR.just(ics).disambiguate(tryGetPrecedenceCode))
+            )
 
         let actions =
             bnf.actions
@@ -37,22 +47,43 @@ type ParseTableRow =
             )
             |> Map.filter( fun src mp -> not mp.IsEmpty )
 
+        let resolvedClosures =
+            actions
+            |> Map.map(fun kernel mp ->
+                let x =
+                    mp
+                    |> Seq.collect(fun(KeyValue(sym, act))->
+                        act.toItemCores(sym)
+                    )
+                    |> Seq.groupBy fst
+                    |> Seq.map(fun (ic,sq) -> 
+                        let symbols =
+                            sq
+                            |> Seq.choose snd
+                            |> Set.ofSeq
+                        ic, symbols)
+                    |> Map.ofSeq
+                x
+            )
+
         let encoder =
             {
                 productions =
                     ParseTableEncoder.getProductions bnf.grammar.productions
                 kernels = bnf.kernels |> Seq.mapi(fun i k -> k,i) |> Map.ofSeq
             } : ParseTableEncoder
+        let encodeActions = encoder.encodeActions actions
 
-        let encodeActions = encoder.getEncodedActions actions
+        let encodeClosures = encoder.encodeClosures resolvedClosures
 
         {
-        bnf                  = bnf
-        dummyTokens          = dummyTokens
-        precedences          = precedences
-        //unambiguousItemCores = unambiguousItemCores
-        actions              = actions             
-        //resolvedClosures: Map<int,Map<ItemCore,Set<string>>>
+        bnf         = bnf
+        dummyTokens = dummyTokens
+        precedences = precedences
+        actions     = actions             
         encodeActions = encodeActions
-        //encodedClosures: list<list<int*int*string list>>
+
+        unambiguousItemCores = unambiguousItemCores
+        resolvedClosures = resolvedClosures
+        encodeClosures = encodeClosures
         }

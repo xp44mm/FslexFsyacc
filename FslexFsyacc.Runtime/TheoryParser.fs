@@ -58,7 +58,7 @@ type TheoryParser =
     /// for state in [0..len-1]
     member this.getClosure(state) = this.closures.[state]
 
-    ///状态的符号
+    ///状态的符号：todo:符号的别名，例如 uminus
     member this.getStateSymbolPairs() =
         this.closures 
         |> List.map(fun closure ->
@@ -118,6 +118,7 @@ type TheoryParser =
             | _ ->
                 i,states
         )
+
     // accept, done, final
     member this.complete(states:(int*obj) list) =
         let rules = this.rules

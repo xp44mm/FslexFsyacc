@@ -38,10 +38,10 @@ let fromRawFsyaccFileCrew (raw:RawFsyaccFileCrew) =
         |> Map.ofList
     FlatedFsyaccFileCrew(raw,flatedRules,augmentRules,flatedPrecedences,flatedDeclarations)
 
-let getFlatedFsyaccFileCrew (text:string) =
-    text
-    |> RawFsyaccFileCrewUtils.parse
-    |> fromRawFsyaccFileCrew
+//let getFlatedFsyaccFileCrew (text:string) =
+//    text
+//    |> RawFsyaccFileCrewUtils.parse
+//    |> fromRawFsyaccFileCrew
 
 let getMainProductions (this:FlatedFsyaccFileCrew) =
     this.flatedRules
@@ -65,7 +65,7 @@ let getSemanticParseTableCrew (this:FlatedFsyaccFileCrew) =
 
     let semanticList = 
         this.flatedRules 
-        |> List.map(fun(x,y,z)->x,z)
+        |> List.map(fun(prod,y,reducer)->prod,reducer)
 
     let parseTable =
         EncodedParseTableCrewUtils.getEncodedParseTableCrew (
@@ -73,6 +73,8 @@ let getSemanticParseTableCrew (this:FlatedFsyaccFileCrew) =
             dummyTokens,
             this.flatedPrecedences
             )
+
+
     SemanticParseTableCrew(parseTable,this.header,semanticList,this.flatedDeclarations)
 
 

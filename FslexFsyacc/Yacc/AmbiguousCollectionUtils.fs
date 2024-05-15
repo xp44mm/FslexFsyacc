@@ -22,12 +22,12 @@ let getItemcores (conflicts:Map<string,Set<ItemCore>>) =
 
     let fReduces,fGotos =
         flat
-        |> List.partition(fun(itemCore,sym)->(ItemCoreUtils.dotmax itemCore))
+        |> List.partition(fun (itemCore,sym) -> ItemCoreUtils.dotmax itemCore )
 
     let reduces =
         fReduces
         |> List.groupBy fst
-        |> List.map(fun(icore,group)-> // 合并lookaheads
+        |> List.map(fun (icore,group) -> // 合并lookaheads
             let lookaheads =
                 group
                 |> Seq.map snd

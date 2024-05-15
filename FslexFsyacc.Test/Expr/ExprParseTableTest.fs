@@ -14,6 +14,8 @@ open System.Text
 open FslexFsyacc.Fsyacc
 open FslexFsyacc.Yacc
 open FslexFsyacc.Runtime
+open FslexFsyacc.Runtime.ParseTables
+
 open FslexFsyacc
 type ExprParseTableTest(output:ITestOutputHelper) =
     let parseTblName = "ExprParseTable"
@@ -23,50 +25,61 @@ type ExprParseTableTest(output:ITestOutputHelper) =
 
     let text = File.ReadAllText(filePath,Encoding.UTF8)
 
-    let fsyaccCrew =
+    let rawFsyacc =
         text
-        |> RawFsyaccFileCrewUtils.parse
-        |> FlatedFsyaccFileCrewUtils.fromRawFsyaccFileCrew
+        |> FsyaccCompiler.compile
+        |> fun f -> f.migrate()
 
-    let inputProductionList =
-        fsyaccCrew.flatedRules
-        |> List.map Triple.first
+    let fsyacc =
+        rawFsyacc
+        |> FslexFsyacc.Runtime.ParseTables.FlatFsyaccFile.from
 
-    let collectionCrew = 
-        inputProductionList
-        |> AmbiguousCollectionCrewUtils.newAmbiguousCollectionCrew
+    let tbl =
+        fsyacc.getParseTable()
 
-    let tblCrew =
-        fsyaccCrew
-        |> FlatedFsyaccFileCrewUtils.getSemanticParseTableCrew
+    //let fsyaccCrew =
+    //    text
+    //    |> RawFsyaccFileCrewUtils.parse
+    //    |> FlatedFsyaccFileCrewUtils.fromRawFsyaccFileCrew
+
+    //let inputProductionList =
+    //    fsyaccCrew.flatedRules
+    //    |> List.map Triple.first
+
+    //let tblCrew =
+    //    fsyaccCrew
+    //    |> FlatedFsyaccFileCrewUtils.getSemanticParseTableCrew
 
     [<Fact>]
     member _.``00 - print rules``() =
-        for r in fsyaccCrew.inputRuleList do
+        for r in rawFsyacc.ruleGroups do
         output.WriteLine($"{stringify r}")
 
     [<Fact>]
-    member _.``01 - norm fsyacc file``() =
-        let s0 = tblCrew.startSymbol
-        let flatedFsyacc =
-            fsyaccCrew
-            |> FlatedFsyaccFileCrewUtils.toFlatFsyaccFile
+    member _.``01 - print resolvedClosures``() =
+        output.WriteLine($"{stringify tbl.resolvedClosures}")
 
-        let src = 
-            flatedFsyacc 
-            |> FlatFsyaccFileUtils.start s0
-            |> RawFsyaccFileUtils.fromFlat
-            |> RawFsyaccFileUtils.render
+    //[<Fact>]
+    //member _.``01 - norm fsyacc file``() =
+    //    let s0 = tblCrew.startSymbol
+    //    let flatedFsyacc =
+    //        fsyaccCrew
+    //        |> FlatedFsyaccFileCrewUtils.toFlatFsyaccFile
 
-        output.WriteLine(src)
+    //    let src = 
+    //        flatedFsyacc 
+    //        |> FlatFsyaccFileUtils.start s0
+    //        |> RawFsyaccFileUtils.fromFlat
+    //        |> RawFsyaccFileUtils.render
+
+    //    output.WriteLine(src)
 
     [<Fact(
     Skip="按需更新源代码"
-    )>] // 
+    )>]
     member _.``02 - generate Parse Table``() =
-        let src =
-            tblCrew
-            |> FsyaccParseTableFileUtils.ofSemanticParseTableCrew
+        let src =            
+            FsyaccParseTableFileUtils.from fsyacc tbl
             |> FsyaccParseTableFileUtils.generateModule(parseTblModule)
 
         File.WriteAllText(parseTblPath, src, Encoding.UTF8)
@@ -74,26 +87,29 @@ type ExprParseTableTest(output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``10 - valid ParseTable``() =
-        Should.equal tblCrew.encodedActions  ExprParseTable.actions
-        Should.equal tblCrew.encodedClosures ExprParseTable.closures
+        Should.equal tbl.encodeActions  ExprParseTable.actions
+        Should.equal tbl.encodeClosures ExprParseTable.closures
 
         //产生式比较
         let prodsFsyacc = 
-            List.map fst tblCrew.rules
+            fsyacc.rules
+            |> Seq.map (fun rule -> rule.production)
+            |> Seq.toList
+            |> List.tail
 
         let prodsParseTable = 
-            List.map fst ExprParseTable.rules
-
+            ExprParseTable.rules
+            |> List.map fst 
+            |> List.sort
         Should.equal prodsFsyacc prodsParseTable
 
         //header,semantic代码比较
         let headerFromFsyacc =
-            FSharp.Compiler.SyntaxTreeX.Parser.getDecls("header.fsx",tblCrew.header)
+            FSharp.Compiler.SyntaxTreeX.Parser.getDecls("header.fsx",fsyacc.header)
 
         let semansFsyacc =
             let mappers = 
-                tblCrew
-                |> FsyaccParseTableFileUtils.ofSemanticParseTableCrew
+                FsyaccParseTableFileUtils.from fsyacc tbl
                 |> FsyaccParseTableFileUtils.generateMappers
             FSharp.Compiler.SyntaxTreeX.SourceCodeParser.semansFromMappers mappers
 
@@ -104,55 +120,55 @@ type ExprParseTableTest(output:ITestOutputHelper) =
         Should.equal headerFromFsyacc header
         Should.equal semansFsyacc semans
 
-    [<Fact(
-    Skip="按需生成文件"
-    )>]
-    member _.``11 - data printer``() =
-        let itemCoreCrews = 
-            collectionCrew.itemCoreCrews
-            |> Map.values
-            //|> Seq.map(fun crew -> ItemCoreCrewUtils.recurItemCoreCrew crew)
-            |> List.ofSeq
+    //[<Fact(
+    //Skip="按需生成文件"
+    //)>]
+    //member _.``11 - data printer``() =
+    //    let itemCoreCrews = 
+    //        tblCrew.itemCoreCrews
+    //        |> Map.values
+    //        //|> Seq.map(fun crew -> ItemCoreCrewUtils.recurItemCoreCrew crew)
+    //        |> List.ofSeq
 
-        let filename = "ExprData"
-        let lines =
-            [
-                $"module FslexFsyacc.Expr.{filename}"
-                "open FslexFsyacc.Runtime"
-                $"let inputProductionList = {stringify inputProductionList}"
-                $"let mainProductions = {stringify collectionCrew.mainProductions}"
-                $"let augmentedProductions = {stringify collectionCrew.augmentedProductions}"
-                $"let symbols = {stringify collectionCrew.symbols}"
-                $"let nonterminals = {stringify collectionCrew.nonterminals}"
-                $"let terminals = {stringify collectionCrew.terminals}"
-                $"let nullables = {stringify collectionCrew.nullables}"
-                $"let firsts = {stringify collectionCrew.firsts}"
-                $"let lasts = {stringify collectionCrew.lasts}"
-                $"let follows = {stringify collectionCrew.follows}"
-                $"let precedes = {stringify collectionCrew.precedes}"
-                $"let itemCoreCrews = {stringify itemCoreCrews}"
+    //    let filename = "ExprData"
+    //    let lines =
+    //        [
+    //            $"module FslexFsyacc.Expr.{filename}"
+    //            "open FslexFsyacc.Runtime"
+    //            $"let inputProductionList = {stringify inputProductionList}"
+    //            $"let mainProductions = {stringify tblCrew.mainProductions}"
+    //            $"let augmentedProductions = {stringify tblCrew.augmentedProductions}"
+    //            $"let symbols = {stringify tblCrew.symbols}"
+    //            $"let nonterminals = {stringify tblCrew.nonterminals}"
+    //            $"let terminals = {stringify tblCrew.terminals}"
+    //            $"let nullables = {stringify tblCrew.nullables}"
+    //            $"let firsts = {stringify tblCrew.firsts}"
+    //            $"let lasts = {stringify tblCrew.lasts}"
+    //            $"let follows = {stringify tblCrew.follows}"
+    //            $"let precedes = {stringify tblCrew.precedes}"
+    //            $"let itemCoreCrews = {stringify itemCoreCrews}"
 
-                $"let kernels = {stringify collectionCrew.kernels}"
-                $"let closures = {stringify collectionCrew.closures}"
-                $"let GOTOs = {stringify collectionCrew.GOTOs}"
-                $"let conflictedItemCores = {stringify collectionCrew.conflictedItemCores}"
+    //            $"let kernels = {stringify tblCrew.kernels}"
+    //            $"let closures = {stringify tblCrew.closures}"
+    //            $"let GOTOs = {stringify tblCrew.GOTOs}"
+    //            $"let conflictedItemCores = {stringify tblCrew.conflictedItemCores}"
 
-                $"let dummyTokens = {stringify tblCrew.dummyTokens}"
-                $"let precedences = {stringify tblCrew.precedences}"
+    //            $"let dummyTokens = {stringify tblCrew.dummyTokens}"
+    //            $"let precedences = {stringify tblCrew.precedences}"
 
 
-                $"let unambiguousItemCores = {stringify tblCrew.unambiguousItemCores}"
+    //            $"let unambiguousItemCores = {stringify tblCrew.unambiguousItemCores}"
 
-                $"let actions = {stringify tblCrew.actions}"
-                $"let resolvedClosures = {stringify tblCrew.resolvedClosures}"
-                $"let encodedActions = {stringify tblCrew.encodedActions}"
-                $"let encodedClosures = {stringify tblCrew.encodedClosures}"
+    //            $"let actions = {stringify tblCrew.actions}"
+    //            $"let resolvedClosures = {stringify tblCrew.resolvedClosures}"
+    //            $"let encodedActions = {stringify tblCrew.encodedActions}"
+    //            $"let encodedClosures = {stringify tblCrew.encodedClosures}"
 
-            ] 
-            |> String.concat "\r\n"
+    //        ] 
+    //        |> String.concat "\r\n"
 
-        let datapath = Path.Combine(__SOURCE_DIRECTORY__,$"{filename}.fs")
-        File.WriteAllText(datapath, lines, Encoding.UTF8)
-        output.WriteLine($"文件输出完成:\r\n{datapath}")
+    //    let datapath = Path.Combine(__SOURCE_DIRECTORY__,$"{filename}.fs")
+    //    File.WriteAllText(datapath, lines, Encoding.UTF8)
+    //    output.WriteLine($"文件输出完成:\r\n{datapath}")
 
 

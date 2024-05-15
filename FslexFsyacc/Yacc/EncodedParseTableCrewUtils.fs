@@ -1,6 +1,9 @@
 ﻿module FslexFsyacc.Yacc.EncodedParseTableCrewUtils
 
 open FSharp.Idioms
+open FslexFsyacc.Runtime.ItemCores
+//open FslexFsyacc.Runtime.ParseTables
+open FslexFsyacc.Runtime.BNFs
 
 let fromActionParseTableCrew (tbl:ActionParseTableCrew) =
     let encoder =

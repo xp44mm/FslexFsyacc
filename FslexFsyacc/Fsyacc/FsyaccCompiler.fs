@@ -1,4 +1,5 @@
 ﻿module FslexFsyacc.Fsyacc.FsyaccCompiler
+open System
 
 open FslexFsyacc.Runtime
 open FslexFsyacc.Fsyacc
@@ -14,7 +15,6 @@ let parser = Parser<Position<FsyaccToken>>(
     FsyaccTokenUtils.getLexeme)
 
 /// 解析文本为结构化数据
-//[<System.ObsoleteAttribute("compile2")>]
 let compile (input:string) =
     //let mutable tokens = []
     let mutable states = [0,null]
@@ -39,9 +39,8 @@ let compile (input:string) =
     | _ ->
         failwith $"{stringify states}"
 
-//bnf的语法检测代码
-
 /// 解析文本为结构化数据
+[<System.Obsolete("compile2")>]
 let compile2 (inputText:string) =
     let mutable tokens = []
     let mutable states = [0,null]

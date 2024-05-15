@@ -51,17 +51,11 @@
 		<Compile Include="Yacc\AmbiguousCollectionCrewsRenderMembers.fs" />
 		<Compile Include="Yacc\ActionParseTableCrewUtils.fs" />
 		<Compile Include="Yacc\EncodedParseTableCrewUtils.fs" />
-		
 		<Compile Include="Brackets\Band.fs" />
-		
 		<None Include="Brackets\bounded.fsyacc" />
-		
 		<Compile Include="Brackets\BoundedParseTable.fs" />
-		
 		<Compile Include="VanillaFSharp\FSharpSourceText.fs" />
-		
 		<Compile Include="VanillaFSharp\TypeArgumentAngleToken.fs" />
-		
 		<Compile Include="VanillaFSharp\TypeArgumentAngleCompiler.fs" />
 		
 		<Compile Include="Fslex\FslexToken.fs" />

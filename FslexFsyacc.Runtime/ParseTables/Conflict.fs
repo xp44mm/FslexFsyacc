@@ -26,33 +26,3 @@ let collectConflictedProductions (conflicts:Map<Set<ItemCore>,Map<string,Set<Ite
         for icore in tgt do
         icore.production
     ]
-
-///// 去重，即冲突项目仅保留一个，但是grammar,kernels,gotos仍然保持去重前的数值
-//let getUnambiguousItemCores
-//    (dummyTokens:Map<string list,string>)
-//    (precedences:Map<string,int>)
-//    (terminals:Set<string>)
-//    (conflicts:Map<_,Map<string,Set<ItemCore>>>)
-//    =
-
-//    let eliminator: AmbiguityEliminator =
-//        {
-//            terminals = terminals
-//            dummyTokens = dummyTokens
-//            precedences = precedences
-//        }
-
-//    conflicts
-//    |> Map.map(fun i closure ->
-//        closure
-//        |> Map.map(fun sym itemcores ->
-//            if SLR.just(itemcores).isConflict() then
-//                eliminator.disambiguate(itemcores)
-//            else
-//                itemcores
-//        )
-//        |> Map.filter(fun sym itemcores ->
-//            // empty is nonassoc, will be error
-//            not itemcores.IsEmpty
-//            )
-//    )

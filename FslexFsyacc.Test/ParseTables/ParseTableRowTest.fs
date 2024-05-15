@@ -19,7 +19,7 @@ type ParseTableRowTest (output: ITestOutputHelper) =
         let dummyTokens:Map<string list,string> = Map []
         let precedences:Map<string,int> = Map []
 
-        let tbl = ParseTableRow.from bnf dummyTokens precedences
+        let tbl = ParseTableRow.from(bnf.productions, dummyTokens, precedences)
         //let iproductions =
         //    tbl.bnf.grammar.productions
         //    |> Seq.mapi(fun i p -> p,i)
@@ -47,36 +47,44 @@ type ParseTableRowTest (output: ITestOutputHelper) =
         Should.equal BNF4_55.uactions tbl.actions
 
     [<Fact>]
+    member _.``BNF4_3 output``() =
+        let bnf = BNF.from BNF4_3.mainProductions
+        let dummyTokens:Map<string list,string> = Map []
+        let precedences:Map<string,int> = BNF4_3.precedences
+
+        let tbl = ParseTableRow.from(bnf.productions, dummyTokens, precedences)
+        let iproductions =
+            tbl.bnf.grammar.productions
+            |> Seq.mapi(fun i p -> p,i)
+            |> Map.ofSeq
+
+        let ikernels =
+            tbl.bnf.kernels
+            |> Seq.mapi(fun i kernel -> kernel,i)
+            |> Map.ofSeq
+
+        let isymbols =
+            tbl.bnf.grammar.symbols
+            |> Seq.mapi(fun i sym -> sym,i)
+            |> Map.ofSeq
+
+        for KeyValue(src,mp) in tbl.actions do
+        for KeyValue(sym,actn) in mp do
+        let i = ikernels.[src]
+        let j = isymbols.[sym]
+        let sact = function
+            | Reduce p -> $"Reduce production_{iproductions.[p]}"
+            | Shift  k -> $"shift kernel_{ikernels.[k]}"
+
+        output.WriteLine($"let uaction_{i}_{j} = kernel_{i},{stringify sym},{sact actn}")
+
+    [<Fact>]
     member _.``BNF4_3``() =
         let bnf = BNF.from BNF4_3.mainProductions
         let dummyTokens:Map<string list,string> = Map []
-        let precedences:Map<string,int> = Map []
+        let precedences:Map<string,int> = BNF4_3.precedences
 
-        let tbl = ParseTableRow.from bnf dummyTokens precedences
-        //let iproductions =
-        //    tbl.bnf.grammar.productions
-        //    |> Seq.mapi(fun i p -> p,i)
-        //    |> Map.ofSeq
-
-        //let ikernels =
-        //    tbl.bnf.kernels
-        //    |> Seq.mapi(fun i kernel -> kernel,i)
-        //    |> Map.ofSeq
-
-        //let isymbols =
-        //    tbl.bnf.grammar.symbols
-        //    |> Seq.mapi(fun i sym -> sym,i)
-        //    |> Map.ofSeq
-
-        //for KeyValue(src,mp) in tbl.actions do
-        //for KeyValue(sym,actn) in mp do
-        //let i = ikernels.[src]
-        //let j = isymbols.[sym]
-        //let sact = function
-        //    | Reduce p -> $"Reduce production_{iproductions.[p]}"
-        //    | Shift  k -> $"shift kernel_{ikernels.[k]}"
-
-        //output.WriteLine($"let uaction_{i}_{j} = kernel_{i},{stringify sym},{sact actn}")
+        let tbl = ParseTableRow.from(bnf.productions, dummyTokens, precedences)
         Should.equal BNF4_3.uactions tbl.actions
 
     [<Fact>]
@@ -85,7 +93,7 @@ type ParseTableRowTest (output: ITestOutputHelper) =
         let dummyTokens:Map<string list,string> = Map []
         let precedences:Map<string,int> = Map []
 
-        let tbl = ParseTableRow.from bnf dummyTokens precedences
+        let tbl = ParseTableRow.from(bnf.productions, dummyTokens, precedences)
         //let iproductions =
         //    tbl.bnf.grammar.productions
         //    |> Seq.mapi(fun i p -> p,i)

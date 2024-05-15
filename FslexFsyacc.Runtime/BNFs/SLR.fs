@@ -68,9 +68,8 @@ type SLR =
         let actions = reduces + shifts
         actions
 
-
     /// 删除冲突的项目
-    member this.disambiguate(iprec:string list -> int) =
+    member this.disambiguate(tryGetPrecedenceCode:string list -> int option ) =
         let reduces,shifts =
             this.items
             |> Set.partition(fun i -> i.dotmax )
@@ -86,16 +85,21 @@ type SLR =
             // to be reduced at the same time, for the same token. When this happens, 
             // the grammar becomes ambiguous since a program can be interpreted more than one way. 
             // This error can be caused when the same rule is reached by more than one path.
-            
-            // reduce/reduce 说明BNF写错了
-            failwith $"R/R conflict:{stringify reduces}"
+            if reduces.Count = 1 then
+                reduces
+            else 
+                // reduce/reduce 说明BNF写错了
+                failwith $"R/R conflict:{stringify reduces}"
         else
             let rdc = Seq.exactlyOne reduces //只能有一个reduce元素
             let sft = Set.minElement shifts  //可以有多个shift元素
 
-            let rprec = iprec rdc.production //reduce产生式的优先级
-            let sprec = iprec sft.production //任何shift产生式的优先级
+            let rprec = tryGetPrecedenceCode rdc.production //reduce产生式的优先级
+            let sprec = tryGetPrecedenceCode sft.production //任何shift产生式的优先级
 
+            match sprec,rprec with
+            | _,None | None,_ -> shifts
+            | Some sprec, Some rprec ->
             if rprec > sprec then
                 reduces
             elif rprec < sprec then
@@ -110,13 +114,7 @@ type SLR =
                     reduces
                 | _ -> failwith $"precedence should int [0;1;9] but {rprec}."
 
-    static member fromActions(actions: Set<Action>) =
-        actions
-        |> Seq.collect(function
-            | Reduce p -> [ItemCore.just(p,p.Tail.Length)]
-            | Shift k -> 
-                k
-                |> Set.toList
-                |> List.map(fun ic -> ic.dotDecr())
-        )
-        |> Set.ofSeq
+    //static member fromActions(actions: seq<Action>) =
+    //    actions
+    //    |> Seq.map(fun act -> act.toItemCores())
+    //    |> Set.unionMany

@@ -204,3 +204,41 @@ let encodeActions = [
     ["",-2;"c",-2;"d",-2];
     ["C",6;"c",2;"d",4];
     ["",-3]]
+
+let unambiguousItemCores = 
+    Map [
+        kernel_0,Map ["C",set [{production=["S";"C";"C"];dot=0}];"S",set [{production=["";"S"];dot=0}];"c",set [{production=["C";"c";"C"];dot=0}];"d",set [{production=["C";"d"];dot=0}]];
+        kernel_1,Map ["",set [{production=["";"S"];dot=1}]];
+        kernel_2,Map ["C",set [{production=["C";"c";"C"];dot=1}];"c",set [{production=["C";"c";"C"];dot=0}];"d",set [{production=["C";"d"];dot=0}]];
+        kernel_3,Map ["",set [{production=["C";"c";"C"];dot=2}];"c",set [{production=["C";"c";"C"];dot=2}];"d",set [{production=["C";"c";"C"];dot=2}]];
+        kernel_4,Map ["",set [{production=["C";"d"];dot=1}];"c",set [{production=["C";"d"];dot=1}];"d",set [{production=["C";"d"];dot=1}]];
+        kernel_5,Map ["C",set [{production=["S";"C";"C"];dot=1}];"c",set [{production=["C";"c";"C"];dot=0}];"d",set [{production=["C";"d"];dot=0}]];
+        kernel_6,Map ["",set [{production=["S";"C";"C"];dot=2}]]
+    ]
+    |> Seq.map(fun(KeyValue(k,mp))-> kernel k,mp )
+    |> Map.ofSeq
+
+let resolvedClosures = 
+    [
+    kernel_0,Map [{production=["";"S"];dot=0},set [];{production=["C";"c";"C"];dot=0},set [];{production=["C";"d"];dot=0},set [];{production=["S";"C";"C"];dot=0},set []]
+    kernel_1,Map [{production=["";"S"];dot=1},set [""]]
+    kernel_2,Map [{production=["C";"c";"C"];dot=0},set [];{production=["C";"c";"C"];dot=1},set [];{production=["C";"d"];dot=0},set []]
+    kernel_3,Map [{production=["C";"c";"C"];dot=2},set ["";"c";"d"]]
+    kernel_4,Map [{production=["C";"d"];dot=1},set ["";"c";"d"]]
+    kernel_5,Map [{production=["C";"c";"C"];dot=0},set [];{production=["C";"d"];dot=0},set [];{production=["S";"C";"C"];dot=1},set []]
+    kernel_6,Map [{production=["S";"C";"C"];dot=2},set [""]]
+    ]
+    |> Seq.map(fun(k,mp)-> kernel k,mp )
+    |> Map.ofSeq
+
+let encodeClosures = 
+    [
+    [0,0,[];-1,0,[];-2,0,[];-3,0,[]]
+    [0,1,[""]]
+    [-1,0,[];-1,1,[];-2,0,[]]
+    [-1,2,["";"c";"d"]]
+    [-2,1,["";"c";"d"]]
+    [-1,0,[];-2,0,[];-3,1,[]]
+    [-3,2,[""]]
+    ]
+

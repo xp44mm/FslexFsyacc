@@ -35,13 +35,14 @@ let disambiguate (tryGetPrecedenceCode: string list -> int option) (actions: Act
         elif rprec < sprec then
             Some s
         else
-            match rprec % 10 with
-            | 0 -> // %nonassoc
+            //优先级相等，在同一行，有相同结合性
+            match Associativity.from(rprec) with
+            | NonAssoc -> // %nonassoc
                 None
-            | 1 -> // %right
+            | RightAssoc -> // %right
                 Some s
-            | 9 -> // %left
+            | LeftAssoc -> // %left
                 Some r
-            | _ -> failwith $"precedence should int [0;1;9] but {rprec}."
+            //| _ -> failwith $"precedence should int [0;1;9] but {rprec}."
     | ls -> failwith $"{ls}"
 

@@ -1,6 +1,8 @@
 ﻿module FslexFsyacc.Yacc.ActionParseTableCrewUtils
 
 open FslexFsyacc.Runtime
+open FslexFsyacc.Runtime.ItemCores
+open FslexFsyacc.Runtime.BNFs
 
 open FSharp.Idioms
 open FSharp.Idioms.Literal

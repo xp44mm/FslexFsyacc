@@ -136,6 +136,12 @@ let actions =
     )
     |> Map.ofList
 
+let precedences =
+    Map [
+        "then",100
+        "else",200
+    ]
+
 let uaction_0_3 = kernel_0,"if",shift kernel_2
 let uaction_0_4 = kernel_0,"other",shift kernel_8
 let uaction_0_5 = kernel_0,"stmt",shift kernel_1
@@ -190,3 +196,48 @@ let uactions =
 
 
 let encodeActions = [["if",2;"other",8;"stmt",1];["",0];["expr",3];["then",4];["if",2;"other",8;"stmt",5];["",-1;"else",6];["if",2;"other",8;"stmt",7];["",-2;"else",-2];["",-3;"else",-3]]
+
+let unambiguousItemCores = 
+    [
+        kernel_0,Map ["if",set [{production=["stmt";"if";"expr";"then";"stmt"];dot=0};{production=["stmt";"if";"expr";"then";"stmt";"else";"stmt"];dot=0}];"other",set [{production=["stmt";"other"];dot=0}];"stmt",set [{production=["";"stmt"];dot=0}]]
+        kernel_1,Map ["",set [{production=["";"stmt"];dot=1}]]
+        kernel_2,Map ["expr",set [{production=["stmt";"if";"expr";"then";"stmt"];dot=1};{production=["stmt";"if";"expr";"then";"stmt";"else";"stmt"];dot=1}]]
+        kernel_3,Map ["then",set [{production=["stmt";"if";"expr";"then";"stmt"];dot=2};{production=["stmt";"if";"expr";"then";"stmt";"else";"stmt"];dot=2}]]
+        kernel_4,Map ["if",set [{production=["stmt";"if";"expr";"then";"stmt"];dot=0};{production=["stmt";"if";"expr";"then";"stmt";"else";"stmt"];dot=0}];"other",set [{production=["stmt";"other"];dot=0}];"stmt",set [{production=["stmt";"if";"expr";"then";"stmt"];dot=3};{production=["stmt";"if";"expr";"then";"stmt";"else";"stmt"];dot=3}]]
+        kernel_5,Map ["",set [{production=["stmt";"if";"expr";"then";"stmt"];dot=4}];"else",set [{production=["stmt";"if";"expr";"then";"stmt";"else";"stmt"];dot=4}]]
+        kernel_6,Map ["if",set [{production=["stmt";"if";"expr";"then";"stmt"];dot=0};{production=["stmt";"if";"expr";"then";"stmt";"else";"stmt"];dot=0}];"other",set [{production=["stmt";"other"];dot=0}];"stmt",set [{production=["stmt";"if";"expr";"then";"stmt";"else";"stmt"];dot=5}]]
+        kernel_7,Map ["",set [{production=["stmt";"if";"expr";"then";"stmt";"else";"stmt"];dot=6}];"else",set [{production=["stmt";"if";"expr";"then";"stmt";"else";"stmt"];dot=6}]]
+        kernel_8,Map ["",set [{production=["stmt";"other"];dot=1}];"else",set [{production=["stmt";"other"];dot=1}]]
+    ]
+    |> Seq.map(fun(k,mp)-> kernel k, mp )
+    |> Map.ofSeq
+
+
+let resolvedClosures = 
+    [
+    kernel_0,Map [{production=["";"stmt"];dot=0},set [];{production=["stmt";"if";"expr";"then";"stmt"];dot=0},set [];{production=["stmt";"if";"expr";"then";"stmt";"else";"stmt"];dot=0},set [];{production=["stmt";"other"];dot=0},set []]
+    kernel_1,Map [{production=["";"stmt"];dot=1},set [""]]
+    kernel_2,Map [{production=["stmt";"if";"expr";"then";"stmt"];dot=1},set [];{production=["stmt";"if";"expr";"then";"stmt";"else";"stmt"];dot=1},set []]
+    kernel_3,Map [{production=["stmt";"if";"expr";"then";"stmt"];dot=2},set [];{production=["stmt";"if";"expr";"then";"stmt";"else";"stmt"];dot=2},set []]
+    kernel_4,Map [{production=["stmt";"if";"expr";"then";"stmt"];dot=0},set [];{production=["stmt";"if";"expr";"then";"stmt"];dot=3},set [];{production=["stmt";"if";"expr";"then";"stmt";"else";"stmt"];dot=0},set [];{production=["stmt";"if";"expr";"then";"stmt";"else";"stmt"];dot=3},set [];{production=["stmt";"other"];dot=0},set []]
+    kernel_5,Map [{production=["stmt";"if";"expr";"then";"stmt"];dot=4},set [""];{production=["stmt";"if";"expr";"then";"stmt";"else";"stmt"];dot=4},set []]
+    kernel_6,Map [{production=["stmt";"if";"expr";"then";"stmt"];dot=0},set [];{production=["stmt";"if";"expr";"then";"stmt";"else";"stmt"];dot=0},set [];{production=["stmt";"if";"expr";"then";"stmt";"else";"stmt"];dot=5},set [];{production=["stmt";"other"];dot=0},set []]
+    kernel_7,Map [{production=["stmt";"if";"expr";"then";"stmt";"else";"stmt"];dot=6},set ["";"else"]]
+    kernel_8,Map [{production=["stmt";"other"];dot=1},set ["";"else"]]
+    ]
+    |> Seq.map(fun(k,mp)-> kernel k,mp )
+    |> Map.ofSeq
+
+let encodeClosures = 
+    [
+    [0,0,[];-1,0,[];-2,0,[];-3,0,[]]
+    [0,1,[""]]
+    [-1,1,[];-2,1,[]]
+    [-1,2,[];-2,2,[]]
+    [-1,0,[];-1,3,[];-2,0,[];-2,3,[];-3,0,[]]
+    [-1,4,[""];-2,4,[]]
+    [-1,0,[];-2,0,[];-2,5,[];-3,0,[]]
+    [-2,6,["";"else"]]
+    [-3,1,["";"else"]]
+    ]
+

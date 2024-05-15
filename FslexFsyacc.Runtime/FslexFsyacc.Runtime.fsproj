@@ -62,13 +62,17 @@
     <Compile Include="BNFs\BNFRow.fs" />
     <Compile Include="BNFs\BNFRowUtils.fs" />
     <Compile Include="BNFs\BNF.fs" />
-    <Compile Include="ParseTables\Precedence.fs" />
+    <Compile Include="ParseTables\Associativity.fs" />
     <Compile Include="ParseTables\Action.fs" />
-    <Compile Include="ParseTables\AmbiguityEliminator.fs" />
+    <Compile Include="ParseTables\Precedence.fs" />
     <Compile Include="ParseTables\ParseTableEncoder.fs" />
     <Compile Include="ParseTables\Conflict.fs" />
     <Compile Include="ParseTables\ParseTableRow.fs" />
+    <Compile Include="ParseTables\ParseTableRowUtils.fs" />
     <Compile Include="ParseTables\Yacc.fs" />
+    <Compile Include="ParseTables\RawFsyaccFile.fs" />
+    <Compile Include="ParseTables\Rule.fs" />
+    <Compile Include="ParseTables\FlatFsyaccFile.fs" />
     
     
     <Compile Include="ParserTableAction.fs" />

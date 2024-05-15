@@ -26,7 +26,7 @@ type ParseTableEncoder =
         | Shift j -> this.kernels.[j]
         | Reduce p -> this.productions.[p]
 
-    member encoder.getEncodedActions (actions: Map< Set<ItemCore>, Map<string,Action>> ) =
+    member encoder.encodeActions (actions: Map< Set<ItemCore>, Map<string,Action>> ) =
         encoder.kernels
         |> Map.toList
         |> List.map(fun (kernel,state) ->
@@ -39,50 +39,24 @@ type ParseTableEncoder =
                 )
             else []
         )
-
-    [<System.Obsolete("未使用")>]
-    member encoder.getEncodedClosures (closures: Map<int,Map<ItemCore,Set<string>>>) =
-        encoder.kernels
-        |> Map.toList
-        |> List.mapi(fun i (_,state) ->
-            if i<>state then failwith $"state编码不同于自然数序列"
-            if closures.ContainsKey state then
-                closures.[state]
-                |> Map.toList
-                |> List.map(fun(icore,las)->
-                    //let prod,dot = encoder.encodeItemCore icore
-                    let prod = encoder.productions.[icore.production]
-                    let dot = icore.dot
-                    prod,dot,Set.toList las
-                )
-            else []
-        )
-
-    [<System.Obsolete("未使用")>]
     member this.encodeProduction (production:string list) =
             this.productions.[production]
 
-    [<System.Obsolete("未使用")>]
     member this.encodeItemCore (itemCore: ItemCore) =
         let iprod = 
-            this.productions.[itemCore.production]
+            this.encodeProduction itemCore.production
         iprod,itemCore.dot
 
-    /// return state -> symbol -> action, state等于list的index
-    [<System.Obsolete("未使用")>]
-    member encoder.getEncodedActions (actions: Map<int,Map<string,Action>>) =
-        encoder.kernels
-        |> Map.toList
-        |> List.mapi(fun i (_,state) ->
-            if i<>state then failwith $"state编码不同于自然数序列"
-            if actions.ContainsKey state then
-                actions.[state]
-                |> Map.toList
-                |> List.map(fun(la,action)->
-                    //try
-                    let iaction = encoder.encodeAction action
-                    la,iaction
-                    //with _ -> failwithf "%A" (la,action)
-                )
-            else []
+    member encoder.encodeClosures(closures: Map<Set<ItemCore>,Map<ItemCore,Set<string>>>) =
+        closures
+        |> Seq.mapi(fun i (KeyValue(kernel,itemCores)) -> 
+            if i<>encoder.kernels.[kernel] then failwith $"state编码不同于自然数序列"
+            itemCores
+            |> Map.toList
+            |> List.map(fun(icore,las)->
+                let prod,dot = encoder.encodeItemCore icore
+                prod,dot,Set.toList las
+            )
         )
+        |> Seq.toList
+

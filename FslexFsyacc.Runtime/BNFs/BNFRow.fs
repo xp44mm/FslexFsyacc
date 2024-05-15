@@ -19,6 +19,8 @@ type BNFRow =
 
     actions: Map<Set<ItemCore>,Map<string,Set<Action>>>
 
+    conflictedItemCores: Map<Set<ItemCore>,Map<string,Set<ItemCore>>>
+
     }
 
     static member from (productions: Set<list<string>>) =
@@ -38,14 +40,14 @@ type BNFRow =
             |> Set.map(fun k -> SLR.from(k).items, toclosure k)
             |> Map.ofSeq
 
-        let conflicts =
+        let conflictedItemCores =
             closures
             |> Map.map( fun _ closure ->
                 SpreadClosure.from(closure).getConflicts()
             )
 
         let actions =
-            conflicts
+            conflictedItemCores
             |> Map.map( fun _ mp ->
                 mp
                 |> Map.map(fun _ items ->
@@ -58,4 +60,5 @@ type BNFRow =
         kernels = kernels
         closures = closures
         actions = actions
+        conflictedItemCores = conflictedItemCores
         }

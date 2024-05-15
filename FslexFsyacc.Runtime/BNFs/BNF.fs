@@ -30,3 +30,8 @@ type BNF =
     member this.actions =
         let row = BNFRowUtils.getRow this.productions
         row.actions
+
+    member this.conflictedItemCores =
+        let row = BNFRowUtils.getRow this.productions
+        row.conflictedItemCores
+

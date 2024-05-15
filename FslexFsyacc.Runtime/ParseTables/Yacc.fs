@@ -8,7 +8,7 @@ open FSharp.Idioms.Literal
 
 type Yacc = 
     {
-        productions:Set<list<string>>
+        productions:Set<string list> // augment productions
         dummyTokens:Map<string list,string> // production -> dummy-token
         precedences:Map<string,int> // token:string -> precedence:int
     }

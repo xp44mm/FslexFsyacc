@@ -39,6 +39,9 @@
 		<Compile Include="ParseTables\PrecedenceTest.fs" />
 		<Compile Include="ParseTables\ParseTableRowTest.fs" />
 		<Compile Include="ParseTables\EncodeActionsTest.fs" />
+		<Compile Include="ParseTables\UnambiguousItemCoresTest.fs" />
+		<Compile Include="ParseTables\ResolvedClosuresTest.fs" />
+		<Compile Include="ParseTables\EncodeClosuresTest.fs" />
     
 		<Compile Include="Yacc\Example427Test.fs" />
 		<Compile Include="Yacc\Example440Test.fs" />
@@ -65,7 +68,6 @@
 		<Compile Include="Fsyacc\SemanticGeneratorTest.fs" />
 		<Compile Include="Fsyacc\RegularSymbolCompilerTest.fs" />
 		<Compile Include="Fsyacc\FsyaccFileRenderTest.fs" />
-		<Compile Include="Fsyacc\FsyaccFileShakingTest.fs" />
 		<Compile Include="Fsyacc\FsyaccFileNameTest.fs" />
 		<Compile Include="Fsyacc\FsyaccFileRulesTest.fs" />
 		<Compile Include="Fsyacc\FsyaccTokenTest.fs" />
