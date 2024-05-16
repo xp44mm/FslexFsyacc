@@ -75,7 +75,7 @@ type ExprParseTableTest(output:ITestOutputHelper) =
     //    output.WriteLine(src)
 
     [<Fact(
-    //Skip="按需更新源代码"
+    Skip="按需更新源代码"
     )>]
     member _.``02 - generate Parse Table``() =
         let fileData = FsyaccParseTableFile.from fsyacc
@@ -85,6 +85,8 @@ type ExprParseTableTest(output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``10 - valid ParseTable``() =
+        let fileData = FsyaccParseTableFile.from fsyacc
+
         Should.equal tbl.encodeActions  ExprParseTable.actions
         Should.equal tbl.encodeClosures ExprParseTable.closures
 
@@ -93,12 +95,11 @@ type ExprParseTableTest(output:ITestOutputHelper) =
             fsyacc.rules
             |> Seq.map (fun rule -> rule.production)
             |> Seq.toList
-            |> List.tail
 
         let prodsParseTable = 
             ExprParseTable.rules
             |> List.map fst 
-            |> List.sort
+
         Should.equal prodsFsyacc prodsParseTable
 
         //header,semantic代码比较
@@ -106,9 +107,7 @@ type ExprParseTableTest(output:ITestOutputHelper) =
             FSharp.Compiler.SyntaxTreeX.Parser.getDecls("header.fsx",fsyacc.header)
 
         let semansFsyacc =
-            let mappers = 
-                FsyaccParseTableFileUtils.from fsyacc tbl
-                |> FsyaccParseTableFileUtils.generateMappers
+            let mappers = fileData.generateMappers()
             FSharp.Compiler.SyntaxTreeX.SourceCodeParser.semansFromMappers mappers
 
         let header,semans =

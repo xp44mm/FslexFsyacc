@@ -13,4 +13,11 @@ type Rule =
         reducer:string
     }
 
+    static member augment (startSymbol) =
+        {
+            production = [""; startSymbol]
+            dummy = ""
+            reducer = "ss.[0]"
+        }
+
     //member this.encode(productions: Map<string list,int>) =

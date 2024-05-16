@@ -3,9 +3,9 @@
 open System
 open FSharp.Idioms
 
-let semanticBody (typeAnnotations:Map<string,string>) (prodSymbols:string list) (semantic:string) =
+let semanticBody (typeAnnotations:Map<string,string>) (production:string list) (reducer:string) =
     let bodySymbols =
-        prodSymbols
+        production
         |> List.tail
         |> List.mapi(fun i s -> i,s)
         |> List.filter(fun(i,s)-> typeAnnotations.ContainsKey s && s <> "unit")
@@ -18,21 +18,24 @@ let semanticBody (typeAnnotations:Map<string,string>) (prodSymbols:string list) 
                 else 
                     failwith $"type annot `{sym}` is required."
 
-            if typeAnnotations.ContainsKey prodSymbols.Head && 
-                typeAnnotations.[prodSymbols.Head] <> "unit" then
+            if typeAnnotations.ContainsKey production.Head && 
+                typeAnnotations.[production.Head] <> "unit" then
 
-                $"let result:{typeAnnotations.[prodSymbols.Head]} ="
-                semantic |> Line.indentCodeBlock (4)
+                $"let result:{typeAnnotations.[production.Head]} ="
+                reducer |> Line.indentCodeBlock (4)
                 $"box result"
             else
-                semantic
+                reducer
                 "null"
-        ]|> String.concat Environment.NewLine
+        ]
+        |> String.concat Environment.NewLine
 
-    if semantic = "" then
+    if production.Head = "" then
+        "ss.[0]"
+    elif reducer = "" then
         "null"
     else
-        mainLines 
+        mainLines
 
 // 生成semantic函数的定义
 let decorateSemantic (typeAnnotations:Map<string,string>) (prodSymbols:string list) (semantic:string) =
@@ -40,8 +43,14 @@ let decorateSemantic (typeAnnotations:Map<string,string>) (prodSymbols:string li
     let funcDef =
         [
             "fun(ss:obj list)->"
-            body 
-            |> Line.indentCodeBlock 4
+            body |> Line.indentCodeBlock 4
         ] 
         |> String.concat Environment.NewLine
     funcDef
+
+//let augmentRule =
+//    match this.rules.Head with
+//    | prod,reducer -> $"{stringify prod},fun(ss:obj list)->{reducer}"
+        
+
+//let mainRules = 

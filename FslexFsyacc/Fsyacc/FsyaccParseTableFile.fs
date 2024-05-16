@@ -74,13 +74,12 @@ type FsyaccParseTableFile =
     /// 输入模块带名字空间的全名
     /// 删除Parse代码
     member this.generateModule (moduleName:string) =
-        let types = this.declarations 
-        
+        let types = this.declarations
         let rules =
             this.rules
             |> List.map(fun(prod, reducer) ->
-                let mapper = SemanticGenerator.decorateSemantic types prod reducer
-                $"{Literal.stringify prod},{mapper}"
+                let fns = SemanticGenerator.decorateSemantic types prod reducer
+                $"{stringify prod},{fns}"
                 )
             |> String.concat Environment.NewLine
 
@@ -92,8 +91,8 @@ type FsyaccParseTableFile =
         //
         [
             $"module {moduleName}"
-            $"let actions = {Literal.stringify this.actions}"
-            $"let closures = {Literal.stringify this.closures}"
+            $"let actions = {stringify this.actions}"
+            $"let closures = {stringify this.closures}"
             this.header
             $"let rules:list<string list*(obj list->obj)> = ["
             rules |> Line.indentCodeBlock 4

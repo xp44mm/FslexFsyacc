@@ -9,7 +9,7 @@ open FSharp.Idioms.Literal
 open FslexFsyacc.Runtime
 
 let parser = 
-    Parser<Position<ExprToken>>(
+    PrimeParser<Position<ExprToken>>(
         ExprParseTable.rules,
         ExprParseTable.actions,
         ExprParseTable.closures,
