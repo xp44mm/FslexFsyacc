@@ -38,8 +38,8 @@ let semanticBody (typeAnnotations:Map<string,string>) (production:string list) (
         mainLines
 
 // 生成semantic函数的定义
-let decorateSemantic (typeAnnotations:Map<string,string>) (prodSymbols:string list) (semantic:string) =
-    let body = semanticBody typeAnnotations prodSymbols semantic
+let decorateSemantic (typeAnnotations:Map<string,string>) (production: string list) (reducer:string) =
+    let body = semanticBody typeAnnotations production reducer
     let funcDef =
         [
             "fun(ss:obj list)->"
@@ -48,9 +48,3 @@ let decorateSemantic (typeAnnotations:Map<string,string>) (prodSymbols:string li
         |> String.concat Environment.NewLine
     funcDef
 
-//let augmentRule =
-//    match this.rules.Head with
-//    | prod,reducer -> $"{stringify prod},fun(ss:obj list)->{reducer}"
-        
-
-//let mainRules = 

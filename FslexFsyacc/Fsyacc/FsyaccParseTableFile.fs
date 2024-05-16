@@ -74,19 +74,26 @@ type FsyaccParseTableFile =
     /// 输入模块带名字空间的全名
     /// 删除Parse代码
     member this.generateModule (moduleName:string) =
-        let types = this.declarations
-        let rules =
-            this.rules
-            |> List.map(fun(prod, reducer) ->
-                let fns = SemanticGenerator.decorateSemantic types prod reducer
-                $"{stringify prod},{fns}"
-                )
-            |> String.concat Environment.NewLine
-
-        if types.ContainsKey this.startSymbol then
+        if this.declarations.ContainsKey this.startSymbol then
             ()
         else 
             failwith $"type annotation `{this.startSymbol}` is required."
+
+        let augmentReducer =
+            match this.rules.Head with
+            | prod,reducer -> prod,  "fun(ss:obj list)-> ss.[0]" // List.exactlyOne
+
+        let mainReducers = 
+            this.rules.Tail
+            |> List.map ( fun(prod, reducer) ->
+                let fns = SemanticGenerator.decorateSemantic this.declarations prod reducer
+                prod, fns
+                )
+
+        let reducers = 
+            augmentReducer :: mainReducers
+            |> List.map(fun (prod, reducer) -> $"{stringify prod}, {reducer}")
+            |> String.concat Environment.NewLine
 
         //
         [
@@ -95,10 +102,10 @@ type FsyaccParseTableFile =
             $"let closures = {stringify this.closures}"
             this.header
             $"let rules:list<string list*(obj list->obj)> = ["
-            rules |> Line.indentCodeBlock 4
+            reducers |> Line.indentCodeBlock 4
             "]"
             "let unboxRoot ="
-            $"    unbox<{types.[this.startSymbol]}>"
+            $"    unbox<{this.declarations.[this.startSymbol]}>"
             "let baseParser = FslexFsyacc.Runtime.BaseParser.create(rules, actions, closures)"
             "let stateSymbolPairs = baseParser.getStateSymbolPairs()"
         ] 

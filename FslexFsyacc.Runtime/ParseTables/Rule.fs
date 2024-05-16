@@ -2,6 +2,7 @@
 
 open System
 open FSharp.Idioms
+open FSharp.Idioms.Literal
 
 open FslexFsyacc.Runtime.BNFs
 open FslexFsyacc.Runtime.ParseTables
@@ -17,7 +18,12 @@ type Rule =
         {
             production = [""; startSymbol]
             dummy = ""
-            reducer = "ss.[0]"
+            reducer = ""
         }
 
-    //member this.encode(productions: Map<string list,int>) =
+    //member this.printAugmentRule() =
+    //    if this.production.Head = "" then
+    //        $"{stringify this.production}, List.exactlyOne"
+    //    else failwith $"{stringify this.production}"
+
+    //member this.printMainRule(typeAnnotations:Map<string,string>) =

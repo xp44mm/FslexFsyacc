@@ -39,6 +39,7 @@ let fromFSharp skip_count decls =
             expr
         | _ -> failwith $"{letrules}"
 
+    // todo: maybe function val
     let semans = 
         Parser.getElements sequential
         |> Seq.map(fun expr ->
