@@ -75,14 +75,12 @@ type ExprParseTableTest(output:ITestOutputHelper) =
     //    output.WriteLine(src)
 
     [<Fact(
-    Skip="按需更新源代码"
+    //Skip="按需更新源代码"
     )>]
     member _.``02 - generate Parse Table``() =
-        let src =            
-            FsyaccParseTableFileUtils.from fsyacc tbl
-            |> FsyaccParseTableFileUtils.generateModule(parseTblModule)
-
-        File.WriteAllText(parseTblPath, src, Encoding.UTF8)
+        let fileData = FsyaccParseTableFile.from fsyacc
+        let outp = fileData.generateModule(parseTblModule)            
+        File.WriteAllText(parseTblPath, outp, Encoding.UTF8)
         output.WriteLine($"output yacc:\r\n{parseTblPath}")
 
     [<Fact>]

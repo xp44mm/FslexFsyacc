@@ -78,10 +78,9 @@
 		<Compile Include="Fsyacc\RegularSymbol.fs" />
 		<Compile Include="Fsyacc\RawFsyaccFile.fs" />
 		<Compile Include="Fsyacc\FlatFsyaccFile.fs" />
+		<Compile Include="Fsyacc\SemanticGenerator.fs" />
 		<Compile Include="Fsyacc\FsyaccParseTableFile.fs" />
 		<Compile Include="Fsyacc\FlatedFsyaccFileCrews.fs" />
-
-		<Compile Include="Fsyacc\SemanticGenerator.fs" />
 
 		<Compile Include="Fsyacc\FsyaccTokenUtils.fs" />
 		<Compile Include="Fsyacc\RegularSymbolUtils.fs" />
