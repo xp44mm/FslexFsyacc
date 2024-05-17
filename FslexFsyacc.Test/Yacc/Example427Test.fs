@@ -8,10 +8,10 @@ open FSharp.Idioms
 open FSharp.Idioms.Literal
 
 type Example427Test(output:ITestOutputHelper) =
-    let show res = 
-        res 
-        |> Literal.stringify
-        |> output.WriteLine
+    //let show res = 
+    //    res 
+    //    |> Literal.stringify
+    //    |> output.WriteLine
 
     let E = "E"
     let E' = "E'"
@@ -32,230 +32,230 @@ type Example427Test(output:ITestOutputHelper) =
         [ F   ; id ]
         ]
 
-    let grammar = 
-        mainProductions
-        |> ProductionsCrewUtils.getProductionsCrew
-        |> GrammarCrewUtils.getNullableCrew
-        |> GrammarCrewUtils.getFirstLastCrew
-        |> GrammarCrewUtils.getFollowPrecedeCrew
+    //let grammar = 
+    //    mainProductions
+    //    |> ProductionsCrewUtils.getProductionsCrew
+    //    |> GrammarCrewUtils.getNullableCrew
+    //    |> GrammarCrewUtils.getFirstLastCrew
+    //    |> GrammarCrewUtils.getFollowPrecedeCrew
 
-    [<Fact>]
-    member _.``grammar collections``() =
-        output.WriteLine($"let productions = {stringify grammar.augmentedProductions}")
-        output.WriteLine($"let startSymbol = {stringify grammar.startSymbol}")
-        output.WriteLine($"let symbols = {stringify grammar.symbols}")
-        output.WriteLine($"let nonterminals = {stringify grammar.nonterminals}")
-        output.WriteLine($"let terminals = {stringify grammar.terminals}")
-        output.WriteLine($"let nullables = {stringify grammar.nullables}")
-        output.WriteLine($"let firsts = {stringify grammar.firsts}")
-        output.WriteLine($"let lasts = {stringify grammar.lasts}")
-        output.WriteLine($"let follows = {stringify grammar.follows}")
-        output.WriteLine($"let precedes = {stringify grammar.precedes}")
+    //[<Fact>]
+    //member _.``grammar collections``() =
+    //    output.WriteLine($"let productions = {stringify grammar.augmentedProductions}")
+    //    output.WriteLine($"let startSymbol = {stringify grammar.startSymbol}")
+    //    output.WriteLine($"let symbols = {stringify grammar.symbols}")
+    //    output.WriteLine($"let nonterminals = {stringify grammar.nonterminals}")
+    //    output.WriteLine($"let terminals = {stringify grammar.terminals}")
+    //    output.WriteLine($"let nullables = {stringify grammar.nullables}")
+    //    output.WriteLine($"let firsts = {stringify grammar.firsts}")
+    //    output.WriteLine($"let lasts = {stringify grammar.lasts}")
+    //    output.WriteLine($"let follows = {stringify grammar.follows}")
+    //    output.WriteLine($"let precedes = {stringify grammar.precedes}")
 
 
-    [<Fact>]
-    member _.``0101 - augment grammar productions``() =
-        //show grammar.productions
-        let y = set [
-            ["";"E"];
-            ["E";"T";"E'"];
-            ["E'"];
-            ["E'";"+";"T";"E'"];
-            ["F";"(";"E";")"];
-            ["F";"id"];
-            ["T";"F";"T'"];
-            ["T'"];
-            ["T'";"*";"F";"T'"]]
+    //[<Fact>]
+    //member _.``0101 - augment grammar productions``() =
+    //    //show grammar.productions
+    //    let y = set [
+    //        ["";"E"];
+    //        ["E";"T";"E'"];
+    //        ["E'"];
+    //        ["E'";"+";"T";"E'"];
+    //        ["F";"(";"E";")"];
+    //        ["F";"id"];
+    //        ["T";"F";"T'"];
+    //        ["T'"];
+    //        ["T'";"*";"F";"T'"]]
 
-        let grammar = 
-            mainProductions
-            |> ProductionsCrewUtils.getProductionsCrew
+    //    let grammar = 
+    //        mainProductions
+    //        |> ProductionsCrewUtils.getProductionsCrew
 
-        Should.equal y grammar.augmentedProductions 
+    //    Should.equal y grammar.augmentedProductions 
 
-    [<Fact>]
-    member _.``0201 - symbols``() =
-        //show grammar.symbols
+    //[<Fact>]
+    //member _.``0201 - symbols``() =
+    //    //show grammar.symbols
 
-        let y = set ["(";")";"*";"+";"E";"E'";"F";"T";"T'";"id"]
-        let grammar = 
-            mainProductions
-            |> ProductionsCrewUtils.getProductionsCrew
-            |> GrammarCrewUtils.getNullableCrew
+    //    let y = set ["(";")";"*";"+";"E";"E'";"F";"T";"T'";"id"]
+    //    let grammar = 
+    //        mainProductions
+    //        |> ProductionsCrewUtils.getProductionsCrew
+    //        |> GrammarCrewUtils.getNullableCrew
 
-        Should.equal y grammar.symbols
+    //    Should.equal y grammar.symbols
 
-    [<Fact>]
-    member _.``0202 nonterminals``() =
-        //show grammar.nonterminals
+    //[<Fact>]
+    //member _.``0202 nonterminals``() =
+    //    //show grammar.nonterminals
 
-        let y = set ["E";"E'";"F";"T";"T'"]
-        let grammar = 
-            mainProductions
-            |> ProductionsCrewUtils.getProductionsCrew
-            |> GrammarCrewUtils.getNullableCrew
+    //    let y = set ["E";"E'";"F";"T";"T'"]
+    //    let grammar = 
+    //        mainProductions
+    //        |> ProductionsCrewUtils.getProductionsCrew
+    //        |> GrammarCrewUtils.getNullableCrew
 
-        Should.equal y grammar.nonterminals
+    //    Should.equal y grammar.nonterminals
 
-    [<Fact>]
-    member _.``0203 nullables``() =
-        //show grammar.nullables
-        let y = set ["E'";"T'"]
-        let grammar = 
-            mainProductions
-            |> ProductionsCrewUtils.getProductionsCrew
-            |> GrammarCrewUtils.getNullableCrew
+    //[<Fact>]
+    //member _.``0203 nullables``() =
+    //    //show grammar.nullables
+    //    let y = set ["E'";"T'"]
+    //    let grammar = 
+    //        mainProductions
+    //        |> ProductionsCrewUtils.getProductionsCrew
+    //        |> GrammarCrewUtils.getNullableCrew
 
-        Should.equal y grammar.nullables
+    //    Should.equal y grammar.nullables
 
-    [<Fact>]
-    member _.``0301 firsts``() =
-        let grammar = 
-            mainProductions
-            |> ProductionsCrewUtils.getProductionsCrew
-            |> GrammarCrewUtils.getNullableCrew
-            |> GrammarCrewUtils.getFirstLastCrew
+    //[<Fact>]
+    //member _.``0301 firsts``() =
+    //    let grammar = 
+    //        mainProductions
+    //        |> ProductionsCrewUtils.getProductionsCrew
+    //        |> GrammarCrewUtils.getNullableCrew
+    //        |> GrammarCrewUtils.getFirstLastCrew
 
-        //show grammar.firsts
-        let y = Map.ofList [
-            "E",set ["(";"id"];
-            "E'",set ["+"];
-            "F",set ["(";"id"];
-            "T",set ["(";"id"];
-            "T'",set ["*"];
-            ]
+    //    //show grammar.firsts
+    //    let y = Map.ofList [
+    //        "E",set ["(";"id"];
+    //        "E'",set ["+"];
+    //        "F",set ["(";"id"];
+    //        "T",set ["(";"id"];
+    //        "T'",set ["*"];
+    //        ]
 
-        Should.equal y grammar.firsts
+    //    Should.equal y grammar.firsts
 
-    [<Fact>]
-    member _.``0302 lasts``() =
-        let grammar = 
-            mainProductions
-            |> ProductionsCrewUtils.getProductionsCrew
-            |> GrammarCrewUtils.getNullableCrew
-            |> GrammarCrewUtils.getFirstLastCrew
+    //[<Fact>]
+    //member _.``0302 lasts``() =
+    //    let grammar = 
+    //        mainProductions
+    //        |> ProductionsCrewUtils.getProductionsCrew
+    //        |> GrammarCrewUtils.getNullableCrew
+    //        |> GrammarCrewUtils.getFirstLastCrew
 
-        //show grammar.lasts
-        let y = Map.ofList [
-            "E",set [")";"id"];
-            "E'",set [")";"id"];
-            "F",set [")";"id"];
-            "T",set [")";"id"];
-            "T'",set [")";"id"];
-            ]
+    //    //show grammar.lasts
+    //    let y = Map.ofList [
+    //        "E",set [")";"id"];
+    //        "E'",set [")";"id"];
+    //        "F",set [")";"id"];
+    //        "T",set [")";"id"];
+    //        "T'",set [")";"id"];
+    //        ]
 
-        Should.equal y grammar.lasts
+    //    Should.equal y grammar.lasts
 
-    [<Fact>]
-    member _.``0303 follows``() =
-        let grammar = 
-            mainProductions
-            |> ProductionsCrewUtils.getProductionsCrew
-            |> GrammarCrewUtils.getNullableCrew
-            |> GrammarCrewUtils.getFirstLastCrew
-            |> GrammarCrewUtils.getFollowPrecedeCrew
+    //[<Fact>]
+    //member _.``0303 follows``() =
+    //    let grammar = 
+    //        mainProductions
+    //        |> ProductionsCrewUtils.getProductionsCrew
+    //        |> GrammarCrewUtils.getNullableCrew
+    //        |> GrammarCrewUtils.getFirstLastCrew
+    //        |> GrammarCrewUtils.getFollowPrecedeCrew
 
-        //show grammar.follows
+    //    //show grammar.follows
 
-        //空字符串代表书中的$
-        let z = Map [
-            "(",set ["(";"id"];")",set ["";")";"*";"+"];
-            "*",set ["(";"id"];"+",set ["(";"id"];
-            "E",set ["";")"];"E'",set ["";")"];
-            "F",set ["";")";"*";"+"];"T",set ["";")";"+"];
-            "T'",set ["";")";"+"];"id",set ["";")";"*";"+"]]
-        Should.equal z grammar.follows
+    //    //空字符串代表书中的$
+    //    let z = Map [
+    //        "(",set ["(";"id"];")",set ["";")";"*";"+"];
+    //        "*",set ["(";"id"];"+",set ["(";"id"];
+    //        "E",set ["";")"];"E'",set ["";")"];
+    //        "F",set ["";")";"*";"+"];"T",set ["";")";"+"];
+    //        "T'",set ["";")";"+"];"id",set ["";")";"*";"+"]]
+    //    Should.equal z grammar.follows
 
-    [<Fact>]
-    member _.``0304 precedes``() =
-        let grammar = 
-            mainProductions
-            |> ProductionsCrewUtils.getProductionsCrew
-            |> GrammarCrewUtils.getNullableCrew
-            |> GrammarCrewUtils.getFirstLastCrew
-            |> GrammarCrewUtils.getFollowPrecedeCrew
+    //[<Fact>]
+    //member _.``0304 precedes``() =
+    //    let grammar = 
+    //        mainProductions
+    //        |> ProductionsCrewUtils.getProductionsCrew
+    //        |> GrammarCrewUtils.getNullableCrew
+    //        |> GrammarCrewUtils.getFirstLastCrew
+    //        |> GrammarCrewUtils.getFollowPrecedeCrew
 
-        //show grammar.precedes
-        ////空字符串代表BOF
-        let y = Map [
-            "(",set ["";"(";"*";"+"];")",set [")";"id"];
-            "*",set [")";"id"];"+",set [")";"id"];
-            "E",set ["";"("];"E'",set [")";"id"];
-            "F",set ["";"(";"*";"+"];"T",set ["";"(";"+"];
-            "T'",set [")";"id"];"id",set ["";"(";"*";"+"]]
-        Should.equal y grammar.precedes
+    //    //show grammar.precedes
+    //    ////空字符串代表BOF
+    //    let y = Map [
+    //        "(",set ["";"(";"*";"+"];")",set [")";"id"];
+    //        "*",set [")";"id"];"+",set [")";"id"];
+    //        "E",set ["";"("];"E'",set [")";"id"];
+    //        "F",set ["";"(";"*";"+"];"T",set ["";"(";"+"];
+    //        "T'",set [")";"id"];"id",set ["";"(";"*";"+"]]
+    //    Should.equal y grammar.precedes
 
-    [<Fact>]
-    member _.``closures``() =
-        let grammar = 
-            mainProductions
-            |> ProductionsCrewUtils.getProductionsCrew
-            |> GrammarCrewUtils.getNullableCrew
-            |> GrammarCrewUtils.getFirstLastCrew
-            |> GrammarCrewUtils.getFollowPrecedeCrew
-            |> GrammarCrewUtils.getItemCoresCrew
+    //[<Fact>]
+    //member _.``closures``() =
+    //    let grammar = 
+    //        mainProductions
+    //        |> ProductionsCrewUtils.getProductionsCrew
+    //        |> GrammarCrewUtils.getNullableCrew
+    //        |> GrammarCrewUtils.getFirstLastCrew
+    //        |> GrammarCrewUtils.getFollowPrecedeCrew
+    //        |> GrammarCrewUtils.getItemCoresCrew
 
-        //let itemCores = 
-        //    ItemCoreFactory.make grammar.augmentedProductions
+    //    //let itemCores = 
+    //    //    ItemCoreFactory.make grammar.augmentedProductions
 
-        //let itemCoreAttributes = 
-        //    ItemCoreAttributeFactory.make grammar.nonterminals grammar.nullables grammar.firsts itemCores
+    //    //let itemCoreAttributes = 
+    //    //    ItemCoreAttributeFactory.make grammar.nonterminals grammar.nullables grammar.firsts itemCores
             
 
-        let closures = 
-            //CollectionFactory.make itemCores itemCoreAttributes grammar.augmentedProductions
-            grammar
-            |> GrammarCrewUtils.getClosureCollection 
-            |> Set.map(fun (kernel,closure)->
-                let k = kernel |> Set.map(fun i -> i.production,i.dot)
-                let c = closure |> Set.map(fun (i,la)->(i.production,i.dot),la)
-                k,c
-            )
-        //show grammar.closures
+    //    let closures = 
+    //        //CollectionFactory.make itemCores itemCoreAttributes grammar.augmentedProductions
+    //        grammar
+    //        |> GrammarCrewUtils.getClosureCollection 
+    //        |> Set.map(fun (kernel,closure)->
+    //            let k = kernel |> Set.map(fun i -> i.production,i.dot)
+    //            let c = closure |> Set.map(fun (i,la)->(i.production,i.dot),la)
+    //            k,c
+    //        )
+    //    //show grammar.closures
 
-        let y = set [
-            set [["";"E"],0],set [(["";"E"],0),set [""];(["E";"T";"E'"],0),set [""];(["F";"(";"E";")"],0),set ["";"*";"+"];(["F";"id"],0),set ["";"*";"+"];(["T";"F";"T'"],0),set ["";"+"]];
-            set [["";"E"],1],set [(["";"E"],1),set [""]];
-            set [["E";"T";"E'"],1],set [(["E";"T";"E'"],1),set ["";")"];(["E'"],0),set ["";")"];(["E'";"+";"T";"E'"],0),set ["";")"]];
-            set [["E";"T";"E'"],2],set [(["E";"T";"E'"],2),set ["";")"]];
-            set [["E'";"+";"T";"E'"],1],set [(["E'";"+";"T";"E'"],1),set ["";")"];(["F";"(";"E";")"],0),set ["";")";"*";"+"];(["F";"id"],0),set ["";")";"*";"+"];(["T";"F";"T'"],0),set ["";")";"+"]];
-            set [["E'";"+";"T";"E'"],2],set [(["E'"],0),set ["";")"];(["E'";"+";"T";"E'"],0),set ["";")"];(["E'";"+";"T";"E'"],2),set ["";")"]];
-            set [["E'";"+";"T";"E'"],3],set [(["E'";"+";"T";"E'"],3),set ["";")"]];
-            set [["F";"(";"E";")"],1],set [(["E";"T";"E'"],0),set [")"];(["F";"(";"E";")"],0),set [")";"*";"+"];(["F";"(";"E";")"],1),set ["";")";"*";"+"];(["F";"id"],0),set [")";"*";"+"];(["T";"F";"T'"],0),set [")";"+"]];
-            set [["F";"(";"E";")"],2],set [(["F";"(";"E";")"],2),set ["";")";"*";"+"]];
-            set [["F";"(";"E";")"],3],set [(["F";"(";"E";")"],3),set ["";")";"*";"+"]];
-            set [["F";"id"],1],set [(["F";"id"],1),set ["";")";"*";"+"]];
-            set [["T";"F";"T'"],1],set [(["T";"F";"T'"],1),set ["";")";"+"];(["T'"],0),set ["";")";"+"];(["T'";"*";"F";"T'"],0),set ["";")";"+"]];
-            set [["T";"F";"T'"],2],set [(["T";"F";"T'"],2),set ["";")";"+"]];
-            set [["T'";"*";"F";"T'"],1],set [(["F";"(";"E";")"],0),set ["";")";"*";"+"];(["F";"id"],0),set ["";")";"*";"+"];(["T'";"*";"F";"T'"],1),set ["";")";"+"]];
-            set [["T'";"*";"F";"T'"],2],set [(["T'"],0),set ["";")";"+"];(["T'";"*";"F";"T'"],0),set ["";")";"+"];(["T'";"*";"F";"T'"],2),set ["";")";"+"]];
-            set [["T'";"*";"F";"T'"],3],set [(["T'";"*";"F";"T'"],3),set ["";")";"+"]]]
+    //    let y = set [
+    //        set [["";"E"],0],set [(["";"E"],0),set [""];(["E";"T";"E'"],0),set [""];(["F";"(";"E";")"],0),set ["";"*";"+"];(["F";"id"],0),set ["";"*";"+"];(["T";"F";"T'"],0),set ["";"+"]];
+    //        set [["";"E"],1],set [(["";"E"],1),set [""]];
+    //        set [["E";"T";"E'"],1],set [(["E";"T";"E'"],1),set ["";")"];(["E'"],0),set ["";")"];(["E'";"+";"T";"E'"],0),set ["";")"]];
+    //        set [["E";"T";"E'"],2],set [(["E";"T";"E'"],2),set ["";")"]];
+    //        set [["E'";"+";"T";"E'"],1],set [(["E'";"+";"T";"E'"],1),set ["";")"];(["F";"(";"E";")"],0),set ["";")";"*";"+"];(["F";"id"],0),set ["";")";"*";"+"];(["T";"F";"T'"],0),set ["";")";"+"]];
+    //        set [["E'";"+";"T";"E'"],2],set [(["E'"],0),set ["";")"];(["E'";"+";"T";"E'"],0),set ["";")"];(["E'";"+";"T";"E'"],2),set ["";")"]];
+    //        set [["E'";"+";"T";"E'"],3],set [(["E'";"+";"T";"E'"],3),set ["";")"]];
+    //        set [["F";"(";"E";")"],1],set [(["E";"T";"E'"],0),set [")"];(["F";"(";"E";")"],0),set [")";"*";"+"];(["F";"(";"E";")"],1),set ["";")";"*";"+"];(["F";"id"],0),set [")";"*";"+"];(["T";"F";"T'"],0),set [")";"+"]];
+    //        set [["F";"(";"E";")"],2],set [(["F";"(";"E";")"],2),set ["";")";"*";"+"]];
+    //        set [["F";"(";"E";")"],3],set [(["F";"(";"E";")"],3),set ["";")";"*";"+"]];
+    //        set [["F";"id"],1],set [(["F";"id"],1),set ["";")";"*";"+"]];
+    //        set [["T";"F";"T'"],1],set [(["T";"F";"T'"],1),set ["";")";"+"];(["T'"],0),set ["";")";"+"];(["T'";"*";"F";"T'"],0),set ["";")";"+"]];
+    //        set [["T";"F";"T'"],2],set [(["T";"F";"T'"],2),set ["";")";"+"]];
+    //        set [["T'";"*";"F";"T'"],1],set [(["F";"(";"E";")"],0),set ["";")";"*";"+"];(["F";"id"],0),set ["";")";"*";"+"];(["T'";"*";"F";"T'"],1),set ["";")";"+"]];
+    //        set [["T'";"*";"F";"T'"],2],set [(["T'"],0),set ["";")";"+"];(["T'";"*";"F";"T'"],0),set ["";")";"+"];(["T'";"*";"F";"T'"],2),set ["";")";"+"]];
+    //        set [["T'";"*";"F";"T'"],3],set [(["T'";"*";"F";"T'"],3),set ["";")";"+"]]]
 
-        Should.equal y closures
+    //    Should.equal y closures
     
-    [<Fact>]
-    member _.``goto factory``() =
-        let grammar = 
-            mainProductions
-            |> ProductionsCrewUtils.getProductionsCrew
-            |> GrammarCrewUtils.getNullableCrew
-            |> GrammarCrewUtils.getFirstLastCrew
-            |> GrammarCrewUtils.getFollowPrecedeCrew
-            |> GrammarCrewUtils.getItemCoresCrew
+    //[<Fact>]
+    //member _.``goto factory``() =
+    //    let grammar = 
+    //        mainProductions
+    //        |> ProductionsCrewUtils.getProductionsCrew
+    //        |> GrammarCrewUtils.getNullableCrew
+    //        |> GrammarCrewUtils.getFirstLastCrew
+    //        |> GrammarCrewUtils.getFollowPrecedeCrew
+    //        |> GrammarCrewUtils.getItemCoresCrew
 
-        //let itemCores = 
-        //    ItemCoreFactory.make grammar.augmentedProductions
+    //    //let itemCores = 
+    //    //    ItemCoreFactory.make grammar.augmentedProductions
 
-        //let itemCoreAttributes = 
-        //    ItemCoreAttributeFactory.make grammar.nonterminals grammar.nullables grammar.firsts itemCores
+    //    //let itemCoreAttributes = 
+    //    //    ItemCoreAttributeFactory.make grammar.nonterminals grammar.nullables grammar.firsts itemCores
             
 
-        let closures = 
-            //CollectionFactory.make itemCores itemCoreAttributes grammar.augmentedProductions
-            grammar
-            |> GrammarCrewUtils.getClosureCollection 
+    //    let closures = 
+    //        //CollectionFactory.make itemCores itemCoreAttributes grammar.augmentedProductions
+    //        grammar
+    //        |> GrammarCrewUtils.getClosureCollection 
 
-        ()
+    //    ()
 
         //let gotos = 
         //    GotoFactory.make closures

@@ -27,91 +27,103 @@ type G01Test(output:ITestOutputHelper) =
     let filePath = Path.Combine(__SOURCE_DIRECTORY__, @"g01.fsyacc")
     let text = File.ReadAllText(filePath,Encoding.UTF8)
 
-    let fsyaccCrew =
+    let rawFsyacc =
         text
-        |> RawFsyaccFileCrewUtils.parse
-        |> FlatedFsyaccFileCrewUtils.fromRawFsyaccFileCrew
+        |> FsyaccCompiler.compile
+        |> fun f -> f.migrate()
 
-    let inputProductionList =
-        fsyaccCrew.flatedRules
-        |> List.map Triple.first
+    let fsyacc =
+        rawFsyacc
+        |> FslexFsyacc.Runtime.ParseTables.FlatFsyaccFile.from
 
-    let collectionCrew = 
-        fsyaccCrew
-        |> FlatedFsyaccFileCrewUtils.getAmbiguousCollectionCrew
+    let tbl =
+        fsyacc.getParseTable()
 
-    let tblCrew =
-        fsyaccCrew
-        |> FlatedFsyaccFileCrewUtils.getSemanticParseTableCrew
+    //let fsyaccCrew =
+    //    text
+    //    |> RawFsyaccFileCrewUtils.parse
+    //    |> FlatedFsyaccFileCrewUtils.fromRawFsyaccFileCrew
 
-    [<Fact>]
-    member _.``01 - norm fsyacc file``() =
-        let s0 = tblCrew.startSymbol
+    //let inputProductionList =
+    //    fsyaccCrew.flatedRules
+    //    |> List.map Triple.first
 
-        let flatedFsyacc =
-            fsyaccCrew
-            |> FlatedFsyaccFileCrewUtils.toFlatFsyaccFile
+    //let collectionCrew = 
+    //    fsyaccCrew
+    //    |> FlatedFsyaccFileCrewUtils.getAmbiguousCollectionCrew
 
-        let src = 
-            flatedFsyacc 
-            |> FlatFsyaccFileUtils.start s0
-            |> RawFsyaccFileUtils.fromFlat
-            |> RawFsyaccFileUtils.render
+    //let tblCrew =
+    //    fsyaccCrew
+    //    |> FlatedFsyaccFileCrewUtils.getSemanticParseTableCrew
 
-        output.WriteLine(src)
+    //[<Fact>]
+    //member _.``01 - norm fsyacc file``() =
+    //    let s0 = tblCrew.startSymbol
 
-    [<Fact(
-    Skip="按需生成文件"
-    )>]
-    member _.``11 - data file generator``() =
-        let filename = "G01Data"
-        let itemCoreCrewFlats = 
-            collectionCrew.itemCoreCrews
-            |> Map.values
-            |> Seq.map(fun crew -> ItemCoreCrewFlat.from crew)
-            |> List.ofSeq
+    //    let flatedFsyacc =
+    //        fsyaccCrew
+    //        |> FlatedFsyaccFileCrewUtils.toFlatFsyaccFile
 
-        let lines =
-            [
-                $"module FslexFsyacc.{filename}"
-                "open FslexFsyacc.Runtime"
-                $"let inputProductionList = {stringify inputProductionList}"
-                $"let mainProductions = {stringify collectionCrew.mainProductions}"
-                $"let augmentedProductions = {stringify collectionCrew.augmentedProductions}"
-                $"let symbols = {stringify collectionCrew.symbols}"
-                $"let nonterminals = {stringify collectionCrew.nonterminals}"
-                $"let terminals = {stringify collectionCrew.terminals}"
-                $"let nullables = {stringify collectionCrew.nullables}"
-                $"let firsts = {stringify collectionCrew.firsts}"
-                $"let lasts = {stringify collectionCrew.lasts}"
-                $"let follows = {stringify collectionCrew.follows}"
-                $"let precedes = {stringify collectionCrew.precedes}"
-                $"let itemCoreCrewFlats = {stringify itemCoreCrewFlats}"
+    //    let src = 
+    //        flatedFsyacc 
+    //        |> FlatFsyaccFileUtils.start s0
+    //        |> RawFsyaccFileUtils.fromFlat
+    //        |> RawFsyaccFileUtils.render
 
-                $"let kernels = {stringify collectionCrew.kernels}"
-                $"let closures = {stringify collectionCrew.closures}"
-                $"let GOTOs = {stringify collectionCrew.GOTOs}"
-                $"let conflictedItemCores = {stringify collectionCrew.conflictedItemCores}"
+    //    output.WriteLine(src)
 
-                $"let dummyTokens = {stringify tblCrew.dummyTokens}"
-                $"let precedences = {stringify tblCrew.precedences}"
+    //[<Fact(
+    //Skip="按需生成文件"
+    //)>]
+    //member _.``11 - data file generator``() =
+    //    let filename = "G01Data"
+    //    let itemCoreCrewFlats = 
+    //        collectionCrew.itemCoreCrews
+    //        |> Map.values
+    //        |> Seq.map(fun crew -> ItemCoreCrewFlat.from crew)
+    //        |> List.ofSeq
+
+    //    let lines =
+    //        [
+    //            $"module FslexFsyacc.{filename}"
+    //            "open FslexFsyacc.Runtime"
+    //            $"let inputProductionList = {stringify inputProductionList}"
+    //            $"let mainProductions = {stringify collectionCrew.mainProductions}"
+    //            $"let augmentedProductions = {stringify collectionCrew.augmentedProductions}"
+    //            $"let symbols = {stringify collectionCrew.symbols}"
+    //            $"let nonterminals = {stringify collectionCrew.nonterminals}"
+    //            $"let terminals = {stringify collectionCrew.terminals}"
+    //            $"let nullables = {stringify collectionCrew.nullables}"
+    //            $"let firsts = {stringify collectionCrew.firsts}"
+    //            $"let lasts = {stringify collectionCrew.lasts}"
+    //            $"let follows = {stringify collectionCrew.follows}"
+    //            $"let precedes = {stringify collectionCrew.precedes}"
+    //            $"let itemCoreCrewFlats = {stringify itemCoreCrewFlats}"
+
+    //            $"let kernels = {stringify collectionCrew.kernels}"
+    //            $"let closures = {stringify collectionCrew.closures}"
+    //            $"let GOTOs = {stringify collectionCrew.GOTOs}"
+    //            $"let conflictedItemCores = {stringify collectionCrew.conflictedItemCores}"
+
+    //            $"let dummyTokens = {stringify tblCrew.dummyTokens}"
+    //            $"let precedences = {stringify tblCrew.precedences}"
 
 
-                $"let unambiguousItemCores = {stringify tblCrew.unambiguousItemCores}"
+    //            $"let unambiguousItemCores = {stringify tblCrew.unambiguousItemCores}"
 
-                $"let actions = {stringify tblCrew.actions}"
-                $"let resolvedClosures = {stringify tblCrew.resolvedClosures}"
+    //            $"let actions = {stringify tblCrew.actions}"
+    //            $"let resolvedClosures = {stringify tblCrew.resolvedClosures}"
 
-                $"let encodedActions = {stringify tblCrew.encodedActions}"
-                $"let encodedClosures = {stringify tblCrew.encodedClosures}"
+    //            $"let encodedActions = {stringify tblCrew.encodedActions}"
+    //            $"let encodedClosures = {stringify tblCrew.encodedClosures}"
 
 
-            ] 
-            |> String.concat "\r\n"
+    //        ] 
+    //        |> String.concat "\r\n"
 
-        let datapath = Path.Combine(__SOURCE_DIRECTORY__,$"{filename}.fs")
-        File.WriteAllText(datapath, lines, Encoding.UTF8)
-        output.WriteLine($"文件输出完成:\r\n{datapath}")
+    //    let datapath = Path.Combine(__SOURCE_DIRECTORY__,$"{filename}.fs")
+    //    File.WriteAllText(datapath, lines, Encoding.UTF8)
+    //    output.WriteLine($"文件输出完成:\r\n{datapath}")
 
 
 

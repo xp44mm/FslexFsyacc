@@ -6,10 +6,10 @@ open FSharp.Idioms
 open FSharp.xUnit
 
 type Example448Test(output:ITestOutputHelper) =
-    let show res =
-        res
-        |> Literal.stringify
-        |> output.WriteLine
+    //let show res =
+    //    res
+    //    |> Literal.stringify
+    //    |> output.WriteLine
 
     // grammar 4.49
     let S = "S"
@@ -25,68 +25,68 @@ type Example448Test(output:ITestOutputHelper) =
         [ R; L ]
     ]
 
-    let grammar = 
-        mainProductions
-        |> ProductionsCrewUtils.getProductionsCrew
-        |> GrammarCrewUtils.getNullableCrew
-        |> GrammarCrewUtils.getFirstLastCrew
+    //let grammar = 
+    //    mainProductions
+    //    |> ProductionsCrewUtils.getProductionsCrew
+    //    |> GrammarCrewUtils.getNullableCrew
+    //    |> GrammarCrewUtils.getFirstLastCrew
 
-    [<Fact>]
-    member _.``closures``() =
-        let grammar = 
-            mainProductions
-            |> ProductionsCrewUtils.getProductionsCrew
-            |> GrammarCrewUtils.getNullableCrew
-            |> GrammarCrewUtils.getFirstLastCrew
-            |> GrammarCrewUtils.getFollowPrecedeCrew
-            |> GrammarCrewUtils.getItemCoresCrew
+    //[<Fact>]
+    //member _.``closures``() =
+    //    let grammar = 
+    //        mainProductions
+    //        |> ProductionsCrewUtils.getProductionsCrew
+    //        |> GrammarCrewUtils.getNullableCrew
+    //        |> GrammarCrewUtils.getFirstLastCrew
+    //        |> GrammarCrewUtils.getFollowPrecedeCrew
+    //        |> GrammarCrewUtils.getItemCoresCrew
 
-        //let itemCores = 
-        //    ItemCoreFactory.make grammar.augmentedProductions
+    //    //let itemCores = 
+    //    //    ItemCoreFactory.make grammar.augmentedProductions
 
-        //let itemCoreAttributes = 
-        //    ItemCoreAttributeFactory.make grammar.nonterminals grammar.nullables grammar.firsts itemCores
+    //    //let itemCoreAttributes = 
+    //    //    ItemCoreAttributeFactory.make grammar.nonterminals grammar.nullables grammar.firsts itemCores
             
 
-        let closures = 
-            //CollectionFactory.make itemCores itemCoreAttributes grammar.augmentedProductions
-            grammar
-            |> GrammarCrewUtils.getClosureCollection 
-            |> Set.map(fun (kernel,closure)->
-                let k = kernel |> Set.map(fun i -> i.production,i.dot)
-                let c = closure |> Set.map(fun (i,la)->(i.production,i.dot),la)
-                k,c
-            )
+    //    let closures = 
+    //        //CollectionFactory.make itemCores itemCoreAttributes grammar.augmentedProductions
+    //        grammar
+    //        |> GrammarCrewUtils.getClosureCollection 
+    //        |> Set.map(fun (kernel,closure)->
+    //            let k = kernel |> Set.map(fun i -> i.production,i.dot)
+    //            let c = closure |> Set.map(fun (i,la)->(i.production,i.dot),la)
+    //            k,c
+    //        )
 
-        //show closures
-        let y = set [
-            set [["";"S"],0],set [(["";"S"],0),set [""];(["L";"*";"R"],0),set ["";"="];(["L";"id"],0),set ["";"="];(["R";"L"],0),set [""];(["S";"L";"=";"R"],0),set [""];(["S";"R"],0),set [""]];
-            set [["";"S"],1],set [(["";"S"],1),set [""]];
-            set [["L";"*";"R"],1],set [(["L";"*";"R"],0),set ["";"="];(["L";"*";"R"],1),set ["";"="];(["L";"id"],0),set ["";"="];(["R";"L"],0),set ["";"="]];
-            set [["L";"*";"R"],2],set [(["L";"*";"R"],2),set ["";"="]];
-            set [["L";"id"],1],set [(["L";"id"],1),set ["";"="]];
-            set [["R";"L"],1],set [(["R";"L"],1),set ["";"="]];
-            set [["R";"L"],1;["S";"L";"=";"R"],1],set [(["R";"L"],1),set [""];(["S";"L";"=";"R"],1),set [""]];
-            set [["S";"L";"=";"R"],2],set [(["L";"*";"R"],0),set [""];(["L";"id"],0),set [""];(["R";"L"],0),set [""];(["S";"L";"=";"R"],2),set [""]];
-            set [["S";"L";"=";"R"],3],set [(["S";"L";"=";"R"],3),set [""]];
-            set [["S";"R"],1],set [(["S";"R"],1),set [""]]]
-        Should.equal y closures
+    //    //show closures
+    //    let y = set [
+    //        set [["";"S"],0],set [(["";"S"],0),set [""];(["L";"*";"R"],0),set ["";"="];(["L";"id"],0),set ["";"="];(["R";"L"],0),set [""];(["S";"L";"=";"R"],0),set [""];(["S";"R"],0),set [""]];
+    //        set [["";"S"],1],set [(["";"S"],1),set [""]];
+    //        set [["L";"*";"R"],1],set [(["L";"*";"R"],0),set ["";"="];(["L";"*";"R"],1),set ["";"="];(["L";"id"],0),set ["";"="];(["R";"L"],0),set ["";"="]];
+    //        set [["L";"*";"R"],2],set [(["L";"*";"R"],2),set ["";"="]];
+    //        set [["L";"id"],1],set [(["L";"id"],1),set ["";"="]];
+    //        set [["R";"L"],1],set [(["R";"L"],1),set ["";"="]];
+    //        set [["R";"L"],1;["S";"L";"=";"R"],1],set [(["R";"L"],1),set [""];(["S";"L";"=";"R"],1),set [""]];
+    //        set [["S";"L";"=";"R"],2],set [(["L";"*";"R"],0),set [""];(["L";"id"],0),set [""];(["R";"L"],0),set [""];(["S";"L";"=";"R"],2),set [""]];
+    //        set [["S";"L";"=";"R"],3],set [(["S";"L";"=";"R"],3),set [""]];
+    //        set [["S";"R"],1],set [(["S";"R"],1),set [""]]]
+    //    Should.equal y closures
 
-    [<Fact>]
-    member _.``goto factory``() =
-        let itemCores = 
-            ItemCoreUtils.make grammar.augmentedProductions
+    //[<Fact>]
+    //member _.``goto factory``() =
+    //    let itemCores = 
+    //        ItemCoreUtils.make grammar.augmentedProductions
 
-        //let itemCoreAttributes = 
-        //    ItemCoreAttributeFactory.make grammar.nonterminals grammar.nullables grammar.firsts itemCores
+    //    //let itemCoreAttributes = 
+    //    //    ItemCoreAttributeFactory.make grammar.nonterminals grammar.nullables grammar.firsts itemCores
    
-        //let closures = 
-        //    CollectionFactory.make itemCores itemCoreAttributes grammar.augmentedProductions
+    //    //let closures = 
+    //    //    CollectionFactory.make itemCores itemCoreAttributes grammar.augmentedProductions
 
-        //let gotos = 
-        //    GotoFactory.make closures
-        //    |> Set.map(fun(k1,s,k2)-> k1 |> Set.map(fun i -> i.production,i.dot),s,k2 |> Set.map(fun i -> i.production,i.dot))
+    //    //let gotos = 
+    //    //    GotoFactory.make closures
+    //    //    |> Set.map(fun(k1,s,k2)-> k1 |> Set.map(fun i -> i.production,i.dot),s,k2 |> Set.map(fun i -> i.production,i.dot))
 
 
-        //Should.equal y gotos
-        ()
+    //    //Should.equal y gotos
+    //    ()

@@ -24,7 +24,7 @@ type PrecedenceTest(output:ITestOutputHelper) =
         [ E; id ]
     ]
 
-    let collection = AmbiguousCollectionCrewUtils.newAmbiguousCollectionCrew mainProductions 
+    //let collection = AmbiguousCollectionCrewUtils.newAmbiguousCollectionCrew mainProductions 
 
     [<Fact>]
     member _.``整理优先级输入``() =

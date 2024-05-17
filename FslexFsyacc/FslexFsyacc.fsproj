@@ -20,37 +20,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Compile Include="Yacc\ItemCoreCrews.fs" />
-		<Compile Include="Yacc\AmbiguousCollectionCrews.fs" />
-		<Compile Include="Yacc\SemanticParseTableCrews.fs" />
     
-    <Compile Include="Yacc\ProductionUtils.fs" />
-		<Compile Include="Yacc\ProductionCrewUtils.fs" />
-		<Compile Include="Yacc\ProductionListUtils.fs" />
-		<Compile Include="Yacc\ProductionSetUtils.fs" />
-    <Compile Include="Yacc\NullableFactory.fs" />
-    <Compile Include="Yacc\FirstFactory.fs" />
-    <Compile Include="Yacc\LastFactory.fs" />
-    <Compile Include="Yacc\FollowFactory.fs" />
-    <Compile Include="Yacc\PrecedeFactory.fs" />
-
-		<Compile Include="Yacc\ItemCoreUtils.fs" />
-		<Compile Include="Yacc\ItemCoreCrewUtils.fs" />
-		<Compile Include="Yacc\ItemCoreCrewRecurs.fs" />
-		<Compile Include="Yacc\ClosureOperators.fs" />
-		<Compile Include="Yacc\KernelUtils.fs" />
-		<Compile Include="Yacc\ActionUtils.fs" />
-		<Compile Include="Yacc\AmbiguityEliminator.fs" />
-		<Compile Include="Yacc\AmbiguousCollectionUtils.fs" />
-		<Compile Include="Yacc\ParseTableEncoder.fs" />
-		<Compile Include="Yacc\ProductionsCrewUtils.fs" />
-		<Compile Include="Yacc\GrammarCrewUtils.fs" />
-		<Compile Include="Yacc\LALRCollectionCrewUtils.fs" />
-		<Compile Include="Yacc\AmbiguousCollectionCrewUtils.fs" />
-		<Compile Include="Yacc\AmbiguousCollectionCrewRecurs.fs" />
-		<Compile Include="Yacc\AmbiguousCollectionCrewsRenderMembers.fs" />
-		<Compile Include="Yacc\ActionParseTableCrewUtils.fs" />
-		<Compile Include="Yacc\EncodedParseTableCrewUtils.fs" />
 		<Compile Include="Brackets\Band.fs" />
 		<None Include="Brackets\bounded.fsyacc" />
 		<Compile Include="Brackets\BoundedParseTable.fs" />

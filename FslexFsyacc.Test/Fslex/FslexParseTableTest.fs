@@ -1,25 +1,21 @@
 ﻿namespace FslexFsyacc.Fslex
 
-open System
-open System.Text
-open System.Text.RegularExpressions
-open System.IO
-
-open Xunit
-open Xunit.Abstractions
-
 open FSharp.Idioms
 open FSharp.Idioms.Literal
 open FSharp.xUnit
-
-open FslexFsyacc.Yacc
+open FslexFsyacc
 open FslexFsyacc.Fsyacc
 open FslexFsyacc.Runtime
+open FslexFsyacc.Runtime.ParseTables
+open FslexFsyacc.Yacc
+open System
+open System.IO
+open System.Text
+open System.Text.RegularExpressions
+open Xunit
+open Xunit.Abstractions
 
 type FslexParseTableTest(output: ITestOutputHelper) =
-    let show res =
-        res |> stringify |> output.WriteLine
-
     let solutionPath =
         DirectoryInfo(
             __SOURCE_DIRECTORY__
@@ -28,6 +24,7 @@ type FslexParseTableTest(output: ITestOutputHelper) =
             .Parent
             .FullName
 
+    // module name
     let parseTblName = "FslexParseTable"
     let parseTblModule = $"FslexFsyacc.Fslex.{parseTblName}"
     let sourcePath = Path.Combine(solutionPath, @"FslexFsyacc\Fslex")
@@ -36,29 +33,43 @@ type FslexParseTableTest(output: ITestOutputHelper) =
 
     let text = File.ReadAllText(filePath,Encoding.UTF8)
 
-    let fsyaccCrew =
+    let rawFsyacc =
         text
-        |> RawFsyaccFileCrewUtils.parse
-        |> FlatedFsyaccFileCrewUtils.fromRawFsyaccFileCrew
+        |> FsyaccCompiler.compile
+        |> fun f -> f.migrate()
 
-    let tblCrew =
-        fsyaccCrew
-        |> FlatedFsyaccFileCrewUtils.getSemanticParseTableCrew
+    let fsyacc =
+        rawFsyacc
+        |> FslexFsyacc.Runtime.ParseTables.FlatFsyaccFile.from
 
-    [<Fact>]
-    member _.``01 - norm fsyacc file``() =
-        let startSymbol = tblCrew.startSymbol
-        let flatedFsyacc =
-            fsyaccCrew
-            |> FlatedFsyaccFileCrewUtils.toFlatFsyaccFile
+    let tbl =
+        fsyacc.getParseTable()
 
-        let txt = 
-            flatedFsyacc 
-            |> FlatFsyaccFileUtils.start startSymbol
-            |> RawFsyaccFileUtils.fromFlat
-            |> RawFsyaccFileUtils.render
+    let moduleFile = FsyaccParseTableFile.from fsyacc
 
-        output.WriteLine(txt)
+    //let fsyaccCrew =
+    //    text
+    //    |> RawFsyaccFileCrewUtils.parse
+    //    |> FlatedFsyaccFileCrewUtils.fromRawFsyaccFileCrew
+
+    //let tblCrew =
+    //    fsyaccCrew
+    //    |> FlatedFsyaccFileCrewUtils.getSemanticParseTableCrew
+
+    //[<Fact>]
+    //member _.``01 - norm fsyacc file``() =
+    //    let startSymbol = tblCrew.startSymbol
+    //    let flatedFsyacc =
+    //        fsyaccCrew
+    //        |> FlatedFsyaccFileCrewUtils.toFlatFsyaccFile
+
+    //    let txt = 
+    //        flatedFsyacc 
+    //        |> FlatFsyaccFileUtils.start startSymbol
+    //        |> RawFsyaccFileUtils.fromFlat
+    //        |> RawFsyaccFileUtils.render
+
+    //    output.WriteLine(txt)
 
     [<Fact>]
     member _.``02 - list all tokens``() =
@@ -83,110 +94,101 @@ type FslexParseTableTest(output: ITestOutputHelper) =
             "|" 
             ]
 
-        let tokens = tblCrew.symbols - tblCrew.nonterminals
-        show tokens
+        //let tokens = tblCrew.symbols - tblCrew.nonterminals
+        Should.equal y tbl.bnf.grammar.terminals
 
-    [<Fact>]
-    member _.``03 - list all states``() =       
-        let text = 
-            AmbiguousCollectionUtils.render 
-                tblCrew.terminals
-                tblCrew.conflictedItemCores
-                (tblCrew.kernels |> Seq.mapi(fun i k -> k,i) |> Map.ofSeq)
+    //[<Fact>]
+    //member _.``03 - list all states``() =       
+    //    let text = 
+    //        AmbiguousCollectionUtils.render 
+    //            tblCrew.terminals
+    //            tblCrew.conflictedItemCores
+    //            (tblCrew.kernels |> Seq.mapi(fun i k -> k,i) |> Map.ofSeq)
 
-        output.WriteLine(text)
+    //    output.WriteLine(text)
 
-    [<Fact>]
-    member _.``04 - 汇总冲突的产生式``() =
-        let productions = 
-            AmbiguousCollectionUtils.collectConflictedProductions tblCrew.conflictedItemCores
+    //[<Fact>]
+    //member _.``04 - 汇总冲突的产生式``() =
+    //    let productions = 
+    //        AmbiguousCollectionUtils.collectConflictedProductions tblCrew.conflictedItemCores
 
-        // production -> %prec
-        let pprods =
-            ProductionSetUtils.precedenceOfProductions tblCrew.terminals productions
+    //    // production -> %prec
+    //    let pprods =
+    //        ProductionSetUtils.precedenceOfProductions tblCrew.terminals productions
 
-        //优先级应该据此结果给出，不能少，也不应该多。
-        let y =
-            [ [ "expr"; "expr"; "&"; "expr" ], "&"
-              [ "expr"; "expr"; "*"         ], "*"
-              [ "expr"; "expr"; "+"         ], "+"
-              [ "expr"; "expr"; "?"         ], "?"
-              [ "expr"; "expr"; "|"; "expr" ], "|" ]
+    //    //优先级应该据此结果给出，不能少，也不应该多。
+    //    let y =
+    //        [ [ "expr"; "expr"; "&"; "expr" ], "&"
+    //          [ "expr"; "expr"; "*"         ], "*"
+    //          [ "expr"; "expr"; "+"         ], "+"
+    //          [ "expr"; "expr"; "?"         ], "?"
+    //          [ "expr"; "expr"; "|"; "expr" ], "|" ]
 
-        Should.equal y pprods
+    //    Should.equal y pprods
 
-    [<Fact>]
-    member _.``05 - list the type annotaitions``() =
-        let terminals =
-            tblCrew.terminals
-            |> Seq.map RenderUtils.renderSymbol
-            |> String.concat " "
+    //[<Fact>]
+    //member _.``05 - list the type annotaitions``() =
+    //    let terminals =
+    //        tblCrew.terminals
+    //        |> Seq.map RenderUtils.renderSymbol
+    //        |> String.concat " "
 
-        let nonterminals =
-            tblCrew.nonterminals
-            |> Seq.map RenderUtils.renderSymbol
-            |> String.concat " "
+    //    let nonterminals =
+    //        tblCrew.nonterminals
+    //        |> Seq.map RenderUtils.renderSymbol
+    //        |> String.concat " "
 
-        let src =
-            [
-                "// Do not list symbols whose return value is always `null`"
-                ""
-                "// terminals: ref to the returned type of `getLexeme`"
-                "%type<> " + terminals
-                ""
-                "// nonterminals"
-                "%type<> " + nonterminals
-            ] 
-            |> String.concat "\r\n"
+    //    let src =
+    //        [
+    //            "// Do not list symbols whose return value is always `null`"
+    //            ""
+    //            "// terminals: ref to the returned type of `getLexeme`"
+    //            "%type<> " + terminals
+    //            ""
+    //            "// nonterminals"
+    //            "%type<> " + nonterminals
+    //        ] 
+    //        |> String.concat "\r\n"
 
-        output.WriteLine(src)
+    //    output.WriteLine(src)
 
     [<Fact(
     Skip="按需更新源代码"
-    )>] // 
+    )>]
     member _.``06 - generate ParseTable``() =
-        let fsharpCode = 
-            tblCrew
-            |> FsyaccParseTableFileUtils.ofSemanticParseTableCrew
-            |> FsyaccParseTableFileUtils.generateModule(parseTblModule)
-        File.WriteAllText(parseTblPath, fsharpCode, Encoding.UTF8)
-        output.WriteLine("output yacc:" + parseTblPath)
+        let outp = moduleFile.generateModule(parseTblModule)
+        File.WriteAllText(parseTblPath, outp, Encoding.UTF8)
+        output.WriteLine($"output yacc:\r\n{parseTblPath}")
 
     [<Fact>]
     member _.``07 - valid ParseTable``() =
-        let src = 
-            tblCrew
-            |> FsyaccParseTableFileUtils.ofSemanticParseTableCrew
-        Should.equal src.actions FslexParseTable.actions
-        Should.equal src.closures FslexParseTable.closures
+        Should.equal tbl.encodeActions  FslexParseTable.actions
+        Should.equal tbl.encodeClosures FslexParseTable.closures
 
-        let prodsFsyacc = 
-            List.map fst src.rules
+        //产生式比较
+        let prodsFsyacc =
+            fsyacc.rules
+            |> Seq.map (fun rule -> rule.production)
+            |> Seq.toList
 
-        let prodsParseTable = 
-            List.map fst FslexParseTable.rules
+        let prodsParseTable =
+            FslexParseTable.rules
+            |> List.map fst
 
         Should.equal prodsFsyacc prodsParseTable
 
+        //header,reducers代码比较
         let headerFromFsyacc =
-            FSharp.Compiler.SyntaxTreeX.Parser.getDecls("header.fsx",src.header)
+            FSharp.Compiler.SyntaxTreeX.Parser.getDecls("header.fsx",fsyacc.header)
 
         let semansFsyacc =
-            let mappers = src|> FsyaccParseTableFileUtils.generateMappers
+            let mappers = moduleFile.generateMappers()
             FSharp.Compiler.SyntaxTreeX.SourceCodeParser.semansFromMappers mappers
 
         let header,semans =
-            File.ReadAllText(parseTblPath, Encoding.UTF8)
-            |> FSharp.Compiler.SyntaxTreeX.SourceCodeParser.getHeaderSemansFromFSharp 2
+            let text = File.ReadAllText(parseTblPath, Encoding.UTF8)
+            FSharp.Compiler.SyntaxTreeX.SourceCodeParser.getHeaderSemansFromFSharp 2 text
 
         Should.equal headerFromFsyacc header
         Should.equal semansFsyacc semans
-
-    [<Fact>]
-    member _.``08 - regex first or last token test``() =
-        let lastsOfExpr = tblCrew.lasts.["expr"]
-        let firstsOfExpr = tblCrew.firsts.["expr"]
-
-        show lastsOfExpr
-        show firstsOfExpr
 

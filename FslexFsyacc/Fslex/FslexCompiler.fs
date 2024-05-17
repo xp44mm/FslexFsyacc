@@ -9,7 +9,7 @@ open FSharp.Idioms.Literal
 let analyze (tokens:seq<Position<FslexToken>>) = 
     FslexDFA.analyzer.analyze(tokens,FslexTokenUtils.getTag)
 
-let parser = Parser<FslexToken Position>(
+let parser = PrimeParser<FslexToken Position>(
     FslexParseTable.rules,
     FslexParseTable.actions,
     FslexParseTable.closures,getTag,getLexeme)

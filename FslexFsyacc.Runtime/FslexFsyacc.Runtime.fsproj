@@ -80,8 +80,6 @@
     <Compile Include="RenderUtils.fs" />
     <Compile Include="AnalyzerUtils.fs" />
     <Compile Include="Analyzer.fs" />
-    <Compile Include="TheoryParser.fs" />
-    <Compile Include="Parser.fs" />
     <Compile Include="BaseParser.fs" />
     <Compile Include="PrimeParser.fs" />
   </ItemGroup>

@@ -1,22 +1,18 @@
 ﻿namespace FslexFsyacc.Expr
 
+open FSharp.Idioms
+open FSharp.Idioms.Literal
+open FSharp.xUnit
+open FslexFsyacc
+open FslexFsyacc.Fsyacc
+open FslexFsyacc.Runtime
+open FslexFsyacc.Runtime.ParseTables
+open FslexFsyacc.Yacc
+open System.IO
+open System.Text
 open Xunit
 open Xunit.Abstractions
 
-open FSharp.Idioms
-
-open FSharp.xUnit
-open FSharp.Idioms.Literal
-
-open System.IO
-open System.Text
-
-open FslexFsyacc.Fsyacc
-open FslexFsyacc.Yacc
-open FslexFsyacc.Runtime
-open FslexFsyacc.Runtime.ParseTables
-
-open FslexFsyacc
 type ExprParseTableTest(output:ITestOutputHelper) =
     let parseTblName = "ExprParseTable"
     let parseTblModule = $"FslexFsyacc.Expr.{parseTblName}"
@@ -36,6 +32,8 @@ type ExprParseTableTest(output:ITestOutputHelper) =
 
     let tbl =
         fsyacc.getParseTable()
+
+    let moduleFile = FsyaccParseTableFile.from fsyacc
 
     //let fsyaccCrew =
     //    text
@@ -66,8 +64,8 @@ type ExprParseTableTest(output:ITestOutputHelper) =
     //        fsyaccCrew
     //        |> FlatedFsyaccFileCrewUtils.toFlatFsyaccFile
 
-    //    let src = 
-    //        flatedFsyacc 
+    //    let src =
+    //        flatedFsyacc
     //        |> FlatFsyaccFileUtils.start s0
     //        |> RawFsyaccFileUtils.fromFlat
     //        |> RawFsyaccFileUtils.render
@@ -78,27 +76,24 @@ type ExprParseTableTest(output:ITestOutputHelper) =
     //Skip="按需更新源代码"
     )>]
     member _.``02 - generate Parse Table``() =
-        let fileData = FsyaccParseTableFile.from fsyacc
-        let outp = fileData.generateModule(parseTblModule)            
+        let outp = moduleFile.generateModule(parseTblModule)
         File.WriteAllText(parseTblPath, outp, Encoding.UTF8)
         output.WriteLine($"output yacc:\r\n{parseTblPath}")
 
     [<Fact>]
     member _.``10 - valid ParseTable``() =
-        let fileData = FsyaccParseTableFile.from fsyacc
-
         Should.equal tbl.encodeActions  ExprParseTable.actions
         Should.equal tbl.encodeClosures ExprParseTable.closures
 
         //产生式比较
-        let prodsFsyacc = 
+        let prodsFsyacc =
             fsyacc.rules
             |> Seq.map (fun rule -> rule.production)
             |> Seq.toList
 
-        let prodsParseTable = 
+        let prodsParseTable =
             ExprParseTable.rules
-            |> List.map fst 
+            |> List.map fst
 
         Should.equal prodsFsyacc prodsParseTable
 
@@ -107,7 +102,7 @@ type ExprParseTableTest(output:ITestOutputHelper) =
             FSharp.Compiler.SyntaxTreeX.Parser.getDecls("header.fsx",fsyacc.header)
 
         let semansFsyacc =
-            let mappers = fileData.generateMappers()
+            let mappers = moduleFile.generateMappers()
             FSharp.Compiler.SyntaxTreeX.SourceCodeParser.semansFromMappers mappers
 
         let header,semans =
@@ -121,7 +116,7 @@ type ExprParseTableTest(output:ITestOutputHelper) =
     //Skip="按需生成文件"
     //)>]
     //member _.``11 - data printer``() =
-    //    let itemCoreCrews = 
+    //    let itemCoreCrews =
     //        tblCrew.itemCoreCrews
     //        |> Map.values
     //        //|> Seq.map(fun crew -> ItemCoreCrewUtils.recurItemCoreCrew crew)
@@ -161,7 +156,7 @@ type ExprParseTableTest(output:ITestOutputHelper) =
     //            $"let encodedActions = {stringify tblCrew.encodedActions}"
     //            $"let encodedClosures = {stringify tblCrew.encodedClosures}"
 
-    //        ] 
+    //        ]
     //        |> String.concat "\r\n"
 
     //    let datapath = Path.Combine(__SOURCE_DIRECTORY__,$"{filename}.fs")

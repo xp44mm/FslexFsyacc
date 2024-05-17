@@ -1,5 +1,0 @@
-﻿%{%}
-pathOp :
-    | IDENT {}
-    | opName {}
-    | IDENT DOT pathOp {}

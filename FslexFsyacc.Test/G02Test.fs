@@ -27,51 +27,63 @@ type G02Test(output:ITestOutputHelper) =
     let filePath = Path.Combine(__SOURCE_DIRECTORY__, @"g02.fsyacc")
     let text = File.ReadAllText(filePath,Encoding.UTF8)
 
-    let fsyaccCrew =
+    let rawFsyacc =
         text
-        |> RawFsyaccFileCrewUtils.parse
-        |> FlatedFsyaccFileCrewUtils.fromRawFsyaccFileCrew
+        |> FsyaccCompiler.compile
+        |> fun f -> f.migrate()
 
-    let tblCrew =
-        fsyaccCrew
-        |> FlatedFsyaccFileCrewUtils.getSemanticParseTableCrew
+    let fsyacc =
+        rawFsyacc
+        |> FslexFsyacc.Runtime.ParseTables.FlatFsyaccFile.from
 
-    [<Fact>]
-    member _.``01 - norm fsyacc file``() =
-        let s0 = tblCrew.startSymbol
-        let flatedFsyacc =
-            fsyaccCrew
-            |> FlatedFsyaccFileCrewUtils.toFlatFsyaccFile
+    let tbl =
+        fsyacc.getParseTable()
 
-        let src = 
-            flatedFsyacc 
-            |> FlatFsyaccFileUtils.start s0
-            |> RawFsyaccFileUtils.fromFlat
-            |> RawFsyaccFileUtils.render
+    //let fsyaccCrew =
+    //    text
+    //    |> RawFsyaccFileCrewUtils.parse
+    //    |> FlatedFsyaccFileCrewUtils.fromRawFsyaccFileCrew
 
-        output.WriteLine(src)
+    //let tblCrew =
+    //    fsyaccCrew
+    //    |> FlatedFsyaccFileCrewUtils.getSemanticParseTableCrew
+
+    //[<Fact>]
+    //member _.``01 - norm fsyacc file``() =
+    //    let s0 = tblCrew.startSymbol
+    //    let flatedFsyacc =
+    //        fsyaccCrew
+    //        |> FlatedFsyaccFileCrewUtils.toFlatFsyaccFile
+
+    //    let src = 
+    //        flatedFsyacc 
+    //        |> FlatFsyaccFileUtils.start s0
+    //        |> RawFsyaccFileUtils.fromFlat
+    //        |> RawFsyaccFileUtils.render
+
+    //    output.WriteLine(src)
 
 
-    [<Fact>]
-    member _.``02 - data printer``() =
-        let ptbl =     
-            let mainProductions = 
-                fsyaccCrew.flatedRules
-                |> List.map Triple.first
+    //[<Fact>]
+    //member _.``02 - data printer``() =
+    //    let ptbl =     
+    //        let mainProductions = 
+    //            fsyaccCrew.flatedRules
+    //            |> List.map Triple.first
 
-            let dummyTokens = 
-                fsyaccCrew.flatedRules
-                |> List.filter(fun (prod,dummy,act) -> dummy > "")
-                |> List.map(Triple.firstTwo)
-                |> Map.ofList
+    //        let dummyTokens = 
+    //            fsyaccCrew.flatedRules
+    //            |> List.filter(fun (prod,dummy,act) -> dummy > "")
+    //            |> List.map(Triple.firstTwo)
+    //            |> Map.ofList
 
-            EncodedParseTableCrewUtils.getEncodedParseTableCrew(
-                mainProductions,
-                dummyTokens,
-                fsyaccCrew.flatedPrecedences)
+    //        EncodedParseTableCrewUtils.getEncodedParseTableCrew(
+    //            mainProductions,
+    //            dummyTokens,
+    //            fsyaccCrew.flatedPrecedences)
 
-        output.WriteLine($"let encodedActions = {stringify ptbl.encodedActions}")
-        output.WriteLine($"let encodedClosures = {stringify ptbl.encodedClosures}")
+    //    output.WriteLine($"let encodedActions = {stringify ptbl.encodedActions}")
+    //    output.WriteLine($"let encodedClosures = {stringify ptbl.encodedClosures}")
 
 
 

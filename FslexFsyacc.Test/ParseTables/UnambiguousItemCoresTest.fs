@@ -13,19 +13,19 @@ open FslexFsyacc.Runtime.BNFs
 
 type unambiguousItemCoresTest (output: ITestOutputHelper) =
 
-    [<Fact>]
-    member _.``BNF4_55 legacy``() =
-        let mainProductions:string list list = BNF4_55.mainProductions
-        let dummyTokens:Map<string list,string> = Map []
-        let precedences:Map<string,int> = Map []
+    //[<Fact>]
+    //member _.``BNF4_55 legacy``() =
+    //    let mainProductions:string list list = BNF4_55.mainProductions
+    //    let dummyTokens:Map<string list,string> = Map []
+    //    let precedences:Map<string,int> = Map []
 
-        let crew = 
-            FslexFsyacc.Yacc.ActionParseTableCrewUtils.getActionParseTableCrew
-                mainProductions
-                dummyTokens
-                precedences
+    //    let crew = 
+    //        FslexFsyacc.Yacc.ActionParseTableCrewUtils.getActionParseTableCrew
+    //            mainProductions
+    //            dummyTokens
+    //            precedences
 
-        output.WriteLine("let unambiguousItemCores = " + stringify crew.unambiguousItemCores)
+    //    output.WriteLine("let unambiguousItemCores = " + stringify crew.unambiguousItemCores)
 
     [<Fact>]
     member _.``BNF4_55 ParseTableRow``() =
@@ -40,27 +40,27 @@ type unambiguousItemCoresTest (output: ITestOutputHelper) =
         let tbl = ParseTableRow.from(productions, dummyTokens, precedences)
         Should.equal tbl.unambiguousItemCores BNF4_55.unambiguousItemCores
 
-    [<Fact>]
-    member _.``BNF4_3 legacy``() =
-        let mainProductions:string list list = BNF4_3.mainProductions
-        let productions = ProductionUtils.augment mainProductions
+    //[<Fact>]
+    //member _.``BNF4_3 legacy``() =
+    //    let mainProductions:string list list = BNF4_3.mainProductions
+    //    let productions = ProductionUtils.augment mainProductions
 
-        let dummyTokens:Map<string list,string> = Map []
-        let precedences:Map<string,int> = BNF4_3.precedences
+    //    let dummyTokens:Map<string list,string> = Map []
+    //    let precedences:Map<string,int> = BNF4_3.precedences
 
-        let crew = 
-            FslexFsyacc.Yacc.ActionParseTableCrewUtils.getActionParseTableCrew
-                mainProductions
-                dummyTokens
-                precedences
+    //    let crew = 
+    //        FslexFsyacc.Yacc.ActionParseTableCrewUtils.getActionParseTableCrew
+    //            mainProductions
+    //            dummyTokens
+    //            precedences
 
-        let rows =
-            crew.unambiguousItemCores
-            |> Seq.map(fun(KeyValue(i,mp))->
-                $"    kernel_{i},{stringify mp}"
-            )
-            |> String.concat "\n"
-        output.WriteLine($"let unambiguousItemCores = [\n{rows}\n]")
+    //    let rows =
+    //        crew.unambiguousItemCores
+    //        |> Seq.map(fun(KeyValue(i,mp))->
+    //            $"    kernel_{i},{stringify mp}"
+    //        )
+    //        |> String.concat "\n"
+    //    output.WriteLine($"let unambiguousItemCores = [\n{rows}\n]")
 
     [<Fact>]
     member _.``BNF4_3 ParseTableRow``() =
@@ -77,27 +77,27 @@ type unambiguousItemCoresTest (output: ITestOutputHelper) =
         ()
 
 
-    [<Fact>]
-    member _.``BNF4_67 legacy``() =
-        let mainProductions:string list list = BNF4_67.mainProductions
-        let productions = ProductionUtils.augment mainProductions
+    //[<Fact>]
+    //member _.``BNF4_67 legacy``() =
+    //    let mainProductions:string list list = BNF4_67.mainProductions
+    //    let productions = ProductionUtils.augment mainProductions
 
-        let dummyTokens:Map<string list,string> = Map []
-        let precedences:Map<string,int> = BNF4_67.precedences
+    //    let dummyTokens:Map<string list,string> = Map []
+    //    let precedences:Map<string,int> = BNF4_67.precedences
 
-        let crew = 
-            FslexFsyacc.Yacc.ActionParseTableCrewUtils.getActionParseTableCrew
-                mainProductions
-                dummyTokens
-                precedences
+    //    let crew = 
+    //        FslexFsyacc.Yacc.ActionParseTableCrewUtils.getActionParseTableCrew
+    //            mainProductions
+    //            dummyTokens
+    //            precedences
 
-        let rows =
-            crew.unambiguousItemCores
-            |> Seq.map(fun(KeyValue(i,mp))->
-                $"    kernel_{i},{stringify mp}"
-            )
-            |> String.concat "\n"
-        output.WriteLine($"let unambiguousItemCores = [\n{rows}\n]")
+    //    let rows =
+    //        crew.unambiguousItemCores
+    //        |> Seq.map(fun(KeyValue(i,mp))->
+    //            $"    kernel_{i},{stringify mp}"
+    //        )
+    //        |> String.concat "\n"
+    //    output.WriteLine($"let unambiguousItemCores = [\n{rows}\n]")
 
     [<Fact>]
     member _.``BNF4_67 ParseTableRow``() =

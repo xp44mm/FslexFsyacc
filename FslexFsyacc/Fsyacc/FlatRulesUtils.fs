@@ -1,10 +1,6 @@
 ﻿module FslexFsyacc.Fsyacc.FlatRulesUtils
 
 open FSharp.Idioms
-open System
-open FslexFsyacc.Yacc
-
-open FSharp.Idioms
 open FSharp.Idioms.Literal
 open System
 
@@ -80,47 +76,47 @@ let replaceRule
         yield! y.Tail
     ]
 
-let removeErrorRules (robust:Set<string>) (rules:list<list<string>*string*string>) =
-    rules
-    |> List.filter(fun (prod,nm,act) -> ProductionUtils.without robust prod )
+//let removeErrorRules (robust:Set<string>) (rules:list<list<string>*string*string>) =
+//    rules
+//    |> List.filter(fun (prod,nm,act) -> ProductionUtils.without robust prod )
 
-/// 消除规则集的被removed符号，生成新的规则集。新旧规则集等价。
-let eliminateSymbol (removed:string) (rules:list<list<string>*string*string>) =
-    //保存名字，和行为
-    let keeps =
-        rules
-        |> List.map(fun(a,b,c)-> a,(b,c))
-        |> Map.ofList
+///// 消除规则集的被removed符号，生成新的规则集。新旧规则集等价。
+//let eliminateSymbol (removed:string) (rules:list<list<string>*string*string>) =
+//    //保存名字，和行为
+//    let keeps =
+//        rules
+//        |> List.map(fun(a,b,c)-> a,(b,c))
+//        |> Map.ofList
                     
-    let productions =
-        rules
-        |> List.map Triple.first
-        |> ProductionListUtils.eliminateSymbol removed
+//    let productions =
+//        rules
+//        |> List.map Triple.first
+//        |> ProductionListUtils.eliminateSymbol removed
 
-    productions
-    |> List.map(fun prod -> 
-        let nm,act = 
-            if keeps.ContainsKey prod then
-                keeps.[prod]
-            else "",""
-        prod,nm,act)
+//    productions
+//    |> List.map(fun prod -> 
+//        let nm,act = 
+//            if keeps.ContainsKey prod then
+//                keeps.[prod]
+//            else "",""
+//        prod,nm,act)
                 
-///
-let getChomsky (rules:list<list<string>*string*string>) =
-    rules
-    |> List.map Triple.first // rule -> prod
-    |> ProductionListUtils.getSingle
+/////
+//let getChomsky (rules:list<list<string>*string*string>) =
+//    rules
+//    |> List.map Triple.first // rule -> prod
+//    |> ProductionListUtils.getSingle
 
-let eliminateChomsky (rules:list<list<string>*string*string>) =
-    let nonterminals = 
-        rules
-        |> getChomsky 
-        |> List.map List.head
+//let eliminateChomsky (rules:list<list<string>*string*string>) =
+//    let nonterminals = 
+//        rules
+//        |> getChomsky 
+//        |> List.map List.head
 
-    let rules =
-        nonterminals
-        |> List.fold(fun rules sym -> eliminateSymbol sym rules) rules
-    rules
+//    let rules =
+//        nonterminals
+//        |> List.fold(fun rules sym -> eliminateSymbol sym rules) rules
+//    rules
 
 // 在excludeSymbols中的符号，位于规则左手边，此规则将被删除
 let removeHeads
@@ -142,22 +138,22 @@ let duplicateRule
     |> List.map(fun(rule,group)->rule,group.Length)
     |> List.filter(fun(r,c)->c>1)
 
-let extractRules (start:string) (rules:list<list<string>*string*string>) =
-    //每个符号对应的产生式体
-    let mp = 
-        rules
-        |> toRaw
-        |> Map.ofList
+//let extractRules (start:string) (rules:list<list<string>*string*string>) =
+//    //每个符号对应的产生式体
+//    let mp = 
+//        rules
+//        |> toRaw
+//        |> Map.ofList
 
-    let symbols =
-        rules
-        |> List.map Triple.first
-        |> ProductionListUtils.extractSymbols start
+//    let symbols =
+//        rules
+//        |> List.map Triple.first
+//        |> ProductionListUtils.extractSymbols start
 
-    symbols
-    |> List.choose(fun s -> 
-        if mp.ContainsKey s then
-            Some(s,mp.[s])
-        else None)
-    |> ofRaw
+//    symbols
+//    |> List.choose(fun s -> 
+//        if mp.ContainsKey s then
+//            Some(s,mp.[s])
+//        else None)
+//    |> ofRaw
 

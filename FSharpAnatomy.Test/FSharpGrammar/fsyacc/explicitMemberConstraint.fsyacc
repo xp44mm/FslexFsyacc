@@ -1,3 +1,0 @@
-﻿%{%}
-explicitMemberConstraint:
-    | static member identOrOp COLON topTypeWithTypeConstraints classMemberSpfnGetSet optLiteralValueSpfn {}

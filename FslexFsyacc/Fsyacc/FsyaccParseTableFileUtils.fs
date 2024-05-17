@@ -2,7 +2,6 @@
 
 open System
 open FSharp.Idioms
-open FslexFsyacc.Yacc
 
 open FslexFsyacc.Runtime
 open FslexFsyacc.Runtime.ParseTables
@@ -16,14 +15,14 @@ let from (fsyacc:FlatFsyaccFile) (crew:ParseTableRow) =
         declarations = fsyacc.declarations
     }
 
-let ofSemanticParseTableCrew (crew:SemanticParseTableCrew) = 
-    id<FsyaccParseTableFile> {
-        header = crew.header
-        rules = crew.rules
-        actions = crew.encodedActions
-        closures = crew.encodedClosures
-        declarations = crew.declarations
-    }
+//let ofSemanticParseTableCrew (crew:SemanticParseTableCrew) = 
+//    id<FsyaccParseTableFile> {
+//        header = crew.header
+//        rules = crew.rules
+//        actions = crew.encodedActions
+//        closures = crew.encodedClosures
+//        declarations = crew.declarations
+//    }
 
 ///闭包就是状态
 let printClosures (this:FsyaccParseTableFile) =

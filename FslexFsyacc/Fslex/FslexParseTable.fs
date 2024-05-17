@@ -4,131 +4,132 @@ let closures = [[0,0,[];-13,0,[];-14,0,[]];[0,1,[""]];[-1,1,["%%";"&";")";"*";"+
 open FslexFsyacc.Runtime
 open FslexFsyacc.Runtime.Lex
 let clazz s = s |> List.rev |> List.reduce(fun a b -> Either(a,b))
-let rules:(string list*(obj list->obj))list = [
-    ["file";"HEADER";"{definition+}";"%%";"{rule+}"],fun(ss:obj list)->
+let rules:list<string list*(obj list->obj)> = [
+    ["";"file"], fun(ss:obj list)-> ss.[0]
+    ["atomic";"ID"], fun(ss:obj list)->
+        let s0 = unbox<string> ss.[0]
+        let result:RegularExpression<string> =
+            Atomic s0
+        box result
+    ["atomic";"LITERAL"], fun(ss:obj list)->
+        let s0 = unbox<string> ss.[0]
+        let result:RegularExpression<string> =
+            Atomic s0
+        box result
+    ["definition";"CAP";"=";"expr"], fun(ss:obj list)->
+        let s0 = unbox<string> ss.[0]
+        let s2 = unbox<RegularExpression<string>> ss.[2]
+        let result:string*RegularExpression<string> =
+            s0,s2
+        box result
+    ["expr";"(";"expr";")"], fun(ss:obj list)->
+        let s1 = unbox<RegularExpression<string>> ss.[1]
+        let result:RegularExpression<string> =
+            s1
+        box result
+    ["expr";"HOLE"], fun(ss:obj list)->
+        let s0 = unbox<string> ss.[0]
+        let result:RegularExpression<string> =
+            Hole s0
+        box result
+    ["expr";"[";"{atomic+}";"]"], fun(ss:obj list)->
+        let s1 = unbox<RegularExpression<string> list> ss.[1]
+        let result:RegularExpression<string> =
+            clazz s1
+        box result
+    ["expr";"atomic"], fun(ss:obj list)->
+        let s0 = unbox<RegularExpression<string>> ss.[0]
+        let result:RegularExpression<string> =
+            s0
+        box result
+    ["expr";"expr";"&";"expr"], fun(ss:obj list)->
+        let s0 = unbox<RegularExpression<string>> ss.[0]
+        let s2 = unbox<RegularExpression<string>> ss.[2]
+        let result:RegularExpression<string> =
+            Both(s0,s2)
+        box result
+    ["expr";"expr";"*"], fun(ss:obj list)->
+        let s0 = unbox<RegularExpression<string>> ss.[0]
+        let result:RegularExpression<string> =
+            Natural s0
+        box result
+    ["expr";"expr";"+"], fun(ss:obj list)->
+        let s0 = unbox<RegularExpression<string>> ss.[0]
+        let result:RegularExpression<string> =
+            Plural s0
+        box result
+    ["expr";"expr";"?"], fun(ss:obj list)->
+        let s0 = unbox<RegularExpression<string>> ss.[0]
+        let result:RegularExpression<string> =
+            Optional s0
+        box result
+    ["expr";"expr";"|";"expr"], fun(ss:obj list)->
+        let s0 = unbox<RegularExpression<string>> ss.[0]
+        let s2 = unbox<RegularExpression<string>> ss.[2]
+        let result:RegularExpression<string> =
+            Either(s0,s2)
+        box result
+    ["file";"HEADER";"{definition+}";"%%";"{rule+}"], fun(ss:obj list)->
         let s0 = unbox<string> ss.[0]
         let s1 = unbox<(string*RegularExpression<string>)list> ss.[1]
         let s3 = unbox<(RegularExpression<string>list*string)list> ss.[3]
         let result:string*(string*RegularExpression<string>)list*(RegularExpression<string>list*string)list =
             s0,List.rev s1,List.rev s3
         box result
-    ["file";"HEADER";"{rule+}"],fun(ss:obj list)->
+    ["file";"HEADER";"{rule+}"], fun(ss:obj list)->
         let s0 = unbox<string> ss.[0]
         let s1 = unbox<(RegularExpression<string>list*string)list> ss.[1]
         let result:string*(string*RegularExpression<string>)list*(RegularExpression<string>list*string)list =
             s0,[],List.rev s1
         box result
-    ["{definition+}";"{definition+}";"definition"],fun(ss:obj list)->
-        let s0 = unbox<(string*RegularExpression<string>)list> ss.[0]
-        let s1 = unbox<string*RegularExpression<string>> ss.[1]
-        let result:(string*RegularExpression<string>)list =
-            s1::s0
-        box result
-    ["{definition+}";"definition"],fun(ss:obj list)->
-        let s0 = unbox<string*RegularExpression<string>> ss.[0]
-        let result:(string*RegularExpression<string>)list =
-            [s0]
-        box result
-    ["definition";"CAP";"=";"expr"],fun(ss:obj list)->
-        let s0 = unbox<string> ss.[0]
-        let s2 = unbox<RegularExpression<string>> ss.[2]
-        let result:string*RegularExpression<string> =
-            s0,s2
-        box result
-    ["expr";"atomic"],fun(ss:obj list)->
-        let s0 = unbox<RegularExpression<string>> ss.[0]
-        let result:RegularExpression<string> =
-            s0
-        box result
-    ["expr";"HOLE"],fun(ss:obj list)->
-        let s0 = unbox<string> ss.[0]
-        let result:RegularExpression<string> =
-            Hole s0
-        box result
-    ["expr";"expr";"*"],fun(ss:obj list)->
-        let s0 = unbox<RegularExpression<string>> ss.[0]
-        let result:RegularExpression<string> =
-            Natural s0
-        box result
-    ["expr";"expr";"+"],fun(ss:obj list)->
-        let s0 = unbox<RegularExpression<string>> ss.[0]
-        let result:RegularExpression<string> =
-            Plural s0
-        box result
-    ["expr";"expr";"?"],fun(ss:obj list)->
-        let s0 = unbox<RegularExpression<string>> ss.[0]
-        let result:RegularExpression<string> =
-            Optional s0
-        box result
-    ["expr";"expr";"|";"expr"],fun(ss:obj list)->
-        let s0 = unbox<RegularExpression<string>> ss.[0]
-        let s2 = unbox<RegularExpression<string>> ss.[2]
-        let result:RegularExpression<string> =
-            Either(s0,s2)
-        box result
-    ["expr";"expr";"&";"expr"],fun(ss:obj list)->
-        let s0 = unbox<RegularExpression<string>> ss.[0]
-        let s2 = unbox<RegularExpression<string>> ss.[2]
-        let result:RegularExpression<string> =
-            Both(s0,s2)
-        box result
-    ["expr";"(";"expr";")"],fun(ss:obj list)->
-        let s1 = unbox<RegularExpression<string>> ss.[1]
-        let result:RegularExpression<string> =
-            s1
-        box result
-    ["expr";"[";"{atomic+}";"]"],fun(ss:obj list)->
-        let s1 = unbox<RegularExpression<string> list> ss.[1]
-        let result:RegularExpression<string> =
-            clazz s1
-        box result
-    ["atomic";"ID"],fun(ss:obj list)->
-        let s0 = unbox<string> ss.[0]
-        let result:RegularExpression<string> =
-            Atomic s0
-        box result
-    ["atomic";"LITERAL"],fun(ss:obj list)->
-        let s0 = unbox<string> ss.[0]
-        let result:RegularExpression<string> =
-            Atomic s0
-        box result
-    ["{atomic+}";"{atomic+}";"&";"atomic"],fun(ss:obj list)->
-        let s0 = unbox<RegularExpression<string> list> ss.[0]
-        let s2 = unbox<RegularExpression<string>> ss.[2]
-        let result:RegularExpression<string> list =
-            s2::s0
-        box result
-    ["{atomic+}";"atomic"],fun(ss:obj list)->
-        let s0 = unbox<RegularExpression<string>> ss.[0]
-        let result:RegularExpression<string> list =
-            [s0]
-        box result
-    ["{rule+}";"{rule+}";"rule"],fun(ss:obj list)->
-        let s0 = unbox<(RegularExpression<string>list*string)list> ss.[0]
-        let s1 = unbox<RegularExpression<string>list*string> ss.[1]
-        let result:(RegularExpression<string>list*string)list =
-            s1::s0
-        box result
-    ["{rule+}";"rule"],fun(ss:obj list)->
-        let s0 = unbox<RegularExpression<string>list*string> ss.[0]
-        let result:(RegularExpression<string>list*string)list =
-            [s0]
-        box result
-    ["rule";"expr";"/";"expr";"SEMANTIC"],fun(ss:obj list)->
+    ["rule";"expr";"/";"expr";"SEMANTIC"], fun(ss:obj list)->
         let s0 = unbox<RegularExpression<string>> ss.[0]
         let s2 = unbox<RegularExpression<string>> ss.[2]
         let s3 = unbox<string> ss.[3]
         let result:RegularExpression<string>list*string =
             [s0;s2],s3
         box result
-    ["rule";"expr";"SEMANTIC"],fun(ss:obj list)->
+    ["rule";"expr";"SEMANTIC"], fun(ss:obj list)->
         let s0 = unbox<RegularExpression<string>> ss.[0]
         let s1 = unbox<string> ss.[1]
         let result:RegularExpression<string>list*string =
             [s0],s1
         box result
+    ["{atomic+}";"atomic"], fun(ss:obj list)->
+        let s0 = unbox<RegularExpression<string>> ss.[0]
+        let result:RegularExpression<string> list =
+            [s0]
+        box result
+    ["{atomic+}";"{atomic+}";"&";"atomic"], fun(ss:obj list)->
+        let s0 = unbox<RegularExpression<string> list> ss.[0]
+        let s2 = unbox<RegularExpression<string>> ss.[2]
+        let result:RegularExpression<string> list =
+            s2::s0
+        box result
+    ["{definition+}";"definition"], fun(ss:obj list)->
+        let s0 = unbox<string*RegularExpression<string>> ss.[0]
+        let result:(string*RegularExpression<string>)list =
+            [s0]
+        box result
+    ["{definition+}";"{definition+}";"definition"], fun(ss:obj list)->
+        let s0 = unbox<(string*RegularExpression<string>)list> ss.[0]
+        let s1 = unbox<string*RegularExpression<string>> ss.[1]
+        let result:(string*RegularExpression<string>)list =
+            s1::s0
+        box result
+    ["{rule+}";"rule"], fun(ss:obj list)->
+        let s0 = unbox<RegularExpression<string>list*string> ss.[0]
+        let result:(RegularExpression<string>list*string)list =
+            [s0]
+        box result
+    ["{rule+}";"{rule+}";"rule"], fun(ss:obj list)->
+        let s0 = unbox<(RegularExpression<string>list*string)list> ss.[0]
+        let s1 = unbox<RegularExpression<string>list*string> ss.[1]
+        let result:(RegularExpression<string>list*string)list =
+            s1::s0
+        box result
 ]
 let unboxRoot =
     unbox<string*(string*RegularExpression<string>)list*(RegularExpression<string>list*string)list>
-let theoryParser = FslexFsyacc.Runtime.TheoryParser.create(rules, actions, closures)
-let stateSymbolPairs = theoryParser.getStateSymbolPairs()
+let baseParser = FslexFsyacc.Runtime.BaseParser.create(rules, actions, closures)
+let stateSymbolPairs = baseParser.getStateSymbolPairs()

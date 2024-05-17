@@ -5,7 +5,7 @@ open FSharp.Idioms.Literal
 open FSharp.Idioms
 open System
 
-let parser = Parser<Position<TypeArgumentAngleToken>> (
+let parser = PrimeParser<Position<TypeArgumentAngleToken>> (
     BoundedParseTable.rules,
     BoundedParseTable.actions,
     BoundedParseTable.closures,
@@ -13,7 +13,7 @@ let parser = Parser<Position<TypeArgumentAngleToken>> (
     TypeArgumentAngleToken.getTag,
     TypeArgumentAngleToken.getLexeme)
 
-let symbols = BoundedParseTable.theoryParser.getStateSymbolPairs()
+let symbols = BoundedParseTable.baseParser.getStateSymbolPairs()
 
 let compile (offset) (input:string) =
     //let mutable tokens = []
