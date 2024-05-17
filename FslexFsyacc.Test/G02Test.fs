@@ -34,7 +34,7 @@ type G02Test(output:ITestOutputHelper) =
 
     let fsyacc =
         rawFsyacc
-        |> FslexFsyacc.Runtime.ParseTables.FlatFsyaccFile.from
+        |> FslexFsyacc.Runtime.YACCs.FlatFsyaccFile.from
 
     let tbl =
         fsyacc.getParseTable()

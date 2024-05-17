@@ -2,7 +2,7 @@
 
 open FslexFsyacc.Runtime
 open FslexFsyacc.Runtime.ItemCores
-open FslexFsyacc.Runtime.ParseTables
+open FslexFsyacc.Runtime.YACCs
 open FslexFsyacc.Runtime.BNFs
 
 /// 文法 4.28 推导的数据集合

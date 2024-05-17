@@ -1,10 +1,10 @@
-﻿namespace FslexFsyacc.Runtime.ParseTables
+﻿namespace FslexFsyacc.Runtime.YACCs
 
 open System
 open FSharp.Idioms
 
 open FslexFsyacc.Runtime.BNFs
-open FslexFsyacc.Runtime.ParseTables
+open FslexFsyacc.Runtime.YACCs
 
 type FlatFsyaccFile =
     {

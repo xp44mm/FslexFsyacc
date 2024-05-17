@@ -1,4 +1,4 @@
-﻿namespace FslexFsyacc.Runtime.ParseTables
+﻿namespace FslexFsyacc.Runtime.YACCs
 
 open FslexFsyacc.Runtime
 open FslexFsyacc.Runtime.BNFs
@@ -12,7 +12,7 @@ type ParseTableRow =
     bnf: BNF
     dummyTokens:Map<string list,string>
     precedences:Map<string,int>
-    actions: Map<Set<ItemCore>,Map<string,Action>>
+    actions: Map<Set<ItemCore>,Map<string,ParseTableAction>>
     encodeActions: list<list<string*int>>
 
     unambiguousItemCores: Map<Set<ItemCore>,Map<string,Set<ItemCore>>>
@@ -40,7 +40,7 @@ type ParseTableRow =
                 mp
                 |> Seq.choose(fun(KeyValue(sym, acts)) ->
                     acts
-                    |> Action.disambiguate tryGetPrecedenceCode
+                    |> ParseTableAction.disambiguate tryGetPrecedenceCode
                     |> Option.map (Pair.prepend sym)
                 )
                 |> Map.ofSeq

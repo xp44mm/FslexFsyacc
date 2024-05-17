@@ -5,7 +5,7 @@ open FSharp.Idioms
 open FSharp.Idioms.Literal
 
 open FslexFsyacc.Runtime
-open FslexFsyacc.Runtime.ParseTables
+open FslexFsyacc.Runtime.YACCs
 
 /// 表示*.fsyacc生成的模块。
 type FsyaccParseTableFile =

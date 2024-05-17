@@ -36,12 +36,12 @@
 		<Compile Include="BNFs\BNF4_55Test.fs" />
 		<Compile Include="BNFs\BNF4_3Test.fs" />
 		<Compile Include="BNFs\BNF4_67Test.fs" />
-		<Compile Include="ParseTables\PrecedenceTest.fs" />
-		<Compile Include="ParseTables\ParseTableRowTest.fs" />
-		<Compile Include="ParseTables\EncodeActionsTest.fs" />
-		<Compile Include="ParseTables\UnambiguousItemCoresTest.fs" />
-		<Compile Include="ParseTables\ResolvedClosuresTest.fs" />
-		<Compile Include="ParseTables\EncodeClosuresTest.fs" />
+		<Compile Include="YACCs\PrecedenceTest.fs" />
+		<Compile Include="YACCs\ParseTableRowTest.fs" />
+		<Compile Include="YACCs\EncodeActionsTest.fs" />
+		<Compile Include="YACCs\UnambiguousItemCoresTest.fs" />
+		<Compile Include="YACCs\ResolvedClosuresTest.fs" />
+		<Compile Include="YACCs\EncodeClosuresTest.fs" />
     
 		<Compile Include="Yacc\Example427Test.fs" />
 		<Compile Include="Yacc\Example440Test.fs" />

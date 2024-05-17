@@ -1,4 +1,4 @@
-﻿module FslexFsyacc.Runtime.ParseTables.Precedence
+﻿module FslexFsyacc.Runtime.YACCs.Precedence
 open FSharp.Idioms
 open FSharp.Idioms.Literal
 

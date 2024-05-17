@@ -4,10 +4,8 @@ open FslexFsyacc.Runtime.Grammars
 open FslexFsyacc.Runtime.ItemCores
 open FSharp.Idioms
 
-///to rename ParseTableAction
-
 /// SLR && LALR
-type Action = 
+type ParseTableAction = 
     /// 这个shift包括龙书中的 *shift* lookahead and *goto* nonterminal
     | Shift of kernel: Set<ItemCore>
     | Reduce of production: string list

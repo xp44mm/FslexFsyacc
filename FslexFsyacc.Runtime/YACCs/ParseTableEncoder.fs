@@ -1,4 +1,4 @@
-﻿namespace FslexFsyacc.Runtime.ParseTables
+﻿namespace FslexFsyacc.Runtime.YACCs
 
 open FslexFsyacc.Runtime
 open FslexFsyacc.Runtime.ItemCores
@@ -21,12 +21,12 @@ type ParseTableEncoder =
         |> Map.ofList
 
     /// 具体数据编码成整数的表
-    member this.encodeAction (action:Action) =
+    member this.encodeAction (action:ParseTableAction) =
         match action with
         | Shift j -> this.kernels.[j]
         | Reduce p -> this.productions.[p]
 
-    member encoder.encodeActions (actions: Map< Set<ItemCore>, Map<string,Action>> ) =
+    member encoder.encodeActions (actions: Map< Set<ItemCore>, Map<string,ParseTableAction>> ) =
         encoder.kernels
         |> Map.toList
         |> List.map(fun (kernel,state) ->

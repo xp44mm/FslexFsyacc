@@ -1,4 +1,4 @@
-﻿module FslexFsyacc.Runtime.ParseTables.ParseTableRowUtils
+﻿module FslexFsyacc.Runtime.YACCs.ParseTableRowUtils
 
 open System.Collections.Concurrent
 
@@ -7,5 +7,9 @@ let rows = ConcurrentDictionary<
             ParseTableRow 
             >(HashIdentity.Structural)
 
-let getRow (productions: Set<list<string>>,dummyTokens:Map<string list,string>,precedences:Map<string,int>) =
+let getRow (
+    productions: Set<list<string>>, 
+    dummyTokens:Map<string list,string>,
+    precedences:Map<string,int>
+    ) =
     rows.GetOrAdd((productions,dummyTokens,precedences), ParseTableRow.from )

@@ -1,4 +1,4 @@
-﻿module FslexFsyacc.Runtime.ParseTables.Conflict
+﻿module FslexFsyacc.Runtime.YACCs.Conflict
 open FslexFsyacc.Runtime.Grammars
 open FslexFsyacc.Runtime.ItemCores
 open FslexFsyacc.Runtime.BNFs

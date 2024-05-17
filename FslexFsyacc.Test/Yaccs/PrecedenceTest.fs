@@ -1,4 +1,4 @@
-﻿namespace FslexFsyacc.Runtime.ParseTables
+﻿namespace FslexFsyacc.Runtime.YACCs
 
 open Xunit
 open Xunit.Abstractions

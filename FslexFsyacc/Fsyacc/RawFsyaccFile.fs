@@ -1,6 +1,6 @@
 ﻿namespace FslexFsyacc.Fsyacc
 open System
-open FslexFsyacc.Runtime.ParseTables
+open FslexFsyacc.Runtime.YACCs
 
 //内嵌在*.yacc源文件的reducer中，表示yacc的返回结果。
 type RawFsyaccFile = 

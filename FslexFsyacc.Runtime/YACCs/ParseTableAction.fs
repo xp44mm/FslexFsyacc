@@ -1,4 +1,4 @@
-﻿module FslexFsyacc.Runtime.ParseTables.Action
+﻿module FslexFsyacc.Runtime.YACCs.ParseTableAction
 
 open System
 open FSharp.Idioms.Literal
@@ -6,14 +6,14 @@ open FslexFsyacc.Runtime.ItemCores
 open FslexFsyacc.Runtime.BNFs
 
 [<Obsolete("未使用")>]
-let getExactlyOneAction (actions:Action list) =
+let getExactlyOneAction (actions:ParseTableAction list) =
     match actions with
     | [] -> failwith $"nonassoc error."
     | [x] -> x
     | acts -> failwith $"there is a conflict: {stringify acts}"
 
 /// 删除冲突的项目
-let disambiguate (tryGetPrecedenceCode: string list -> int option) (actions: Action Set) =
+let disambiguate (tryGetPrecedenceCode: string list -> int option) (actions: ParseTableAction Set) =
     match Seq.toList actions with
     | [] -> failwith "never"
     | [x] -> Some x

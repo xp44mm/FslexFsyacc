@@ -1,7 +1,7 @@
 ﻿module FslexFsyacc.G01Data
 open FslexFsyacc.Runtime
 open FslexFsyacc.Runtime.ItemCores
-open FslexFsyacc.Runtime.ParseTables
+open FslexFsyacc.Runtime.YACCs
 open FslexFsyacc.Runtime.BNFs
 
 let inputProductionList = [["E";"E";"+";"T"];["E";"T"];["T";"T";"*";"F"];["T";"F"];["F";"(";"E";")"];["F";"id"]]

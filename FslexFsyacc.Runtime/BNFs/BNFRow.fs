@@ -17,7 +17,7 @@ type BNFRow =
     // kernel -> closure
     closures: Map<Set<ItemCore>,Set<ItemCore*Set<string>>>
 
-    actions: Map<Set<ItemCore>,Map<string,Set<Action>>>
+    actions: Map<Set<ItemCore>,Map<string,Set<ParseTableAction>>>
 
     conflictedItemCores: Map<Set<ItemCore>,Map<string,Set<ItemCore>>>
 

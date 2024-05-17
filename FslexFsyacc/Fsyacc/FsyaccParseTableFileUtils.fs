@@ -4,7 +4,7 @@ open System
 open FSharp.Idioms
 
 open FslexFsyacc.Runtime
-open FslexFsyacc.Runtime.ParseTables
+open FslexFsyacc.Runtime.YACCs
 
 let from (fsyacc:FlatFsyaccFile) (crew:ParseTableRow) =
     id<FsyaccParseTableFile>{

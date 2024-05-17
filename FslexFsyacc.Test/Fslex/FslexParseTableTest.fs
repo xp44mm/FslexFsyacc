@@ -6,7 +6,7 @@ open FSharp.xUnit
 open FslexFsyacc
 open FslexFsyacc.Fsyacc
 open FslexFsyacc.Runtime
-open FslexFsyacc.Runtime.ParseTables
+open FslexFsyacc.Runtime.YACCs
 open FslexFsyacc.Yacc
 open System
 open System.IO
@@ -40,7 +40,7 @@ type FslexParseTableTest(output: ITestOutputHelper) =
 
     let fsyacc =
         rawFsyacc
-        |> FslexFsyacc.Runtime.ParseTables.FlatFsyaccFile.from
+        |> FslexFsyacc.Runtime.YACCs.FlatFsyaccFile.from
 
     let tbl =
         fsyacc.getParseTable()

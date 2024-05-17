@@ -1,7 +1,7 @@
 ﻿module FslexFsyacc.Expr.ExprData
 open FslexFsyacc.Runtime
 open FslexFsyacc.Runtime.ItemCores
-open FslexFsyacc.Runtime.ParseTables
+open FslexFsyacc.Runtime.YACCs
 open FslexFsyacc.Runtime.BNFs
 
 let inputProductionList = [["expr";"expr";"+";"expr"];["expr";"expr";"-";"expr"];["expr";"expr";"*";"expr"];["expr";"expr";"/";"expr"];["expr";"(";"expr";")"];["expr";"-";"expr"];["expr";"NUMBER"]]
