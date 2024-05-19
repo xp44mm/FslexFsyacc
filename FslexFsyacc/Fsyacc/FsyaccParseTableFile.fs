@@ -85,7 +85,7 @@ type FsyaccParseTableFile =
         let mainReducers = 
             this.rules.Tail
             |> List.map ( fun(prod, reducer) ->
-                let fns = SemanticGenerator.decorateSemantic this.declarations prod reducer
+                let fns = ReducerGenerator.decorateReducer this.declarations prod reducer
                 prod, fns
                 )
 
@@ -116,6 +116,6 @@ type FsyaccParseTableFile =
 
         this.rules
         |> List.map(fun(prod, reducer) ->
-            SemanticGenerator.decorateSemantic types prod reducer
+            ReducerGenerator.decorateReducer types prod reducer
             )
         |> String.concat Environment.NewLine

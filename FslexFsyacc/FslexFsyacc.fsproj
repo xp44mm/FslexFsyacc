@@ -44,7 +44,7 @@
     
 		<Compile Include="Fsyacc\FsyaccToken.fs" />
 		<Compile Include="Fsyacc\RegularSymbol.fs" />
-		<Compile Include="Fsyacc\SemanticGenerator.fs" />
+		<Compile Include="Fsyacc\ReducerGenerator.fs" />
 		<Compile Include="Fsyacc\FsyaccParseTableFile.fs" />
 		<!--<Compile Include="Fsyacc\FlatedFsyaccFileCrews.fs" />-->
 

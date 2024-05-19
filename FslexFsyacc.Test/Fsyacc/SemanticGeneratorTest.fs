@@ -19,7 +19,7 @@ type SemanticGeneratorTest(output:ITestOutputHelper) =
         let prodSymbols = [ "expr" ; "expr" ; "+"; "expr"]
         let semantic = "s0 + s3"
 
-        let y = SemanticGenerator.decorateSemantic typeAnnotations prodSymbols semantic
+        let y = ReducerGenerator.decorateReducer typeAnnotations prodSymbols semantic
         //output.WriteLine(y)
         let e = 
             """

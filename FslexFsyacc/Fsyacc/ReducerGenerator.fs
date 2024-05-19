@@ -1,9 +1,9 @@
-﻿module FslexFsyacc.Fsyacc.SemanticGenerator
+﻿module FslexFsyacc.Fsyacc.ReducerGenerator
 
 open System
 open FSharp.Idioms
 
-let semanticBody (typeAnnotations:Map<string,string>) (production:string list) (reducer:string) =
+let reducerBody (typeAnnotations:Map<string,string>) (production:string list) (reducer:string) =
     let bodySymbols =
         production
         |> List.tail
@@ -38,8 +38,8 @@ let semanticBody (typeAnnotations:Map<string,string>) (production:string list) (
         mainLines
 
 // 生成semantic函数的定义
-let decorateSemantic (typeAnnotations:Map<string,string>) (production: string list) (reducer:string) =
-    let body = semanticBody typeAnnotations production reducer
+let decorateReducer (typeAnnotations:Map<string,string>) (production: string list) (reducer:string) =
+    let body = reducerBody typeAnnotations production reducer
     let funcDef =
         [
             "fun(ss:obj list)->"

@@ -16,15 +16,16 @@ let parser = Parser<Position<FsyaccToken>>(
 
 /// 解析文本为结构化数据
 let compile (input:string) =
-    //let mutable tokens = []
+    let mutable tokens = []
     let mutable states = [0,null]
 
     input
     |> FsyaccTokenUtils.tokenize 0
-    //|> Seq.map(fun tok ->
-    //    tokens <- tok::tokens
-    //    tok
-    //)
+
+    |> Seq.map(fun tok ->
+        tokens <- tok::tokens
+        tok
+    )
     |> Seq.iter(fun postok ->
         //match parser.tryReduce(states,lookahead) with
         //| Some x -> states <- x
