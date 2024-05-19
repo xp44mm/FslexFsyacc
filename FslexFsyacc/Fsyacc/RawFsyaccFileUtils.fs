@@ -1,4 +1,5 @@
 ﻿module FslexFsyacc.Fsyacc.RawFsyaccFileUtils
+open FslexFsyacc.Runtime.YACCs
 
 ///从`*.fsyacc`文件中解析成本类型的数据
 let parse text =
@@ -61,17 +62,30 @@ let render (fsyacc:RawFsyaccFile) =
         |> RawFsyaccFileRender.renderHeader 
 
     let r =
-        fsyacc.inputRules
-        |> List.map RawFsyaccFileRender.renderRule
+        fsyacc.ruleGroups
+        |> List.map(fun ruleGroup ->
+            let lhs = ruleGroup.head
+            let rhs = 
+                ruleGroup.bodies
+                |> List.map(fun body -> body.body,body.dummy,body.reducer)
+            RawFsyaccFileRender.renderRule(lhs, rhs)
+            )
         |> String.concat "\r\n"
 
     let p() =
-        fsyacc.precedenceLines
-        |> List.map RawFsyaccFileRender.renderPrecedenceLine
+        fsyacc.operatorsLines
+        |> List.map(fun (assoc,symbols) ->
+            let assoc =
+                match assoc with
+                | LeftAssoc -> "left"
+                | RightAssoc -> "right"
+                | NonAssoc -> "nonassoc"
+            RawFsyaccFileRender.renderPrecedenceLine(assoc,symbols)
+            )
         |> String.concat "\r\n"
 
     let d() =
-        fsyacc.declarationLines
+        fsyacc.declarationsLines
         |> List.map RawFsyaccFileRender.renderTypeLine
         |> String.concat "\r\n"
 
@@ -79,8 +93,8 @@ let render (fsyacc:RawFsyaccFile) =
     let rpd =
         [
             r
-            if fsyacc.precedenceLines.IsEmpty then () else p()
-            if fsyacc.declarationLines.IsEmpty then () else d()
+            if fsyacc.operatorsLines.IsEmpty then () else p()
+            if fsyacc.declarationsLines.IsEmpty then () else d()
         ]
         |> String.concat "\r\n%%\r\n"
 

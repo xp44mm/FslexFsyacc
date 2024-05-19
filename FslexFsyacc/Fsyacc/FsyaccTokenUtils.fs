@@ -38,7 +38,7 @@ let getTag(token:Position<FsyaccToken>) =
     | HEADER   _ -> "HEADER"
     | ID       _ -> "ID"
     | LITERAL  _ -> "LITERAL"
-    | SEMANTIC _ -> "SEMANTIC"
+    | REDUCER _ -> "REDUCER"
     | TYPE_ARGUMENT _ -> "TYPE_ARGUMENT"
     | LEFT     -> "%left"
     | RIGHT    -> "%right"
@@ -53,7 +53,7 @@ let getLexeme(token:Position<_>) =
     | HEADER   x -> box x
     | ID       x -> box x
     | LITERAL  x -> box x
-    | SEMANTIC x -> box x
+    | REDUCER x -> box x
     | TYPE_ARGUMENT x -> box x
 
     | _ -> null
@@ -102,7 +102,7 @@ let tokenize (offset:int) (input:string) =
                         let fcode = formatNestedCode col code
                         nlpos,nlinp,fcode
 
-                yield Position.from(pos,len,SEMANTIC fcode)
+                yield Position.from(pos,len,REDUCER fcode)
                 yield! loop (nlpos,nlinp) (pos+len,rest.[len..])
 
             | On tryHeader x ->

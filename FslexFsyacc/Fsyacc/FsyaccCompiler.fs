@@ -7,9 +7,9 @@ open FslexFsyacc.Fsyacc
 open FSharp.Idioms.Literal
 
 let parser = Parser<Position<FsyaccToken>>(
-    FsyaccParseTable.rules,
-    FsyaccParseTable.actions,
-    FsyaccParseTable.closures,
+    FsyaccParseTable1.rules,
+    FsyaccParseTable1.actions,
+    FsyaccParseTable1.closures,
 
     FsyaccTokenUtils.getTag,
     FsyaccTokenUtils.getLexeme)
@@ -35,6 +35,6 @@ let compile (input:string) =
 
     match parser.accept states with
     | [1,lxm; 0,null] ->
-        FsyaccParseTable.unboxRoot lxm
+        FsyaccParseTable1.unboxRoot lxm
     | _ ->
         failwith $"{stringify states}"

@@ -32,8 +32,8 @@ rule+ :
     | rule+ rule {s1::s0}
     | rule {[s0]}
 rule :
-    | expr "/" expr SEMANTIC {[s0;s2],s3}
-    | expr SEMANTIC {[s0],s1}
+    | expr "/" expr REDUCER {[s0;s2],s3}
+    | expr REDUCER {[s0],s1}
 
 %%
 
@@ -43,7 +43,7 @@ rule :
 
 %%
 
-%type<string> HEADER ID CAP LITERAL SEMANTIC HOLE
+%type<string> HEADER ID CAP LITERAL REDUCER HOLE
 %type<RegularExpression<string>> atomic expr
 %type<RegularExpression<string> list> atomic+
 %type<string*RegularExpression<string>> definition

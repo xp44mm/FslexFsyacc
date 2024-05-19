@@ -36,7 +36,7 @@ type FslexParseTableTest(output: ITestOutputHelper) =
     let rawFsyacc =
         text
         |> FsyaccCompiler.compile
-        |> fun f -> f.migrate()
+        //|> fun f -> f.migrate()
 
     let fsyacc =
         rawFsyacc
@@ -88,7 +88,7 @@ type FslexParseTableTest(output: ITestOutputHelper) =
             "HOLE"
             "ID"
             "LITERAL"
-            "SEMANTIC"
+            "REDUCER"
             "["
             "]"
             "|" 

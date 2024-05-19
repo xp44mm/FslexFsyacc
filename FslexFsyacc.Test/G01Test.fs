@@ -30,7 +30,7 @@ type G01Test(output:ITestOutputHelper) =
     let rawFsyacc =
         text
         |> FsyaccCompiler.compile
-        |> fun f -> f.migrate()
+        //|> fun f -> f.migrate()
 
     let fsyacc =
         rawFsyacc

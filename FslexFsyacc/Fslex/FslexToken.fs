@@ -9,7 +9,7 @@ type FslexToken =
     /// quote string literal(unquoted)
     | LITERAL of string
 
-    | SEMANTIC of string
+    | REDUCER of string
 
     | HOLE of string
 

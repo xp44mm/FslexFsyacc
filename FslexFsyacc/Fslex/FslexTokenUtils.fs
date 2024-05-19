@@ -40,7 +40,7 @@ let getTag (token:_ Position) =
     | ID       _ -> "ID"
     | CAP      _ -> "CAP"
     | LITERAL  _ -> "LITERAL"
-    | SEMANTIC _ -> "SEMANTIC"
+    | REDUCER _ -> "REDUCER"
     | HOLE     _ -> "HOLE"
     | _ -> failwith "getTag Wild"
 
@@ -50,7 +50,7 @@ let getLexeme (token:_ Position) =
     | ID       x -> box x
     | CAP      x -> box x
     | LITERAL  x -> box x
-    | SEMANTIC x -> box x
+    | REDUCER x -> box x
     | HOLE     x -> box x
     | _ -> null
 
@@ -86,22 +86,6 @@ let tokenize (offset:int) (input:string) =
                 yield Position.from(pos, len, tok)
                 yield! loop (lpos,lrest) (pos+len,rest.[len..])
 
-            //| Rgx @"^<(\w+)>" m -> //todo: @"^<(\w+)>\s*(=)?"
-            //    let len = m.Length
-            //    yield Position<_>.from(pos,len,HOLE m.Groups.[1].Value)
-            //    yield! loop (lpos,lrest) (pos+len,rest.[len..])
-
-            //| Rgx @"^(\w+)\s*(=)?" m -> //todo: @"^\w+"
-            //    let g1 = m.Groups.[1]
-            //    let tok =
-            //        if m.Groups.[2].Success then
-            //            CAP g1.Value
-            //        else
-            //            ID g1.Value
-            //    yield Position<_>.from(pos, g1.Length, tok)
-            //    yield! loop (lpos,lrest) (pos+g1.Length,rest.[g1.Length..])
-
-
             | On trySingleQuoteString m ->
                 let len = m.Length
                 yield Position.from(pos,len,LITERAL(Json.unquote m.Value))
@@ -120,7 +104,7 @@ let tokenize (offset:int) (input:string) =
                         let fcode = formatNestedCode col code
                         nli,nlrest,fcode
 
-                yield Position.from(pos, len, SEMANTIC fcode)
+                yield Position.from(pos, len, REDUCER fcode)
                 yield! loop (nlpos,nlinp) (pos+len,rest.[len..])
 
             | On tryHeader x ->

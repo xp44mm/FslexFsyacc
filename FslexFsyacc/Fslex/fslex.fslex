@@ -7,7 +7,7 @@ type token = Position<FslexToken>
 
 <last>  = [")" "*" "+" "?" HOLE ID LITERAL "]"]
 <first> = ["(" HOLE ID LITERAL "["]
-<any>   = ["%%" "&" "(" ")" "*" "+" "/" "=" "?" CAP HEADER HOLE ID LITERAL SEMANTIC "[" "]" "|"]
+<any>   = ["%%" "&" "(" ")" "*" "+" "/" "=" "?" CAP HEADER HOLE ID LITERAL REDUCER "[" "]" "|"]
 
 %%
 

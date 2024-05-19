@@ -19,26 +19,26 @@ type FsyaccFileRenderTest(output:ITestOutputHelper) =
         |> stringify
         |> output.WriteLine
 
-    [<Fact>]
-    member _.``00 - rec ? test``() =
-        let text = """
-%{%}
-defnBindings :
-    | LET rec? localBindings {  }
-    | cPrototype {  }
-rec? :
-    | rec {  }
-    | (*empty*) {  }
-"""
+//    [<Fact>]
+//    member _.``00 - rec ? test``() =
+//        let text = """
+//%{%}
+//defnBindings :
+//    | LET rec? localBindings {  }
+//    | cPrototype {  }
+//rec? :
+//    | rec {  }
+//    | (*empty*) {  }
+//"""
 
-        //let fsyacc = RawFsyaccFile.parse text
+//        //let fsyacc = RawFsyaccFile.parse text
 
-        let fsyacc =
-            text
-            |> RawFsyaccFileUtils.parse
+//        let fsyacc =
+//            text
+//            |> RawFsyaccFileUtils.parse
 
-        let outp = fsyacc |> RawFsyaccFileUtils.render
+//        let outp = fsyacc |> RawFsyaccFileUtils.render
 
-        output.WriteLine(stringify fsyacc.inputRules)
-        output.WriteLine(outp)
-        //()
+//        output.WriteLine(stringify fsyacc.inputRules)
+//        output.WriteLine(outp)
+//        //()

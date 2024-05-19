@@ -4,7 +4,7 @@ type FsyaccToken =
     | HEADER of string
     | ID of string
     | LITERAL of string
-    | SEMANTIC of string
+    | REDUCER of string
     | TYPE_ARGUMENT of string
     | COLON
     | BAR
