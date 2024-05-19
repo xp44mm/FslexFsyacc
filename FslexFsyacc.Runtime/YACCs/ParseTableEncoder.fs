@@ -10,7 +10,7 @@ open FSharp.Idioms.Literal
 type ParseTableEncoder =
     {
         productions: Map<string list,int>
-        kernels    : Map<Set<ItemCore>,int>
+        kernels: Map<Set<ItemCore>,int>
     }
 
     /// 产生式编码为负

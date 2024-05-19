@@ -22,7 +22,7 @@ let rec render poly =
         $"({content})"
 
 /// 转换表的符号: 设计可以反向解析的格式，符号的内部表达
-let innerSymbol poly =
+let innerSymbol (poly: RegularSymbol ) =
     match poly with
     | Atomic x -> x
     | _ -> "{" + render poly + "}"

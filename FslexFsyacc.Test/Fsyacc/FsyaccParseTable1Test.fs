@@ -16,17 +16,19 @@ open System.Text.RegularExpressions
 open Xunit
 open Xunit.Abstractions
 
-type FsyaccParseTableTest(output:ITestOutputHelper) =
+type FsyaccParseTable1Test(output:ITestOutputHelper) =
     let show res =
         res
         |> Literal.stringify
         |> output.WriteLine
 
     // ** input **
-    let parseTblName = "FsyaccParseTable"
+    let sourceFile = "fsyacc1.fsyacc"
+    let parseTblName = "FsyaccParseTable1"
+
     let parseTblModule = $"FslexFsyacc.Fsyacc.{parseTblName}"
     let sourcePath = Path.Combine(solutionPath, @"FslexFsyacc\Fsyacc")
-    let filePath = Path.Combine(sourcePath, @"fsyacc.fsyacc")
+    let filePath = Path.Combine(sourcePath, sourceFile)
     let parseTblPath = Path.Combine(sourcePath, $"{parseTblName}.fs")
 
     let text = File.ReadAllText(filePath,Encoding.UTF8)
@@ -45,15 +47,6 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
 
     let moduleFile = FsyaccParseTableFile.from fsyacc
 
-    //let fsyaccCrew =
-    //    text
-    //    |> RawFsyaccFileCrewUtils.parse
-    //    |> FlatedFsyaccFileCrewUtils.fromRawFsyaccFileCrew
-
-    //let tblCrew =
-    //    fsyaccCrew
-    //    |> FlatedFsyaccFileCrewUtils.getSemanticParseTableCrew
-
     //[<Fact>]
     //member _.``01 - norm fsyacc file``() =
     //    let s0 = tblCrew.startSymbol
@@ -69,63 +62,9 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
 
     //    output.WriteLine(src)
 
-    [<Fact>]
-    member _.``02 - list all tokens``() =
-        let y = set ["%%";"%left";"%nonassoc";"%prec";"%right";"%type";"(";")";"*";"+";":";"?";"HEADER";"ID";"LITERAL";"SEMANTIC";"TYPE_ARGUMENT";"[";"]";"|"]
-        Should.equal y tbl.bnf.grammar.terminals
-
-    //[<Fact>]
-    //member _.``03 - list all states``() =        
-    //    let src = 
-    //        AmbiguousCollectionUtils.render
-    //            tblCrew.terminals
-    //            tblCrew.conflictedItemCores
-    //            (tblCrew.kernels |> Seq.mapi(fun i k -> k,i) |> Map.ofSeq)
-    //    output.WriteLine(src)
-
-    //[<Fact>]
-    //member _.``04 - precedence Of Productions`` () =
-    //    let productions = 
-    //        AmbiguousCollectionUtils.collectConflictedProductions tblCrew.conflictedItemCores
-
-    //    // production -> %prec
-    //    let pprods =
-    //        ProductionSetUtils.precedenceOfProductions tblCrew.terminals productions
-
-    //    //优先级应该据此结果给出，不能少，也不应该多。
-    //    let y = []
-
-    //    Should.equal y pprods
-
-    //[<Fact>]
-    //member _.``05 - list declarations``() =
-    //    let terminals =
-    //        tblCrew.terminals
-    //        |> Seq.map RenderUtils.renderSymbol
-    //        |> String.concat " "
-
-    //    let nonterminals =
-    //        tblCrew.nonterminals
-    //        |> Seq.map RenderUtils.renderSymbol
-    //        |> String.concat " "
-
-    //    let sourceCode =
-    //        [
-    //            "// Do not list symbols whose return value is always `null`"
-    //            ""
-    //            "// terminals: ref to the returned type of `getLexeme`"
-    //            "%type<> " + terminals
-    //            ""
-    //            "// nonterminals"
-    //            "%type<> " + nonterminals
-    //        ] 
-    //        |> String.concat "\r\n"
-
-    //    output.WriteLine(sourceCode)
-
 
     [<Fact(
-    Skip="按需更新源代码"
+    //Skip="按需更新源代码"
     )>]
     member _.``06 - generate FsyaccParseTable``() =
         let outp = moduleFile.generateModule(parseTblModule)
@@ -134,8 +73,8 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``10 - valid ParseTable``() =
-        Should.equal tbl.encodeActions  FsyaccParseTable.actions
-        Should.equal tbl.encodeClosures FsyaccParseTable.closures
+        Should.equal tbl.encodeActions  FsyaccParseTable1.actions
+        Should.equal tbl.encodeClosures FsyaccParseTable1.closures
 
         //产生式比较
         let prodsFsyacc =
@@ -144,7 +83,7 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
             |> Seq.toList
 
         let prodsParseTable =
-            FsyaccParseTable.rules
+            FsyaccParseTable1.rules
             |> List.map fst
 
         Should.equal prodsFsyacc prodsParseTable

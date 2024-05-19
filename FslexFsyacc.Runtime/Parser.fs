@@ -4,8 +4,8 @@ open FSharp.Idioms
 open FSharp.Idioms.Literal
 open FslexFsyacc.Runtime.ParserTableAction
 
-/// 相比TheoryParser合并了一些步骤
-type PrimeParser<'tok> (
+/// 相比BaseParser合并了一些步骤
+type Parser<'tok> (
         rules    : (string list*(obj list->obj))list,
         actions  : (string*int)list list,
         closures : (int*int*string list)list list,

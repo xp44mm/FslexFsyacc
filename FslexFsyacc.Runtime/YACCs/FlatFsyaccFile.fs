@@ -10,8 +10,10 @@ type FlatFsyaccFile =
     {
         header: string        
         rules:Rule Set //augment Rules
-        precedences:Map<string,int> // symbol -> prec level
-        declarations:Map<string,string> // symbol,type
+        operatorsLines: list<Associativity * Set<string>> // symbol -> prec level
+        //declarations:Map<string,string> // symbol,type
+        declarationsLines: Map<string, Set<string>>
+
     }
 
     static member from (raw:RawFsyaccFile) =
@@ -37,26 +39,34 @@ type FlatFsyaccFile =
             )
             |> fun tail -> augmentRule :: tail
 
-        let precedences =
+        let operatorsLines =
             raw.operatorsLines
-            |> List.mapi(fun i (assoc,operators) ->
-                let iprec = (i+1) * 100 // 索引大，则优先级高
-                operators
-                |> List.map(fun symbol -> symbol, iprec + assoc.value)
-            )
-            |> List.concat
-            |> Map.ofList
+            |> List.map(fun (assoc,operators) ->
+                let operators = Set.ofList operators
+                assoc,operators)
 
-        let declarations = 
+        //let declarations = 
+        //    raw.declarationsLines
+        //    |> List.collect(fun (tp,symbols)->symbols |> List.map(fun sym -> sym,tp))
+        //    |> Map.ofList
+
+        let declarationsLines =
             raw.declarationsLines
-            |> List.collect(fun (tp,symbols)->symbols |> List.map(fun sym -> sym,tp))
+            |> List.groupBy fst
+            |> List.map(fun (tp,ls) ->
+                let symbols =
+                    ls
+                    |> List.collect snd
+                    |> Set.ofList
+                tp,symbols
+            )
             |> Map.ofList
 
         {
             header = raw.header
             rules = Set.ofList rules
-            precedences = precedences
-            declarations = declarations
+            operatorsLines = operatorsLines
+            declarationsLines = declarationsLines
         }
 
     member this.rulesMap =
@@ -69,17 +79,18 @@ type FlatFsyaccFile =
         |> List.ofSeq
         |> List.map(fun rule -> rule.production, rule.reducer)
 
-    member this.getParseTable () =
+    member this.getYacc () =
+        let productions =
+            this.rules
+            |> Set.map(fun rule -> rule.production)
+
         let dummyTokens = 
             this.rules
             |> Seq.filter(fun rule -> rule.dummy > "")
             |> Seq.map(fun rule -> rule.production,rule.dummy)
             |> Map.ofSeq
 
-        let productions =
-            this.rules
-            |> Set.map(fun rule -> rule.production)
+        let precedences =
+            Precedence.from this.operatorsLines
 
-        //let bnf = BNF.just productions
-
-        ParseTableRow.from( productions, dummyTokens, this.precedences )
+        YaccRow.from( productions, dummyTokens, precedences )

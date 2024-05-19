@@ -43,7 +43,7 @@ type FslexParseTableTest(output: ITestOutputHelper) =
         |> FslexFsyacc.Runtime.YACCs.FlatFsyaccFile.from
 
     let tbl =
-        fsyacc.getParseTable()
+        fsyacc.getYacc()
 
     let moduleFile = FsyaccParseTableFile.from fsyacc
 

@@ -7,32 +7,36 @@ open FslexFsyacc.Runtime.ItemCores
 open FSharp.Idioms
 open FSharp.Idioms.Literal
 
-type ParseTableRow = 
+type YaccRow = 
     {
     bnf: BNF
     dummyTokens:Map<string list,string>
-    precedences:Map<string,int>
+    precedences:Map<string,int*Associativity>
     actions: Map<Set<ItemCore>,Map<string,ParseTableAction>>
     encodeActions: list<list<string*int>>
 
-    unambiguousItemCores: Map<Set<ItemCore>,Map<string,Set<ItemCore>>>
+    //unambiguousItemCores: Map<Set<ItemCore>,Map<string,Set<ItemCore>>>
     resolvedClosures: Map<Set<ItemCore>,Map<ItemCore,Set<string>>>
     encodeClosures: list<list<int*int*string list>>
     }
 
-    static member from (productions:Set<string list>, dummyTokens:Map<string list,string>, precedences:Map<string,int>) =
+    static member from (
+        productions:Set<string list>, 
+        dummyTokens:Map<string list,string>, 
+        precedences:Map<string,int * Associativity >
+        ) =
         let bnf = BNF.just productions
         let tryGetDummy = Precedence.tryGetDummy dummyTokens bnf.grammar.terminals
 
-        let tryGetPrecedenceCode = Precedence.tryGetPrecedenceCode tryGetDummy precedences
+        let tryGetPrecedence = Precedence.tryGetPrecedence tryGetDummy precedences
 
-        let unambiguousItemCores =
-            bnf.conflictedItemCores
-            |> Map.map(fun k mp ->
-                mp
-                |> Map.map(fun s ics -> 
-                    SLR.just(ics).disambiguate(tryGetPrecedenceCode))
-            )
+        //let unambiguousItemCores =
+        //    bnf.conflictedItemCores
+        //    |> Map.map(fun k mp ->
+        //        mp
+        //        |> Map.map(fun s ics -> 
+        //            SLR.just(ics).disambiguate(tryGetPrecedence))
+        //    )
 
         let actions =
             bnf.actions
@@ -40,7 +44,7 @@ type ParseTableRow =
                 mp
                 |> Seq.choose(fun(KeyValue(sym, acts)) ->
                     acts
-                    |> ParseTableAction.disambiguate tryGetPrecedenceCode
+                    |> ParseTableAction.disambiguate2 tryGetPrecedence
                     |> Option.map (Pair.prepend sym)
                 )
                 |> Map.ofSeq
@@ -83,7 +87,7 @@ type ParseTableRow =
         actions     = actions             
         encodeActions = encodeActions
 
-        unambiguousItemCores = unambiguousItemCores
+        //unambiguousItemCores = unambiguousItemCores
         resolvedClosures = resolvedClosures
         encodeClosures = encodeClosures
         }

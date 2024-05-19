@@ -8,10 +8,6 @@ open FSharp.Idioms
 open FSharp.Idioms.Literal
 
 type Example427Test(output:ITestOutputHelper) =
-    //let show res = 
-    //    res 
-    //    |> Literal.stringify
-    //    |> output.WriteLine
 
     let E = "E"
     let E' = "E'"

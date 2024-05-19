@@ -18,9 +18,9 @@ type EncodeActionsTest (output: ITestOutputHelper) =
         //let bnf = BNF.from BNF4_55.mainProductions
         let productions = ProductionUtils.augment BNF4_55.mainProductions
         let dummyTokens:Map<string list,string> = Map []
-        let precedences:Map<string,int> = Map []
+        let precedences:Map<string,int*Associativity> = Map []
 
-        let tbl = ParseTableRow.from(productions, dummyTokens, precedences)
+        let tbl = YaccRow.from(productions, dummyTokens, precedences)
         //output.WriteLine("let encodeActions = " + stringify tbl.encodeActions)
         Should.equal BNF4_55.encodeActions tbl.encodeActions
 
@@ -30,9 +30,9 @@ type EncodeActionsTest (output: ITestOutputHelper) =
         let productions = ProductionUtils.augment BNF4_3.mainProductions
 
         let dummyTokens:Map<string list,string> = Map []
-        let precedences:Map<string,int> = BNF4_3.precedences
+        let precedences:Map<string,int*Associativity> = BNF4_3.precedences
 
-        let tbl = ParseTableRow.from(productions, dummyTokens, precedences)
+        let tbl = YaccRow.from(productions, dummyTokens, precedences)
         output.WriteLine("let encodeActions = " + stringify tbl.encodeActions)
         Should.equal BNF4_3.encodeActions tbl.encodeActions
 
@@ -42,9 +42,9 @@ type EncodeActionsTest (output: ITestOutputHelper) =
         let productions = ProductionUtils.augment BNF4_67.mainProductions
 
         let dummyTokens:Map<string list,string> = Map []
-        let precedences:Map<string,int> = Map []
+        let precedences:Map<string,int*Associativity> = Map []
 
-        let tbl = ParseTableRow.from(productions, dummyTokens, precedences)
+        let tbl = YaccRow.from(productions, dummyTokens, precedences)
         //output.WriteLine("let encodeActions = " + stringify tbl.encodeActions)
         Should.equal BNF4_67.encodeActions tbl.encodeActions
 

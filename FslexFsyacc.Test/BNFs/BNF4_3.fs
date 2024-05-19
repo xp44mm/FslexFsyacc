@@ -1,5 +1,6 @@
 ﻿module FslexFsyacc.Runtime.BNFs.BNF4_3
 open FslexFsyacc.Runtime.ItemCores
+open FslexFsyacc.Runtime.YACCs
 
 let E = "E"
 let T = "T"
@@ -221,8 +222,8 @@ let actions =
 
 let precedences =
     Map [
-        "+",100-1
-        "*",200-1
+        "+",(100,Associativity.LeftAssoc)
+        "*",(200,Associativity.LeftAssoc)
     ]
 
 let uaction_0_1 = kernel_0,"(",shift kernel_2

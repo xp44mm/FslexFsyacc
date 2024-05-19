@@ -341,8 +341,8 @@ let getExpr (expr:SynExpr) =
 
     | SynExpr.Lazy ( expr: SynExpr , range: range)->
         XExpr.Lazy (getExpr expr)
-    | SynExpr.Sequential ( debugPoint: DebugPointAtSequential , isTrueSeq: bool , expr1: SynExpr , expr2: SynExpr , range: range)->
-        XExpr.Sequential ( isTrueSeq , getExpr expr1 ,getExpr expr2)
+    | SynExpr.Sequential ( debugPoint: DebugPointAtSequential, isTrueSeq: bool, expr1: SynExpr, expr2: SynExpr, range: range, trivia )->
+        XExpr.Sequential ( isTrueSeq, getExpr expr1, getExpr expr2)
     | SynExpr.IfThenElse (
         ifExpr: SynExpr ,
         thenExpr: SynExpr ,
@@ -845,18 +845,18 @@ let getMemberDefn (src:SynMemberDefn) =
     | SynMemberDefn.Member ( memberDefn: SynBinding , range: FSharp.Compiler.Text.range) ->
         XMemberDefn.Member (getBinding memberDefn)
     | SynMemberDefn.ImplicitCtor ( 
-        accessibility: SynAccess option , 
-        attributes: SynAttributes , 
-        ctorArgs: SynSimplePats , 
-        selfIdentifier: Ident option ,
-        xmlDoc: FSharp.Compiler.Xml.PreXmlDoc ,
+        accessibility: SynAccess option, 
+        attributes: SynAttributes, 
+        ctorArgs: SynPat, 
+        selfIdentifier: Ident option,
+        xmlDoc: FSharp.Compiler.Xml.PreXmlDoc,
         range: FSharp.Compiler.Text.range,
         trivia
         ) ->
         XMemberDefn.ImplicitCtor ( 
             Option.map getAccess accessibility , 
             getAttributes attributes , 
-            getSimplePats ctorArgs , 
+            getPat ctorArgs , 
             Option.map (fun(i:Ident)->i.idText) selfIdentifier
         )
     | SynMemberDefn.ImplicitInherit ( 
@@ -1394,14 +1394,14 @@ let getTypeDefnSimpleRepr(src:SynTypeDefnSimpleRepr) =
         XTypeDefnSimpleRepr.Record (
             Option.map getAccess accessibility, 
             List.map getField recordFields)
-    | SynTypeDefnSimpleRepr.General ( kind: SynTypeDefnKind , inherits: (SynType * FSharp.Compiler.Text.range * Ident option) list , slotsigs: (SynValSig * SynMemberFlags) list , fields: SynField list , isConcrete: bool , isIncrClass: bool , implicitCtorSynPats: SynSimplePats option , range: FSharp.Compiler.Text.range) ->
+    | SynTypeDefnSimpleRepr.General ( kind: SynTypeDefnKind , inherits: (SynType * FSharp.Compiler.Text.range * Ident option) list , slotsigs: (SynValSig * SynMemberFlags) list , fields: SynField list , isConcrete: bool , isIncrClass: bool , implicitCtorSynPats: SynPat option , range: FSharp.Compiler.Text.range) ->
         XTypeDefnSimpleRepr.General (
             getTypeDefnKind kind, 
             inherits |> List.map(fun(ty,_,i)-> getType ty,Option.map (fun(i:Ident)->i.idText) i) , 
             slotsigs |> List.map(fun(vs,mf)-> getValSig vs, getMemberFlags mf) , 
             List.map getField fields , 
             isConcrete , isIncrClass , 
-            Option.map getSimplePats implicitCtorSynPats
+            Option.map getPat implicitCtorSynPats
             )
     | SynTypeDefnSimpleRepr.LibraryOnlyILAssembly ( ilType: obj , range: FSharp.Compiler.Text.range) ->
         XTypeDefnSimpleRepr.LibraryOnlyILAssembly

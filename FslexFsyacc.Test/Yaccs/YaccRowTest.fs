@@ -11,15 +11,15 @@ open FslexFsyacc.Runtime.Grammars
 open FslexFsyacc.Runtime.ItemCores
 open FslexFsyacc.Runtime.BNFs
 
-type ParseTableRowTest (output: ITestOutputHelper) =
+type YaccRowTest (output: ITestOutputHelper) =
 
     [<Fact>]
     member _.``BNF4_55``() =
         let bnf = BNF.from BNF4_55.mainProductions
         let dummyTokens:Map<string list,string> = Map []
-        let precedences:Map<string,int> = Map []
+        let precedences:Map<string,int*Associativity> = Map []
 
-        let tbl = ParseTableRow.from(bnf.productions, dummyTokens, precedences)
+        let tbl = YaccRow.from(bnf.productions, dummyTokens, precedences)
         //let iproductions =
         //    tbl.bnf.grammar.productions
         //    |> Seq.mapi(fun i p -> p,i)
@@ -50,9 +50,9 @@ type ParseTableRowTest (output: ITestOutputHelper) =
     member _.``BNF4_3 output``() =
         let bnf = BNF.from BNF4_3.mainProductions
         let dummyTokens:Map<string list,string> = Map []
-        let precedences:Map<string,int> = BNF4_3.precedences
+        let precedences:Map<string,int*Associativity> = BNF4_3.precedences
 
-        let tbl = ParseTableRow.from(bnf.productions, dummyTokens, precedences)
+        let tbl = YaccRow.from(bnf.productions, dummyTokens, precedences)
         let iproductions =
             tbl.bnf.grammar.productions
             |> Seq.mapi(fun i p -> p,i)
@@ -82,18 +82,18 @@ type ParseTableRowTest (output: ITestOutputHelper) =
     member _.``BNF4_3``() =
         let bnf = BNF.from BNF4_3.mainProductions
         let dummyTokens:Map<string list,string> = Map []
-        let precedences:Map<string,int> = BNF4_3.precedences
+        let precedences:Map<string,int*Associativity> = BNF4_3.precedences
 
-        let tbl = ParseTableRow.from(bnf.productions, dummyTokens, precedences)
+        let tbl = YaccRow.from(bnf.productions, dummyTokens, precedences)
         Should.equal BNF4_3.uactions tbl.actions
 
     [<Fact>]
     member _.``BNF4_67``() =
         let bnf = BNF.from BNF4_67.mainProductions
         let dummyTokens:Map<string list,string> = Map []
-        let precedences:Map<string,int> = Map []
+        let precedences:Map<string,int*Associativity> = Map []
 
-        let tbl = ParseTableRow.from(bnf.productions, dummyTokens, precedences)
+        let tbl = YaccRow.from(bnf.productions, dummyTokens, precedences)
         //let iproductions =
         //    tbl.bnf.grammar.productions
         //    |> Seq.mapi(fun i p -> p,i)

@@ -6,7 +6,7 @@ open FslexFsyacc.Fsyacc
 
 open FSharp.Idioms.Literal
 
-let parser = PrimeParser<Position<FsyaccToken>>(
+let parser = Parser<Position<FsyaccToken>>(
     FsyaccParseTable.rules,
     FsyaccParseTable.actions,
     FsyaccParseTable.closures,

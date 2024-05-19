@@ -5,7 +5,7 @@ open FSharp.Idioms.Literal
 open FSharp.Idioms
 open System
 
-let parser = PrimeParser<Position<TypeArgumentAngleToken>> (
+let parser = Parser<Position<TypeArgumentAngleToken>> (
     BoundedParseTable.rules,
     BoundedParseTable.actions,
     BoundedParseTable.closures,

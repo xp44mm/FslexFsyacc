@@ -35,8 +35,8 @@ type ResolvedClosuresTest (output: ITestOutputHelper) =
         let mainProductions:string list list = BNF4_55.mainProductions
         let productions = ProductionUtils.augment mainProductions
         let dummyTokens:Map<string list,string> = Map []
-        let precedences:Map<string,int> = Map []
-        let tbl = ParseTableRow.from(productions, dummyTokens, precedences)
+        let precedences:Map<string,int*Associativity> = Map []
+        let tbl = YaccRow.from(productions, dummyTokens, precedences)
         Should.equal tbl.resolvedClosures BNF4_55.resolvedClosures
 
     //[<Fact>]
@@ -61,8 +61,8 @@ type ResolvedClosuresTest (output: ITestOutputHelper) =
         let mainProductions:string list list = BNF4_3.mainProductions
         let productions = ProductionUtils.augment mainProductions
         let dummyTokens:Map<string list,string> = Map []
-        let precedences:Map<string,int> = BNF4_3.precedences
-        let tbl = ParseTableRow.from(productions, dummyTokens, precedences)
+        let precedences:Map<string,int*Associativity> = BNF4_3.precedences
+        let tbl = YaccRow.from(productions, dummyTokens, precedences)
         Should.equal tbl.resolvedClosures BNF4_3.resolvedClosures
 
     //[<Fact>]
@@ -87,8 +87,8 @@ type ResolvedClosuresTest (output: ITestOutputHelper) =
         let mainProductions:string list list = BNF4_67.mainProductions
         let productions = ProductionUtils.augment mainProductions
         let dummyTokens:Map<string list,string> = Map []
-        let precedences:Map<string,int> = Map []
-        let tbl = ParseTableRow.from(productions, dummyTokens, precedences)
+        let precedences:Map<string,int*Associativity> = Map []
+        let tbl = YaccRow.from(productions, dummyTokens, precedences)
         Should.equal tbl.resolvedClosures BNF4_67.resolvedClosures
 
 

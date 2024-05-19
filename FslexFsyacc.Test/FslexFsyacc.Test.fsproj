@@ -8,7 +8,6 @@
 
 	<ItemGroup>
 		<Compile Include="Dir.fs" />
-		<Compile Include="ItemCoreCrewFlat.fs" />
 		<Compile Include="Runtime\PositionTest.fs" />
 		<Compile Include="Runtime\RenderUtilsTest.fs" />    
 		<Compile Include="Lex\NFACombineTest.fs" />
@@ -37,9 +36,8 @@
 		<Compile Include="BNFs\BNF4_3Test.fs" />
 		<Compile Include="BNFs\BNF4_67Test.fs" />
 		<Compile Include="YACCs\PrecedenceTest.fs" />
-		<Compile Include="YACCs\ParseTableRowTest.fs" />
+		<Compile Include="YACCs\YaccRowTest.fs" />
 		<Compile Include="YACCs\EncodeActionsTest.fs" />
-		<Compile Include="YACCs\UnambiguousItemCoresTest.fs" />
 		<Compile Include="YACCs\ResolvedClosuresTest.fs" />
 		<Compile Include="YACCs\EncodeClosuresTest.fs" />
     
@@ -72,6 +70,7 @@
 		<Compile Include="Fsyacc\FsyaccFileRulesTest.fs" />
 		<Compile Include="Fsyacc\FsyaccTokenTest.fs" />
 		<Compile Include="Fsyacc\FsyaccParseTableTest.fs" />
+		<Compile Include="Fsyacc\FsyaccParseTable1Test.fs" />
 		<Compile Include="PolynomialExpressions\Polynomials.fs" />
 		<Compile Include="PolynomialExpressions\Tokenizer.fs" />
 		<Compile Include="PolynomialExpressions\TokenizerTest.fs" />
@@ -123,7 +122,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Update="FSharp.Core" Version="8.0.200" />
+	  <PackageReference Update="FSharp.Core" Version="8.0.300" />
 	</ItemGroup>
 
 </Project>

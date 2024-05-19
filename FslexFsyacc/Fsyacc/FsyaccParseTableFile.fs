@@ -23,14 +23,14 @@ type FsyaccParseTableFile =
             |> Set.map(fun rule -> rule.production,rule.reducer)
             |> Set.toList
 
-        let tbl = fsyacc.getParseTable()
+        let tbl = fsyacc.getYacc()
 
         id<FsyaccParseTableFile> {
             header = fsyacc.header
             rules = rules
             actions = tbl.encodeActions
             closures = tbl.encodeClosures
-            declarations = fsyacc.declarations
+            declarations = fsyacc.declarationsLines |> Declaration.types
         }
 
     /// 增广产生式，它是：s' -> s

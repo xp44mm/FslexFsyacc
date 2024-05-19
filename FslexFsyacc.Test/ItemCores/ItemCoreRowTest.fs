@@ -6,7 +6,8 @@ open FSharp.xUnit
 open FSharp.Idioms
 open FSharp.Idioms.Literal
 
-type ItemCoreRowTest(output:ITestOutputHelper) =
+type ItemCoreRowTest (output:ITestOutputHelper) =
+
     [<Fact>]
     member _.``01 - empty production test``() =
         let production = ["e"]

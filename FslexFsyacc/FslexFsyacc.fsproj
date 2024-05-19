@@ -59,10 +59,11 @@
 		<Compile Include="Fsyacc\DeclarationLinesUtils.fs" />
 		<None Include="fsyacc\fsyacc.fsyacc" />
 		<Compile Include="Fsyacc\FsyaccParseTable.fs" />
+		<None Include="Fsyacc\fsyacc1.fsyacc" />
+		<Compile Include="Fsyacc\FsyaccParseTable1.fs" />
 		<Compile Include="Fsyacc\FsyaccCompiler.fs" />
 		<Compile Include="Fsyacc\RawFsyaccFileRender.fs" />
 		<Compile Include="Fsyacc\RawFsyaccFileUtils.fs" />
-		<Compile Include="Fsyacc\FlatFsyaccFileUtils.fs" />
 		<!--<Compile Include="Fsyacc\RawFsyaccFileCrewUtils.fs" />-->
 		<!--<Compile Include="Fsyacc\FlatedFsyaccFileCrewUtils.fs" />-->
 		
@@ -82,7 +83,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Update="FSharp.Core" Version="8.0.200" />
+		<PackageReference Update="FSharp.Core" Version="8.0.300" />
 	</ItemGroup>
 
 </Project>

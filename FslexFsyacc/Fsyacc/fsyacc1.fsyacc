@@ -1,0 +1,128 @@
+﻿%{
+open FslexFsyacc.Runtime.YACCs
+%}
+
+file :
+    | HEADER ruleGroup+ "%%"? {
+        {
+            header = s0
+            ruleGroups = List.rev s1
+            operatorsLines = []
+            declarationsLines = []
+        }
+    }
+    | HEADER ruleGroup+ "%%" operatorsLine+ "%%"? {
+        {
+            header = s0
+            ruleGroups = List.rev s1
+            operatorsLines = List.rev s3
+            declarationsLines = []
+        }
+    }
+    | HEADER ruleGroup+ "%%" declaration+ "%%"? {
+        {
+            header = s0
+            ruleGroups = List.rev s1
+            operatorsLines = []
+            declarationsLines = List.rev s3
+        }
+    }
+    | HEADER ruleGroup+ "%%" operatorsLine+ "%%" declaration+ "%%"? {
+        {
+            header = s0
+            ruleGroups = List.rev s1
+            operatorsLines = List.rev s3
+            declarationsLines = List.rev s5
+        }
+    }
+ruleGroup+ :
+    | ruleGroup {[s0]}
+    | ruleGroup+ ruleGroup {s1::s0}
+ruleGroup :
+    | symbol ":" "|"? ruleBody+ {
+        let head = RegularSymbolUtils.innerSymbol s0
+        let bodies = List.rev s3
+        { head = head; bodies = bodies }
+    }
+symbol :
+    | atomic { Atomic s0 }
+    | repetition {
+        match s0 with (f,q) ->
+        Repetition(f,q)
+    }
+    | brackets { Oneof s0 }
+    | parens { Chain s0 }
+atomic :
+    | ID { s0 }
+    | LITERAL { s0 }
+repetition :
+    | symbol quantifier {s0,s1}
+quantifier :
+    | "?" {"?"}
+    | "+" {"+"}
+    | "*" {"*"}
+brackets :
+    | "[" symbol+ "]" {List.rev s1}
+symbol+ :
+    | symbol {[s0]}
+    | symbol+ symbol {s1::s0}
+parens :
+    | "(" symbol+ ")" {List.rev s1}
+"|"? :
+    | (*empty*) {}
+    | "|" {}
+ruleBody+ :
+    | ruleBody {[s0]}
+    | ruleBody+ "|" ruleBody {s2::s0}
+ruleBody :
+    | symbol* precToken? REDUCER {
+        let s0 = s0 |> List.map RegularSymbolUtils.innerSymbol |> List.rev
+        { body = s0; dummy = s1; reducer = s2 }
+    }
+symbol* :
+    | (*empty*) {[]}
+    | symbol+ {s0}
+precToken? :
+    | (*empty*) {""}
+    | "%prec" ID {s1}
+"%%"? :
+    | (*empty*) {}
+    | "%%" {}
+operatorsLine+ :
+    | operatorsLine {[s0]}
+    | operatorsLine+ operatorsLine {s1::s0}
+operatorsLine :
+    | assoc symbol+ {
+        let s1 = s1 |> List.map RegularSymbolUtils.innerSymbol |> List.rev
+        s0,s1
+    }
+assoc :
+    | "%left" {LeftAssoc}
+    | "%right" {RightAssoc}
+    | "%nonassoc" {NonAssoc}
+declaration+ :
+    | declaration {[s0]}
+    | declaration+ declaration {s1::s0}
+declaration :
+    | "%type" TYPE_ARGUMENT symbol+ {
+        let symbols = s2 |> List.map RegularSymbolUtils.innerSymbol |> List.rev
+        s1,symbols
+    }
+
+%%
+
+%type<string> HEADER ID LITERAL REDUCER TYPE_ARGUMENT precToken? atomic quantifier
+%type<Associativity> assoc
+%type<RuleBody list> ruleBody+
+%type<RuleBody> ruleBody
+%type<RawFsyaccFile> file
+%type<RuleGroup> ruleGroup
+%type<RuleGroup list> ruleGroup+
+%type<Associativity*string list> operatorsLine
+%type<(Associativity*string list)list> operatorsLine+
+%type<string*string list> declaration
+%type<(string*string list)list> declaration+
+%type<RegularSymbol> symbol
+%type<RegularSymbol list> symbol+ symbol* brackets parens
+%type<RegularSymbol*string> repetition
+

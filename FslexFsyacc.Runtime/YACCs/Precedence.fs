@@ -35,3 +35,22 @@ let tryGetPrecedenceCode tryGetDummy (precedences:Map<string,int>) (production: 
             Some precedences.[token]
         else None)
     
+let from (operatorsLines:list<Associativity * Set<string>>) =
+    operatorsLines
+    |> List.mapi(fun i (assoc,operators) ->
+        let prec = (i+1) * 100 // 索引大，则优先级高
+        operators
+        |> Set.map(fun op -> op,(prec,assoc))
+    )
+    |> Seq.concat
+    |> Map.ofSeq
+
+/// 尝试获取产生式优先级编码
+let tryGetPrecedence tryGetDummy (precedences:Map<string,int*Associativity>) (production: string list) =
+    production
+    |> tryGetDummy
+    |> Option.bind(fun token -> 
+        if precedences.ContainsKey token then
+            Some precedences.[token]
+        else None)
+

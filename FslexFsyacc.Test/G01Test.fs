@@ -37,7 +37,7 @@ type G01Test(output:ITestOutputHelper) =
         |> FslexFsyacc.Runtime.YACCs.FlatFsyaccFile.from
 
     let tbl =
-        fsyacc.getParseTable()
+        fsyacc.getYacc()
 
     //let fsyaccCrew =
     //    text

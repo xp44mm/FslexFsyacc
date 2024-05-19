@@ -5,54 +5,54 @@ let parse text =
     text
     |> FsyaccCompiler.compile
 
-let toFlated (raw:RawFsyaccFile) =
-    let startSymbol,_ = raw.inputRules.[0]
-    let flatedRules =
-        raw.inputRules
-        |> FlatRulesUtils.ofRaw
+//let toFlated (raw:RawFsyaccFile) =
+//    let startSymbol,_ = raw.inputRules.[0]
+//    let flatedRules =
+//        raw.inputRules
+//        |> FlatRulesUtils.ofRaw
 
-    let augRule = ["";startSymbol],"","s0"
+//    let augRule = ["";startSymbol],"","s0"
 
-    let augmentRules =
-        flatedRules
-        |> Set.ofList
-        |> Set.add augRule
+//    let augmentRules =
+//        flatedRules
+//        |> Set.ofList
+//        |> Set.add augRule
 
-    let precedences =
-        raw.precedenceLines
-        |> PrecedenceLinesUtils.toMap
+//    let precedences =
+//        raw.precedenceLines
+//        |> PrecedenceLinesUtils.toMap
 
-    let declarations = 
-        raw.declarationLines
-        |> DeclarationLinesUtils.toMap
+//    let declarations = 
+//        raw.declarationLines
+//        |> DeclarationLinesUtils.toMap
 
-    id<FlatFsyaccFile> {
-        header = raw.header
-        rules = flatedRules
-        augmentRules = augmentRules
-        precedences = precedences
-        declarations = declarations
-    }
+//    id<FlatFsyaccFile> {
+//        header = raw.header
+//        rules = flatedRules
+//        augmentRules = augmentRules
+//        precedences = precedences
+//        declarations = declarations
+//    }
 
-let fromFlat (flat:FlatFsyaccFile) =
-    let rules =
-        flat.rules
-        |> FlatRulesUtils.toRaw
+//let fromFlat (flat:FlatFsyaccFile) =
+//    let rules =
+//        flat.rules
+//        |> FlatRulesUtils.toRaw
 
-    let precedences =
-        flat.precedences
-        |> PrecedenceLinesUtils.ofMap
+//    let precedences =
+//        flat.precedences
+//        |> PrecedenceLinesUtils.ofMap
 
-    let declarations = 
-        flat.declarations
-        |> DeclarationLinesUtils.ofMap
+//    let declarations = 
+//        flat.declarations
+//        |> DeclarationLinesUtils.ofMap
 
-    id<RawFsyaccFile>{
-        inputRules = rules
-        precedenceLines = precedences
-        header = flat.header
-        declarationLines = declarations
-    }
+//    id<RawFsyaccFile>{
+//        inputRules = rules
+//        precedenceLines = precedences
+//        header = flat.header
+//        declarationLines = declarations
+//    }
 
 ///打印`*.fsyacc`文件
 let render (fsyacc:RawFsyaccFile) =

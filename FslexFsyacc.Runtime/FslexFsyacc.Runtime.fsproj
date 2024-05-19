@@ -65,10 +65,11 @@
     <Compile Include="YACCs\Associativity.fs" />
     <Compile Include="YACCs\ParseTableAction.fs" />
     <Compile Include="YACCs\Precedence.fs" />
+    <Compile Include="YACCs\Declaration.fs" />
     <Compile Include="YACCs\ParseTableEncoder.fs" />
     <Compile Include="YACCs\Conflict.fs" />
-    <Compile Include="YACCs\ParseTableRow.fs" />
-    <Compile Include="YACCs\ParseTableRowUtils.fs" />
+    <Compile Include="YACCs\YaccRow.fs" />
+    <Compile Include="YACCs\YaccRowUtils.fs" />
     <Compile Include="YACCs\Yacc.fs" />
     <Compile Include="YACCs\RawFsyaccFile.fs" />
     <Compile Include="YACCs\Rule.fs" />
@@ -81,7 +82,7 @@
     <Compile Include="AnalyzerUtils.fs" />
     <Compile Include="Analyzer.fs" />
     <Compile Include="BaseParser.fs" />
-    <Compile Include="PrimeParser.fs" />
+    <Compile Include="Parser.fs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -96,7 +97,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="8.0.200" />
+    <PackageReference Update="FSharp.Core" Version="8.0.300" />
   </ItemGroup>
 
 </Project>

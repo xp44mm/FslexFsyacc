@@ -462,7 +462,7 @@ type XTypeDefnSimpleRepr =
         fields: XField list *
         isConcrete: bool *
         isIncrClass: bool *
-        implicitCtorXPats: XSimplePats option
+        implicitCtorXPats: XPat option
     | LibraryOnlyILAssembly
     | TypeAbbrev of 
         //detail: ParserDetail * 
@@ -572,7 +572,7 @@ type XMemberDefn =
     | ImplicitCtor of
         accessibility: XAccess option *
         attributes: XAttributes *
-        ctorArgs: XSimplePats *
+        ctorArgs: XPat *
         selfIdentifier: Ident option
     | ImplicitInherit of inheritType: XType * inheritArgs: XExpr * inheritAlias: Ident option
     | LetBindings of bindings: XBinding list * isStatic: bool * isRecursive: bool

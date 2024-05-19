@@ -114,7 +114,3 @@ type SLR =
                     reduces
                 | _ -> failwith $"precedence should int [0;1;9] but {rprec}."
 
-    //static member fromActions(actions: seq<Action>) =
-    //    actions
-    //    |> Seq.map(fun act -> act.toItemCores())
-    //    |> Set.unionMany
