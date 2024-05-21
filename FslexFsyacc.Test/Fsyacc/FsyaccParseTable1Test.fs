@@ -64,7 +64,7 @@ type FsyaccParseTable1Test(output:ITestOutputHelper) =
 
 
     [<Fact(
-    //Skip="按需更新源代码"
+    Skip="按需更新源代码"
     )>]
     member _.``06 - generate FsyaccParseTable``() =
         let outp = moduleFile.generateModule(parseTblModule)
@@ -73,6 +73,7 @@ type FsyaccParseTable1Test(output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``10 - valid ParseTable``() =
+        Should.equal tbl.bnf.terminals  FsyaccParseTable1.tokens
         Should.equal tbl.encodeActions  FsyaccParseTable1.actions
         Should.equal tbl.encodeClosures FsyaccParseTable1.closures
 
@@ -98,7 +99,7 @@ type FsyaccParseTable1Test(output:ITestOutputHelper) =
 
         let header,semans =
             let text = File.ReadAllText(parseTblPath, Encoding.UTF8)
-            FSharp.Compiler.SyntaxTreeX.SourceCodeParser.getHeaderSemansFromFSharp 2 text
+            FSharp.Compiler.SyntaxTreeX.SourceCodeParser.getHeaderSemansFromFSharp 3 text
 
         Should.equal headerFromFsyacc header
         Should.equal semansFsyacc semans

@@ -2,9 +2,9 @@
 open FslexFsyacc.Runtime.YACCs
 
 ///从`*.fsyacc`文件中解析成本类型的数据
-let parse text =
-    text
-    |> FsyaccCompiler.compile
+//let parse text =
+//    text
+//    |> FsyaccCompiler.compile
 
 //let toFlated (raw:RawFsyaccFile) =
 //    let startSymbol,_ = raw.inputRules.[0]
@@ -64,10 +64,10 @@ let render (fsyacc:RawFsyaccFile) =
     let r =
         fsyacc.ruleGroups
         |> List.map(fun ruleGroup ->
-            let lhs = ruleGroup.head
+            let lhs = ruleGroup.lhs
             let rhs = 
                 ruleGroup.bodies
-                |> List.map(fun body -> body.body,body.dummy,body.reducer)
+                |> List.map(fun body -> body.rhs,body.dummy,body.reducer)
             RawFsyaccFileRender.renderRule(lhs, rhs)
             )
         |> String.concat "\r\n"
@@ -75,12 +75,13 @@ let render (fsyacc:RawFsyaccFile) =
     let p() =
         fsyacc.operatorsLines
         |> List.map(fun (assoc,symbols) ->
-            let assoc =
-                match assoc with
-                | LeftAssoc -> "left"
-                | RightAssoc -> "right"
-                | NonAssoc -> "nonassoc"
-            RawFsyaccFileRender.renderPrecedenceLine(assoc,symbols)
+            //RawFsyaccFileRender.renderPrecedenceLine(assoc.render(),symbols)
+            [
+                assoc.render()
+                yield! symbols 
+                    |> Seq.map RawFsyaccFileRender.renderSymbol
+            ]
+            |> String.concat " "
             )
         |> String.concat "\r\n"
 

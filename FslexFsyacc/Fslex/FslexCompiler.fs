@@ -3,18 +3,17 @@
 open FslexFsyacc.Runtime
 open FslexFsyacc.Runtime.Lex
 
-open FslexFsyacc.Fslex.FslexTokenUtils
+//open FslexFsyacc.Fslex.
 open FSharp.Idioms.Literal
-
+open FslexFsyacc.Fslex
 let analyze (tokens:seq<Position<FslexToken>>) = 
     FslexDFA.analyzer.analyze(tokens,FslexTokenUtils.getTag)
 
-let parser = Parser<FslexToken Position>(
-    FslexParseTable.rules,
-    FslexParseTable.actions,
-    FslexParseTable.closures,getTag,getLexeme)
+let parser = FslexParseTable.getParser<FslexToken Position> 
+                FslexTokenUtils.getTag 
+                FslexTokenUtils.getLexeme
 
-let parse(tokens:seq<FslexToken Position>) =
+let parse (tokens:seq<FslexToken Position>) =
     tokens
     |> parser.parse
     |> FslexParseTable.unboxRoot

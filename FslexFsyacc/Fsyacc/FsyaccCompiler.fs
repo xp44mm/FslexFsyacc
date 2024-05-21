@@ -1,18 +1,22 @@
 ﻿module FslexFsyacc.Fsyacc.FsyaccCompiler
+
 open System
 
 open FslexFsyacc.Runtime
-open FslexFsyacc.Fsyacc
+open FslexFsyacc.Runtime.Grammars
 
 open FSharp.Idioms.Literal
+open FslexFsyacc.Fsyacc
 
-let parser = Parser<Position<FsyaccToken>>(
-    FsyaccParseTable1.rules,
-    FsyaccParseTable1.actions,
-    FsyaccParseTable1.closures,
+let parser = FsyaccParseTable1.getParser<Position<FsyaccToken>>
+                FsyaccTokenUtils.getTag
+                FsyaccTokenUtils.getLexeme
 
-    FsyaccTokenUtils.getTag,
-    FsyaccTokenUtils.getLexeme)
+let grammar = 
+    FsyaccParseTable1.rules
+    |> List.map fst
+    |> Set.ofList
+    |> Grammar.just
 
 /// 解析文本为结构化数据
 let compile (input:string) =
@@ -24,6 +28,9 @@ let compile (input:string) =
 
     |> Seq.map(fun tok ->
         tokens <- tok::tokens
+        let tag = FsyaccTokenUtils.getTag tok
+        if grammar.terminals.Contains tag = false then
+            failwith $"{tag} not in {grammar.terminals}"
         tok
     )
     |> Seq.iter(fun postok ->

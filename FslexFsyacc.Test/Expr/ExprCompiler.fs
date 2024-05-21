@@ -8,14 +8,9 @@ open FSharp.Idioms.Literal
 
 open FslexFsyacc.Runtime
 
-let parser = 
-    Parser<Position<ExprToken>>(
-        ExprParseTable.rules,
-        ExprParseTable.actions,
-        ExprParseTable.closures,
-
-        ExprToken.getTag,
-        ExprToken.getLexeme)
+let parser = ExprParseTable.getParser< Position<ExprToken> > 
+                ExprToken.getTag 
+                ExprToken.getLexeme
 
 let parse(tokens:seq<Position<ExprToken>>) =
     tokens
@@ -30,6 +25,9 @@ let compile (txt:string) =
     |> ExprToken.tokenize 0
     |> Seq.map(fun tok ->
         tokens <- tok::tokens
+        //let tag = ExprToken.getTag tok
+        //if ExprParseTable.tokens.Contains tag = false then
+        //    failwith $"{tag} not in {ExprParseTable.tokens}"
         tok
     )
     |> Seq.iter(fun tok ->

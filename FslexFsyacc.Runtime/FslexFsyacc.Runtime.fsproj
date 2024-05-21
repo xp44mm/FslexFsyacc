@@ -71,6 +71,8 @@
     <Compile Include="YACCs\YaccRow.fs" />
     <Compile Include="YACCs\YaccRowUtils.fs" />
     <Compile Include="YACCs\Yacc.fs" />
+    <Compile Include="YACCs\RuleBody.fs" />
+    <Compile Include="YACCs\RuleGroup.fs" />
     <Compile Include="YACCs\RawFsyaccFile.fs" />
     <Compile Include="YACCs\Rule.fs" />
     <Compile Include="YACCs\FlatFsyaccFile.fs" />
@@ -81,6 +83,8 @@
     <Compile Include="RenderUtils.fs" />
     <Compile Include="AnalyzerUtils.fs" />
     <Compile Include="Analyzer.fs" />
+    <Compile Include="TokenParser.fs" />
+    <Compile Include="CreditParser.fs" />
     <Compile Include="BaseParser.fs" />
     <Compile Include="Parser.fs" />
   </ItemGroup>

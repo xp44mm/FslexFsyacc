@@ -9,15 +9,13 @@ open FslexFsyacc.Runtime.YACCs
 type FlatFsyaccFile =
     {
         header: string        
-        rules:Rule Set //augment Rules
+        rules: Rule Set //augment Rules
         operatorsLines: list<Associativity * Set<string>> // symbol -> prec level
-        //declarations:Map<string,string> // symbol,type
         declarationsLines: Map<string, Set<string>>
-
     }
 
     static member from (raw:RawFsyaccFile) =
-        let startSymbol = raw.ruleGroups.[0].head
+        let startSymbol = raw.ruleGroups.[0].lhs
         let augmentRule =
             {
                 production = [""; startSymbol]
@@ -31,7 +29,7 @@ type FlatFsyaccFile =
                 grp.bodies
                 |> List.map(fun bd ->
                     {
-                        production = grp.head::bd.body
+                        production = grp.lhs::bd.rhs
                         dummy = bd.dummy
                         reducer =  bd.reducer
                     }

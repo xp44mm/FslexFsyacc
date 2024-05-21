@@ -12,6 +12,7 @@ type YaccRow =
     bnf: BNF
     dummyTokens:Map<string list,string>
     precedences:Map<string,int*Associativity>
+
     actions: Map<Set<ItemCore>,Map<string,ParseTableAction>>
     encodeActions: list<list<string*int>>
 

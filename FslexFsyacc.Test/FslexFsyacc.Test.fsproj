@@ -85,7 +85,6 @@
 		<Compile Include="Expr\ExprParseTable.fs" />
 		<Compile Include="Expr\ExprParseTableTest.fs" />
 		<Compile Include="Expr\ExprData.fs" />
-		<Compile Include="Expr\ExprDataCrewTest.fs" />
 		<Compile Include="Expr\ExprCompiler.fs" />
 		<Compile Include="Expr\ExprCompilerTest.fs" />
 		<None Include="g01.fsyacc" />

@@ -12,34 +12,34 @@ type FsyaccFileRulesTest(output:ITestOutputHelper) =
         |> Literal.stringify
         |> output.WriteLine
 
-    [<Fact>]
-    member _.``00 - rawToFlatRules``() =
-        let rawRules = [
-            "AsyncArrowFunction",[
-                ["async";"AsyncArrowBindingIdentifier";"=>";"AsyncConciseBody"],"","";
-                ["CoverCallExpressionAndAsyncArrowHead";"=>";"AsyncConciseBody"],"",""]]
-        let y = FlatRulesUtils.ofRaw rawRules
-        let e = [
-            ["AsyncArrowFunction";"async";"AsyncArrowBindingIdentifier";"=>";"AsyncConciseBody"],"","";
-            ["AsyncArrowFunction";"CoverCallExpressionAndAsyncArrowHead";"=>";"AsyncConciseBody"],"",""
-            ]
-        //show y
-        Should.equal y e
+    //[<Fact>]
+    //member _.``00 - rawToFlatRules``() =
+    //    let rawRules = [
+    //        "AsyncArrowFunction",[
+    //            ["async";"AsyncArrowBindingIdentifier";"=>";"AsyncConciseBody"],"","";
+    //            ["CoverCallExpressionAndAsyncArrowHead";"=>";"AsyncConciseBody"],"",""]]
+    //    let y = FlatRulesUtils.ofRaw rawRules
+    //    let e = [
+    //        ["AsyncArrowFunction";"async";"AsyncArrowBindingIdentifier";"=>";"AsyncConciseBody"],"","";
+    //        ["AsyncArrowFunction";"CoverCallExpressionAndAsyncArrowHead";"=>";"AsyncConciseBody"],"",""
+    //        ]
+    //    //show y
+    //    Should.equal y e
 
-    [<Fact>]
-    member _.``11 - flatToRawRules``() =
-        let x = [
-            ["AsyncArrowFunction";"async";"AsyncArrowBindingIdentifier";"=>";"AsyncConciseBody"],"","";
-            ["AsyncArrowFunction";"CoverCallExpressionAndAsyncArrowHead";"=>";"AsyncConciseBody"],"",""
-            ]
-        let y = FlatRulesUtils.toRaw x
+    //[<Fact>]
+    //member _.``11 - flatToRawRules``() =
+    //    let x = [
+    //        ["AsyncArrowFunction";"async";"AsyncArrowBindingIdentifier";"=>";"AsyncConciseBody"],"","";
+    //        ["AsyncArrowFunction";"CoverCallExpressionAndAsyncArrowHead";"=>";"AsyncConciseBody"],"",""
+    //        ]
+    //    let y = FlatRulesUtils.toRaw x
 
-        let z = [
-            "AsyncArrowFunction",[
-                ["async";"AsyncArrowBindingIdentifier";"=>";"AsyncConciseBody"],"","";
-                ["CoverCallExpressionAndAsyncArrowHead";"=>";"AsyncConciseBody"],"",""]]
-        //show y
-        Should.equal y z
+    //    let z = [
+    //        "AsyncArrowFunction",[
+    //            ["async";"AsyncArrowBindingIdentifier";"=>";"AsyncConciseBody"],"","";
+    //            ["CoverCallExpressionAndAsyncArrowHead";"=>";"AsyncConciseBody"],"",""]]
+    //    //show y
+    //    Should.equal y z
 
     [<Fact>]
     member _.``12 - addRule``() =

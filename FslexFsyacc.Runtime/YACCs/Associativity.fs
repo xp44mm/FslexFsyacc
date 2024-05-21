@@ -18,3 +18,9 @@ type Associativity =
     //    | LeftAssoc -> -1
     //    | RightAssoc -> 1
     //    | NonAssoc -> 0
+
+    member assoc.render () =
+        match assoc with
+        | LeftAssoc  -> "%left"
+        | RightAssoc -> "%right"
+        | NonAssoc   -> "%nonassoc"

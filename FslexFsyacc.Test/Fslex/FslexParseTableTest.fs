@@ -162,6 +162,7 @@ type FslexParseTableTest(output: ITestOutputHelper) =
 
     [<Fact>]
     member _.``07 - valid ParseTable``() =
+        Should.equal tbl.bnf.terminals  FslexParseTable.tokens
         Should.equal tbl.encodeActions  FslexParseTable.actions
         Should.equal tbl.encodeClosures FslexParseTable.closures
 
@@ -187,7 +188,7 @@ type FslexParseTableTest(output: ITestOutputHelper) =
 
         let header,semans =
             let text = File.ReadAllText(parseTblPath, Encoding.UTF8)
-            FSharp.Compiler.SyntaxTreeX.SourceCodeParser.getHeaderSemansFromFSharp 2 text
+            FSharp.Compiler.SyntaxTreeX.SourceCodeParser.getHeaderSemansFromFSharp 3 text
 
         Should.equal headerFromFsyacc header
         Should.equal semansFsyacc semans

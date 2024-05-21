@@ -40,9 +40,9 @@ ruleGroup+ :
     | ruleGroup+ ruleGroup {s1::s0}
 ruleGroup :
     | symbol ":" "|"? ruleBody+ {
-        let head = RegularSymbolUtils.innerSymbol s0
+        let lhs = RegularSymbolUtils.innerSymbol s0
         let bodies = List.rev s3
-        { head = head; bodies = bodies }
+        { lhs = lhs; bodies = bodies }
     }
 symbol :
     | atomic { Atomic s0 }
@@ -77,7 +77,7 @@ ruleBody+ :
 ruleBody :
     | symbol* precToken? REDUCER {
         let s0 = s0 |> List.map RegularSymbolUtils.innerSymbol |> List.rev
-        { body = s0; dummy = s1; reducer = s2 }
+        { rhs = s0; dummy = s1; reducer = s2 }
     }
 symbol* :
     | (*empty*) {[]}

@@ -15,15 +15,6 @@ open FslexFsyacc.Runtime.YACCs
 //        declarations = fsyacc.declarations
 //    }
 
-//let ofSemanticParseTableCrew (crew:SemanticParseTableCrew) = 
-//    id<FsyaccParseTableFile> {
-//        header = crew.header
-//        rules = crew.rules
-//        actions = crew.encodedActions
-//        closures = crew.encodedClosures
-//        declarations = crew.declarations
-//    }
-
 /////闭包就是状态
 //let printClosures (this:FsyaccParseTableFile) =
 //    let startSymbol = (fst this.rules.[0]).[0]

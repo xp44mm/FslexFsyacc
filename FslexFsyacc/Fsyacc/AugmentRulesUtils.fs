@@ -6,26 +6,26 @@ open FSharp.Idioms
 open FSharp.Idioms.Literal
 open System
 
-/// get Augment Rules
-let ofFlat (rules:list<list<string>*string*string>) =
-    let p0,_,_ = rules.[0]
-    let augmentRule = ["";p0.Head],"","s0"
+///// get Augment Rules
+//let ofFlat (rules:list<list<string>*string*string>) =
+//    let p0,_,_ = rules.[0]
+//    let augmentRule = ["";p0.Head],"","s0"
 
-    rules
-    |> Set.ofList
-    |> Set.add augmentRule
+//    rules
+//    |> Set.ofList
+//    |> Set.add augmentRule
 
-let toFlat (augmentRules:Set<list<string>*string*string>) =
-    augmentRules
-    |> Set.minElement
-    |> Set.remove <| augmentRules
-    |> Set.toList
+//let toFlat (augmentRules:Set<list<string>*string*string>) =
+//    augmentRules
+//    |> Set.minElement
+//    |> Set.remove <| augmentRules
+//    |> Set.toList
 
-/// get Augment Rules
-let ofRaw (rules:(string*(list<list<string>*string*string>))list) =
-    rules
-    |> FlatRulesUtils.ofRaw
-    |> ofFlat
+///// get Augment Rules
+//let ofRaw (rules:(string*(list<list<string>*string*string>))list) =
+//    rules
+//    |> FlatRulesUtils.ofRaw
+//    |> ofFlat
 
 let getDummyTokens (augmentRules:Set<list<string>*string*string>) =
     augmentRules

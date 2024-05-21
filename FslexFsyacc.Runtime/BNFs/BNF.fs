@@ -15,10 +15,6 @@ type BNF =
         |> ProductionUtils.augment
         |> BNF.just
 
-    member this.grammar =
-        let row = BNFRowUtils.getRow this.productions
-        row.grammar
-
     member this.kernels =
         let row = BNFRowUtils.getRow this.productions
         row.kernels
@@ -34,4 +30,53 @@ type BNF =
     member this.conflictedItemCores =
         let row = BNFRowUtils.getRow this.productions
         row.conflictedItemCores
+
+    //下面是Grammar的成员
+    member this.grammar =
+        let row = BNFRowUtils.getRow this.productions
+        row.grammar
+
+    member this.symbols =
+        let row = GrammarRowUtils.getRow this.productions
+        row.symbols
+
+    member this.nonterminals =
+        let row = GrammarRowUtils.getRow this.productions
+        row.nonterminals
+
+    member this.terminals =
+        let row = GrammarRowUtils.getRow this.productions
+        row.terminals
+
+    member this.nullables =
+        let row = GrammarRowUtils.getRow this.productions
+        row.nullables
+
+    member this.firsts =
+        let row = GrammarRowUtils.getRow this.productions
+        row.firsts
+
+    member this.lasts =
+        let row = GrammarRowUtils.getRow this.productions
+        row.lasts
+
+    member this.follows =
+        let row = GrammarRowUtils.getRow this.productions
+        row.follows
+
+    member this.precedes =
+        let row = GrammarRowUtils.getRow this.productions
+        row.precedes
+
+    member this.nullable (alpha:string list) =
+        NullableUtils.nullable this.nullables alpha
+
+    member this.leftmost (alpha:string list) =        
+        NullableUtils.leftmost this.nullables alpha
+
+    member this.rightmost (alpha:string list) =
+        NullableUtils.rightmost this.nullables alpha
+
+    member this.first (alpha:string list) =
+        FirstUtils.first this.nullables this.firsts alpha
 

@@ -12,6 +12,7 @@ type FsyaccParseTableFile =
     {
         header: string
         rules: (string list*string)list // rename to reducers
+        tokens: Set<string>
         actions: (string*int)list list
         closures: (int*int*string list)list list
         declarations: Map<string,string> // symbol -> type of symbol
@@ -19,7 +20,7 @@ type FsyaccParseTableFile =
 
     static member from (fsyacc:FlatFsyaccFile) =
         let rules =
-            fsyacc.rules 
+            fsyacc.rules
             |> Set.map(fun rule -> rule.production,rule.reducer)
             |> Set.toList
 
@@ -27,6 +28,7 @@ type FsyaccParseTableFile =
 
         id<FsyaccParseTableFile> {
             header = fsyacc.header
+            tokens = tbl.bnf.terminals
             rules = rules
             actions = tbl.encodeActions
             closures = tbl.encodeClosures
@@ -94,9 +96,10 @@ type FsyaccParseTableFile =
             |> List.map(fun (prod, reducer) -> $"{stringify prod}, {reducer}")
             |> String.concat Environment.NewLine
 
-        //
+        // output
         [
             $"module {moduleName}"
+            $"let tokens = {stringify this.tokens}"
             $"let actions = {stringify this.actions}"
             $"let closures = {stringify this.closures}"
             this.header
@@ -105,9 +108,11 @@ type FsyaccParseTableFile =
             "]"
             "let unboxRoot ="
             $"    unbox<{this.declarations.[this.startSymbol]}>"
-            "let baseParser = FslexFsyacc.Runtime.BaseParser.create(rules, actions, closures)"
-            "let stateSymbolPairs = baseParser.getStateSymbolPairs()"
-        ] 
+            "let parser = FslexFsyacc.Runtime.TokenParser.create(rules, tokens, actions, closures)"
+            "let stateSymbolPairs = parser.getStateSymbolPairs()"
+            "let getParser<'t> getTag getLexeme ="
+            "    FslexFsyacc.Runtime.CreditParser<'t>(rules, tokens, actions, closures, getTag, getLexeme)"
+        ]
         |> String.concat "\r\n"
 
     /// 单独生成action code的源代码module

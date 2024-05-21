@@ -4,7 +4,7 @@ open FSharp.Idioms
 
 let isStateOfShift (i:int) = i > 0
 
-let isRuleOfReduce(i:int) = i < 0 
+let isRuleOfReduce(i:int) = i < 0
 
 let shift(getLexeme,states,token,stateIndex) =
     let tree = getLexeme token

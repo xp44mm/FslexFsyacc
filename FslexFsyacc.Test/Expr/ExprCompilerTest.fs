@@ -16,7 +16,7 @@ type ExprCompilerTest(output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``01 - output closures details``() =
-        let theory = ExprParseTable.baseParser
+        let theory = ExprParseTable.parser
         let str = theory.collection()
         output.WriteLine(str)
 
@@ -54,7 +54,7 @@ type ExprCompilerTest(output:ITestOutputHelper) =
     [<Fact>]
     member _.``11 - state symbol pair test``() =
         let symbols = 
-            ExprParseTable.baseParser.getStateSymbolPairs()
+            ExprParseTable.parser.getStateSymbolPairs()
             |> List.mapi Pair.ofApp
 
         //output.WriteLine(stringify symbols)
@@ -75,6 +75,7 @@ type ExprCompilerTest(output:ITestOutputHelper) =
             13,"+";
             14,"-";
             15,"/"]
+
         Should.equal mp symbols
 
 

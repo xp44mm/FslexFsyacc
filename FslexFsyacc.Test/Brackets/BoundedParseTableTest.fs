@@ -68,7 +68,7 @@ type BoundedParseTableTest(output: ITestOutputHelper) =
     [<Fact>]
     member _.``02 - list all tokens``() =
         let e = set ["LEFT";"RIGHT";"TICK"]
-        let y = tbl.bnf.grammar.terminals
+        let y = tbl.bnf.terminals
         Should.equal e y
 
     //[<Fact>]
@@ -142,6 +142,7 @@ type BoundedParseTableTest(output: ITestOutputHelper) =
 
     [<Fact>]
     member _.``07 - valid ParseTable``() =
+        //Should.equal tbl.bnf.terminals BoundedParseTable.tokens
         Should.equal tbl.encodeActions  BoundedParseTable.actions
         Should.equal tbl.encodeClosures BoundedParseTable.closures
 
@@ -167,7 +168,7 @@ type BoundedParseTableTest(output: ITestOutputHelper) =
 
         let header,semans =
             let text = File.ReadAllText(parseTblPath, Encoding.UTF8)
-            FSharp.Compiler.SyntaxTreeX.SourceCodeParser.getHeaderSemansFromFSharp 2 text
+            FSharp.Compiler.SyntaxTreeX.SourceCodeParser.getHeaderSemansFromFSharp 3 text
 
         Should.equal headerFromFsyacc header
         Should.equal semansFsyacc semans

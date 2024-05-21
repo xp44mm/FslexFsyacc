@@ -4,28 +4,28 @@ open FSharp.Idioms
 open FSharp.Idioms.Literal
 open System
 
-///分配左手边到右手边，保持规则顺序不变
-let ofRaw (rules:(string*(list<list<string>*string*string>))list) =
-    rules
-    |> List.collect(fun(lhs,bodies)->
-        bodies
-        |> List.map(fun (body,name,semantic)->
-            lhs::body,name,semantic
-        )
-    )
+/////分配左手边到右手边，保持规则顺序不变
+//let ofRaw (rules:(string*(list<list<string>*string*string>))list) =
+//    rules
+//    |> List.collect(fun(lhs,bodies)->
+//        bodies
+//        |> List.map(fun (body,name,semantic)->
+//            lhs::body,name,semantic
+//        )
+//    )
 
-/// 对相同lhs的rule合并，仅此
-let toRaw (rules:list<list<string>*string*string>) =
-    rules
-    |> List.groupBy(fun(prod,_,_)->prod.Head) //lhs
-    |> List.map(fun(lhs,groups)->
-        let rhs =
-            groups
-            |> List.map(fun(prod,name,sem)->
-                prod.Tail,name,sem
-            )
-        lhs,rhs
-    )
+///// 对相同lhs的rule合并，仅此
+//let toRaw (rules:list<list<string>*string*string>) =
+//    rules
+//    |> List.groupBy(fun(prod,_,_)->prod.Head) //lhs
+//    |> List.map(fun(lhs,groups)->
+//        let rhs =
+//            groups
+//            |> List.map(fun(prod,name,sem)->
+//                prod.Tail,name,sem
+//            )
+//        lhs,rhs
+//    )
 
 let getStartSymbol (rules:list<list<string>*string*string>) =
     rules.[0]
