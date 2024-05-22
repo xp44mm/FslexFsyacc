@@ -1,8 +1,6 @@
-﻿namespace FslexFsyacc.Runtime.BNFs
+﻿namespace FslexFsyacc.Runtime
 
-open FslexFsyacc.Runtime.Grammars
 open FslexFsyacc.Runtime.ItemCores
-open FSharp.Idioms
 
 /// SLR && LALR
 type ParseTableAction = 

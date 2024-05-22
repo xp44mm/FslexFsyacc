@@ -26,15 +26,16 @@ let tryGetDummy (dummyTokens:Map<string list,string>) (terminals:Set<string>) (p
     else
         lastTerminal terminals production
 
-/// 尝试获取优先级编码
-let tryGetPrecedenceCode tryGetDummy (precedences:Map<string,int>) (production: string list) =
-    production
-    |> tryGetDummy
-    |> Option.bind(fun token -> 
-        if precedences.ContainsKey token then
-            Some precedences.[token]
-        else None)
+///// 尝试获取优先级编码
+//let tryGetPrecedenceCode tryGetDummy (precedences:Map<string,int>) (production: string list) =
+//    production
+//    |> tryGetDummy
+//    |> Option.bind(fun token -> 
+//        if precedences.ContainsKey token then
+//            Some precedences.[token]
+//        else None)
     
+///每个运算符号的优先级和相关性
 let from (operatorsLines:list<Associativity * Set<string>>) =
     operatorsLines
     |> List.mapi(fun i (assoc,operators) ->

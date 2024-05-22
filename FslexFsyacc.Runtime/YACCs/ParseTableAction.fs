@@ -2,6 +2,7 @@
 
 open System
 open FSharp.Idioms.Literal
+open FslexFsyacc.Runtime
 open FslexFsyacc.Runtime.ItemCores
 open FslexFsyacc.Runtime.BNFs
 

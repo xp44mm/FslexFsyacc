@@ -14,28 +14,9 @@ type FlatFsyaccFile =
         declarationsLines: Map<string, Set<string>>
     }
 
+    /// 带有重复检查
     static member from (raw:RawFsyaccFile) =
-        let startSymbol = raw.ruleGroups.[0].lhs
-        let augmentRule =
-            {
-                production = [""; startSymbol]
-                dummy = ""
-                reducer = "s0"
-            }
-
-        let rules =
-            raw.ruleGroups
-            |> List.collect(fun grp -> 
-                grp.bodies
-                |> List.map(fun bd ->
-                    {
-                        production = grp.lhs::bd.rhs
-                        dummy = bd.dummy
-                        reducer =  bd.reducer
-                    }
-                )
-            )
-            |> fun tail -> augmentRule :: tail
+        let rules = Rule.fromGroups raw.ruleGroups
 
         let operatorsLines =
             raw.operatorsLines
@@ -43,10 +24,7 @@ type FlatFsyaccFile =
                 let operators = Set.ofList operators
                 assoc,operators)
 
-        //let declarations = 
-        //    raw.declarationsLines
-        //    |> List.collect(fun (tp,symbols)->symbols |> List.map(fun sym -> sym,tp))
-        //    |> Map.ofList
+        Symbol.duplOperators raw.operatorsLines
 
         let declarationsLines =
             raw.declarationsLines
@@ -60,13 +38,38 @@ type FlatFsyaccFile =
             )
             |> Map.ofList
 
+        Symbol.duplDeclar raw.declarationsLines
+
         {
             header = raw.header
-            rules = Set.ofList rules
+            rules = rules
             operatorsLines = operatorsLines
             declarationsLines = declarationsLines
         }
 
+    member this.unused() =
+        let heads = 
+            this.rules
+            |> Set.map(fun rule -> rule.production)
+            |> Symbol.getNonterminals
+
+        let usedRules,unusedRules =
+            this.rules
+            |> Set.partition(fun rule -> rule.production.Head |> heads.Contains)
+
+        let usedProductions =
+            usedRules
+            |> Set.map(fun rule -> rule.production)
+
+        let usedDummies =
+            usedRules
+            |> Set.map(fun rule -> rule.dummy)
+            |> Set.filter(fun dummy -> dummy > "")
+
+        // unused operators (usedProductions, dummy)
+
+        // unused type decl
+        ()
     member this.rulesMap =
         this.rules
         |> Seq.map(fun rule -> rule.production,rule)

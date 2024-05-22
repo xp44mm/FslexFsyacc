@@ -15,6 +15,9 @@ type BNF =
         |> ProductionUtils.augment
         |> BNF.just
 
+
+
+
     member this.kernels =
         let row = BNFRowUtils.getRow this.productions
         row.kernels

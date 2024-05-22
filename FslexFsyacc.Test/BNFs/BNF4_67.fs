@@ -1,4 +1,6 @@
 ﻿module FslexFsyacc.Runtime.BNFs.BNF4_67
+
+open FslexFsyacc.Runtime
 open FslexFsyacc.Runtime.ItemCores
 
 let stmt = "stmt"

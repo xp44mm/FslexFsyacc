@@ -1,5 +1,6 @@
 ﻿namespace FslexFsyacc.Runtime.BNFs
 
+open FslexFsyacc.Runtime
 open FslexFsyacc.Runtime.Grammars
 open FslexFsyacc.Runtime.ItemCores
 open FSharp.Idioms

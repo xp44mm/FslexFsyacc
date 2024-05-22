@@ -1,5 +1,7 @@
 ﻿module FslexFsyacc.Runtime.BNFs.BNF4_3
+
 open FslexFsyacc.Runtime.ItemCores
+open FslexFsyacc.Runtime
 open FslexFsyacc.Runtime.YACCs
 
 let E = "E"

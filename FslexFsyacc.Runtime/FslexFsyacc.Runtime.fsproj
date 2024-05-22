@@ -52,12 +52,13 @@
     <Compile Include="Grammars\GrammarRow.fs" />
     <Compile Include="Grammars\GrammarRowUtils.fs" />
     <Compile Include="Grammars\Grammar.fs" />
+    <Compile Include="ParseTableAction.fs" />
+    <Compile Include="ParserTableAction.fs" />
 
     <Compile Include="BNFs\LALR.fs" />
     <Compile Include="BNFs\LALRCollection.fs" />
     <Compile Include="BNFs\Grammar.fs" />
     <Compile Include="BNFs\SpreadClosure.fs" />
-    <Compile Include="BNFs\ParseTableAction.fs" />
     <Compile Include="BNFs\SLR.fs" />
     <Compile Include="BNFs\BNFRow.fs" />
     <Compile Include="BNFs\BNFRowUtils.fs" />
@@ -75,10 +76,8 @@
     <Compile Include="YACCs\RuleGroup.fs" />
     <Compile Include="YACCs\RawFsyaccFile.fs" />
     <Compile Include="YACCs\Rule.fs" />
+    <Compile Include="YACCs\Symbol.fs" />
     <Compile Include="YACCs\FlatFsyaccFile.fs" />
-    
-    
-    <Compile Include="ParserTableAction.fs" />
     <Compile Include="Position.fs" />
     <Compile Include="RenderUtils.fs" />
     <Compile Include="AnalyzerUtils.fs" />

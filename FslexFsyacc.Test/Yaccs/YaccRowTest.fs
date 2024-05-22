@@ -7,6 +7,7 @@ open FSharp.xUnit
 open FSharp.Idioms
 open FSharp.Idioms.Literal
 
+open FslexFsyacc.Runtime
 open FslexFsyacc.Runtime.Grammars
 open FslexFsyacc.Runtime.ItemCores
 open FslexFsyacc.Runtime.BNFs
