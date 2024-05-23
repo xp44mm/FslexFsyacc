@@ -2,7 +2,7 @@
 
 open FSharp.Idioms
 open FSharp.Idioms.Literal
-open FslexFsyacc.Runtime.ParserTableAction
+open FslexFsyacc.Runtime.Precedences.ParserTableAction
 
 /// 相比BaseParser合并了一些步骤
 type CreditParser<'tok> (

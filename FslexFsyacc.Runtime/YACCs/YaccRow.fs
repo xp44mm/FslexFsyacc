@@ -1,6 +1,6 @@
 ﻿namespace FslexFsyacc.Runtime.YACCs
 
-open FslexFsyacc.Runtime
+open FslexFsyacc.Runtime.Precedences
 open FslexFsyacc.Runtime.BNFs
 open FslexFsyacc.Runtime.ItemCores
 
@@ -45,7 +45,7 @@ type YaccRow =
                 mp
                 |> Seq.choose(fun(KeyValue(sym, acts)) ->
                     acts
-                    |> ParseTableAction.disambiguate2 tryGetPrecedence
+                    |> ParseTableAction.disambiguate tryGetPrecedence
                     |> Option.map (Pair.prepend sym)
                 )
                 |> Map.ofSeq

@@ -2,6 +2,7 @@
 
 open FslexFsyacc.Runtime
 open FslexFsyacc.Runtime.ItemCores
+open FslexFsyacc.Runtime.Precedences
 
 let stmt = "stmt"
 let expr = "expr"

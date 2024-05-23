@@ -2,7 +2,10 @@
 
 open System
 open FSharp.Idioms
+open FSharp.Idioms.Literal
 
+open FslexFsyacc.Runtime.Grammars
+open FslexFsyacc.Runtime.Precedences
 open FslexFsyacc.Runtime.BNFs
 open FslexFsyacc.Runtime.YACCs
 
@@ -47,13 +50,14 @@ type FlatFsyaccFile =
             declarationsLines = declarationsLines
         }
 
-    member this.unused() =
+    /// 打印未使用的规则，操作符，类型声明等。
+    member this.unusedReport() =
         let heads = 
             this.rules
             |> Set.map(fun rule -> rule.production)
             |> Symbol.getNonterminals
 
-        let usedRules,unusedRules =
+        let usedRules, unusedRules =
             this.rules
             |> Set.partition(fun rule -> rule.production.Head |> heads.Contains)
 
@@ -61,15 +65,45 @@ type FlatFsyaccFile =
             usedRules
             |> Set.map(fun rule -> rule.production)
 
+        let grammar = Grammar.just usedProductions
+
         let usedDummies =
             usedRules
             |> Set.map(fun rule -> rule.dummy)
             |> Set.filter(fun dummy -> dummy > "")
 
-        // unused operators (usedProductions, dummy)
+        let operators =
+            this.operatorsLines
+            |> List.map snd
+            |> Set.unionMany
 
-        // unused type decl
-        ()
+        let unusedOperators =
+            operators - grammar.terminals - usedDummies
+
+        let unusedDummies =
+            usedDummies - operators
+
+        let typeDecls =
+            this.declarationsLines
+            |> Map.values
+            |> Set.unionMany
+
+        // unused operators (usedProductions, dummy)
+        let unusedTypeDecls =
+            typeDecls - grammar.symbols
+        [
+            "# unused report"
+            "## unused rules"
+            stringify unusedRules
+            "## unusedOperators"
+            stringify unusedOperators
+            "## unusedDummies"
+            stringify unusedDummies
+            "## unusedTypeDecls"
+            stringify unusedTypeDecls
+        ]
+        |> String.concat "\n"
+
     member this.rulesMap =
         this.rules
         |> Seq.map(fun rule -> rule.production,rule)

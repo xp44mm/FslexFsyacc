@@ -1,6 +1,6 @@
 ﻿namespace FslexFsyacc.Runtime.YACCs
 
-open FslexFsyacc.Runtime
+open FslexFsyacc.Runtime.Precedences
 open FslexFsyacc.Runtime.ItemCores
 open FslexFsyacc.Runtime.BNFs
 

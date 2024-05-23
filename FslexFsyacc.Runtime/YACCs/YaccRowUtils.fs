@@ -1,5 +1,6 @@
 ﻿module FslexFsyacc.Runtime.YACCs.YaccRowUtils
 
+open FslexFsyacc.Runtime.Precedences
 open System.Collections.Concurrent
 
 let rows = ConcurrentDictionary< 

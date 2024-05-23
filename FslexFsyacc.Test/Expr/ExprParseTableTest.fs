@@ -24,7 +24,6 @@ type ExprParseTableTest(output:ITestOutputHelper) =
     let rawFsyacc =
         text
         |> FsyaccCompiler.compile
-        //|> fun f -> f.migrate()
 
     let fsyacc =
         rawFsyacc
@@ -34,28 +33,6 @@ type ExprParseTableTest(output:ITestOutputHelper) =
         fsyacc.getYacc()
 
     let moduleFile = FsyaccParseTableFile.from fsyacc
-
-    //let fsyaccCrew =
-    //    text
-    //    |> RawFsyaccFileCrewUtils.parse
-    //    |> FlatedFsyaccFileCrewUtils.fromRawFsyaccFileCrew
-
-    //let inputProductionList =
-    //    fsyaccCrew.flatedRules
-    //    |> List.map Triple.first
-
-    //let tblCrew =
-    //    fsyaccCrew
-    //    |> FlatedFsyaccFileCrewUtils.getSemanticParseTableCrew
-
-    [<Fact>]
-    member _.``00 - print rules``() =
-        for r in rawFsyacc.ruleGroups do
-        output.WriteLine($"{stringify r}")
-
-    [<Fact>]
-    member _.``01 - print resolvedClosures``() =
-        output.WriteLine($"{stringify tbl.resolvedClosures}")
 
     //[<Fact>]
     //member _.``01 - norm fsyacc file``() =
@@ -71,6 +48,28 @@ type ExprParseTableTest(output:ITestOutputHelper) =
     //        |> RawFsyaccFileUtils.render
 
     //    output.WriteLine(src)
+
+    [<Fact>]
+    member _.``00 - print rules``() =
+        for r in rawFsyacc.ruleGroups do
+        output.WriteLine($"{stringify r}")
+
+    [<Fact>]
+    member _.``01 - print resolvedClosures``() =
+        output.WriteLine($"{stringify tbl.resolvedClosures}")
+
+    [<Fact>]
+    member _.``02 - print conflict``() =
+        let bnf = tbl.bnf
+        for acts in bnf.getProperConflictActions() do
+        output.WriteLine($"{stringify acts}")
+
+    [<Fact>]
+    member _.``02 - print conflict productions``() =
+        let bnf = tbl.bnf
+        let productions = bnf.getConflictedProductions()
+        for prod in productions do
+        output.WriteLine($"{stringify prod}")
 
     [<Fact(
     Skip="按需更新源代码"

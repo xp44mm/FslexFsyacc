@@ -1,5 +1,7 @@
 ﻿namespace FslexFsyacc.Runtime.BNFs
 open FslexFsyacc.Runtime.Grammars
+open FslexFsyacc.Runtime.ItemCores
+open FslexFsyacc.Runtime.Precedences
 
 type BNF =
     {
@@ -15,13 +17,10 @@ type BNF =
         |> ProductionUtils.augment
         |> BNF.just
 
-
-
-
     member this.kernels =
         let row = BNFRowUtils.getRow this.productions
         row.kernels
-
+    /// to be removed
     member this.closures =
         let row = BNFRowUtils.getRow this.productions
         row.closures
@@ -30,6 +29,7 @@ type BNF =
         let row = BNFRowUtils.getRow this.productions
         row.actions
 
+    /// to be removed
     member this.conflictedItemCores =
         let row = BNFRowUtils.getRow this.productions
         row.conflictedItemCores
@@ -83,3 +83,18 @@ type BNF =
     member this.first (alpha:string list) =
         FirstUtils.first this.nullables this.firsts alpha
 
+    member this.getProperConflictActions() =
+        [
+            for KeyValue(_,mp) in this.actions do
+            for KeyValue(_,acts) in mp do
+            if acts.Count > 1 then List.ofSeq acts
+        ]
+
+    member bnf.getConflictedProductions() =
+        [
+        for acts in bnf.getProperConflictActions() do
+        for act in acts do
+        yield! act.getProductions()
+        ]
+        |> Set.ofList
+        |> Precedence.precedenceOfProductions bnf.terminals

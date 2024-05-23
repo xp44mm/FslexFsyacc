@@ -3,6 +3,7 @@
 open System
 open FSharp.Idioms
 open FSharp.Idioms.Literal
+open FslexFsyacc.Runtime.Precedences
 
 /// without getTag, getLexeme
 type TokenParser =

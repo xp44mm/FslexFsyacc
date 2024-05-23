@@ -1,6 +1,6 @@
 ﻿module FslexFsyacc.Runtime.BNFs.BNF4_55
 open FslexFsyacc.Runtime
-
+open FslexFsyacc.Runtime.Precedences
 open FslexFsyacc.Runtime.Grammars
 open FslexFsyacc.Runtime.ItemCores
 open FSharp.Idioms

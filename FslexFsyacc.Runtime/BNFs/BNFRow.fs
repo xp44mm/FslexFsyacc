@@ -1,6 +1,6 @@
 ﻿namespace FslexFsyacc.Runtime.BNFs
 
-open FslexFsyacc.Runtime
+open FslexFsyacc.Runtime.Precedences
 open FslexFsyacc.Runtime.Grammars
 open FslexFsyacc.Runtime.ItemCores
 open FSharp.Idioms
@@ -16,9 +16,11 @@ type BNFRow =
     kernels: Set<Set<ItemCore>>
 
     // kernel -> closure
-    closures: Map<Set<ItemCore>,Set<ItemCore*Set<string>>>
+    closures: Map<Set<ItemCore>,Set<ItemCore*Set<string>>> 
 
     actions: Map<Set<ItemCore>,Map<string,Set<ParseTableAction>>>
+
+    //properConflictActions: Map<Set<ItemCore>,Map<string,Set<ParseTableAction>>>
 
     conflictedItemCores: Map<Set<ItemCore>,Map<string,Set<ItemCore>>>
 

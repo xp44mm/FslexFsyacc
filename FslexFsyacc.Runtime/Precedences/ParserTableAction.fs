@@ -1,4 +1,4 @@
-﻿module FslexFsyacc.Runtime.ParserTableAction
+﻿module FslexFsyacc.Runtime.Precedences.ParserTableAction
 
 open FSharp.Idioms
 

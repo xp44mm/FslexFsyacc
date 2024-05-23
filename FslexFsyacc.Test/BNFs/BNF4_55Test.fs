@@ -9,6 +9,7 @@ open FSharp.Idioms.Literal
 
 open FslexFsyacc.Runtime.Grammars
 open FslexFsyacc.Runtime.ItemCores
+open FslexFsyacc.Runtime.Precedences
 
 type BNF4_55Test(output: ITestOutputHelper) =
     [<Fact>]

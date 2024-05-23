@@ -1,4 +1,4 @@
-﻿namespace FslexFsyacc.Runtime
+﻿namespace FslexFsyacc.Runtime.Precedences
 
 open FslexFsyacc.Runtime.ItemCores
 
@@ -15,3 +15,10 @@ type ParseTableAction =
         | Shift k -> //当shift时候符号没有用处，舍去。
             k
             |> Set.map(fun ic -> ic.dotDecr(),None)
+
+    member this.getProductions() =
+        match this with
+        | Reduce p -> Set.singleton p
+        | Shift k ->
+            k
+            |> Set.map(fun ic -> ic.production)

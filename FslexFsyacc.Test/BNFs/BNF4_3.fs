@@ -3,6 +3,7 @@
 open FslexFsyacc.Runtime.ItemCores
 open FslexFsyacc.Runtime
 open FslexFsyacc.Runtime.YACCs
+open FslexFsyacc.Runtime.Precedences
 
 let E = "E"
 let T = "T"

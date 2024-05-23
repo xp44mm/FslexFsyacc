@@ -10,6 +10,7 @@ open FSharp.Idioms.Literal
 open FslexFsyacc.Runtime.Grammars
 open FslexFsyacc.Runtime.ItemCores
 open FslexFsyacc.Runtime.BNFs
+open FslexFsyacc.Runtime.Precedences
 
 type PrecedenceTest (output: ITestOutputHelper) =
 

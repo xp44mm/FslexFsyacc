@@ -1,4 +1,5 @@
-﻿namespace FslexFsyacc.Runtime.YACCs
+﻿namespace FslexFsyacc.Runtime.Precedences
+
 open System
 
 type Associativity =

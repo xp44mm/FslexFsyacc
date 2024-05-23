@@ -3,6 +3,7 @@ open FslexFsyacc.Runtime
 open FslexFsyacc.Runtime.ItemCores
 open FslexFsyacc.Runtime.YACCs
 open FslexFsyacc.Runtime.BNFs
+open FslexFsyacc.Runtime.Precedences
 
 let inputProductionList = [["E";"E";"+";"T"];["E";"T"];["T";"T";"*";"F"];["T";"F"];["F";"(";"E";")"];["F";"id"]]
 let mainProductions = set [["E";"E";"+";"T"];["E";"T"];["F";"(";"E";")"];["F";"id"];["T";"F"];["T";"T";"*";"F"]]
