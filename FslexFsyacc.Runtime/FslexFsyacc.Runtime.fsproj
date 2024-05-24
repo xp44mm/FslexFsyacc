@@ -56,6 +56,7 @@
     <Compile Include="Precedences\Precedence.fs" />
     <Compile Include="Precedences\ParseTableAction.fs" />
     <Compile Include="Precedences\ParserTableAction.fs" />
+    <Compile Include="Precedences\Conflict.fs" />
 
     <Compile Include="BNFs\LALR.fs" />
     <Compile Include="BNFs\LALRCollection.fs" />
@@ -65,10 +66,8 @@
     <Compile Include="BNFs\BNFRow.fs" />
     <Compile Include="BNFs\BNFRowUtils.fs" />
     <Compile Include="BNFs\BNF.fs" />
-    <Compile Include="YACCs\ParseTableAction.fs" />
     <Compile Include="YACCs\Declaration.fs" />
     <Compile Include="YACCs\ParseTableEncoder.fs" />
-    <Compile Include="YACCs\Conflict.fs" />
     <Compile Include="YACCs\YaccRow.fs" />
     <Compile Include="YACCs\YaccRowUtils.fs" />
     <Compile Include="YACCs\Yacc.fs" />
@@ -76,6 +75,8 @@
     <Compile Include="YACCs\RuleGroup.fs" />
     <Compile Include="YACCs\RawFsyaccFile.fs" />
     <Compile Include="YACCs\Rule.fs" />
+    <Compile Include="YACCs\RuleSet.fs" />
+    <Compile Include="YACCs\Operators.fs" />
     <Compile Include="YACCs\Symbol.fs" />
     <Compile Include="YACCs\FlatFsyaccFile.fs" />
     <Compile Include="Position.fs" />

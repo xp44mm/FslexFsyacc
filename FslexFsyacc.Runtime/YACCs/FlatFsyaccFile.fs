@@ -19,7 +19,7 @@ type FlatFsyaccFile =
 
     /// 带有重复检查
     static member from (raw:RawFsyaccFile) =
-        let rules = Rule.fromGroups raw.ruleGroups
+        let rules = RuleSet.fromGroups raw.ruleGroups
 
         let operatorsLines =
             raw.operatorsLines
@@ -28,6 +28,13 @@ type FlatFsyaccFile =
                 assoc,operators)
 
         Symbol.duplOperators raw.operatorsLines
+
+        let operators = Symbol.getSymbols operatorsLines
+        let dummies = Operators.unusedDummies operators rules
+        if dummies.IsEmpty then
+            ()
+        else
+            failwith $"未使用的%%prec命名：{dummies}"
 
         let declarationsLines =
             raw.declarationsLines
@@ -52,14 +59,13 @@ type FlatFsyaccFile =
 
     /// 打印未使用的规则，操作符，类型声明等。
     member this.unusedReport() =
-        let heads = 
+        let symbols = 
             this.rules
-            |> Set.map(fun rule -> rule.production)
-            |> Symbol.getNonterminals
+            |> RuleSet.getSymbols
 
         let usedRules, unusedRules =
             this.rules
-            |> Set.partition(fun rule -> rule.production.Head |> heads.Contains)
+            |> Set.partition(fun rule -> rule.production.Head |> symbols.Contains)
 
         let usedProductions =
             usedRules
