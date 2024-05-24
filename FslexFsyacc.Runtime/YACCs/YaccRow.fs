@@ -45,7 +45,7 @@ type YaccRow =
                 mp
                 |> Seq.choose(fun(KeyValue(sym, acts)) ->
                     acts
-                    |> Conflict.disambiguate tryGetPrecedence
+                    |> ParseTableAction.disambiguate tryGetPrecedence
                     |> Option.map (Pair.prepend sym)
                 )
                 |> Map.ofSeq
