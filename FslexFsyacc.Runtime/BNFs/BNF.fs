@@ -97,4 +97,4 @@ type BNF =
         yield! act.getProductions()
         ]
         |> Set.ofList
-        |> Precedence.precedenceOfProductions bnf.terminals
+        //|> Precedence.precedenceOfProductions bnf.terminals

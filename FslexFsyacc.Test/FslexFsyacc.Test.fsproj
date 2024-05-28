@@ -23,6 +23,7 @@
 		<Compile Include="ItemCores\ItemCoreRowTest.fs" />
 		<Compile Include="ItemCores\ItemCoreRowUtilsTest.fs" />
 		<Compile Include="ItemCores\ItemCoreTest.fs" />
+		<Compile Include="ItemCores\DummyTokenTest.fs" />
     
 		<Compile Include="Grammars\Grammar4_1.fs" />
 		<Compile Include="Grammars\Grammar4_28.fs" />
@@ -101,9 +102,9 @@
 
 	<ItemGroup>
 		<PackageReference Include="FSharp.xUnit" Version="1.2.27" />
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
-		<PackageReference Include="xunit" Version="2.8.0" />
-		<PackageReference Include="xunit.runner.visualstudio" Version="2.8.0">
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
+		<PackageReference Include="xunit" Version="2.8.1" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="2.8.1">
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>

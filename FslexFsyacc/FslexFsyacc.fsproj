@@ -47,17 +47,17 @@
 		<Compile Include="Fsyacc\FsyaccTokenUtils.fs" />
 		<Compile Include="Fsyacc\RegularSymbol.fs" />
 		<Compile Include="Fsyacc\RegularSymbolUtils.fs" />
-		<Compile Include="Fsyacc\ReducerGenerator.fs" />
-		<Compile Include="Fsyacc\FsyaccParseTableFile.fs" />
 		<!--<Compile Include="Fsyacc\FlatedFsyaccFileCrews.fs" />-->
-		<Compile Include="Fsyacc\FsyaccParseTableFileUtils.fs" />
-		<Compile Include="Fsyacc\FlatRulesUtils.fs" />
-		<Compile Include="Fsyacc\AugmentRulesUtils.fs" />
 		<None Include="Fsyacc\fsyacc1.fsyacc" />
 		<Compile Include="Fsyacc\FsyaccParseTable1.fs" />
 		<Compile Include="Fsyacc\FsyaccCompiler.fs" />
 		<Compile Include="Fsyacc\RawFsyaccFileRender.fs" />
 		<Compile Include="Fsyacc\RawFsyaccFileUtils.fs" />
+		<Compile Include="Fsyacc\ReducerGenerator.fs" />
+		<Compile Include="Fsyacc\FsyaccParseTableFile.fs" />
+		<Compile Include="Fsyacc\FsyaccParseTableFileUtils.fs" />
+		<Compile Include="Fsyacc\FlatRulesUtils.fs" />
+		<Compile Include="Fsyacc\AugmentRulesUtils.fs" />
 		<!--<Compile Include="Fsyacc\RawFsyaccFileCrewUtils.fs" />-->
 		<!--<Compile Include="Fsyacc\FlatedFsyaccFileCrewUtils.fs" />-->
 		

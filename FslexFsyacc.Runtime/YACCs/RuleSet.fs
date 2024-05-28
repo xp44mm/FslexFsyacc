@@ -4,6 +4,13 @@ open System
 open FSharp.Idioms
 open FSharp.Idioms.Literal
 
+open FslexFsyacc.Runtime
+open FslexFsyacc.Runtime.Grammars
+open FslexFsyacc.Runtime.ItemCores
+open FslexFsyacc.Runtime.Precedences
+open FslexFsyacc.Runtime.BNFs
+
+
 let fromGroups (ruleGroups: RuleGroup list) =
     let ruleList =
         ruleGroups
@@ -32,7 +39,7 @@ let fromGroups (ruleGroups: RuleGroup list) =
         failwith $"输入有重复的产生式：{stringify ps}"
 
 /// 用到的符号
-let getSymbols (rules:Set<Rule>) =
+let getUsedSymbols (startSymbol:string) (rules:Set<Rule>) =
     let rec loop (rules:Set<Rule>) (symbols:Set<string>) =
         let nextRules, remainRules =
             rules
@@ -48,21 +55,52 @@ let getSymbols (rules:Set<Rule>) =
                 |> Set.unionMany
                 |> Set.union symbols
             loop remainRules nextSymbols
-    set [""]
+    startSymbol
+    |> Set.singleton
     |> loop rules
         
-let filterUsedRules (rules:Set<Rule>) =
-    let symbols = getSymbols rules
-    rules
-    |> Set.filter(fun rule -> 
-        rule.production.Head 
-        |> symbols.Contains
-        )
+let purgeRules (startSymbol:string) (rules:Set<Rule>) =
+    let symbols = getUsedSymbols startSymbol rules
+    let rules =
+        rules
+        |> Set.filter(fun rule -> 
+            rule.production.Head 
+            |> symbols.Contains
+            )
+    if startSymbol = "" then
+        rules
+    else
+        rules.Add(Rule.augment startSymbol)
 
 let removeHeads (heads:Set<string>) (rules:Set<Rule>) =
     rules
-    |> Set.filter(fun rule -> 
+    |> Set.filter(fun rule ->
         rule.production.Head 
         |> heads.Contains
         |> not
         )
+
+let getProperDummies (rules: Rule Set) =
+    rules
+    |> Set.filter(fun rule -> rule.dummy > "")
+
+///检查多余的dummy
+let redundantDummies (rules: Rule Set) =
+    let dummies =
+        rules
+        |> Set.filter(fun rule -> rule.dummy > "")
+        |> Set.map(fun rule -> rule.production)
+
+    let bnf =
+        rules
+        |> Set.map(fun rule -> rule.production)
+        |> BNF.just
+
+    let conflictedProductions = bnf.getConflictedProductions()
+
+    let diff = 
+        Set.difference dummies conflictedProductions
+
+    if diff.IsEmpty then
+        ()
+    else failwith $"{stringify (List.ofSeq diff)}"

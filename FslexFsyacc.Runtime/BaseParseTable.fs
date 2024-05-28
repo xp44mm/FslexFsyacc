@@ -3,33 +3,43 @@
 open System
 open FSharp.Idioms
 open FSharp.Idioms.Literal
+open FslexFsyacc.Runtime.ItemCores
 open FslexFsyacc.Runtime.Precedences
+open FslexFsyacc.Runtime.BNFs
+open FslexFsyacc.Runtime.YACCs
+open FslexFsyacc.Runtime.ParserTableAction
 
-/// without getTag, getLexeme
-type TokenParser =
+type BaseParseTable =
     {
         rules: Map<int,string list*(obj list->obj)>
-        tokens:Set<string>
+        tokens: Set<string>
+        kernels: Map<int,Set<ItemCore>>
+        symbols: Map<int,string>
         actions: Map<int,Map<string,int>>
-        closures: (string list*int*string list)list list
+        decoder: ParseTableDecoder
     }
 
     static member create(
         rules: (string list*(obj list->obj))list,
         tokens: Set<string>,
-        actions: (string*int)list list,
-        closures: (int*int*string list)list list
+        kernels: list<list<int*int>>,
+        actions: (string*int)list list
+
         ) =
         let augmentProduction = fst rules.Head
         if augmentProduction.Head > "" then 
             raise <| ArgumentException("augment rule Set")
 
+        let decoder = 
+            ParseTableDecoder.from(rules,kernels)
+
         // code -> production * reducer
-        let rules: Map<int,string list*(obj list->obj)> =
+        let rules =
             rules
-            //|> List.sortBy fst
             |> List.mapi(fun i entry -> -i, entry)
             |> Map.ofList
+
+        let dkernels = decoder.ikernels
 
         /// state -> lookahead -> action
         let actions:Map<int,Map<string,int>> =
@@ -39,56 +49,51 @@ type TokenParser =
                 src,mp)
             |> Map.ofList
 
-        let closures =
-            closures
-            |> List.map(fun closure ->
-                closure
-                |> List.map(fun(prod,dot,las) ->
-                    let prod = fst rules.[prod]
-                    prod,dot,las
-                )
-            )
+        let dactions = decoder.decodeActions actions
+
+        let symbols =
+            dkernels
+            |> Map.map(fun i k -> SLR.just(k).getSymbol())
 
         {
             rules = rules
             tokens = tokens
+            kernels = decoder.ikernels
+            symbols = symbols
             actions = actions
-            closures = closures
+            decoder = decoder
+            //closures = closures
         }
 
-    ///状态的闭包
-    /// for state in [ 0..len-1 ]
-    member this.getClosure(state) = this.closures.[state]
+    /////状态的符号：todo:符号的别名，例如 uminus
+    //member this.getStateSymbolPairs() =
+    //    this.closures 
+    //    |> List.map(fun closure ->
+    //        match
+    //            closure
+    //            |> Seq.find(fun (prod,dot,_) -> 
+    //                // kernel
+    //                List.head prod = "" || dot > 0)
+    //        with prod,dot,_ ->
+    //            prod.[dot]
+    //    )
 
-    ///状态的符号：todo:符号的别名，例如 uminus
-    member this.getStateSymbolPairs() =
-        this.closures 
-        |> List.map(fun closure ->
-            match
-                closure
-                |> Seq.find(fun (prod,dot,_) -> 
-                    // kernel
-                    List.head prod = "" || dot > 0)
-            with prod,dot,_ ->
-                prod.[dot]
-        )
+    ///// print state
+    //member this.collection() =
+    //    let symbols = this.getStateSymbolPairs()
 
-    /// print state
-    member this.collection() =
-        let symbols = this.getStateSymbolPairs()
+    //    this.closures
+    //    |> List.mapi(fun i cls ->
+    //        let symbol =
+    //            symbols.[i]
+    //            |> RenderUtils.renderSymbol
 
-        this.closures
-        |> List.mapi(fun i cls ->
-            let symbol =
-                symbols.[i]
-                |> RenderUtils.renderSymbol
-
-            let ls =
-                RenderUtils.renderClosure cls
-                |> Line.indentCodeBlock 4
-            $"state {i} {symbol} :\r\n{ls}"
-        )
-        |> String.concat "\r\n"
+    //        let ls =
+    //            RenderUtils.renderClosure cls
+    //            |> Line.indentCodeBlock 4
+    //        $"state {i} {symbol} :\r\n{ls}"
+    //    )
+    //    |> String.concat "\r\n"
 
     /// theory method: token抽象成字符串
     member this.tryNextAction(states: (int*obj)list, ai:string) =
@@ -115,13 +120,15 @@ type TokenParser =
         this.tryNextAction(states, getTag token)
         |> Option.map(fun i ->
             match i with
-            | _ when ParserTableAction.isStateOfShift i ->
+            | ToShift ->
+            //| _ when ParserTableAction.isStateOfShift i ->
                 let pushedStates = ParserTableAction.shift(getLexeme,states,token,i)
                 i,pushedStates
-            | _ when ParserTableAction.isRuleOfReduce i ->
+            | ToReduce ->
+            //| _ when ParserTableAction.isRuleOfReduce i ->
                 let pushedStates = ParserTableAction.reduce(rules,actions,states,i)
                 i,pushedStates
-            | _ ->
+            | ToAccept ->
                 i,states
         )
 
@@ -132,12 +139,14 @@ type TokenParser =
         this.tryNextAction(states,"")
         |> Option.map(fun i -> // i is action's code. shift nextstate or reduce rule.
             match i with
-            | _ when ParserTableAction.isStateOfShift i ->
+            | ToShift ->
+            //| _ when ParserTableAction.isStateOfShift i ->
                 failwith $"no more shift."
-            | _ when ParserTableAction.isRuleOfReduce i ->
+            //| _ when ParserTableAction.isRuleOfReduce i ->
+            | ToReduce ->
                 let pushedStates = ParserTableAction.reduce(rules,actions,states,i)
                 i,pushedStates
-            | _ ->
+            | ToAccept ->
                 i,states
         )
 

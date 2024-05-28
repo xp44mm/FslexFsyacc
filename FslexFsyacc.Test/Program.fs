@@ -16,14 +16,11 @@ open FslexFsyacc.Yacc
 open System.Reflection
 open FslexFsyacc.Runtime
 open FslexFsyacc.Runtime.ItemCores
-
-let x = set [
-    ["expr";"-";"expr"];
-    ["expr";"expr";"*";"expr"];
-    ["expr";"expr";"+";"expr"];
-    ["expr";"expr";"-";"expr"];
-    ["expr";"expr";"/";"expr"]]
+open FslexFsyacc.Expr
 
 [<EntryPoint>]
 let main _ =
+    let inp = "2 + 3"
+    let y = ExprCompiler.compile inp
+
     0

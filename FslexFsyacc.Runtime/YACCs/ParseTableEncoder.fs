@@ -14,19 +14,25 @@ type ParseTableEncoder =
     }
 
     /// 产生式编码为负
-    static member getProductions (productions:Set<string list>) =
-        productions
-        |> Set.toList
-        |> List.mapi(fun i p -> p,-i)
-        |> Map.ofList
+    static member from (productions:Set<string list>, kernels: Set<Set<ItemCore>>) =
+        let p =
+            productions
+            |> Seq.mapi(fun i p -> p,-i)
+            |> Map.ofSeq
+        let k =
+            kernels 
+            |> Seq.mapi(fun i k -> k,i) 
+            |> Map.ofSeq
+        { productions = p; kernels = k }
 
     /// 具体数据编码成整数的表
     member this.encodeAction (action:ParseTableAction) =
         match action with
-        | Shift j -> this.kernels.[j]
-        | Reduce p -> this.productions.[p]
+        | Shift ik -> this.kernels.[ik]
+        | Reduce ip -> this.productions.[ip]
 
-    member encoder.encodeActions (actions: Map< Set<ItemCore>, Map<string,ParseTableAction>> ) =
+    member encoder.encodeActions (actions: Map<Set<ItemCore>, Map<string,ParseTableAction>>) =
+        // 一些kernel没有出状态的箭头，必须用完全的kernels补足所有状态
         encoder.kernels
         |> Map.toList
         |> List.map(fun (kernel,state) ->
@@ -39,13 +45,19 @@ type ParseTableEncoder =
                 )
             else []
         )
-    member this.encodeProduction (production:string list) =
-            this.productions.[production]
 
-    member this.encodeItemCore (itemCore: ItemCore) =
-        let iprod = 
-            this.encodeProduction itemCore.production
-        iprod,itemCore.dot
+    member this.encodeItemCore(itemCore: ItemCore) =
+        this.productions.[itemCore.production],itemCore.dot
+
+    member this.encodeKernel(kernel: Set<ItemCore>) =
+        kernel
+        |> Seq.map(this.encodeItemCore)
+        |> Seq.toList
+
+    member this.encodeKernels(kernels: Set<Set<ItemCore>>) =
+        kernels
+        |> List.ofSeq
+        |> List.map this.encodeKernel
 
     member encoder.encodeClosures(closures: Map<Set<ItemCore>,Map<ItemCore,Set<string>>>) =
         closures

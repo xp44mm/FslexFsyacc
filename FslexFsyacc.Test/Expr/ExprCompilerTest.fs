@@ -14,11 +14,11 @@ open FslexFsyacc.Runtime
 
 type ExprCompilerTest(output:ITestOutputHelper) =
 
-    [<Fact>]
-    member _.``01 - output closures details``() =
-        let theory = ExprParseTable.parser
-        let str = theory.collection()
-        output.WriteLine(str)
+    //[<Fact>]
+    //member _.``01 - output closures details``() =
+    //    let theory = ExprParseTable.parser
+    //    let str = theory.collection()
+    //    output.WriteLine(str)
 
     [<Fact>]
     member _.``02 - basis test``() =

@@ -20,6 +20,8 @@ type FlatFsyaccFile =
     /// 带有重复检查
     static member from (raw:RawFsyaccFile) =
         let rules = RuleSet.fromGroups raw.ruleGroups
+            
+        RuleSet.redundantDummies rules
 
         let operatorsLines =
             raw.operatorsLines
@@ -28,13 +30,6 @@ type FlatFsyaccFile =
                 assoc,operators)
 
         Symbol.duplOperators raw.operatorsLines
-
-        let operators = Symbol.getSymbols operatorsLines
-        let dummies = Operators.unusedDummies operators rules
-        if dummies.IsEmpty then
-            ()
-        else
-            failwith $"未使用的%%prec命名：{dummies}"
 
         let declarationsLines =
             raw.declarationsLines
@@ -61,7 +56,7 @@ type FlatFsyaccFile =
     member this.unusedReport() =
         let symbols = 
             this.rules
-            |> RuleSet.getSymbols
+            |> RuleSet.getUsedSymbols ""
 
         let usedRules, unusedRules =
             this.rules
@@ -71,7 +66,7 @@ type FlatFsyaccFile =
             usedRules
             |> Set.map(fun rule -> rule.production)
 
-        let grammar = Grammar.just usedProductions
+        let bnf = BNF.just usedProductions
 
         let usedDummies =
             usedRules
@@ -84,7 +79,7 @@ type FlatFsyaccFile =
             |> Set.unionMany
 
         let unusedOperators =
-            operators - grammar.terminals - usedDummies
+            operators - bnf.terminals - usedDummies
 
         let unusedDummies =
             usedDummies - operators
@@ -96,7 +91,7 @@ type FlatFsyaccFile =
 
         // unused operators (usedProductions, dummy)
         let unusedTypeDecls =
-            typeDecls - grammar.symbols
+            typeDecls - bnf.symbols
         [
             "# unused report"
             "## unused rules"
@@ -135,3 +130,4 @@ type FlatFsyaccFile =
             Precedence.from this.operatorsLines
 
         YaccRow.from( productions, dummyTokens, precedences )
+

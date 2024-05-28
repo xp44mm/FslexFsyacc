@@ -2,134 +2,99 @@
 
 open System
 open FSharp.Idioms
+open FSharp.Idioms.Literal
 
-///// without getTag, getLexeme
-//type BaseParser =
-//    {
-//        rules: Map<int,string list*(obj list->obj)>
-//        actions: Map<int,Map<string,int>>
-//        closures: (string list*int*string list)list list
-//    }
+/// without getTag, getLexeme
+type BaseParser =
+    {
+        rules: Map<int,string list*(obj list->obj)>
+        actions: Map<int,Map<string,int>>
+    }
 
-//    static member create(
-//        rules: (string list*(obj list->obj))list,
-//        actions: (string*int)list list,
-//        closures: (int*int*string list)list list
-//        ) =
-//        let augmentProduction = fst rules.Head
-//        if augmentProduction.Head > "" then 
-//            raise <| ArgumentException("augment rule Set")
+    static member create(
+        rules: (string list*(obj list->obj))list,
+        actions: (string*int)list list
+        ) =
+        let augmentProduction = fst rules.Head
+        if augmentProduction.Head > "" then
+            raise <| ArgumentException("augment rule Set")
 
-//        // code -> production * reducer
-//        let rules: Map<int,string list*(obj list->obj)> =
-//            rules
-//            //|> List.sortBy fst
-//            |> List.mapi(fun i entry -> -i, entry)
-//            |> Map.ofList
+        // code -> production * reducer
+        let rules =
+            rules
+            |> List.mapi(fun i entry -> -i, entry)
+            |> Map.ofList
 
-//        /// state -> lookahead -> action
-//        let actions:Map<int,Map<string,int>> =
-//            actions
-//            |> List.mapi(fun src pairs ->
-//                let mp = Map.ofList pairs
-//                src,mp)
-//            |> Map.ofList
+        /// state -> lookahead -> action
+        let actions =
+            actions
+            |> List.mapi(fun src pairs ->
+                let mp = Map.ofList pairs
+                src,mp)
+            |> Map.ofList
 
-//        let closures =
-//            closures
-//            |> List.map(fun closure ->
-//                closure
-//                |> List.map(fun(prod,dot,las) ->
-//                    let prod = fst rules.[prod]
-//                    prod,dot,las
-//                )
-//            )
+        {
+            rules = rules
+            actions = actions
+        }
 
-//        {
-//            rules = rules
-//            actions = actions
-//            closures = closures
-//        }
+    member this.getNextStates(getTag: 'tok -> string, getLexeme: 'tok -> obj) =
+        let rules = this.rules
+        let actions = this.actions
+        fun (states: list<int*obj>) (maybeToken: 'tok option) ->
+            let sm = fst states.Head
+            let lookaheads =
+                if actions.ContainsKey sm then
+                    actions.[sm]
+                else
+                    failwith $"栈内未知状态"
 
-//    ///状态的闭包
-//    /// for state in [0..len-1]
-//    member this.getClosure(state) = this.closures.[state]
+            let ai, lexeme =
+                match maybeToken with
+                | None -> "",null
+                | Some token ->
+                    let ai = getTag token
+                    let lexeme = getLexeme token
+                    ai,lexeme
 
-//    ///状态的符号：todo:符号的别名，例如 uminus
-//    member this.getStateSymbolPairs() =
-//        this.closures 
-//        |> List.map(fun closure ->
-//            match
-//                closure
-//                |> Seq.find(fun (prod,dot,_) -> 
-//                    // kernel
-//                    List.head prod = "" || dot > 0)
-//            with prod,dot,_ ->
-//                prod.[dot]
-//        )
+            if not(lookaheads.ContainsKey ai) then
+                let states = states |> List.map fst
+                failwith $"未知的向前看符号:{ai},{stringify states}"
 
-//    /// print state
-//    member this.collection() =
-//        let symbols = this.getStateSymbolPairs()
+            let i = lookaheads.[ai]
+            Console.WriteLine($"{i}")
 
-//        this.closures
-//        |> List.mapi(fun i cls ->
-//            let symbol =
-//                symbols.[i]
-//                |> RenderUtils.renderSymbol
+            if i = 0 then
+                if ai = "" then
+                    states // 接受最后一步不压入栈
+                else
+                    failwith "应该不是接受状态"
 
-//            let ls =
-//                RenderUtils.renderClosure cls
-//                |> Line.indentCodeBlock 4
-//            $"state {i} {symbol} :\r\n{ls}"
-//        )
-//        |> String.concat "\r\n"
+            elif i > 0 then //shift
+                (i,lexeme) :: states
+            else // reduce
+                //产生式符号列表。比如产生式 e-> e + e 的符号列表为 [e;e;+;e]
+                let symbols,reducer = rules.[i]
+                let leftside = symbols.[0]
+                // 产生式右侧的长度
+                let len = symbols.Length-1
+                // 弹出产生式体符号对应的状态
+                let children, restStates =
+                    states
+                    |> List.advance len
 
-//    /// theory method: token抽象成字符串
-//    member this.tryNextAction(states: (int*obj)list, ai:string) =
-//        let actions = this.actions
-//        let sm,_ = states.Head
-//        if actions.ContainsKey sm && actions.[sm].ContainsKey ai then
-//            Some actions.[sm].[ai]
-//        else
-//            None
+                // 产生式头的数据
+                let lexeme =
+                    children
+                    |> List.map snd
+                    |> reducer
 
-//    member this.next<'tok>(
-//        getTag: 'tok -> string,
-//        getLexeme: 'tok->obj,
-//        states: (int*obj) list,
-//        token:'tok
-//        ) =
-//        let rules = this.rules
-//        let actions = this.actions
-
-//        this.tryNextAction(states, getTag token)
-//        |> Option.map(fun i ->
-//            match i with
-//            | _ when ParserTableAction.isStateOfShift i ->
-//                let pushedStates = ParserTableAction.shift(getLexeme,states,token,i)
-//                i,pushedStates
-//            | _ when ParserTableAction.isRuleOfReduce i ->
-//                let pushedStates = ParserTableAction.reduce(rules,actions,states,i)
-//                i,pushedStates
-//            | _ ->
-//                i,states
-//        )
-
-//    // accept, done, final
-//    member this.complete(states:(int*obj) list) =
-//        let rules = this.rules
-//        let actions = this.actions
-//        this.tryNextAction(states,"")
-//        |> Option.map(fun i -> // i is action's code. shift nextstate or reduce rule.
-//            match i with
-//            | _ when ParserTableAction.isStateOfShift i ->
-//                failwith $"no more shift."
-//            | _ when ParserTableAction.isRuleOfReduce i ->
-//                let pushedStates = ParserTableAction.reduce(rules,actions,states,i)
-//                i,pushedStates
-//            | _ ->
-//                i,states
-//        )
+                // 剩下状态栈最顶部的状态编号
+                let smr = fst restStates.Head // = s_{m-r}
+                // 根据顶部状态，产生式左侧，得到新状态
+                let newstate = actions.[smr].[leftside] // GOTO
+                // 压入新状态
+                (newstate,lexeme) :: restStates
+            |> Pair.prepend i
 
 

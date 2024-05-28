@@ -19,6 +19,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="RenderUtils.fs" />
     <Compile Include="Lex\RegularExpression.fs" />
     <Compile Include="Lex\RegularNFA.fs" />
     <Compile Include="Lex\PatternNFA.fs" />
@@ -42,6 +43,7 @@
     <Compile Include="ItemCores\ItemCoreRow.fs" />
     <Compile Include="ItemCores\ItemCoreRowUtils.fs" />
     <Compile Include="ItemCores\ItemCore.fs" />
+    <Compile Include="ItemCores\DummyToken.fs" />
     
     <Compile Include="Grammars\ProductionUtils.fs" />
     <Compile Include="Grammars\NullableUtils.fs" />
@@ -55,7 +57,6 @@
     <Compile Include="Precedences\Associativity.fs" />
     <Compile Include="Precedences\Precedence.fs" />
     <Compile Include="Precedences\ParseTableAction.fs" />
-    <Compile Include="Precedences\ParserTableAction.fs" />
     <Compile Include="Precedences\Conflict.fs" />
 
     <Compile Include="BNFs\LALR.fs" />
@@ -68,6 +69,7 @@
     <Compile Include="BNFs\BNF.fs" />
     <Compile Include="YACCs\Declaration.fs" />
     <Compile Include="YACCs\ParseTableEncoder.fs" />
+    <Compile Include="YACCs\ParseTableDecoder.fs" />
     <Compile Include="YACCs\YaccRow.fs" />
     <Compile Include="YACCs\YaccRowUtils.fs" />
     <Compile Include="YACCs\Yacc.fs" />
@@ -76,16 +78,19 @@
     <Compile Include="YACCs\RawFsyaccFile.fs" />
     <Compile Include="YACCs\Rule.fs" />
     <Compile Include="YACCs\RuleSet.fs" />
+    <Compile Include="YACCs\ConflictedProduction.fs" />
     <Compile Include="YACCs\Operators.fs" />
     <Compile Include="YACCs\Symbol.fs" />
     <Compile Include="YACCs\FlatFsyaccFile.fs" />
     <Compile Include="Position.fs" />
-    <Compile Include="RenderUtils.fs" />
     <Compile Include="AnalyzerUtils.fs" />
     <Compile Include="Analyzer.fs" />
-    <Compile Include="TokenParser.fs" />
-    <Compile Include="CreditParser.fs" />
     <Compile Include="BaseParser.fs" />
+    <Compile Include="MoreParser.fs" />
+    <Compile Include="ParserTableAction.fs" />
+    <Compile Include="TokenParser.fs" />
+    <Compile Include="BaseParseTable.fs" />
+    <Compile Include="CreditParser.fs" />
     <Compile Include="Parser.fs" />
   </ItemGroup>
 

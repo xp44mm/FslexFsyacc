@@ -22,3 +22,4 @@ type ParseTableAction =
         | Shift k ->
             k
             |> Set.map(fun ic -> ic.production)
+

@@ -6,6 +6,8 @@ open FSharp.Idioms.Literal
 
 open FslexFsyacc.Runtime
 open FslexFsyacc.Runtime.YACCs
+open FslexFsyacc.Runtime.BNFs
+open FslexFsyacc.Runtime.ItemCores
 
 /// 表示*.fsyacc生成的模块。
 type FsyaccParseTableFile =
@@ -13,7 +15,8 @@ type FsyaccParseTableFile =
         header: string
         rules: (string list*string)list // rename to reducers
         tokens: Set<string>
-        actions: (string*int)list list
+        kernels: list<list<int*int>> // Set<Set<ItemCore>>
+        actions: (string*int)list list // kernel -> symbol -> kernel
         closures: (int*int*string list)list list
         declarations: Map<string,string> // symbol -> type of symbol
     }
@@ -24,14 +27,20 @@ type FsyaccParseTableFile =
             |> Set.map(fun rule -> rule.production,rule.reducer)
             |> Set.toList
 
-        let tbl = fsyacc.getYacc()
+        let yacc = fsyacc.getYacc()
+        let bnf = yacc.bnf
+        let encoder = ParseTableEncoder.from(bnf.productions,bnf.kernels)
+
+        let kernels = encoder.encodeKernels bnf.kernels
+        let actions = encoder.encodeActions yacc.actions
 
         id<FsyaccParseTableFile> {
             header = fsyacc.header
-            tokens = tbl.bnf.terminals
             rules = rules
-            actions = tbl.encodeActions
-            closures = tbl.encodeClosures
+            tokens = yacc.bnf.terminals
+            kernels = kernels
+            actions = actions
+            closures = yacc.encodeClosures
             declarations = fsyacc.declarationsLines |> Declaration.types
         }
 
@@ -48,7 +57,6 @@ type FsyaccParseTableFile =
         // code -> production * reducer
         let rules =
             this.rules
-            //|> List.sortBy fst
             |> List.mapi(fun i entry -> -i, entry)
             |> Map.ofList
 

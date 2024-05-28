@@ -71,12 +71,8 @@ type YaccRow =
                 x
             )
 
-        let encoder =
-            {
-                productions =
-                    ParseTableEncoder.getProductions bnf.grammar.productions
-                kernels = bnf.kernels |> Seq.mapi(fun i k -> k,i) |> Map.ofSeq
-            } : ParseTableEncoder
+        let encoder = ParseTableEncoder.from(productions, bnf.kernels)
+
         let encodeActions = encoder.encodeActions actions
 
         let encodeClosures = encoder.encodeClosures resolvedClosures
