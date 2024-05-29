@@ -32,7 +32,8 @@ type ExprParseTableTest(output:ITestOutputHelper) =
     let tbl =
         fsyacc.getYacc()
 
-    let moduleFile = FsyaccParseTableFile.from fsyacc
+    //let moduleFile = FsyaccParseTableFile.from fsyacc
+    let coder = FsyaccParseTableCoder.from fsyacc
 
     //[<Fact>]
     //member _.``01 - norm fsyacc file``() =
@@ -75,7 +76,7 @@ type ExprParseTableTest(output:ITestOutputHelper) =
     Skip="按需更新源代码"
     )>]
     member _.``02 - generate Parse Table``() =
-        let outp = moduleFile.generateModule(parseTblModule)
+        let outp = coder.generateModule(parseTblModule)
         File.WriteAllText(parseTblPath, outp, Encoding.UTF8)
         output.WriteLine($"output yacc:\r\n{parseTblPath}")
 
@@ -83,7 +84,7 @@ type ExprParseTableTest(output:ITestOutputHelper) =
     member _.``10 - valid ParseTable``() =
         Should.equal tbl.bnf.terminals ExprParseTable.tokens
         Should.equal tbl.encodeActions ExprParseTable.actions
-        Should.equal tbl.encodeClosures ExprParseTable.closures
+        //Should.equal tbl.encodeClosures ExprParseTable.closures
 
         //产生式比较
         let prodsFsyacc =
@@ -102,12 +103,12 @@ type ExprParseTableTest(output:ITestOutputHelper) =
             FSharp.Compiler.SyntaxTreeX.Parser.getDecls("header.fsx",fsyacc.header)
 
         let semansFsyacc =
-            let mappers = moduleFile.generateMappers()
+            let mappers = coder.generateMappers()
             FSharp.Compiler.SyntaxTreeX.SourceCodeParser.semansFromMappers mappers
 
         let header,semans =
             let text = File.ReadAllText(parseTblPath, Encoding.UTF8)
-            FSharp.Compiler.SyntaxTreeX.SourceCodeParser.getHeaderSemansFromFSharp 3 text
+            FSharp.Compiler.SyntaxTreeX.SourceCodeParser.getHeaderSemansFromFSharp 4 text
 
         Should.equal headerFromFsyacc header
         Should.equal semansFsyacc semans

@@ -55,6 +55,7 @@
 		<Compile Include="Fsyacc\RawFsyaccFileUtils.fs" />
 		<Compile Include="Fsyacc\ReducerGenerator.fs" />
 		<Compile Include="Fsyacc\FsyaccParseTableFile.fs" />
+		<Compile Include="Fsyacc\FsyaccParseTableCoder.fs" />
 		<Compile Include="Fsyacc\FsyaccParseTableFileUtils.fs" />
 		<Compile Include="Fsyacc\FlatRulesUtils.fs" />
 		<Compile Include="Fsyacc\AugmentRulesUtils.fs" />

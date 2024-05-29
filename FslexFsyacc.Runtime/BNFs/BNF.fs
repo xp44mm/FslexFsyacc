@@ -20,6 +20,11 @@ type BNF =
     member this.kernels =
         let row = BNFRowUtils.getRow this.productions
         row.kernels
+
+    member this.kernelSymbols =
+        let row = BNFRowUtils.getRow this.productions
+        row.kernelSymbols
+
     /// to be removed
     member this.closures =
         let row = BNFRowUtils.getRow this.productions
@@ -97,4 +102,3 @@ type BNF =
         yield! act.getProductions()
         ]
         |> Set.ofList
-        //|> Precedence.precedenceOfProductions bnf.terminals

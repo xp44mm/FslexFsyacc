@@ -54,8 +54,8 @@ type ExprCompilerTest(output:ITestOutputHelper) =
     [<Fact>]
     member _.``11 - state symbol pair test``() =
         let symbols = 
-            ExprParseTable.parser.getStateSymbolPairs()
-            |> List.mapi Pair.ofApp
+            ExprCompiler.table.kernelSymbols
+            |> Map.toList
 
         //output.WriteLine(stringify symbols)
         let mp = [

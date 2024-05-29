@@ -15,6 +15,8 @@ type BNFRow =
     /// (kernel:Set<ItemCore>)
     kernels: Set<Set<ItemCore>>
 
+    kernelSymbols: Map<Set<ItemCore>,string>
+
     // kernel -> closure
     closures: Map<Set<ItemCore>,Set<ItemCore*Set<string>>> 
 
@@ -36,6 +38,11 @@ type BNFRow =
             collection
             |> Set.map(fun lalr -> SLR.from(lalr).items)
 
+        let kernelSymbols =
+            kernels
+            |> Seq.map(fun kernel -> kernel, SLR.just(kernel).getSymbol())
+            |> Map.ofSeq
+            
         let toclosure = Grammar.kernelToClosure grammar
 
         let closures = 
@@ -61,6 +68,7 @@ type BNFRow =
         productions = productions
         grammar = grammar
         kernels = kernels
+        kernelSymbols = kernelSymbols
         closures = closures
         actions = actions
         conflictedItemCores = conflictedItemCores

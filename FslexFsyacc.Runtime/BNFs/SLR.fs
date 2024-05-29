@@ -20,13 +20,15 @@ type SLR =
         |> SLR.just
 
     /// 获取一个kernel/closure的Symbol
-    member this.getSymbol() = // dummies:Map<string list,string>
+    member this.getSymbol() =
         let itemCore = 
             this.items
-            //|> Seq.map fst
             |> Seq.find (fun itemCore -> itemCore.isKernel )
         // 如果前一个符号是产生式的lastTerm
-        itemCore.prevSymbol
+        if itemCore.production.Head = "" && itemCore.dot = 0 then
+            ""
+        else
+            itemCore.prevSymbol
 
     member this.toActions () =
         let reduces,shifts =

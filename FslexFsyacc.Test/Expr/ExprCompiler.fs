@@ -10,19 +10,8 @@ open FslexFsyacc.Runtime
 
 open FslexFsyacc.Expr.ExprParseTable
 
-//let stateSymbolPairs = parser.getStateSymbolPairs()
-
-let getParser<'tok> getTag getLexeme =
-    let getTag (tok:'tok) =
-        let tag = getTag tok
-        if tokens.Contains tag then
-            tag
-        else raise (invalidArg "tok" $"{tag}")
-    FslexFsyacc.Runtime.MoreParser<'tok>.from(rules, actions, getTag, getLexeme)
-
-let parser = getParser< Position<ExprToken> >
-                ExprToken.getTag
-                ExprToken.getLexeme
+let parser = app.getParser< Position<ExprToken> >(ExprToken.getTag,ExprToken.getLexeme)
+let table = app.getTable parser
 
 let parse(tokens:seq<Position<ExprToken>>) =
     tokens
@@ -42,9 +31,6 @@ let compile (txt:string) =
     |> ExprToken.tokenize 0
     |> Seq.map(fun tok ->
         tokens <- tok::tokens
-        //let tag = ExprToken.getTag tok
-        //if ExprParseTable.tokens.Contains tag = false then
-        //    failwith $"{tag} not in {ExprParseTable.tokens}"
         tok
     )
     |> Seq.iter(fun tok ->

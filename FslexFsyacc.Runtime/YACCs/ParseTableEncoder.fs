@@ -59,6 +59,11 @@ type ParseTableEncoder =
         |> List.ofSeq
         |> List.map this.encodeKernel
 
+    //member _.encodeKernelSymbols(kernelSymbols: Map<Set<ItemCore>,string>) =
+    //    kernelSymbols
+    //    |> Map.values
+    //    |> Seq.toList
+
     member encoder.encodeClosures(closures: Map<Set<ItemCore>,Map<ItemCore,Set<string>>>) =
         closures
         |> Seq.mapi(fun i (KeyValue(kernel,itemCores)) -> 

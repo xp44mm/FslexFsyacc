@@ -87,11 +87,13 @@
     <Compile Include="Analyzer.fs" />
     <Compile Include="BaseParser.fs" />
     <Compile Include="MoreParser.fs" />
+    <Compile Include="DecompressedParseTable.fs" />
     <Compile Include="ParserTableAction.fs" />
     <Compile Include="TokenParser.fs" />
     <Compile Include="BaseParseTable.fs" />
     <Compile Include="CreditParser.fs" />
     <Compile Include="Parser.fs" />
+    <Compile Include="ParseTableApp.fs" />
   </ItemGroup>
 
   <ItemGroup>
