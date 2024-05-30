@@ -6,7 +6,9 @@ open FSharp.xUnit
 open FslexFsyacc
 open FslexFsyacc.Fsyacc
 open FslexFsyacc.Runtime
+open FslexFsyacc.Runtime.Precedences
 open FslexFsyacc.Runtime.YACCs
+
 open FslexFsyacc.Yacc
 open System.IO
 open System.Text
@@ -29,11 +31,12 @@ type ExprParseTableTest(output:ITestOutputHelper) =
         rawFsyacc
         |> FslexFsyacc.Runtime.YACCs.FlatFsyaccFile.from
 
+    let coder = FsyaccParseTableCoder.from fsyacc
+
     let tbl =
         fsyacc.getYacc()
 
     let bnf = tbl.bnf
-    let coder = FsyaccParseTableCoder.from fsyacc
 
     //[<Fact>]
     //member _.``01 - norm fsyacc file``() =
@@ -51,26 +54,15 @@ type ExprParseTableTest(output:ITestOutputHelper) =
     //    output.WriteLine(src)
 
     [<Fact>]
-    member _.``00 - print rules``() =
-        for r in rawFsyacc.ruleGroups do
-        output.WriteLine($"{stringify r}")
-
-    [<Fact>]
-    member _.``01 - print resolvedClosures``() =
-        output.WriteLine($"{stringify tbl.resolvedClosures}")
-
-    [<Fact>]
     member _.``02 - print conflict``() =
-        let bnf = tbl.bnf
         for acts in bnf.getProperConflictActions() do
         output.WriteLine($"{stringify acts}")
 
     [<Fact>]
     member _.``02 - print conflict productions``() =
-        let bnf = tbl.bnf
-        let productions = bnf.getConflictedProductions()
-        for prod in productions do
-        output.WriteLine($"{stringify prod}")
+        let st = ConflictedProduction.from fsyacc.rules
+        for cp in st do
+        output.WriteLine($"{stringify cp}")
 
     [<Fact(
     Skip="按需更新源代码"

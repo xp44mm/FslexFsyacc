@@ -43,17 +43,6 @@ type DecompressedParseTable =
             |> List.mapi(fun i s -> i,s)
             |> Map.ofList
 
-            //|> Map.map(fun index itemcores ->
-            //    let ic = Seq.head itemcores
-            //    if index = 0 then
-            //        if itemcores.Count = 1 && ic.production.Head = "" && ic.dot = 0 then
-            //            ""
-            //        else 
-            //            failwith $"开始状态有误：{index},{stringify itemcores}"
-            //    else
-            //        ic.prevSymbol
-            //)
-
         /// 具体数据编码成整数的表
         let decodeAction (iaction:int) =
             if iaction > 0 then

@@ -41,11 +41,10 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
         rawFsyacc
         |> FslexFsyacc.Runtime.YACCs.FlatFsyaccFile.from
 
+    let coder = FsyaccParseTableCoder.from fsyacc
+
     let tbl =
         fsyacc.getYacc()
-
-    //let moduleFile = FsyaccParseTableFile.from fsyacc
-    let coder = FsyaccParseTableCoder.from fsyacc
 
     //[<Fact>]
     //member _.``01 - norm fsyacc file``() =
@@ -62,6 +61,13 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
 
     //    output.WriteLine(src)
 
+    [<Fact>]
+    member _.``02 - print conflict productions``() =
+        let st = ConflictedProduction.from fsyacc.rules
+        if st.IsEmpty then
+            output.WriteLine("no conflict")
+        for cp in st do
+        output.WriteLine($"{stringify cp}")
 
     [<Fact(
     Skip="按需更新源代码"
@@ -75,7 +81,7 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
     [<Fact>]
     member _.``10 - valid ParseTable``() =
         Should.equal coder.tokens FsyaccParseTable.tokens
-        //Should.equal coder.kernels FsyaccParseTable1.kernels
+        Should.equal coder.kernels FsyaccParseTable.kernels
         Should.equal coder.actions FsyaccParseTable.actions
 
         //产生式比较

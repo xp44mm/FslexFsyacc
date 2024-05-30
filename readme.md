@@ -1,4 +1,4 @@
-# FslexFsyacc & Runtime
+ï»¿# FslexFsyacc & Runtime
 
 Tools and Runtime for Fslex/Fsyacc analyzer/parser generation tools.
 
@@ -7,9 +7,9 @@ Fslex is a code generator that uses regular expression syntax as a rule to gener
 Fsyacc is a code generator that use BNF productions and precedences as a rule to generate a function, which resolves the input token sequence to an abstract syntax tree.
 
 
-ÓÃ³ÉÊìµÄÕıÔò±í´ïÊ½£¬BNFÓï·¨¡£
+ç”¨æˆç†Ÿçš„æ­£åˆ™è¡¨è¾¾å¼ï¼ŒBNFè¯­æ³•ã€‚
 
-¿ÉÒÔÎŞÏŞÇ¶Ì×BNFºÍÕıÔò±í´ïÊ½¡£ÕâÑù£¬¿ÉÒÔ½«Ò»¸ö´óµÄBNFÄ£¿é»¯¶à¸öĞ¡BNF£¬ºÃ´¦ÓĞ½µµÍÓï·¨ÄÑ¶È£¬Ôö¼ÓÁË¿É¶ÁĞÔ£¬¼õÉÙ¼ÇÒäÁ¿¡£Óï·¨ÎÄ¼şÇåÎú£¬¼¸ºõ¿ÉÒÔÖ±½Ó×÷Îª°ïÖúÎÄµµ¡£±ÜÃâĞí¶àÊÖĞ´´úÂë¡£
+å¯ä»¥æ— é™åµŒå¥—BNFå’Œæ­£åˆ™è¡¨è¾¾å¼ã€‚è¿™æ ·ï¼Œå¯ä»¥å°†ä¸€ä¸ªå¤§çš„BNFæ¨¡å—åŒ–å¤šä¸ªå°BNFï¼Œå¥½å¤„æœ‰é™ä½è¯­æ³•éš¾åº¦ï¼Œå¢åŠ äº†å¯è¯»æ€§ï¼Œå‡å°‘è®°å¿†é‡ã€‚è¯­æ³•æ–‡ä»¶æ¸…æ™°ï¼Œå‡ ä¹å¯ä»¥ç›´æ¥ä½œä¸ºå¸®åŠ©æ–‡æ¡£ã€‚é¿å…è®¸å¤šæ‰‹å†™ä»£ç ã€‚
 
 ## Fsyacc Example
 

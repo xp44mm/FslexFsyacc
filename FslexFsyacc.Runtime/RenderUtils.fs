@@ -18,7 +18,9 @@ let renderProduction (symbols:string list) =
     let symbols =
         symbols
         |> List.map renderSymbol
-    let body = symbols.Tail |> String.concat " "
+    let body = 
+        symbols.Tail 
+        |> String.concat " "
     $"{symbols.Head} : {body}"
 
 let renderItemCore (prod:string list) (dot:int) =

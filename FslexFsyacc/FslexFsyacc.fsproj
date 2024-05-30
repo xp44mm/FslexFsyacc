@@ -14,7 +14,7 @@
 		<PackageReleaseNotes>update idioms</PackageReleaseNotes>
 		<Company>34696643@qq.com</Company>
 		<Authors>xp44m</Authors>
-		<Version>1.3.18</Version>
+		<Version>1.4.0</Version>
 		<IsPublishable>True</IsPublishable>
 		<PackageReadmeFile>readme.md</PackageReadmeFile>
 	</PropertyGroup>

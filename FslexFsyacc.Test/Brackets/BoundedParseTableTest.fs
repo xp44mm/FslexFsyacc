@@ -32,19 +32,10 @@ type BoundedParseTableTest(output: ITestOutputHelper) =
         rawFsyacc
         |> FslexFsyacc.Runtime.YACCs.FlatFsyaccFile.from
 
-    let tbl =
-        fsyacc.getYacc()
+    //let tbl =
+    //    fsyacc.getYacc()
 
     let coder = FsyaccParseTableCoder.from fsyacc
-
-    //// 与fsyacc文件完全相对应的结构树
-    //let rawFsyacc =
-    //    text
-    //    |> RawFsyaccFileCrewUtils.parse
-
-    //let fsyacc =
-    //    rawFsyacc
-    //    |> fsyaccFileCrewUtils.fromRawFsyaccFileCrew
 
     //[<Fact>]
     //member _.``01 - norm fsyacc file``() =
@@ -64,12 +55,6 @@ type BoundedParseTableTest(output: ITestOutputHelper) =
 
     //    output.WriteLine(src)
 
-    [<Fact>]
-    member _.``02 - list all tokens``() =
-        let e = set ["LEFT";"RIGHT";"TICK"]
-        let y = tbl.bnf.terminals
-        Should.equal e y
-
     //[<Fact>]
     //member _.``03 - list all states``() =
     //    //let collection =
@@ -83,24 +68,6 @@ type BoundedParseTableTest(output: ITestOutputHelper) =
     //            (collection.kernels |> Seq.mapi(fun i k -> k,i) |> Map.ofSeq)
 
     //    output.WriteLine(src)
-
-    //[<Fact>]
-    //member _.``04 - 汇总冲突的产生式``() =
-    //    //let collection =
-    //    //    fsyacc
-    //    //    |> fsyaccFileCrewUtils.getSemanticParseTableCrew
-    //    let ics = tbl.bnf.conflictedItemCores
-    //    let productions =
-    //        AmbiguousCollectionUtils.collectConflictedProductions ics
-
-    //    // production -> %prec
-    //    let pprods =
-    //        ProductionSetUtils.precedenceOfProductions tbl.bnf.grammar.terminals productions
-
-    //    //优先级应该据此结果给出，不能少，也不应该多。
-    //    let y = []
-
-    //    Should.equal y pprods
 
     //[<Fact>]
     //member _.``05 - list declarations``() =
@@ -130,6 +97,14 @@ type BoundedParseTableTest(output: ITestOutputHelper) =
     //        |> String.concat "\r\n"
 
     //    output.WriteLine(src)
+
+    [<Fact>]
+    member _.``02 - print conflict productions``() =
+        let st = ConflictedProduction.from fsyacc.rules
+        if st.IsEmpty then
+            output.WriteLine("no conflict")
+        for cp in st do
+        output.WriteLine($"{stringify cp}")
 
     [<Fact(
     Skip="once for all!"

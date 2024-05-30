@@ -19,10 +19,7 @@ type FslexParseTableTest(output: ITestOutputHelper) =
     let solutionPath =
         DirectoryInfo(
             __SOURCE_DIRECTORY__
-        )
-            .Parent
-            .Parent
-            .FullName
+        ) .Parent .Parent .FullName
 
     // module name
     let parseTblName = "FslexParseTable"
@@ -41,20 +38,11 @@ type FslexParseTableTest(output: ITestOutputHelper) =
         rawFsyacc
         |> FslexFsyacc.Runtime.YACCs.FlatFsyaccFile.from
 
-    let tbl =
-        fsyacc.getYacc()
-
     //let moduleFile = FsyaccParseTableFile.from fsyacc
     let coder = FsyaccParseTableCoder.from fsyacc
 
-    //let fsyaccCrew =
-    //    text
-    //    |> RawFsyaccFileCrewUtils.parse
-    //    |> FlatedFsyaccFileCrewUtils.fromRawFsyaccFileCrew
-
-    //let tblCrew =
-    //    fsyaccCrew
-    //    |> FlatedFsyaccFileCrewUtils.getSemanticParseTableCrew
+    let tbl =
+        fsyacc.getYacc()
 
     //[<Fact>]
     //member _.``01 - norm fsyacc file``() =
@@ -93,8 +81,6 @@ type FslexParseTableTest(output: ITestOutputHelper) =
             "]"
             "|" 
             ]
-
-        //let tokens = tblCrew.symbols - tblCrew.nonterminals
         Should.equal y tbl.bnf.terminals
 
     //[<Fact>]
@@ -107,24 +93,13 @@ type FslexParseTableTest(output: ITestOutputHelper) =
 
     //    output.WriteLine(text)
 
-    //[<Fact>]
-    //member _.``04 - 汇总冲突的产生式``() =
-    //    let productions = 
-    //        AmbiguousCollectionUtils.collectConflictedProductions tblCrew.conflictedItemCores
-
-    //    // production -> %prec
-    //    let pprods =
-    //        ProductionSetUtils.precedenceOfProductions tblCrew.terminals productions
-
-    //    //优先级应该据此结果给出，不能少，也不应该多。
-    //    let y =
-    //        [ [ "expr"; "expr"; "&"; "expr" ], "&"
-    //          [ "expr"; "expr"; "*"         ], "*"
-    //          [ "expr"; "expr"; "+"         ], "+"
-    //          [ "expr"; "expr"; "?"         ], "?"
-    //          [ "expr"; "expr"; "|"; "expr" ], "|" ]
-
-    //    Should.equal y pprods
+    [<Fact>]
+    member _.``02 - print conflict productions``() =
+        let st = ConflictedProduction.from fsyacc.rules
+        if st.IsEmpty then
+            output.WriteLine("no conflict")
+        for cp in st do
+        output.WriteLine($"{stringify cp}")
 
     //[<Fact>]
     //member _.``05 - list the type annotaitions``() =
