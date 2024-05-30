@@ -4,7 +4,7 @@ let kernels = [[0,0];[0,1;-4,1;-5,1;-6,1;-7,1];[-1,1];[-1,2;-4,1;-5,1;-6,1;-7,1]
 let kernelSymbols = ["";"expr";"(";"expr";")";"-";"expr";"NUMBER";"expr";"expr";"expr";"expr";"*";"+";"-";"/"]
 let actions = [["(",2;"-",5;"NUMBER",7;"expr",1];["",0;"*",12;"+",13;"-",14;"/",15];["(",2;"-",5;"NUMBER",7;"expr",3];[")",4;"*",12;"+",13;"-",14;"/",15];["",-1;")",-1;"*",-1;"+",-1;"-",-1;"/",-1];["(",2;"-",5;"NUMBER",7;"expr",6];["",-2;")",-2;"*",-2;"+",-2;"-",-2;"/",-2];["",-3;")",-3;"*",-3;"+",-3;"-",-3;"/",-3];["",-4;")",-4;"*",-4;"+",-4;"-",-4;"/",-4];["",-5;")",-5;"*",12;"+",-5;"-",-5;"/",15];["",-6;")",-6;"*",12;"+",-6;"-",-6;"/",15];["",-7;")",-7;"*",-7;"+",-7;"-",-7;"/",-7];["(",2;"-",5;"NUMBER",7;"expr",8];["(",2;"-",5;"NUMBER",7;"expr",9];["(",2;"-",5;"NUMBER",7;"expr",10];["(",2;"-",5;"NUMBER",7;"expr",11]]
 
-let rules: list<string list*(obj list->obj)> = [
+let rules : list<string list*(obj list->obj)> = [
     ["";"expr"], fun(ss:obj list)-> ss.[0]
     ["expr";"(";"expr";")"], fun(ss:obj list)->
         let s1 = unbox<float> ss.[1]
@@ -48,11 +48,10 @@ let rules: list<string list*(obj list->obj)> = [
 ]
 let unboxRoot =
     unbox<float>
-
-let app:FslexFsyacc.Runtime.ParseTableApp = {
-    tokens = tokens
-    kernels = kernels
+let app: FslexFsyacc.Runtime.ParseTableApp = {
+    tokens        = tokens
+    kernels       = kernels
     kernelSymbols = kernelSymbols
-    actions = actions
-    rules = rules
+    actions       = actions
+    rules         = rules
 }

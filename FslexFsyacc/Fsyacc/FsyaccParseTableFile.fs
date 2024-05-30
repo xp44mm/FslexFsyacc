@@ -111,15 +111,15 @@ type FsyaccParseTableFile =
             $"let actions = {stringify this.actions}"
             $"let closures = {stringify this.closures}"
             this.header
-            $"let rules:list<string list*(obj list->obj)> = ["
+            "let rules:list<string list*(obj list->obj)> = ["
             reducers |> Line.indentCodeBlock 4
             "]"
             "let unboxRoot ="
             $"    unbox<{this.declarations.[this.startSymbol]}>"
-            "let parser = FslexFsyacc.Runtime.TokenParser.create(rules, tokens, actions, closures)"
-            "let stateSymbolPairs = parser.getStateSymbolPairs()"
-            "let getParser<'t> getTag getLexeme ="
-            "    FslexFsyacc.Runtime.CreditParser<'t>(rules, tokens, actions, closures, getTag, getLexeme)"
+            //"let parser = FslexFsyacc.Runtime.TokenParser.create(rules, tokens, actions, closures)"
+            //"let stateSymbolPairs = parser.getStateSymbolPairs()"
+            //"let getParser<'t> getTag getLexeme ="
+            //"    FslexFsyacc.Runtime.CreditParser<'t>(rules, tokens, actions, closures, getTag, getLexeme)"
         ]
         |> String.concat "\r\n"
 

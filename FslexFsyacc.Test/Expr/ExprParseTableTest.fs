@@ -73,7 +73,7 @@ type ExprParseTableTest(output:ITestOutputHelper) =
         output.WriteLine($"{stringify prod}")
 
     [<Fact(
-    Skip="按需更新源代码"
+    //Skip="按需更新源代码"
     )>]
     member _.``02 - generate Parse Table``() =
         let outp = coder.generateModule(parseTblModule)

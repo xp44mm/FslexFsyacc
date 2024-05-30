@@ -92,12 +92,20 @@ type FsyaccParseTableCoder =
 
             this.header
 
-            $"let rules: list<string list*(obj list->obj)> = ["
+            $"let rules : list<string list*(obj list->obj)> = ["
             reducers |> Line.indentCodeBlock 4
             "]"
 
             "let unboxRoot ="
             $"    unbox<{this.declarations.[this.startSymbol]}>"
+
+            "let app: FslexFsyacc.Runtime.ParseTableApp = {"
+            "    tokens        = tokens"
+            "    kernels       = kernels"
+            "    kernelSymbols = kernelSymbols"
+            "    actions       = actions"
+            "    rules         = rules"
+            "}"
 
         ]
         |> String.concat "\r\n"
