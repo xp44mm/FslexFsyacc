@@ -3,20 +3,17 @@
 open FslexFsyacc.Runtime
 open FslexFsyacc.Runtime.Lex
 
-//open FslexFsyacc.Fslex.
 open FSharp.Idioms.Literal
 open FslexFsyacc.Fslex
+
 let analyze (tokens:seq<Position<FslexToken>>) = 
     FslexDFA.analyzer.analyze(tokens,FslexTokenUtils.getTag)
 
-let parser = FslexParseTable.getParser<FslexToken Position> 
-                FslexTokenUtils.getTag 
-                FslexTokenUtils.getLexeme
+let parser = FslexParseTable.app.getParser<FslexToken Position>(
+                FslexTokenUtils.getTag,
+                FslexTokenUtils.getLexeme)
 
-let parse (tokens:seq<FslexToken Position>) =
-    tokens
-    |> parser.parse
-    |> FslexParseTable.unboxRoot
+let tbl = FslexParseTable.app.getTable parser
 
 /// 获取被使用的正则定义名称
 let getUsedNames
@@ -60,11 +57,11 @@ let compile (txt:string) =
         states <- parser.shift(states,lookahead)
     )
 
-    //match parser.tryReduce(states) with
-    //| Some x -> states <- x
-    //| None -> ()
+    match parser.tryReduce(states) with
+    | None -> ()
+    | Some x -> states <- x
 
-    match parser.accept states with
+    match states with
     | [1,lxm; 0,null] ->
         FslexParseTable.unboxRoot lxm
     | _ ->

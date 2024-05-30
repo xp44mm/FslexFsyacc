@@ -36,7 +36,6 @@ type FslexParseTableTest(output: ITestOutputHelper) =
     let rawFsyacc =
         text
         |> FsyaccCompiler.compile
-        //|> fun f -> f.migrate()
 
     let fsyacc =
         rawFsyacc
@@ -45,7 +44,8 @@ type FslexParseTableTest(output: ITestOutputHelper) =
     let tbl =
         fsyacc.getYacc()
 
-    let moduleFile = FsyaccParseTableFile.from fsyacc
+    //let moduleFile = FsyaccParseTableFile.from fsyacc
+    let coder = FsyaccParseTableCoder.from fsyacc
 
     //let fsyaccCrew =
     //    text
@@ -95,7 +95,7 @@ type FslexParseTableTest(output: ITestOutputHelper) =
             ]
 
         //let tokens = tblCrew.symbols - tblCrew.nonterminals
-        Should.equal y tbl.bnf.grammar.terminals
+        Should.equal y tbl.bnf.terminals
 
     //[<Fact>]
     //member _.``03 - list all states``() =       
@@ -156,15 +156,15 @@ type FslexParseTableTest(output: ITestOutputHelper) =
     Skip="按需更新源代码"
     )>]
     member _.``06 - generate ParseTable``() =
-        let outp = moduleFile.generateModule(parseTblModule)
+        let outp = coder.generateModule(parseTblModule)
         File.WriteAllText(parseTblPath, outp, Encoding.UTF8)
         output.WriteLine($"output yacc:\r\n{parseTblPath}")
 
     [<Fact>]
     member _.``07 - valid ParseTable``() =
-        Should.equal tbl.bnf.terminals  FslexParseTable.tokens
-        Should.equal tbl.encodeActions  FslexParseTable.actions
-        Should.equal tbl.encodeClosures FslexParseTable.closures
+        Should.equal coder.tokens FslexParseTable.tokens
+        Should.equal coder.kernels FslexParseTable.kernels
+        Should.equal coder.actions FslexParseTable.actions
 
         //产生式比较
         let prodsFsyacc =
@@ -183,12 +183,12 @@ type FslexParseTableTest(output: ITestOutputHelper) =
             FSharp.Compiler.SyntaxTreeX.Parser.getDecls("header.fsx",fsyacc.header)
 
         let semansFsyacc =
-            let mappers = moduleFile.generateMappers()
+            let mappers = coder.generateMappers()
             FSharp.Compiler.SyntaxTreeX.SourceCodeParser.semansFromMappers mappers
 
         let header,semans =
             let text = File.ReadAllText(parseTblPath, Encoding.UTF8)
-            FSharp.Compiler.SyntaxTreeX.SourceCodeParser.getHeaderSemansFromFSharp 3 text
+            FSharp.Compiler.SyntaxTreeX.SourceCodeParser.getHeaderSemansFromFSharp 4 text
 
         Should.equal headerFromFsyacc header
         Should.equal semansFsyacc semans

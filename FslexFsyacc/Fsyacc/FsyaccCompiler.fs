@@ -8,15 +8,11 @@ open FslexFsyacc.Runtime.Grammars
 open FSharp.Idioms.Literal
 open FslexFsyacc.Fsyacc
 
-let parser = FsyaccParseTable1.getParser<Position<FsyaccToken>>
-                FsyaccTokenUtils.getTag
-                FsyaccTokenUtils.getLexeme
+let parser = FsyaccParseTable.app.getParser<Position<FsyaccToken>>(
+                FsyaccTokenUtils.getTag,
+                FsyaccTokenUtils.getLexeme)
 
-let grammar = 
-    FsyaccParseTable1.rules
-    |> List.map fst
-    |> Set.ofList
-    |> Grammar.just
+let tbl = FsyaccParseTable.app.getTable parser
 
 /// 解析文本为结构化数据
 let compile (input:string) =
@@ -28,9 +24,6 @@ let compile (input:string) =
 
     |> Seq.map(fun tok ->
         tokens <- tok::tokens
-        let tag = FsyaccTokenUtils.getTag tok
-        if grammar.terminals.Contains tag = false then
-            failwith $"{tag} not in {grammar.terminals}"
         tok
     )
     |> Seq.iter(fun postok ->
@@ -40,9 +33,12 @@ let compile (input:string) =
 
         states <- parser.shift(states, postok)
     )
+    match parser.tryReduce(states) with
+    | None -> ()
+    | Some x -> states <- x
 
-    match parser.accept states with
+    match states with
     | [1,lxm; 0,null] ->
-        FsyaccParseTable1.unboxRoot lxm
+        FsyaccParseTable.unboxRoot lxm
     | _ ->
         failwith $"{stringify states}"

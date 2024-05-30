@@ -18,14 +18,14 @@ type ParseTableApp =
         MoreParser<'tok>.from(this.rules, this.actions, getTag, getLexeme)
 
     member this.getTable<'tok> (parser:MoreParser<'tok>) = 
-        FslexFsyacc.Runtime.DecompressedParseTable.decompress(
+        DecompressedParseTable.decompress(
             parser.baseParser.rules, 
             this.kernels, 
             this.kernelSymbols,
             parser.baseParser.actions
             )
 
-//let app:FslexFsyacc.Runtime.ParseTableApp = {
+//let app: ParseTableApp = {
 //    tokens = tokens
 //    kernels = kernels
 //    kernelSymbols = kernelSymbols

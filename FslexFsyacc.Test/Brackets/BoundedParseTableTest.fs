@@ -27,7 +27,6 @@ type BoundedParseTableTest(output: ITestOutputHelper) =
     let rawFsyacc =
         text
         |> FsyaccCompiler.compile
-        //|> fun f -> f.migrate()
 
     let fsyacc =
         rawFsyacc
@@ -36,7 +35,7 @@ type BoundedParseTableTest(output: ITestOutputHelper) =
     let tbl =
         fsyacc.getYacc()
 
-    let moduleFile = FsyaccParseTableFile.from fsyacc
+    let coder = FsyaccParseTableCoder.from fsyacc
 
     //// 与fsyacc文件完全相对应的结构树
     //let rawFsyacc =
@@ -136,15 +135,15 @@ type BoundedParseTableTest(output: ITestOutputHelper) =
     Skip="once for all!"
     )>]
     member _.``06 - generate ParseTable``() =
-        let outp = moduleFile.generateModule(parseTblModule)
+        let outp = coder.generateModule(parseTblModule)
         File.WriteAllText(parseTblPath, outp, Encoding.UTF8)
         output.WriteLine($"output yacc:\r\n{parseTblPath}")
 
     [<Fact>]
     member _.``07 - valid ParseTable``() =
-        //Should.equal tbl.bnf.terminals BoundedParseTable.tokens
-        Should.equal tbl.encodeActions  BoundedParseTable.actions
-        Should.equal tbl.encodeClosures BoundedParseTable.closures
+        Should.equal coder.tokens BoundedParseTable.tokens
+        Should.equal coder.kernels BoundedParseTable.kernels
+        Should.equal coder.actions BoundedParseTable.actions
 
         //产生式比较
         let prodsFsyacc =
@@ -163,12 +162,12 @@ type BoundedParseTableTest(output: ITestOutputHelper) =
             FSharp.Compiler.SyntaxTreeX.Parser.getDecls("header.fsx",fsyacc.header)
 
         let semansFsyacc =
-            let mappers = moduleFile.generateMappers()
+            let mappers = coder.generateMappers()
             FSharp.Compiler.SyntaxTreeX.SourceCodeParser.semansFromMappers mappers
 
         let header,semans =
             let text = File.ReadAllText(parseTblPath, Encoding.UTF8)
-            FSharp.Compiler.SyntaxTreeX.SourceCodeParser.getHeaderSemansFromFSharp 3 text
+            FSharp.Compiler.SyntaxTreeX.SourceCodeParser.getHeaderSemansFromFSharp 4 text
 
         Should.equal headerFromFsyacc header
         Should.equal semansFsyacc semans

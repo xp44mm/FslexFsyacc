@@ -70,7 +70,7 @@
 		<Compile Include="Fsyacc\FsyaccFileNameTest.fs" />
 		<Compile Include="Fsyacc\FsyaccFileRulesTest.fs" />
 		<Compile Include="Fsyacc\FsyaccTokenTest.fs" />
-		<Compile Include="Fsyacc\FsyaccParseTable1Test.fs" />
+		<Compile Include="Fsyacc\FsyaccParseTableTest.fs" />
 		<Compile Include="PolynomialExpressions\Polynomials.fs" />
 		<Compile Include="PolynomialExpressions\Tokenizer.fs" />
 		<Compile Include="PolynomialExpressions\TokenizerTest.fs" />
@@ -93,8 +93,6 @@
 		<Compile Include="G01Data.fs" />
 		<None Include="g02.fsyacc" />
 		<Compile Include="G02Test.fs" />
-		<Compile Include="BNF428Data.fs" />
-		<Compile Include="BNF428CrewTest.fs" />
 
 		<Compile Include="Program.fs" />
     

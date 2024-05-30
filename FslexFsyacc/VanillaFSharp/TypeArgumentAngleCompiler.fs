@@ -4,12 +4,14 @@ open FslexFsyacc.Runtime
 open FSharp.Idioms.Literal
 open FSharp.Idioms
 open System
+open System.Diagnostics
 
-let parser = BoundedParseTable.getParser<Position<TypeArgumentAngleToken>>
-                TypeArgumentAngleToken.getTag
+let parser = BoundedParseTable.app.getParser<Position<TypeArgumentAngleToken>>(
+                TypeArgumentAngleToken.getTag,
                 TypeArgumentAngleToken.getLexeme
+                )
 
-let symbols = BoundedParseTable.parser.getStateSymbolPairs()
+let tbl = BoundedParseTable.app.getTable parser
 
 let compile (offset) (input:string) =
     //let mutable tokens = []
@@ -20,7 +22,7 @@ let compile (offset) (input:string) =
     let ongoing () = 
         let rec loop expect actual =
             match expect, actual with
-            | he::te,(state,_)::ta when symbols.[state] = he ->
+            | he::te,(state,_)::ta when tbl.kernelSymbols.[state] = he ->
                 loop te ta
             | [],[0,null] -> false
             | _ -> true
@@ -46,14 +48,18 @@ let compile (offset) (input:string) =
         //Console.WriteLine(stringify states)
         states <- parser.shift(states,tok)
     )
-    match parser.accept states with
+    match parser.tryReduce(states) with
+    | None -> ()
+    | Some x -> states <- x
+
+    match states with
     | [1,lxm; 0,null] -> BoundedParseTable.unboxRoot lxm
     | _ -> failwith $"{stringify states}"
         
 let getRange (offset:int) (input:string) =
     match compile offset input with
     | FslexFsyacc.Brackets.Band.Bounded(i,_,j) ->
-        Diagnostics.Debug.Assert((i=offset))
+        Debug.Assert((i=offset))
         {
             index = i
             length = j-i+1

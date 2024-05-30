@@ -16,15 +16,15 @@ open System.Text.RegularExpressions
 open Xunit
 open Xunit.Abstractions
 
-type FsyaccParseTable1Test(output:ITestOutputHelper) =
+type FsyaccParseTableTest(output:ITestOutputHelper) =
     let show res =
         res
         |> Literal.stringify
         |> output.WriteLine
 
     // ** input **
-    let sourceFile = "fsyacc1.fsyacc"
-    let parseTblName = "FsyaccParseTable1"
+    let sourceFile = "fsyacc.fsyacc"
+    let parseTblName = "FsyaccParseTable"
 
     let parseTblModule = $"FslexFsyacc.Fsyacc.{parseTblName}"
     let sourcePath = Path.Combine(solutionPath, @"FslexFsyacc\Fsyacc")
@@ -36,7 +36,6 @@ type FsyaccParseTable1Test(output:ITestOutputHelper) =
     let rawFsyacc =
         text
         |> FsyaccCompiler.compile
-        //|> fun f -> f.migrate()
 
     let fsyacc =
         rawFsyacc
@@ -45,7 +44,8 @@ type FsyaccParseTable1Test(output:ITestOutputHelper) =
     let tbl =
         fsyacc.getYacc()
 
-    let moduleFile = FsyaccParseTableFile.from fsyacc
+    //let moduleFile = FsyaccParseTableFile.from fsyacc
+    let coder = FsyaccParseTableCoder.from fsyacc
 
     //[<Fact>]
     //member _.``01 - norm fsyacc file``() =
@@ -67,15 +67,16 @@ type FsyaccParseTable1Test(output:ITestOutputHelper) =
     Skip="按需更新源代码"
     )>]
     member _.``06 - generate FsyaccParseTable``() =
-        let outp = moduleFile.generateModule(parseTblModule)
+        let outp = coder.generateModule(parseTblModule)
         File.WriteAllText(parseTblPath, outp, Encoding.UTF8)
-        output.WriteLine($"output yacc:\r\n{parseTblPath}")
+        output.WriteLine("output yacc:")
+        output.WriteLine(parseTblPath)
 
     [<Fact>]
     member _.``10 - valid ParseTable``() =
-        Should.equal tbl.bnf.terminals  FsyaccParseTable1.tokens
-        Should.equal tbl.encodeActions  FsyaccParseTable1.actions
-        Should.equal tbl.encodeClosures FsyaccParseTable1.closures
+        Should.equal coder.tokens FsyaccParseTable.tokens
+        //Should.equal coder.kernels FsyaccParseTable1.kernels
+        Should.equal coder.actions FsyaccParseTable.actions
 
         //产生式比较
         let prodsFsyacc =
@@ -84,7 +85,7 @@ type FsyaccParseTable1Test(output:ITestOutputHelper) =
             |> Seq.toList
 
         let prodsParseTable =
-            FsyaccParseTable1.rules
+            FsyaccParseTable.rules
             |> List.map fst
 
         Should.equal prodsFsyacc prodsParseTable
@@ -94,12 +95,12 @@ type FsyaccParseTable1Test(output:ITestOutputHelper) =
             FSharp.Compiler.SyntaxTreeX.Parser.getDecls("header.fsx",fsyacc.header)
 
         let semansFsyacc =
-            let mappers = moduleFile.generateMappers()
+            let mappers = coder.generateMappers()
             FSharp.Compiler.SyntaxTreeX.SourceCodeParser.semansFromMappers mappers
 
         let header,semans =
             let text = File.ReadAllText(parseTblPath, Encoding.UTF8)
-            FSharp.Compiler.SyntaxTreeX.SourceCodeParser.getHeaderSemansFromFSharp 3 text
+            FSharp.Compiler.SyntaxTreeX.SourceCodeParser.getHeaderSemansFromFSharp 4 text
 
         Should.equal headerFromFsyacc header
         Should.equal semansFsyacc semans

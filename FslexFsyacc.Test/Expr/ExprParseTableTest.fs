@@ -32,7 +32,7 @@ type ExprParseTableTest(output:ITestOutputHelper) =
     let tbl =
         fsyacc.getYacc()
 
-    //let moduleFile = FsyaccParseTableFile.from fsyacc
+    let bnf = tbl.bnf
     let coder = FsyaccParseTableCoder.from fsyacc
 
     //[<Fact>]
@@ -73,7 +73,7 @@ type ExprParseTableTest(output:ITestOutputHelper) =
         output.WriteLine($"{stringify prod}")
 
     [<Fact(
-    //Skip="按需更新源代码"
+    Skip="按需更新源代码"
     )>]
     member _.``02 - generate Parse Table``() =
         let outp = coder.generateModule(parseTblModule)
@@ -82,9 +82,9 @@ type ExprParseTableTest(output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``10 - valid ParseTable``() =
-        Should.equal tbl.bnf.terminals ExprParseTable.tokens
-        Should.equal tbl.encodeActions ExprParseTable.actions
-        //Should.equal tbl.encodeClosures ExprParseTable.closures
+        Should.equal coder.tokens ExprParseTable.tokens
+        Should.equal coder.kernels ExprParseTable.kernels
+        Should.equal coder.actions ExprParseTable.actions
 
         //产生式比较
         let prodsFsyacc =

@@ -48,8 +48,8 @@
 		<Compile Include="Fsyacc\RegularSymbol.fs" />
 		<Compile Include="Fsyacc\RegularSymbolUtils.fs" />
 		<!--<Compile Include="Fsyacc\FlatedFsyaccFileCrews.fs" />-->
-		<None Include="Fsyacc\fsyacc1.fsyacc" />
-		<Compile Include="Fsyacc\FsyaccParseTable1.fs" />
+		<None Include="Fsyacc\fsyacc.fsyacc" />
+		<Compile Include="Fsyacc\FsyaccParseTable.fs" />
 		<Compile Include="Fsyacc\FsyaccCompiler.fs" />
 		<Compile Include="Fsyacc\RawFsyaccFileRender.fs" />
 		<Compile Include="Fsyacc\RawFsyaccFileUtils.fs" />
