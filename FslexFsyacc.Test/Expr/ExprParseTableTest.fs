@@ -9,7 +9,6 @@ open FslexFsyacc.Runtime
 open FslexFsyacc.Runtime.Precedences
 open FslexFsyacc.Runtime.YACCs
 
-open FslexFsyacc.Yacc
 open System.IO
 open System.Text
 open Xunit

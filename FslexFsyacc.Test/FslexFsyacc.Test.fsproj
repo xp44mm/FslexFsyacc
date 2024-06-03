@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
+		<TargetFramework>net8.0</TargetFramework>
 		<IsPackable>false</IsPackable>
 		<GenerateProgramFile>false</GenerateProgramFile>
 	</PropertyGroup>
@@ -36,6 +36,7 @@
 		<Compile Include="BNFs\BNF4_55Test.fs" />
 		<Compile Include="BNFs\BNF4_3Test.fs" />
 		<Compile Include="BNFs\BNF4_67Test.fs" />
+    
 		<Compile Include="YACCs\PrecedenceTest.fs" />
 		<Compile Include="YACCs\YaccRowTest.fs" />
 		<Compile Include="YACCs\EncodeActionsTest.fs" />
@@ -51,7 +52,8 @@
 		<Compile Include="Yacc\PrecedenceTest.fs" />
 		<Compile Include="Yacc\Section4_8_1Test.fs" />
 		<Compile Include="Yacc\Section4_8_2Test.fs" />
-		
+		<Compile Include="TypeArguments\TypeArgumentCompilerTest.fs" />
+    
 		<Compile Include="Brackets\BoundedParseTableTest.fs" />
 		
 		<Compile Include="VanillaFSharp\FSharpSourceTextTest.fs" />
@@ -114,6 +116,7 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\FSharp.Compiler.SyntaxTreeX\FSharp.Compiler.SyntaxTreeX.fsproj" />
+	  <ProjectReference Include="..\FslexFsyacc.Bootstrap\FslexFsyacc.Bootstrap.fsproj" />
 	  <ProjectReference Include="..\FslexFsyacc.Runtime\FslexFsyacc.Runtime.fsproj" />
 	  <ProjectReference Include="..\FslexFsyacc\FslexFsyacc.fsproj" />
 	</ItemGroup>

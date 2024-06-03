@@ -7,86 +7,84 @@ open System
 /// 相比BaseParser合并了一些步骤
 type MoreParser<'tok> =
     {
-    baseParser:BaseParser
-    getNextStates:list<int*obj> -> 'tok option -> int * list<int*obj>
+    baseParser: BaseParser
+    getNextState: list<int*obj> -> 'tok option -> NextState
     }
 
     static member from (
-        rules : (string list*(obj list->obj))list,
-        actions : (string*int)list list,
-        getTag : 'tok -> string,
-        getLexeme : 'tok -> obj
+        rules: (string list*(obj list->obj))list,
+        actions: (string*int)list list,
+        getTag: 'tok -> string,
+        getLexeme: 'tok -> obj
     ) =
         let baseParser = BaseParser.create(rules, actions)
         {
         baseParser = baseParser
-        getNextStates =baseParser.getNextStates(getTag,getLexeme)
+        getNextState = baseParser.getNextState(getTag,getLexeme)
         }
 
     /// 返回 shift token 执行完成后的状态
-    member this.shift(states: list<int*obj>, token:'tok) =
-        let maybeToken = Some token
+    member this.shift(states: list<int*obj>, token: 'tok) =
         let rec loop states =
-            let act, nextStates = this.getNextStates states maybeToken
-            if act > 0 then
-                nextStates
-            elif act < 0 then
-                loop nextStates
-            else
-                failwith "never accept in this case."
+            match this.getNextState states (Some token) with
+            | Shifted nextStates -> nextStates
+            | Reduced nextStates -> loop nextStates
+            | x -> failwith (stringify x)
         loop states
 
     /// 返回最后一次reduce完成的状态，None表示未改变
     member this.tryReduce(states: list<int*obj>, token:'tok) =
-        let maybeToken = Some token
         let rec loop times states =
-            let act, nextStates = this.getNextStates states maybeToken
-            if act < 0 then
-                loop (times+1) nextStates
-            elif act > 0 then
+            match this.getNextState states (Some token) with
+            | Reduced nextStates -> loop (times+1) nextStates
+            | Shifted _
+            //| Accepted nextStates
+                ->
                 if times > 0 then
                     Some states
                 else None
-            else
-                failwith "never accept in this case."
+            | x -> failwith (stringify x)
         loop 0 states
 
     /// 返回若干次reduce完成的状态，None表示未改变
     member this.tryReduce(states: list<int*obj>) =
         let rec loop times states =
-            let act, nextStates = this.getNextStates states None
-            if act < 0 then
-                loop (times+1) nextStates
-            elif act = 0 then
+            match this.getNextState states None with
+            | Reduced nextStates -> loop (times+1) nextStates
+            | Accepted ->
                 if times > 0 then
                     Some states
                 else None
-            else
-                failwith "never shift in this case."
+            | x -> failwith (stringify x)
+
         loop 0 states
 
-    [<System.Obsolete("示例用")>]
-    member this.isAccept(states: list<int*obj>) =
-        let act, _ = this.getNextStates states None
-        act = 0
+    member this.tryAccept(states: list<int*obj>) =
+        let rec loop states =
+            match this.getNextState states None with
+            | Reduced nextStates -> loop nextStates
+            | Accepted ->
+                match states with
+                | [1,lxm; 0,null] ->
+                    Some lxm
+                | _ ->
+                    None
+            | _ -> None
+        loop states
 
     /// 简单解析过程，一步到底
     member this.parse(tokens:seq<'tok>) =
         let iterator = Iterator tokens
 
         let rec loop (states: list<int*obj>) (maybeToken:'tok option) =
-            Console.WriteLine($"{stringify states},{stringify maybeToken}")
-            let act, nextStates = this.getNextStates states maybeToken
-            if act = 0 then
-                // accept
-                states
-            elif act < 0 then
-                // reduce
-                loop nextStates maybeToken
-            else
-                // shift next token
+            //Console.WriteLine($"{stringify states},{stringify maybeToken}")
+            match this.getNextState states maybeToken with
+            | Accepted -> states
+            | Reduced nextStates -> loop nextStates maybeToken
+            | Shifted nextStates ->
                 iterator.tryNext()
                 |> loop nextStates
+            | x -> failwith (stringify x)
 
         iterator.tryNext()
         |> loop [0,null] // init states

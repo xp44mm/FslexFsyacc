@@ -85,6 +85,7 @@
     <Compile Include="Position.fs" />
     <Compile Include="AnalyzerUtils.fs" />
     <Compile Include="Analyzer.fs" />
+    <Compile Include="NextState.fs" />
     <Compile Include="BaseParser.fs" />
     <Compile Include="MoreParser.fs" />
     <Compile Include="DecompressedParseTable.fs" />

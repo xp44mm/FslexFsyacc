@@ -11,6 +11,10 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "FslexFsyacc.Test", "FslexFs
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "FSharp.Compiler.SyntaxTreeX", "FSharp.Compiler.SyntaxTreeX\FSharp.Compiler.SyntaxTreeX.fsproj", "{C479040B-43DB-47C3-9D36-4F3F69B52689}"
 EndProject
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "FslexFsyacc.Bootstrap", "FslexFsyacc.Bootstrap\FslexFsyacc.Bootstrap.fsproj", "{D6FF67A0-B4C6-4195-A698-E678AD47FFF9}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FslexFsyacc.Generators", "FslexFsyacc.Generators\FslexFsyacc.Generators.fsproj", "{D037F91F-E8AF-4346-9648-3B7E99DCC22A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +37,14 @@ Global
 		{C479040B-43DB-47C3-9D36-4F3F69B52689}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C479040B-43DB-47C3-9D36-4F3F69B52689}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C479040B-43DB-47C3-9D36-4F3F69B52689}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D6FF67A0-B4C6-4195-A698-E678AD47FFF9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D6FF67A0-B4C6-4195-A698-E678AD47FFF9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D6FF67A0-B4C6-4195-A698-E678AD47FFF9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D6FF67A0-B4C6-4195-A698-E678AD47FFF9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D037F91F-E8AF-4346-9648-3B7E99DCC22A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D037F91F-E8AF-4346-9648-3B7E99DCC22A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D037F91F-E8AF-4346-9648-3B7E99DCC22A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D037F91F-E8AF-4346-9648-3B7E99DCC22A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

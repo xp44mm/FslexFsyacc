@@ -38,17 +38,15 @@ type BaseParser =
             actions = actions
         }
 
-    member this.getNextStates(getTag: 'tok -> string, getLexeme: 'tok -> obj) =
+    member this.getNextState<'tok>(getTag: 'tok -> string, getLexeme: 'tok -> obj) =
         let rules = this.rules
         let actions = this.actions
         fun (states: list<int*obj>) (maybeToken: 'tok option) ->
             let sm = fst states.Head
-            let lookaheads =
-                if actions.ContainsKey sm then
-                    actions.[sm]
-                else
-                    failwith $"栈内未知状态"
 
+            if not(actions.ContainsKey sm) then NoSource sm else
+
+            let lookaheads = actions.[sm]
             let ai, lexeme =
                 match maybeToken with
                 | None -> "",null
@@ -57,22 +55,17 @@ type BaseParser =
                     let lexeme = getLexeme token
                     ai,lexeme
 
-            if not(lookaheads.ContainsKey ai) then
-                let states = states |> List.map fst
-                failwith $"未知的向前看符号:{ai},{stringify states}"
+            if not(lookaheads.ContainsKey ai) then NoSymbol ai else
 
             let i = lookaheads.[ai]
-            Console.WriteLine($"{i}")
-
             if i = 0 then
                 if ai = "" then
-                    states // 接受最后一步不压入栈
+                    Accepted
                 else
-                    failwith "应该不是接受状态"
-
-            elif i > 0 then //shift
-                (i,lexeme) :: states
-            else // reduce
+                    NoZero ai
+            elif i > 0 then
+                Shifted((i,lexeme) :: states)
+            else
                 //产生式符号列表。比如产生式 e-> e + e 的符号列表为 [e;e;+;e]
                 let symbols,reducer = rules.[i]
                 let leftside = symbols.[0]
@@ -94,7 +87,6 @@ type BaseParser =
                 // 根据顶部状态，产生式左侧，得到新状态
                 let newstate = actions.[smr].[leftside] // GOTO
                 // 压入新状态
-                (newstate,lexeme) :: restStates
-            |> Pair.prepend i
+                Reduced((newstate,lexeme) :: restStates)
 
 
