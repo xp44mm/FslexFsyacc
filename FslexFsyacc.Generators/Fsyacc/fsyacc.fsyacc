@@ -1,6 +1,6 @@
 ﻿%{
-open FslexFsyacc.Runtime.Precedences
-open FslexFsyacc.Runtime.YACCs
+open FslexFsyacc.Precedences
+open FslexFsyacc.YACCs
 %}
 
 file :

@@ -1,4 +1,4 @@
-﻿module FslexFsyacc.Runtime.Lex.Partition
+﻿module FslexFsyacc.Lex.Partition
 
 open FSharp.Idioms
 

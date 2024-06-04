@@ -1,6 +1,6 @@
 ﻿module FslexFsyacc.TypeArguments.TypeArgumentCompiler
 
-open FslexFsyacc.Runtime
+open FslexFsyacc
 open FslexFsyacc.TypeArguments.TypeArgumentParseTable
 open FSharp.Idioms
 open FSharp.Idioms.Literal

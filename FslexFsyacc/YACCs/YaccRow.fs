@@ -1,8 +1,8 @@
-﻿namespace FslexFsyacc.Runtime.YACCs
+﻿namespace FslexFsyacc.YACCs
 
-open FslexFsyacc.Runtime.Precedences
-open FslexFsyacc.Runtime.BNFs
-open FslexFsyacc.Runtime.ItemCores
+open FslexFsyacc.Precedences
+open FslexFsyacc.BNFs
+open FslexFsyacc.ItemCores
 
 open FSharp.Idioms
 open FSharp.Idioms.Literal

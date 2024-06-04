@@ -1,4 +1,4 @@
-﻿namespace FslexFsyacc.Runtime.ItemCores
+﻿namespace FslexFsyacc.ItemCores
 
 open Xunit
 open Xunit.Abstractions

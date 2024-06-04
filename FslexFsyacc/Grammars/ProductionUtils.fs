@@ -1,4 +1,4 @@
-﻿module FslexFsyacc.Runtime.Grammars.ProductionUtils
+﻿module FslexFsyacc.Grammars.ProductionUtils
 
 open FSharp.Idioms.Literal
 

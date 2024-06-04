@@ -1,4 +1,4 @@
-﻿module FslexFsyacc.Runtime.ItemCores.ItemCoreRowUtils
+﻿module FslexFsyacc.ItemCores.ItemCoreRowUtils
 open System.Collections.Generic
 open System.Collections.Concurrent
 

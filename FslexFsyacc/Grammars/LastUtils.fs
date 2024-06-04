@@ -1,5 +1,5 @@
 ﻿[<RequireQualifiedAccess>]
-module FslexFsyacc.Runtime.Grammars.LastUtils
+module FslexFsyacc.Grammars.LastUtils
 
 open FSharp.Idioms
 

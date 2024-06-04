@@ -10,7 +10,7 @@ open FSharp.xUnit
 open FSharp.Idioms.Literal
 open FSharp.Idioms
 
-open FslexFsyacc.Runtime
+open FslexFsyacc
 
 type ExprCompilerTest(output:ITestOutputHelper) =
 

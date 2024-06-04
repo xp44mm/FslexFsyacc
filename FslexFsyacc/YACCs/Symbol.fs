@@ -1,5 +1,5 @@
-﻿module FslexFsyacc.Runtime.YACCs.Symbol
-open FslexFsyacc.Runtime.Precedences
+﻿module FslexFsyacc.YACCs.Symbol
+open FslexFsyacc.Precedences
 
 ///获取重复的符号
 let getDuplication (symbols:string list) =

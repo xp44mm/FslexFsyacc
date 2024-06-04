@@ -4,10 +4,10 @@ open System
 open FSharp.Idioms
 open FSharp.Idioms.Literal
 
-open FslexFsyacc.Runtime
-open FslexFsyacc.Runtime.YACCs
-open FslexFsyacc.Runtime.BNFs
-open FslexFsyacc.Runtime.ItemCores
+open FslexFsyacc
+open FslexFsyacc.YACCs
+open FslexFsyacc.BNFs
+open FslexFsyacc.ItemCores
 
 /// 表示*.fsyacc生成的模块。
 [<Obsolete("FsyaccParseTableCoder")>]
@@ -117,10 +117,10 @@ type FsyaccParseTableFile =
             "]"
             "let unboxRoot ="
             $"    unbox<{this.declarations.[this.startSymbol]}>"
-            //"let parser = FslexFsyacc.Runtime.TokenParser.create(rules, tokens, actions, closures)"
+            //"let parser = FslexFsyacc.TokenParser.create(rules, tokens, actions, closures)"
             //"let stateSymbolPairs = parser.getStateSymbolPairs()"
             //"let getParser<'t> getTag getLexeme ="
-            //"    FslexFsyacc.Runtime.CreditParser<'t>(rules, tokens, actions, closures, getTag, getLexeme)"
+            //"    FslexFsyacc.CreditParser<'t>(rules, tokens, actions, closures, getTag, getLexeme)"
         ]
         |> String.concat "\r\n"
 

@@ -1,13 +1,13 @@
-﻿namespace FslexFsyacc.Runtime.YACCs
+﻿namespace FslexFsyacc.YACCs
 
 open System
 open FSharp.Idioms
 open FSharp.Idioms.Literal
 
-open FslexFsyacc.Runtime.Grammars
-open FslexFsyacc.Runtime.Precedences
-open FslexFsyacc.Runtime.BNFs
-open FslexFsyacc.Runtime.YACCs
+open FslexFsyacc.Grammars
+open FslexFsyacc.Precedences
+open FslexFsyacc.BNFs
+open FslexFsyacc.YACCs
 
 type FlatFsyaccFile =
     {

@@ -1,10 +1,10 @@
-﻿module FslexFsyacc.Runtime.Precedences.Precedence
+﻿module FslexFsyacc.Precedences.Precedence
 open FSharp.Idioms
 open FSharp.Idioms.Literal
-open FslexFsyacc.Runtime
-open FslexFsyacc.Runtime.Grammars
-open FslexFsyacc.Runtime.ItemCores
-open FslexFsyacc.Runtime.Precedences
+open FslexFsyacc
+open FslexFsyacc.Grammars
+open FslexFsyacc.ItemCores
+open FslexFsyacc.Precedences
 
 /// Normally, the precedence of a production is taken to be the same as
 /// that of its rightmost terminal.

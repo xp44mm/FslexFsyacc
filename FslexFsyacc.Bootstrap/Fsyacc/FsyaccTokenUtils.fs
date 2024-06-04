@@ -2,7 +2,7 @@
 
 open FslexFsyacc.VanillaFSharp.FSharpSourceText
 
-open FslexFsyacc.Runtime
+open FslexFsyacc
 
 open FSharp.Idioms
 open FSharp.Idioms.StringOps

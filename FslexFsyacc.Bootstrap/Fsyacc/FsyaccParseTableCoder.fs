@@ -4,10 +4,10 @@ open System
 open FSharp.Idioms
 open FSharp.Idioms.Literal
 
-open FslexFsyacc.Runtime
-open FslexFsyacc.Runtime.YACCs
-open FslexFsyacc.Runtime.BNFs
-open FslexFsyacc.Runtime.ItemCores
+open FslexFsyacc
+open FslexFsyacc.YACCs
+open FslexFsyacc.BNFs
+open FslexFsyacc.ItemCores
 
 /// 表示*.fsyacc生成的模块。
 type FsyaccParseTableCoder =
@@ -99,7 +99,7 @@ type FsyaccParseTableCoder =
             "let unboxRoot ="
             $"    unbox<{this.declarations.[this.startSymbol]}>"
 
-            "let app: FslexFsyacc.Runtime.ParseTableApp = {"
+            "let app: FslexFsyacc.ParseTableApp = {"
             "    tokens        = tokens"
             "    kernels       = kernels"
             "    kernelSymbols = kernelSymbols"

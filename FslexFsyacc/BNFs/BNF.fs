@@ -1,7 +1,7 @@
-﻿namespace FslexFsyacc.Runtime.BNFs
-open FslexFsyacc.Runtime.Grammars
-open FslexFsyacc.Runtime.ItemCores
-open FslexFsyacc.Runtime.Precedences
+﻿namespace FslexFsyacc.BNFs
+open FslexFsyacc.Grammars
+open FslexFsyacc.ItemCores
+open FslexFsyacc.Precedences
 
 type BNF =
     {

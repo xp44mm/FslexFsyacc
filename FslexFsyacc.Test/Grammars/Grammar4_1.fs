@@ -1,5 +1,5 @@
 ﻿///表达式文法(4.1)
-module FslexFsyacc.Runtime.Grammars.Grammar4_1
+module FslexFsyacc.Grammars.Grammar4_1
 
 let E = "E"
 let T = "T"

@@ -6,7 +6,7 @@ open FSharp.xUnit
 open FSharp.Idioms
 open PolynomialExpressions
 open PolynomialExpressions.Tokenizer
-open FslexFsyacc.Runtime
+open FslexFsyacc
 
 type ParserTest(output:ITestOutputHelper) =
     let show res =

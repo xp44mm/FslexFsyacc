@@ -1,4 +1,4 @@
-# FslexFsyacc.Runtime
+# FslexFsyacc
 
 Runtime for Fslex/Fsyacc analyzer/parser generation tools. It includes several types to support `FslexFsyacc`:
 

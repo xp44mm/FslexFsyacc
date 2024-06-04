@@ -1,4 +1,4 @@
-﻿namespace FslexFsyacc.Runtime.Lex
+﻿namespace FslexFsyacc.Lex
 
 ///
 type DFA<'tag when 'tag: comparison> =

@@ -2,7 +2,7 @@
 
 open FslexFsyacc.Fsyacc
 open FslexFsyacc.Yacc
-open FslexFsyacc.Runtime
+open FslexFsyacc
 open FslexFsyacc.Dir
 
 open Xunit
@@ -34,7 +34,7 @@ type G01Test(output:ITestOutputHelper) =
 
     let fsyacc =
         rawFsyacc
-        |> FslexFsyacc.Runtime.YACCs.FlatFsyaccFile.from
+        |> FslexFsyacc.YACCs.FlatFsyaccFile.from
 
     let tbl =
         fsyacc.getYacc()
@@ -86,7 +86,7 @@ type G01Test(output:ITestOutputHelper) =
     //    let lines =
     //        [
     //            $"module FslexFsyacc.{filename}"
-    //            "open FslexFsyacc.Runtime"
+    //            "open FslexFsyacc"
     //            $"let inputProductionList = {stringify inputProductionList}"
     //            $"let mainProductions = {stringify collectionCrew.mainProductions}"
     //            $"let augmentedProductions = {stringify collectionCrew.augmentedProductions}"

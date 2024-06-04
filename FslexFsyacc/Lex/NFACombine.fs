@@ -1,4 +1,4 @@
-﻿module FslexFsyacc.Runtime.Lex.NFACombine
+﻿module FslexFsyacc.Lex.NFACombine
 
 /// Figure 3.40: NFA for the union of two NFA transition
 /// 状态编号由小到大排列，没有重复，没有空位：i,s,t

@@ -1,4 +1,4 @@
-﻿module FslexFsyacc.Runtime.Lex.DFATools
+﻿module FslexFsyacc.Lex.DFATools
 
 open FSharp.Idioms
 

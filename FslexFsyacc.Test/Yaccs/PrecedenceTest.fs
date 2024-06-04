@@ -1,4 +1,4 @@
-﻿namespace FslexFsyacc.Runtime.YACCs
+﻿namespace FslexFsyacc.YACCs
 
 open Xunit
 open Xunit.Abstractions
@@ -7,10 +7,10 @@ open FSharp.xUnit
 open FSharp.Idioms
 open FSharp.Idioms.Literal
 
-open FslexFsyacc.Runtime.Grammars
-open FslexFsyacc.Runtime.ItemCores
-open FslexFsyacc.Runtime.BNFs
-open FslexFsyacc.Runtime.Precedences
+open FslexFsyacc.Grammars
+open FslexFsyacc.ItemCores
+open FslexFsyacc.BNFs
+open FslexFsyacc.Precedences
 
 type PrecedenceTest (output: ITestOutputHelper) =
 

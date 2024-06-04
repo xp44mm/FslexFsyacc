@@ -1,8 +1,8 @@
-﻿namespace FslexFsyacc.Runtime.BNFs
+﻿namespace FslexFsyacc.BNFs
 
-open FslexFsyacc.Runtime.Precedences
-open FslexFsyacc.Runtime.Grammars
-open FslexFsyacc.Runtime.ItemCores
+open FslexFsyacc.Precedences
+open FslexFsyacc.Grammars
+open FslexFsyacc.ItemCores
 open FSharp.Idioms
 open FSharp.Idioms.Literal
 

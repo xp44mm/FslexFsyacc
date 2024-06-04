@@ -1,4 +1,4 @@
-﻿namespace FslexFsyacc.Runtime.Lex
+﻿namespace FslexFsyacc.Lex
 
 /// 从Lex文件一个匹配模式翻译过来的NFA
 type PatternNFA<'a when 'a:comparison> = {

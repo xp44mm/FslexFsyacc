@@ -2,7 +2,7 @@
 
 open FslexFsyacc.Fsyacc
 open FslexFsyacc.Yacc
-open FslexFsyacc.Runtime
+open FslexFsyacc
 open FslexFsyacc.Dir
 
 open Xunit
@@ -34,7 +34,7 @@ type G02Test(output:ITestOutputHelper) =
 
     let fsyacc =
         rawFsyacc
-        |> FslexFsyacc.Runtime.YACCs.FlatFsyaccFile.from
+        |> FslexFsyacc.YACCs.FlatFsyaccFile.from
 
     let tbl =
         fsyacc.getYacc()

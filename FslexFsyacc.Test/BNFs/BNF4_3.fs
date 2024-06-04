@@ -1,9 +1,9 @@
-﻿module FslexFsyacc.Runtime.BNFs.BNF4_3
+﻿module FslexFsyacc.BNFs.BNF4_3
 
-open FslexFsyacc.Runtime.ItemCores
-open FslexFsyacc.Runtime
-open FslexFsyacc.Runtime.YACCs
-open FslexFsyacc.Runtime.Precedences
+open FslexFsyacc.ItemCores
+open FslexFsyacc
+open FslexFsyacc.YACCs
+open FslexFsyacc.Precedences
 
 let E = "E"
 let T = "T"

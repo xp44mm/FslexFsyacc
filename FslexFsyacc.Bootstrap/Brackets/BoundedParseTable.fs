@@ -36,7 +36,7 @@ let rules : list<string list*(obj list->obj)> = [
 ]
 let unboxRoot =
     unbox<Band>
-let app: FslexFsyacc.Runtime.ParseTableApp = {
+let app: FslexFsyacc.ParseTableApp = {
     tokens        = tokens
     kernels       = kernels
     kernelSymbols = kernelSymbols

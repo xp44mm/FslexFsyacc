@@ -14,8 +14,8 @@ open FSharp.Idioms
 open FslexFsyacc.Fsyacc
 open FslexFsyacc.Yacc
 open System.Reflection
-open FslexFsyacc.Runtime
-open FslexFsyacc.Runtime.ItemCores
+open FslexFsyacc
+open FslexFsyacc.ItemCores
 open FslexFsyacc.Expr
 
 [<EntryPoint>]

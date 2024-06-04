@@ -1,5 +1,5 @@
 ﻿%{
-open FslexFsyacc.Runtime
+open FslexFsyacc
 open FslexFsyacc.Fslex
 open FslexFsyacc.Fslex.FslexTokenUtils
 type token = Position<FslexToken>

@@ -9,7 +9,7 @@ open FSharp.Idioms.Literal
 
 open System.Text.RegularExpressions
 open FslexFsyacc.VanillaFSharp.FSharpSourceText
-open FslexFsyacc.Runtime
+open FslexFsyacc
 open System
 
 let ops = Map [

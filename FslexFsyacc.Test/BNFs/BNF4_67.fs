@@ -1,8 +1,8 @@
-﻿module FslexFsyacc.Runtime.BNFs.BNF4_67
+﻿module FslexFsyacc.BNFs.BNF4_67
 
-open FslexFsyacc.Runtime
-open FslexFsyacc.Runtime.ItemCores
-open FslexFsyacc.Runtime.Precedences
+open FslexFsyacc
+open FslexFsyacc.ItemCores
+open FslexFsyacc.Precedences
 
 let stmt = "stmt"
 let expr = "expr"

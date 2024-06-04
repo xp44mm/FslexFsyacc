@@ -1,4 +1,4 @@
-﻿module FslexFsyacc.Runtime.YACCs.Declaration
+﻿module FslexFsyacc.YACCs.Declaration
 
 /// 
 let types (declarationLines:Map<string, Set<string>>) = 

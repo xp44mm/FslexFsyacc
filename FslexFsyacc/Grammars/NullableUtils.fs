@@ -1,5 +1,5 @@
 ﻿[<RequireQualifiedAccess>]
-module FslexFsyacc.Runtime.Grammars.NullableUtils
+module FslexFsyacc.Grammars.NullableUtils
 
 open FSharp.Idioms
 open System.Collections.Concurrent

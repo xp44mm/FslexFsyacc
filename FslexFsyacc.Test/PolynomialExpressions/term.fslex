@@ -1,5 +1,5 @@
 ﻿%{
-open FslexFsyacc.Runtime
+open FslexFsyacc
 open PolynomialExpressions.Tokenizer
 type token = Position<Token>
 %}

@@ -1,7 +1,7 @@
-﻿module FslexFsyacc.Runtime.BNFs.Grammar
+﻿module FslexFsyacc.BNFs.Grammar
 
-open FslexFsyacc.Runtime.Grammars
-open FslexFsyacc.Runtime.ItemCores
+open FslexFsyacc.Grammars
+open FslexFsyacc.ItemCores
 open FSharp.Idioms
 
 /// itemcore.preface(nullable,first)

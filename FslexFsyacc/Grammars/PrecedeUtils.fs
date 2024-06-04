@@ -1,5 +1,5 @@
 ﻿[<RequireQualifiedAccess>]
-module FslexFsyacc.Runtime.Grammars.PrecedeUtils
+module FslexFsyacc.Grammars.PrecedeUtils
 
 let make 
     (nullables:Set<string>)

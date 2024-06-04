@@ -1,4 +1,4 @@
-﻿module FslexFsyacc.Runtime.Lex.AnalyzerNFAUtils
+﻿module FslexFsyacc.Lex.AnalyzerNFAUtils
 
 let unionMany (nfas:PatternNFA<'a> list) =
     {

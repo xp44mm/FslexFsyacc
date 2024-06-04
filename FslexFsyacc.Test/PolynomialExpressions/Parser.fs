@@ -2,7 +2,7 @@
 
 //open PolynomialExpressions.Tokenizer
 open PolynomialExpressions
-open FslexFsyacc.Runtime
+open FslexFsyacc
 
 let analyze (tokens:seq<_>) = 
     TermDFA.analyzer.analyze(tokens,Tokenizer.getTag)

@@ -1,4 +1,4 @@
-﻿namespace FslexFsyacc.Runtime.YACCs
+﻿namespace FslexFsyacc.YACCs
 open System
 
 

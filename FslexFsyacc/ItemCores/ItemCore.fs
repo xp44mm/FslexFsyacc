@@ -1,4 +1,4 @@
-﻿namespace FslexFsyacc.Runtime.ItemCores
+﻿namespace FslexFsyacc.ItemCores
 
 /// 4.6 Introduction to LR Parsing: Simple LR; 4.6.2 Items and the LR(0) Automaton
 type ItemCore = 

@@ -1,4 +1,4 @@
-﻿module FslexFsyacc.Runtime.Grammars.GrammarRowUtils
+﻿module FslexFsyacc.Grammars.GrammarRowUtils
 
 open System.Collections.Generic
 open System.Collections.Concurrent

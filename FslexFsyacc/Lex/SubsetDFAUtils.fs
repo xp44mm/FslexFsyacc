@@ -1,4 +1,4 @@
-﻿module FslexFsyacc.Runtime.Lex.SubsetDFAUtils
+﻿module FslexFsyacc.Lex.SubsetDFAUtils
 
 open FSharp.Idioms
 

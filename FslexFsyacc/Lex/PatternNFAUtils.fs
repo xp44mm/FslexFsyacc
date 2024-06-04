@@ -1,4 +1,4 @@
-﻿module FslexFsyacc.Runtime.Lex.PatternNFAUtils
+﻿module FslexFsyacc.Lex.PatternNFAUtils
 
 open FSharp.Idioms.Literal
 

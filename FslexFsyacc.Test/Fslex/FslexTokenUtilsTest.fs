@@ -4,7 +4,7 @@ open Xunit
 open Xunit.Abstractions
 open FSharp.xUnit
 open FSharp.Idioms.Literal
-open FslexFsyacc.Runtime
+open FslexFsyacc
 open FslexFsyacc
 open System.IO
 type FslexTokenUtilsTest(output:ITestOutputHelper) =

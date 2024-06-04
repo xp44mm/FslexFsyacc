@@ -1,7 +1,7 @@
-﻿namespace FslexFsyacc.Runtime.BNFs
+﻿namespace FslexFsyacc.BNFs
 
-open FslexFsyacc.Runtime.Grammars
-open FslexFsyacc.Runtime.ItemCores
+open FslexFsyacc.Grammars
+open FslexFsyacc.ItemCores
 open FSharp.Idioms
 
 type LALR = 

@@ -1,4 +1,4 @@
-﻿namespace FslexFsyacc.Runtime.Lex
+﻿namespace FslexFsyacc.Lex
 
 /// Figure 3.31: Operations on NFA states
 type NFAOperations<'state,'a when 'state:comparison and 'a:comparison> = {

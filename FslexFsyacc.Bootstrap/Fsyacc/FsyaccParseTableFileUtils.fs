@@ -3,8 +3,8 @@
 open System
 open FSharp.Idioms
 
-open FslexFsyacc.Runtime
-open FslexFsyacc.Runtime.YACCs
+open FslexFsyacc
+open FslexFsyacc.YACCs
 
 //let from (fsyacc:FlatFsyaccFile) (crew:YaccRow) =
 //    id<FsyaccParseTableFile>{
@@ -80,7 +80,7 @@ open FslexFsyacc.Runtime.YACCs
 //            "]"
 //            "let unboxRoot ="
 //            $"    unbox<{types.[startSymbol]}>"
-//            "let theoryParser = FslexFsyacc.Runtime.TheoryParser.create(rules, actions, closures)"
+//            "let theoryParser = FslexFsyacc.TheoryParser.create(rules, actions, closures)"
 //            "let stateSymbolPairs = theoryParser.getStateSymbolPairs()"
 //        ] |> String.concat "\r\n"
 //    result

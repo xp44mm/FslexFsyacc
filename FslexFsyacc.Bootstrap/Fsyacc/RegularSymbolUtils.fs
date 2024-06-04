@@ -1,6 +1,6 @@
 ﻿module FslexFsyacc.Fsyacc.RegularSymbolUtils
 
-open FslexFsyacc.Runtime.RenderUtils
+open FslexFsyacc.RenderUtils
 
 let rec render poly =
     match poly with

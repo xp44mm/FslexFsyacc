@@ -1,8 +1,8 @@
-﻿module FslexFsyacc.Runtime.BNFs.BNF4_55
-open FslexFsyacc.Runtime
-open FslexFsyacc.Runtime.Precedences
-open FslexFsyacc.Runtime.Grammars
-open FslexFsyacc.Runtime.ItemCores
+﻿module FslexFsyacc.BNFs.BNF4_55
+open FslexFsyacc
+open FslexFsyacc.Precedences
+open FslexFsyacc.Grammars
+open FslexFsyacc.ItemCores
 open FSharp.Idioms
 
 // grammar 4.55

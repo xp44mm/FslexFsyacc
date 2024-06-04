@@ -8,7 +8,7 @@ open FSharp.Idioms.ActivePatterns
 open System
 open System.Text.RegularExpressions
 
-open FslexFsyacc.Runtime
+open FslexFsyacc
 
 
 //"(" ")" "*" "+" "-" "/" "NUMBER"

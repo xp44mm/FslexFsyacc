@@ -1,4 +1,4 @@
-﻿namespace FslexFsyacc.Runtime.Lex
+﻿namespace FslexFsyacc.Lex
 
 /// 3.3 正则表达式
 type RegularExpression<'c> =

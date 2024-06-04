@@ -6,7 +6,7 @@ open System.Text
 open FSharp.Idioms
 open FSharp.Idioms.Literal
 
-open FslexFsyacc.Runtime
+open FslexFsyacc
 
 open FslexFsyacc.Expr.ExprParseTable
 

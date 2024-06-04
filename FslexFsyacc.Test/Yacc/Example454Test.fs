@@ -4,8 +4,8 @@ open Xunit
 open Xunit.Abstractions
 open FSharp.xUnit
 
-open FslexFsyacc.Runtime.ItemCores
-open FslexFsyacc.Runtime
+open FslexFsyacc.ItemCores
+open FslexFsyacc
 open FSharp.Idioms
 open FSharp.Idioms.Literal
 

@@ -1,6 +1,6 @@
 ﻿module FslexFsyacc.Fsyacc.AugmentRulesUtils
 
-open FslexFsyacc.Runtime
+open FslexFsyacc
 
 open FSharp.Idioms
 open FSharp.Idioms.Literal

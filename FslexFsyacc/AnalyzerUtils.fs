@@ -1,4 +1,4 @@
-﻿module FslexFsyacc.Runtime.AnalyzerUtils
+﻿module FslexFsyacc.AnalyzerUtils
 
 let skipUntilFoundIn<'a> (significants:Set<uint32>) (revStates:uint32 list) (revTokens:'a list) =
     let rec loop (revStates) (revTokens:_ list) =

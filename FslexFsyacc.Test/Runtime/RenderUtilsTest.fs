@@ -1,4 +1,4 @@
-﻿namespace FslexFsyacc.Runtime
+﻿namespace FslexFsyacc
 
 open Xunit
 open Xunit.Abstractions

@@ -3,7 +3,7 @@ open PolynomialExpressions
 open System
 open System.Text.RegularExpressions
 open FSharp.Idioms
-open FslexFsyacc.Runtime
+open FslexFsyacc
 
 type Token =
     | ID of string

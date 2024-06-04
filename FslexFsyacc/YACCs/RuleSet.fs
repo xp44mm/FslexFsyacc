@@ -1,14 +1,14 @@
-﻿module FslexFsyacc.Runtime.YACCs.RuleSet
+﻿module FslexFsyacc.YACCs.RuleSet
 
 open System
 open FSharp.Idioms
 open FSharp.Idioms.Literal
 
-open FslexFsyacc.Runtime
-open FslexFsyacc.Runtime.Grammars
-open FslexFsyacc.Runtime.ItemCores
-open FslexFsyacc.Runtime.Precedences
-open FslexFsyacc.Runtime.BNFs
+open FslexFsyacc
+open FslexFsyacc.Grammars
+open FslexFsyacc.ItemCores
+open FslexFsyacc.Precedences
+open FslexFsyacc.BNFs
 
 
 let fromGroups (ruleGroups: RuleGroup list) =

@@ -1,4 +1,4 @@
-﻿module FslexFsyacc.Runtime.BNFs.BNFRowUtils
+﻿module FslexFsyacc.BNFs.BNFRowUtils
 
 open System.Collections.Concurrent
 

@@ -1,4 +1,4 @@
-﻿module FslexFsyacc.Runtime.Lex.RegularNFAUtils
+﻿module FslexFsyacc.Lex.RegularNFAUtils
 
 /// Algorithm 3.23: The McNaughton-Yamada-Thompson algorithm to convert a regular expression to an NFA.
 let rec fromRgx i = function

@@ -1,4 +1,4 @@
-﻿module FslexFsyacc.Runtime.Lex.RegularExpressionUtils
+﻿module FslexFsyacc.Lex.RegularExpressionUtils
 
 let rec getCharacters(this:RegularExpression<'c>) =
     [

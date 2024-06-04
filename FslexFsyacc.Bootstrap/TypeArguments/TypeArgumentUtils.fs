@@ -1,7 +1,7 @@
 ﻿module FslexFsyacc.TypeArguments.TypeArgumentUtils
 
 open FslexFsyacc.TypeArguments.FSharpTokenScratch
-open FslexFsyacc.Runtime
+open FslexFsyacc
 open FSharp.Idioms
 
 open FSharp.Idioms.ActivePatterns

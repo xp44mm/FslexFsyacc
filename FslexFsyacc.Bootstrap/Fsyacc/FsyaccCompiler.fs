@@ -2,8 +2,8 @@
 
 open System
 
-open FslexFsyacc.Runtime
-open FslexFsyacc.Runtime.Grammars
+open FslexFsyacc
+open FslexFsyacc.Grammars
 
 open FSharp.Idioms.Literal
 open FslexFsyacc.Fsyacc

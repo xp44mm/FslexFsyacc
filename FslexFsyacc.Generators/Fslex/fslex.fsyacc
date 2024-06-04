@@ -1,6 +1,6 @@
 ﻿%{
-open FslexFsyacc.Runtime
-open FslexFsyacc.Runtime.Lex
+open FslexFsyacc
+open FslexFsyacc.Lex
 let clazz s = s |> List.rev |> List.reduce(fun a b -> Either(a,b))
 %}
 

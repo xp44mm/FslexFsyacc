@@ -1,8 +1,8 @@
-﻿module FslexFsyacc.Runtime.ItemCores.DummyToken
+﻿module FslexFsyacc.ItemCores.DummyToken
 
 open FSharp.Idioms
 open FSharp.Idioms.Literal
-open FslexFsyacc.Runtime
+open FslexFsyacc
 
 /// Normally, the precedence of a production is taken to be the same as
 /// that of its rightmost terminal.

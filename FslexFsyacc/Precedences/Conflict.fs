@@ -1,6 +1,6 @@
-﻿module FslexFsyacc.Runtime.Precedences.Conflict
-open FslexFsyacc.Runtime.Grammars
-open FslexFsyacc.Runtime.ItemCores
+﻿module FslexFsyacc.Precedences.Conflict
+open FslexFsyacc.Grammars
+open FslexFsyacc.ItemCores
 
 /// 删除冲突的项目
 let disambiguate (tryGetPrecedence: string list -> option<int*Associativity>) (actions: ParseTableAction Set) =

@@ -1,7 +1,7 @@
 ﻿namespace FslexFsyacc.VanillaFSharp
 
 open FslexFsyacc
-open FslexFsyacc.Runtime
+open FslexFsyacc
 
 open Xunit
 open Xunit.Abstractions

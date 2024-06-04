@@ -1,9 +1,9 @@
 ﻿module FslexFsyacc.Expr.ExprData
-open FslexFsyacc.Runtime
-open FslexFsyacc.Runtime.ItemCores
-open FslexFsyacc.Runtime.YACCs
-open FslexFsyacc.Runtime.BNFs
-open FslexFsyacc.Runtime.Precedences
+open FslexFsyacc
+open FslexFsyacc.ItemCores
+open FslexFsyacc.YACCs
+open FslexFsyacc.BNFs
+open FslexFsyacc.Precedences
 
 let inputProductionList = [["expr";"expr";"+";"expr"];["expr";"expr";"-";"expr"];["expr";"expr";"*";"expr"];["expr";"expr";"/";"expr"];["expr";"(";"expr";")"];["expr";"-";"expr"];["expr";"NUMBER"]]
 let mainProductions = set [["expr";"(";"expr";")"];["expr";"-";"expr"];["expr";"NUMBER"];["expr";"expr";"*";"expr"];["expr";"expr";"+";"expr"];["expr";"expr";"-";"expr"];["expr";"expr";"/";"expr"]]

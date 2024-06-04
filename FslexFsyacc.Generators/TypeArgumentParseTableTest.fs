@@ -1,8 +1,8 @@
 ﻿namespace FslexFsyacc.TypeArguments
 
 open FslexFsyacc.Fsyacc
-open FslexFsyacc.Runtime.YACCs
-open FslexFsyacc.Runtime
+open FslexFsyacc.YACCs
+open FslexFsyacc
 open FslexFsyacc
 
 open Xunit
@@ -31,7 +31,7 @@ type TypeArgumentParseTableTest (output:ITestOutputHelper) =
 
     let fsyacc =
         rawFsyacc
-        |> FslexFsyacc.Runtime.YACCs.FlatFsyaccFile.from
+        |> FslexFsyacc.YACCs.FlatFsyaccFile.from
 
     let coder = FsyaccParseTableCoder.from fsyacc
 

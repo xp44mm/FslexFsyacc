@@ -1,4 +1,4 @@
-﻿module FslexFsyacc.Runtime.RenderUtils
+﻿module FslexFsyacc.RenderUtils
 
 open System
 open System.Text.RegularExpressions

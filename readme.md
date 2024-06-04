@@ -52,7 +52,7 @@ The ch8.6 Some Recursive Descent Parsing in Expert F# 4.0, the fslex input file:
 
 ```fslex
 %{
-open FslexFsyacc.Runtime
+open FslexFsyacc
 open PolynomialExpressions.Tokenizer
 type token = Position<Token>
 %}

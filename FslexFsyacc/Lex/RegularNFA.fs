@@ -1,4 +1,4 @@
-﻿namespace FslexFsyacc.Runtime.Lex
+﻿namespace FslexFsyacc.Lex
 
 /// 假设操作数的状态编号不需要重新整理
 type RegularNFA<'a when 'a:comparison> = {

@@ -1,6 +1,6 @@
-﻿namespace FslexFsyacc.Runtime.Precedences
+﻿namespace FslexFsyacc.Precedences
 
-open FslexFsyacc.Runtime.ItemCores
+open FslexFsyacc.ItemCores
 
 /// SLR && LALR
 type ParseTableAction = 

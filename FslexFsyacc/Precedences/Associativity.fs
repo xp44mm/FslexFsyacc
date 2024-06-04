@@ -1,4 +1,4 @@
-﻿namespace FslexFsyacc.Runtime.Precedences
+﻿namespace FslexFsyacc.Precedences
 
 open System
 

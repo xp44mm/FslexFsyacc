@@ -1,4 +1,4 @@
-﻿namespace FslexFsyacc.Runtime.Grammars
+﻿namespace FslexFsyacc.Grammars
 
 type Grammar =
     {

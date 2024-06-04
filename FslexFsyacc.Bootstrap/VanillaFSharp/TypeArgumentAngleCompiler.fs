@@ -1,6 +1,6 @@
 ﻿module FslexFsyacc.VanillaFSharp.TypeArgumentAngleCompiler
 open FslexFsyacc.Brackets
-open FslexFsyacc.Runtime
+open FslexFsyacc
 open FSharp.Idioms.Literal
 open FSharp.Idioms
 open System

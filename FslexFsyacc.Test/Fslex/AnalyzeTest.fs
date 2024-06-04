@@ -1,5 +1,5 @@
 ﻿namespace FslexFsyacc.Fslex
-open FslexFsyacc.Runtime
+open FslexFsyacc
 
 open System.IO
 

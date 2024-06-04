@@ -1,11 +1,11 @@
-﻿namespace FslexFsyacc.Runtime.YACCs
+﻿namespace FslexFsyacc.YACCs
 
 open System
 open FSharp.Idioms
 open FSharp.Idioms.Literal
 
-open FslexFsyacc.Runtime.BNFs
-open FslexFsyacc.Runtime.YACCs
+open FslexFsyacc.BNFs
+open FslexFsyacc.YACCs
 
 type Rule =
     {

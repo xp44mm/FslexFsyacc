@@ -20,7 +20,7 @@ let renderHeader (header:string) =
 let renderSymbol (sym:string) =
     if sym.[0] = '{' && sym.[sym.Length-1] = '}'
     then sym.[1..sym.Length-2]
-    else sym |> FslexFsyacc.Runtime.RenderUtils.renderSymbol
+    else sym |> FslexFsyacc.RenderUtils.renderSymbol
 
 /// rhs
 let renderBody (body:string list) =
