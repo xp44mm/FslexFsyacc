@@ -82,16 +82,6 @@ type FslexTokenUtilsTest(output:ITestOutputHelper) =
             |> Seq.toList
         show y
 
-    [<Fact>]
-    member _.``fslex file test``() =
-        let sourcePath = Path.Combine(Dir.solutionPath, @"FslexFsyacc\Fslex")
-        let filePath = Path.Combine(sourcePath, @"fslex.fslex")
-        let text = File.ReadAllText(filePath)
-        let y = 
-            FslexTokenUtils.tokenize 0 text
-            |> Seq.map(fun tok -> stringify tok)
-            |> String.concat "\r\n"
-        output.WriteLine(y)
 
 
 
