@@ -10,6 +10,7 @@ open FslexFsyacc.Runtime.BNFs
 open FslexFsyacc.Runtime.ItemCores
 
 /// 表示*.fsyacc生成的模块。
+[<Obsolete("FsyaccParseTableCoder")>]
 type FsyaccParseTableFile =
     {
         header: string

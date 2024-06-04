@@ -12,8 +12,42 @@
     <Compile Include="TypeArguments\TypeArgumentUtils.fs" />
     <Compile Include="TypeArguments\TypeArgumentParseTable.fs" />
     <Compile Include="TypeArguments\TypeArgumentCompiler.fs" />
-    <Compile Include="Library.fs" />
+    <Compile Include="Brackets\Band.fs" />
+    <Compile Include="Brackets\BoundedParseTable.fs" />
+    <Compile Include="VanillaFSharp\FSharpSourceText.fs" />
+    <Compile Include="VanillaFSharp\TypeArgumentAngleToken.fs" />
+    <Compile Include="VanillaFSharp\TypeArgumentAngleCompiler.fs" />
+    <Compile Include="Fslex\FslexToken.fs" />
+    <Compile Include="Fslex\FslexFile.fs" />
+    <Compile Include="Fslex\FslexDFAFile.fs" />
+    <Compile Include="Fslex\LexSemanticGenerator.fs" />
+    <Compile Include="Fslex\LexFileNormalization.fs" />
+    <Compile Include="Fslex\FslexTokenUtils.fs" />
+    <Compile Include="Fslex\FslexDFA.fs" />
+    <Compile Include="Fslex\FslexParseTable.fs" />
+    <Compile Include="Fslex\FslexCompiler.fs" />
+    <Compile Include="Fslex\FslexDFAFileUtils.fs" />
+    <Compile Include="Fslex\FslexFileUtils.fs" />
+    <Compile Include="Fsyacc\FsyaccToken.fs" />
+    <Compile Include="Fsyacc\FsyaccTokenUtils.fs" />
+    <Compile Include="Fsyacc\RegularSymbol.fs" />
+    <Compile Include="Fsyacc\RegularSymbolUtils.fs" />
+    <Compile Include="Fsyacc\FsyaccParseTable.fs" />
+    <Compile Include="Fsyacc\FsyaccCompiler.fs" />
+    <Compile Include="Fsyacc\RawFsyaccFileRender.fs" />
+    <Compile Include="Fsyacc\RawFsyaccFileUtils.fs" />
+    <Compile Include="Fsyacc\ReducerGenerator.fs" />
+    <Compile Include="Fsyacc\FsyaccParseTableFile.fs" />
+    <Compile Include="Fsyacc\FsyaccParseTableCoder.fs" />
+    <Compile Include="Fsyacc\FsyaccParseTableFileUtils.fs" />
+    <Compile Include="Fsyacc\AugmentRulesUtils.fs" />
+    <Compile Include="Fsyacc\FlatRulesUtils.fs" />
     
+    <None Include="..\readme.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+
   </ItemGroup>
 
   <ItemGroup>

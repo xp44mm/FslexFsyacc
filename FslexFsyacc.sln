@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32526.322
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "FslexFsyacc", "FslexFsyacc\FslexFsyacc.fsproj", "{4B355DEC-CF77-4A19-B8CD-20472CD9E1A8}"
-EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "FslexFsyacc.Runtime", "FslexFsyacc.Runtime\FslexFsyacc.Runtime.fsproj", "{D371D166-1B07-4943-8702-F1EB4EEBF788}"
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "FslexFsyacc.Test", "FslexFsyacc.Test\FslexFsyacc.Test.fsproj", "{A093FED7-6DBB-47F6-BA98-F8AE62F3B639}"
@@ -13,7 +11,7 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "FSharp.Compiler.SyntaxTreeX
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "FslexFsyacc.Bootstrap", "FslexFsyacc.Bootstrap\FslexFsyacc.Bootstrap.fsproj", "{D6FF67A0-B4C6-4195-A698-E678AD47FFF9}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FslexFsyacc.Generators", "FslexFsyacc.Generators\FslexFsyacc.Generators.fsproj", "{D037F91F-E8AF-4346-9648-3B7E99DCC22A}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "FslexFsyacc.Generators", "FslexFsyacc.Generators\FslexFsyacc.Generators.fsproj", "{D037F91F-E8AF-4346-9648-3B7E99DCC22A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,10 +19,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{4B355DEC-CF77-4A19-B8CD-20472CD9E1A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4B355DEC-CF77-4A19-B8CD-20472CD9E1A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4B355DEC-CF77-4A19-B8CD-20472CD9E1A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4B355DEC-CF77-4A19-B8CD-20472CD9E1A8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D371D166-1B07-4943-8702-F1EB4EEBF788}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D371D166-1B07-4943-8702-F1EB4EEBF788}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D371D166-1B07-4943-8702-F1EB4EEBF788}.Release|Any CPU.ActiveCfg = Release|Any CPU

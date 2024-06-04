@@ -1,37 +1,31 @@
 ﻿namespace FslexFsyacc.Fslex
 open FslexFsyacc.Runtime.Lex
-
+open FslexFsyacc
 open System.IO
 open System.Text
 
 open Xunit
 open Xunit.Abstractions
 
-open FSharp.Idioms
+open FSharp.Idioms.Literal
 open FSharp.xUnit
 
 type FslexDFATest(output:ITestOutputHelper) =
-    let show res =
-        res
-        |> Literal.stringify
-        |> output.WriteLine
-
-    let solutionPath = DirectoryInfo(__SOURCE_DIRECTORY__).Parent.Parent.FullName
-    let sourcePath = Path.Combine(solutionPath, @"FslexFsyacc\Fslex")
-    let filePath = Path.Combine(sourcePath, @"fslex.fslex")
-    let text = File.ReadAllText(filePath)
-    let fslex = FslexFileUtils.parse text
-
     let name = "FslexDFA"
     let moduleName = $"FslexFsyacc.Fslex.{name}"
-    let modulePath = Path.Combine(sourcePath, $"{name}.fs")
+    let modulePath = Path.Combine(Dir.bootstrap, "Fslex", $"{name}.fs")
+
+    let filePath = Path.Combine(__SOURCE_DIRECTORY__, "fslex.fslex")
+    let text = File.ReadAllText(filePath,Encoding.UTF8)
+
+    let fslex = FslexFileUtils.parse text
 
     [<Fact>]
     member _.``01 - compiler test``() =
         let hdr,dfs,rls = FslexCompiler.compile text
-        show hdr
-        show dfs
-        show rls
+        output.WriteLine(stringify hdr )
+        output.WriteLine(stringify dfs )
+        output.WriteLine(stringify rls )
         
     [<Fact>]
     member _.``02 - verify``() =
@@ -48,7 +42,7 @@ type FslexDFATest(output:ITestOutputHelper) =
             res
             |> List.collect(fun re -> re|>RegularExpressionUtils.getCharacters)
             |> Set.ofList
-        show y
+        output.WriteLine(stringify y)
 
     [<Fact(
     Skip="once and for all!"

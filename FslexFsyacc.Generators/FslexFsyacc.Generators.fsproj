@@ -13,6 +13,14 @@
     <Compile Include="DirTest.fs" />
     <None Include="typeArgument.fsyacc" />
     <Compile Include="TypeArgumentParseTableTest.fs" />
+    <None Include="Brackets\bounded.fsyacc" />
+    <Compile Include="Brackets\BoundedParseTableTest.fs" />
+    <None Include="Fslex\fslex.fslex" />
+    <Compile Include="Fslex\FslexDFATest.fs" />
+    <None Include="Fslex\fslex.fsyacc" />
+    <Compile Include="Fslex\FslexParseTableTest.fs" />
+    <None Include="Fsyacc\fsyacc.fsyacc" />
+    <Compile Include="Fsyacc\FsyaccParseTableTest.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
@@ -34,7 +42,6 @@
     <ProjectReference Include="..\FSharp.Compiler.SyntaxTreeX\FSharp.Compiler.SyntaxTreeX.fsproj" />
     <ProjectReference Include="..\FslexFsyacc.Bootstrap\FslexFsyacc.Bootstrap.fsproj" />
     <ProjectReference Include="..\FslexFsyacc.Runtime\FslexFsyacc.Runtime.fsproj" />
-    <ProjectReference Include="..\FslexFsyacc\FslexFsyacc.fsproj" />
   </ItemGroup>
 
 </Project>

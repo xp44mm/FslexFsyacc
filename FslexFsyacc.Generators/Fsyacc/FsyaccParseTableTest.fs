@@ -8,7 +8,7 @@ open FslexFsyacc.Dir
 open FslexFsyacc.Fsyacc
 open FslexFsyacc.Runtime
 open FslexFsyacc.Runtime.YACCs
-open FslexFsyacc.Yacc
+
 open System
 open System.IO
 open System.Text
@@ -17,21 +17,12 @@ open Xunit
 open Xunit.Abstractions
 
 type FsyaccParseTableTest(output:ITestOutputHelper) =
-    let show res =
-        res
-        |> Literal.stringify
-        |> output.WriteLine
+    let name = "FsyaccParseTable"
+    let moduleName = $"FslexFsyacc.Fsyacc.{name}"
+    let modulePath = Path.Combine(Dir.bootstrap, "Fsyacc", $"{name}.fs")
 
-    // ** input **
-    let sourceFile = "fsyacc.fsyacc"
-    let parseTblName = "FsyaccParseTable"
-
-    let parseTblModule = $"FslexFsyacc.Fsyacc.{parseTblName}"
-    let sourcePath = Path.Combine(solutionPath, @"FslexFsyacc\Fsyacc")
-    let filePath = Path.Combine(sourcePath, sourceFile)
-    let parseTblPath = Path.Combine(sourcePath, $"{parseTblName}.fs")
-
-    let text = File.ReadAllText(filePath,Encoding.UTF8)
+    let filePath = Path.Combine(__SOURCE_DIRECTORY__, "fsyacc.fsyacc")
+    let text = File.ReadAllText(filePath, Encoding.UTF8)
 
     let rawFsyacc =
         text
@@ -73,10 +64,10 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
     Skip="按需更新源代码"
     )>]
     member _.``06 - generate FsyaccParseTable``() =
-        let outp = coder.generateModule(parseTblModule)
-        File.WriteAllText(parseTblPath, outp, Encoding.UTF8)
+        let outp = coder.generateModule(moduleName)
+        File.WriteAllText(modulePath, outp, Encoding.UTF8)
         output.WriteLine("output yacc:")
-        output.WriteLine(parseTblPath)
+        output.WriteLine(modulePath)
 
     [<Fact>]
     member _.``10 - valid ParseTable``() =
@@ -105,7 +96,7 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
             FSharp.Compiler.SyntaxTreeX.SourceCodeParser.semansFromMappers mappers
 
         let header,semans =
-            let text = File.ReadAllText(parseTblPath, Encoding.UTF8)
+            let text = File.ReadAllText(modulePath, Encoding.UTF8)
             FSharp.Compiler.SyntaxTreeX.SourceCodeParser.getHeaderSemansFromFSharp 4 text
 
         Should.equal headerFromFsyacc header
