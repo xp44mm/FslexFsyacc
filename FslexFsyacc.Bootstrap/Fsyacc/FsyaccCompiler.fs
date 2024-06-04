@@ -21,7 +21,6 @@ let compile (input:string) =
 
     input
     |> FsyaccTokenUtils.tokenize 0
-
     |> Seq.map(fun tok ->
         tokens <- tok::tokens
         tok

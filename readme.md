@@ -6,11 +6,6 @@ Fslex is a code generator that uses regular expression syntax as a rule to gener
 
 Fsyacc is a code generator that use BNF productions and precedences as a rule to generate a function, which resolves the input token sequence to an abstract syntax tree.
 
-
-用成熟的正则表达式，BNF语法。
-
-可以无限嵌套BNF和正则表达式。这样，可以将一个大的BNF模块化多个小BNF，好处有降低语法难度，增加了可读性，减少记忆量。语法文件清晰，几乎可以直接作为帮助文档。避免许多手写代码。
-
 ## Fsyacc Example
 
 Dragon book fig 4-59 example `expr.fsyacc`, fsyacc input file:
@@ -26,13 +21,17 @@ expr : expr "+" expr         { s0 + s2 }
      | "(" expr ")"          { s1 }
      | "-" expr %prec UMINUS { -s1 }
      | NUMBER                { s0 }
+
 %%
+
 %left "+" "-"
 %left "*" "/"
 %right UMINUS
+
 %%
-NUMBER : "float"
-expr   : "float"
+
+%type <float> NUMBER expr
+
 ```
 
 After `ParseTable` module is generated, you can use the parse function to work:
@@ -91,4 +90,6 @@ Should.equal y [Term(2,"x",2);Term(3,"x",1);Const -5]
 
 - Flexiblely compose of tokenize, regular expressions, BNF technology.
 
+用正则表达式，BNF语法表达语言。
 
+无限嵌套BNF和正则表达式。将一个大的BNF模块化多个小BNF。其好处包括降低语法难度，增加了可读性，减少记忆量。语法文件清晰，几乎可以直接作为帮助文档。避免许多手写代码。

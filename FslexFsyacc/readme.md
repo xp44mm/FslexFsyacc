@@ -1,6 +1,6 @@
 # FslexFsyacc
 
-Runtime for Fslex/Fsyacc analyzer/parser generation tools. It includes several types to support `FslexFsyacc`:
+Runtime for Fslex/Fsyacc analyzer/parser generation tools. It includes several types to support `FslexFsyacc.Bootstrap`:
 
 ```F#
 type Analyzer<'tok,'u>
@@ -9,13 +9,13 @@ type Analyzer<'tok,'u>
         rules: (uint32 list*uint32 list*('tok list -> 'u)) list
     ) =
 
-type Parser
-    (
-        rules: (string list*(obj list->obj)) list,
-        actions: (string*int) list list,
-        closures: (int*int*string list) list list,
-        getTag:'tok -> string,
-        getLexeme:'tok->obj
-    ) =
+type ParseTableApp =
+    {
+        tokens: Set<string>
+        kernels: list<list<int*int>>
+        kernelSymbols: list<string>
+        actions: (string*int) list list
+        rules: list<string list*(obj list->obj)>
+    }
 
 ```
