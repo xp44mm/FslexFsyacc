@@ -20,8 +20,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="SourceText.fs" />
     <Compile Include="TypeArguments\FSharpTokenScratch.fs" />
     <Compile Include="TypeArguments\TypeArgument.fs" />
+    <Compile Include="TypeArguments\TypeArgumentTools.fs" />
     <Compile Include="TypeArguments\FSharpToken.fs" />
     <Compile Include="TypeArguments\TypeArgumentUtils.fs" />
     <Compile Include="TypeArguments\TypeArgumentParseTable.fs" />
@@ -42,12 +44,8 @@
     <Compile Include="Fslex\FslexCompiler.fs" />
     <Compile Include="Fslex\FslexDFAFileUtils.fs" />
     <Compile Include="Fslex\FslexFileUtils.fs" />
-    <Compile Include="Fsyacc\FsyaccToken.fs" />
-    <Compile Include="Fsyacc\FsyaccTokenUtils.fs" />
     <Compile Include="Fsyacc\RegularSymbol.fs" />
     <Compile Include="Fsyacc\RegularSymbolUtils.fs" />
-    <Compile Include="Fsyacc\FsyaccParseTable.fs" />
-    <Compile Include="Fsyacc\FsyaccCompiler.fs" />
     <Compile Include="Fsyacc\RawFsyaccFileRender.fs" />
     <Compile Include="Fsyacc\RawFsyaccFileUtils.fs" />
     <Compile Include="Fsyacc\ReducerGenerator.fs" />
@@ -56,6 +54,10 @@
     <Compile Include="Fsyacc\FsyaccParseTableFileUtils.fs" />
     <Compile Include="Fsyacc\AugmentRulesUtils.fs" />
     <Compile Include="Fsyacc\FlatRulesUtils.fs" />
+    <Compile Include="Fsyacc2\FsyaccToken2.fs" />
+    <Compile Include="Fsyacc2\FsyaccToken2Utils.fs" />
+    <Compile Include="Fsyacc2\FsyaccParseTable2.fs" />
+    <Compile Include="Fsyacc2\FsyaccCompiler2.fs" />
     
     <None Include="..\readme.md">
       <Pack>True</Pack>

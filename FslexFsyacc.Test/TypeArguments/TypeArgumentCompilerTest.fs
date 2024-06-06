@@ -24,27 +24,27 @@ type TypeArgumentCompilerTest(output:ITestOutputHelper) =
             "list<_>",Ctor(["list"],[Anon])
             "Map<_,_>",Ctor(["Map"],[Anon;Anon])
             "System.String",Ctor(["String";"System"],[])
-            "{|x:int;y:int|}",AnonRecd(false,["y",Ctor(["int"],[]);"x",Ctor(["int"],[])])
-            "{|x:int;y:int;|}",AnonRecd(false,["y",Ctor(["int"],[]);"x",Ctor(["int"],[])])
             "(int*float)",Tuple(false,[Ctor(["int"],[]);Ctor(["float"],[])])
             "struct(int*float)",Tuple(true,[Ctor(["int"],[]);Ctor(["float"],[])])
-            "struct{|x:int|}",AnonRecd(true,["x",Ctor(["int"],[])])
             "int list",App(Ctor(["int"],[]),[LongIdent ["list"]])
             "int * string",Tuple(false,[Ctor(["int"],[]);Ctor(["string"],[])])
             "string->int",Fun [Ctor(["string"],[]);Ctor(["int"],[])]
             "string list*int[]",Tuple(false,[App(Ctor(["string"],[]),[LongIdent ["list"]]);App(Ctor(["int"],[]),[ArrayTypeSuffix 1])])
             "string list->int list",Fun [App(Ctor(["string"],[]),[LongIdent ["list"]]);App(Ctor(["int"],[]),[LongIdent ["list"]])]
+            "{|x:int;y:int|}",AnonRecd(false,["y",Ctor(["int"],[]);"x",Ctor(["int"],[])])
+            "{|x:int;y:int;|}",AnonRecd(false,["y",Ctor(["int"],[]);"x",Ctor(["int"],[])])
+            "struct{|x:int|}",AnonRecd(true,["x",Ctor(["int"],[])])
             ]
 
         //验证总次数
         Should.equal source.Length 17
         //output.WriteLine($"{}")
 
-        let exit (rest:string) =  Regex.IsMatch(rest, @"^\s*\>")
+        let exit (rest:string) = Regex.IsMatch(rest, @"^\s*\>")
         let x,e = source.[i]
         let txt = $"{x}>"
         output.WriteLine(x)
-        let y = TypeArgumentCompiler.compile exit 0 txt
+        let y = TypeArgumentCompiler.compile exit 99 txt
         output.WriteLine(stringify y)
         //Should.equal e y
 

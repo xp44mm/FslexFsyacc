@@ -33,7 +33,7 @@ type FSharpSourceTextTest(output:ITestOutputHelper) =
     member _.``tryWS``() =
         let x = "  "
         let y = 
-            FSharpSourceText.tryWS x
+            SourceText.tryWS x
             |> Option.get
 
         Should.equal x y.Value

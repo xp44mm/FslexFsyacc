@@ -8,13 +8,6 @@ open FSharp.Idioms.ActivePatterns
 
 open System.Text.RegularExpressions
 
-let tryWS =
-    Regex @"^\s+"
-    |> trySearch
-
-let tryWord =
-    Regex @"^\w+"
-    |> trySearch
 
 let trySingleLineComment =
     Regex @"^//[^\r\n]*"

@@ -1,7 +1,7 @@
 ﻿%{
 %}
 typeArgument :
-    | funtype {TypeArgument.ofFun s0}
+    | funtype {TypeArgumentTools.ofFun s0}
     | flexibletype {Flexible s0}
     | subtype {s0}
 funtype :
@@ -11,14 +11,14 @@ tupletype :
     | apptype "*" tupletype {s0::s2}
     | apptype {[s0]}
 apptype :
-    | atomtype suffixTypes {TypeArgument.ofApp(s0,s1)}
+    | atomtype suffixTypes {TypeArgumentTools.ofApp(s0,s1)}
 atomtype :
     | "_" {Anon}
-    | typar { TypeArgument.ofTypar s0 }
+    | typar { TypeArgumentTools.ofTypar s0 }
     | namedtype {match s0 with a,b -> Ctor(a,b)}
     | anonRecordType {s0}
     | "(" typeArgument ")" {s1}
-    | struct "(" tupletype ")" {match TypeArgument.ofTuple s2 with Tuple(_,ls) -> Tuple(true,ls) |_->failwith""}
+    | struct "(" tupletype ")" {match TypeArgumentTools.ofTuple s2 with Tuple(_,ls) -> Tuple(true,ls) |_->failwith""}
     | struct anonRecordType {match s1 with AnonRecd(_,ls) -> AnonRecd(true,ls) |_->failwith""}
 namedtype :
     | ctortype {s0,[]}
@@ -43,10 +43,10 @@ suffixTypes :
     | (*empty*) {[]}
 flexibletype :
     | "#" namedtype {match s1 with ctor,targs -> FlexibleCtor(ctor,targs)}
-    | "#" "(" apptype ")" {TypeArgument.toBaseOrInterfaceType s2}
+    | "#" "(" apptype ")" {TypeArgumentTools.toBaseOrInterfaceType s2}
     | "#" "_" {FlexibleAnon}
 subtype :
-    | variabletype ":>" apptype { Subtype(s0,TypeArgument.toBaseOrInterfaceType s2) }
+    | variabletype ":>" apptype { Subtype(s0,TypeArgumentTools.toBaseOrInterfaceType s2) }
 variabletype :
     | "_" {AnonTypar}
     | typar {s0}

@@ -20,7 +20,19 @@ open FslexFsyacc.Expr
 
 [<EntryPoint>]
 let main _ =
-    let inp = "2 + 3"
-    let y = ExprCompiler.compile inp
+    let ls = [
+        "%type"
+        "%type<_>"
+        "%type <int>"
+        "%type <seq<float*string>> starts"
+    ]
+
+    let y = 
+        FsyaccToken2Utils.tokenize 0 ls.[1]
+        |> Seq.map(fun tok ->
+            Console.WriteLine(stringify tok)
+        )
+        |> Seq.toList
+    Console.WriteLine(stringify y)
 
     0

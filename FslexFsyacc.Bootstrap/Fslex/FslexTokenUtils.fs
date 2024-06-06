@@ -7,10 +7,11 @@ open FSharp.Idioms.RegularExpressions
 open FSharp.Idioms.ActivePatterns
 open FSharp.Idioms.Literal
 
+open System
 open System.Text.RegularExpressions
 open FslexFsyacc.VanillaFSharp.FSharpSourceText
 open FslexFsyacc
-open System
+open FslexFsyacc.SourceText
 
 let ops = Map [
     "%%",PERCENT;

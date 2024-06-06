@@ -1,13 +1,27 @@
-﻿namespace FslexFsyacc.TypeArguments
+﻿namespace rec FslexFsyacc.TypeArguments
 
 /// 又名：signature syntax
 type Typar =
     | AnonTypar
     | NamedTypar of isInline:bool * string // todo '\'' '^'
 
+    member this.toString() = 
+        match this with
+        | AnonTypar -> "_"
+        | NamedTypar (isInline, id) -> 
+            let p = if isInline then "^" else "'"
+            $"{p}{id}"
+
 type SuffixType =
     | LongIdent of string list
     | ArrayTypeSuffix of int
+
+    member this.toString() = 
+        match this with
+        | LongIdent ids -> ids |> String.concat "."
+        | ArrayTypeSuffix rank -> 
+            let cs = String.replicate rank ","
+            $"[{cs}]"
 
 type TypeArgument =
     | Anon
@@ -20,37 +34,22 @@ type TypeArgument =
     | Flexible of BaseOrInterfaceType
     | Subtype of Typar * BaseOrInterfaceType
 
-and BaseOrInterfaceType =
+    member this.toString() = 
+        match this with
+        | Anon -> "_"
+        | Fun ls -> sprintf ""
+        | Tuple (isStruct, ls: TypeArgument list) -> ""
+        | App (atomtype:TypeArgument , suffixTypes:SuffixType list) -> sprintf ""
+        | TypeParam ( isInline:bool , nm: string) -> 
+            let p = if isInline then "^" else "'"
+            $"{p}{nm}"
+        | Ctor (longIdent:string list , ls: TypeArgument list) -> ""
+        | AnonRecd ( isStruct: bool, fields: (string * TypeArgument) list) -> ""
+        | Flexible (tp: BaseOrInterfaceType) -> ""
+        | Subtype (tp: Typar , it: BaseOrInterfaceType) -> ""
+
+type BaseOrInterfaceType =
     | FlexibleAnon
     | FlexibleApp of atomtype:TypeArgument * suffixTypes:SuffixType list
     | FlexibleCtor of string list * TypeArgument list
 
-module TypeArgument =
-    let ofApp (atomtype:TypeArgument, suffixTypes:_ list) =
-        match suffixTypes with
-        | [] -> atomtype
-        | _ -> App(atomtype,suffixTypes)
-
-    let ofTuple (ls:TypeArgument list) =
-        match ls with
-        | [] -> failwith ""
-        | [x] -> x
-        | _ -> Tuple(false,ls)
-
-    let ofFun (ls:TypeArgument list list) =
-        match ls with
-        | [] -> failwith ""
-        | [x] -> ofTuple x
-        | _ -> ls |> List.map ofTuple |> Fun
-
-    let ofTypar (typar:Typar) =
-        match typar with
-        | NamedTypar (isInline, id) -> TypeParam(isInline,id)
-        | AnonTypar -> failwith ""
-
-    let toBaseOrInterfaceType (apptype:TypeArgument) = 
-        match apptype with
-        | Anon -> FlexibleAnon
-        | App(ty,suffixes) -> FlexibleApp(ty,suffixes)
-        | Ctor(id,args) -> FlexibleCtor(id,args)
-        | _ -> failwith ""

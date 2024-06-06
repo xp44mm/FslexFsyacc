@@ -8,6 +8,7 @@
 
 	<ItemGroup>
 		<Compile Include="Dir.fs" />
+		<Compile Include="SourceTextTest.fs" />
 		<Compile Include="Runtime\PositionTest.fs" />
 		<Compile Include="Runtime\RenderUtilsTest.fs" />    
 		<Compile Include="Lex\NFACombineTest.fs" />
@@ -67,6 +68,8 @@
 		<Compile Include="Fsyacc\FsyaccFileNameTest.fs" />
 		<Compile Include="Fsyacc\FsyaccFileRulesTest.fs" />
 		<Compile Include="Fsyacc\FsyaccTokenTest.fs" />
+		<Compile Include="Fsyacc2\FsyaccToken2Test.fs" />
+    
 		<Compile Include="PolynomialExpressions\Polynomials.fs" />
 		<Compile Include="PolynomialExpressions\Tokenizer.fs" />
 		<Compile Include="PolynomialExpressions\TokenizerTest.fs" />

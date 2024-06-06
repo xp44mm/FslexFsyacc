@@ -1,6 +1,7 @@
 ﻿module FslexFsyacc.Fsyacc.FsyaccTokenUtils
 
 open FslexFsyacc.VanillaFSharp.FSharpSourceText
+open FslexFsyacc.SourceText
 
 open FslexFsyacc
 
@@ -23,6 +24,7 @@ let ops = Map [
     "[",LBRACK;
     "]",RBRACK;
     "|",BAR;
+
     ]
 
 let ops_inverse = 
@@ -45,7 +47,7 @@ let getTag(token:Position<FsyaccToken>) =
     | NONASSOC -> "%nonassoc"
     | PREC     -> "%prec"
     | TYPE     -> "%type"
-    | tok -> failwith $"getTag:{stringify tok}"
+    | tok -> failwith (stringify tok)
 
 /// 获取token携带的语义信息§
 let getLexeme(token:Position<_>) =
@@ -129,7 +131,7 @@ let tokenize (offset:int) (input:string) =
                     | "%nonassoc" -> NONASSOC
                     | "%prec" -> PREC
                     | "%type" -> TYPE
-                    | never -> failwith ""
+                    | _ -> failwith "never"
                 let len = m.Length
                 yield Position.from(pos,len,tok)
                 yield! loop (lpos,lrest) (pos+len,rest.[len..])

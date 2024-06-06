@@ -29,8 +29,7 @@ type G02Test(output:ITestOutputHelper) =
 
     let rawFsyacc =
         text
-        |> FsyaccCompiler.compile
-        //|> fun f -> f.migrate()
+        |> FsyaccCompiler2.compile
 
     let fsyacc =
         rawFsyacc

@@ -24,7 +24,7 @@ type FslexParseTableTest(output: ITestOutputHelper) =
 
     let rawFsyacc =
         text
-        |> FsyaccCompiler.compile
+        |> FsyaccCompiler2.compile
 
     let fsyacc =
         rawFsyacc

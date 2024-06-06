@@ -1,15 +1,11 @@
 ﻿module FslexFsyacc.VanillaFSharp.FSharpSourceText
-
+open FslexFsyacc
 open System
 open System.Text.RegularExpressions
 
 open FSharp.Idioms
 open FSharp.Idioms.Line
 open FSharp.Idioms.RegularExpressions
-
-let tryWS =
-    Regex @"^\s+"
-    |> trySearch
 
 let trySingleLineComment =
     Regex @"^//[^\r\n]*"
@@ -62,7 +58,7 @@ let tryHTypar =
 // 不终止循环的消费者 fsharpCodeCommonTries
 let tries = 
     [
-        tryWS
+        SourceText.tryWS
         trySingleLineComment
         tryMultiLineComment
         tryDoubleTick

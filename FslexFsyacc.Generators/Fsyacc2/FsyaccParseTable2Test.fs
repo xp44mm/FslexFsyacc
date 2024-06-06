@@ -1,41 +1,41 @@
-﻿namespace FslexFsyacc.Expr
+﻿namespace FslexFsyacc.Fsyacc
 
 open FSharp.Idioms
 open FSharp.Idioms.Literal
 open FSharp.xUnit
 open FslexFsyacc
+open FslexFsyacc.Dir
 open FslexFsyacc.Fsyacc
 open FslexFsyacc
-open FslexFsyacc.Precedences
 open FslexFsyacc.YACCs
 
+open System
 open System.IO
 open System.Text
+open System.Text.RegularExpressions
 open Xunit
 open Xunit.Abstractions
 
-type ExprParseTableTest(output:ITestOutputHelper) =
-    let parseTblName = "ExprParseTable"
-    let parseTblModule = $"FslexFsyacc.Expr.{parseTblName}"
-    let filePath = Path.Combine(__SOURCE_DIRECTORY__, @"expr.fsyacc")
-    let parseTblPath = Path.Combine(__SOURCE_DIRECTORY__, $"{parseTblName}.fs")
+type FsyaccParseTable2Test(output:ITestOutputHelper) =
+    let name = "FsyaccParseTable2"
+    let moduleName = $"FslexFsyacc.Fsyacc.{name}"
+    let modulePath = Path.Combine(Dir.bootstrap, "Fsyacc2", $"{name}.fs")
 
-    let text = File.ReadAllText(filePath,Encoding.UTF8)
+    let filePath = Path.Combine(__SOURCE_DIRECTORY__, "fsyacc2.fsyacc")
+    let text = File.ReadAllText(filePath, Encoding.UTF8)
 
     let rawFsyacc =
         text
-        |> FsyaccCompiler2.compile
+        |> FsyaccCompiler.compile
 
     let fsyacc =
         rawFsyacc
-        |> FlatFsyaccFile.from
+        |> FslexFsyacc.YACCs.FlatFsyaccFile.from
 
     let coder = FsyaccParseTableCoder.from fsyacc
 
     let tbl =
         fsyacc.getYacc()
-
-    let bnf = tbl.bnf
 
     //[<Fact>]
     //member _.``01 - norm fsyacc file``() =
@@ -43,9 +43,9 @@ type ExprParseTableTest(output:ITestOutputHelper) =
     //    let flatedFsyacc =
     //        fsyaccCrew
     //        |> FlatedFsyaccFileCrewUtils.toFlatFsyaccFile
-
-    //    let src =
-    //        flatedFsyacc
+        
+    //    let src = 
+    //        flatedFsyacc 
     //        |> FlatFsyaccFileUtils.start s0
     //        |> RawFsyaccFileUtils.fromFlat
     //        |> RawFsyaccFileUtils.render
@@ -53,29 +53,27 @@ type ExprParseTableTest(output:ITestOutputHelper) =
     //    output.WriteLine(src)
 
     [<Fact>]
-    member _.``02 - print conflict``() =
-        for acts in bnf.getProperConflictActions() do
-        output.WriteLine($"{stringify acts}")
-
-    [<Fact>]
     member _.``02 - print conflict productions``() =
         let st = ConflictedProduction.from fsyacc.rules
+        if st.IsEmpty then
+            output.WriteLine("no conflict")
         for cp in st do
         output.WriteLine($"{stringify cp}")
 
     [<Fact(
-    Skip="按需更新源代码"
+    //Skip="按需更新源代码"
     )>]
-    member _.``02 - generate Parse Table``() =
-        let outp = coder.generateModule(parseTblModule)
-        File.WriteAllText(parseTblPath, outp, Encoding.UTF8)
-        output.WriteLine($"output yacc:\r\n{parseTblPath}")
+    member _.``06 - generate FsyaccParseTable``() =
+        let outp = coder.generateModule(moduleName)
+        File.WriteAllText(modulePath, outp, Encoding.UTF8)
+        output.WriteLine("output yacc:")
+        output.WriteLine(modulePath)
 
     [<Fact>]
     member _.``10 - valid ParseTable``() =
-        Should.equal coder.tokens ExprParseTable.tokens
-        Should.equal coder.kernels ExprParseTable.kernels
-        Should.equal coder.actions ExprParseTable.actions
+        Should.equal coder.tokens FsyaccParseTable2.tokens
+        Should.equal coder.kernels FsyaccParseTable2.kernels
+        Should.equal coder.actions FsyaccParseTable2.actions
 
         //产生式比较
         let prodsFsyacc =
@@ -84,12 +82,12 @@ type ExprParseTableTest(output:ITestOutputHelper) =
             |> Seq.toList
 
         let prodsParseTable =
-            ExprParseTable.rules
+            FsyaccParseTable2.rules
             |> List.map fst
 
         Should.equal prodsFsyacc prodsParseTable
 
-        //header,semantic代码比较
+        //header,reducers代码比较
         let headerFromFsyacc =
             FSharp.Compiler.SyntaxTreeX.Parser.getDecls("header.fsx",fsyacc.header)
 
@@ -98,7 +96,7 @@ type ExprParseTableTest(output:ITestOutputHelper) =
             FSharp.Compiler.SyntaxTreeX.SourceCodeParser.semansFromMappers mappers
 
         let header,semans =
-            let text = File.ReadAllText(parseTblPath, Encoding.UTF8)
+            let text = File.ReadAllText(modulePath, Encoding.UTF8)
             FSharp.Compiler.SyntaxTreeX.SourceCodeParser.getHeaderSemansFromFSharp 4 text
 
         Should.equal headerFromFsyacc header

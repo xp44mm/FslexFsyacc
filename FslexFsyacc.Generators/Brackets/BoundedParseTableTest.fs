@@ -24,11 +24,11 @@ type BoundedParseTableTest(output: ITestOutputHelper) =
 
     let rawFsyacc =
         text
-        |> FsyaccCompiler.compile
+        |> FsyaccCompiler2.compile
 
     let fsyacc =
         rawFsyacc
-        |> FslexFsyacc.YACCs.FlatFsyaccFile.from
+        |> FlatFsyaccFile.from
 
     //let tbl =
     //    fsyacc.getYacc()

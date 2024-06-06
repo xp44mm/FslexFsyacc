@@ -1,6 +1,6 @@
 ﻿namespace FslexFsyacc.Fsyacc
 
-type FsyaccToken =
+type FsyaccToken2 =
     | HEADER of string
     | ID of string
     | LITERAL of string
@@ -9,8 +9,8 @@ type FsyaccToken =
     | COLON
     | BAR
     | PERCENT
-    | LEFT
-    | RIGHT
+    | LEFTASSOC
+    | RIGHTASSOC
     | NONASSOC
     | PREC
     | TYPE
@@ -19,8 +19,9 @@ type FsyaccToken =
     | PLUS
     | STAR
 
-    | LBRACK 
+    | LBRACK
     | RBRACK
-    | LPAREN 
+    | LPAREN
     | RPAREN
-
+    | LANGLE
+    | RANGLE

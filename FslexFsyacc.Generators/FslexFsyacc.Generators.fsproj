@@ -11,16 +11,23 @@
   <ItemGroup>
     <Compile Include="Dir.fs" />
     <Compile Include="DirTest.fs" />
-    <None Include="typeArgument.fsyacc" />
-    <Compile Include="TypeArgumentParseTableTest.fs" />
+    <None Include="TypeArguments\typeArgument.fsyacc" />
+    <Compile Include="TypeArguments\TypeArgumentParseTableTest.fs" />
     <None Include="Brackets\bounded.fsyacc" />
     <Compile Include="Brackets\BoundedParseTableTest.fs" />
     <None Include="Fslex\fslex.fslex" />
     <Compile Include="Fslex\FslexDFATest.fs" />
     <None Include="Fslex\fslex.fsyacc" />
     <Compile Include="Fslex\FslexParseTableTest.fs" />
+    <Compile Include="Fsyacc\FsyaccToken.fs" />
+    <Compile Include="Fsyacc\FsyaccTokenUtils.fs" />
+    <Compile Include="Fsyacc\FsyaccParseTable.fs" />
+    <Compile Include="Fsyacc\FsyaccCompiler.fs" />
     <None Include="Fsyacc\fsyacc.fsyacc" />
     <Compile Include="Fsyacc\FsyaccParseTableTest.fs" />
+    <None Include="fsyacc2\fsyacc2.fsyacc" />
+    <Compile Include="Fsyacc2\FsyaccParseTable2Test.fs" />
+        
     <Compile Include="Program.fs" />
   </ItemGroup>
 

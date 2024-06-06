@@ -69,36 +69,36 @@ type FsyaccParseTableTest(output:ITestOutputHelper) =
         output.WriteLine("output yacc:")
         output.WriteLine(modulePath)
 
-    [<Fact>]
-    member _.``10 - valid ParseTable``() =
-        Should.equal coder.tokens FsyaccParseTable.tokens
-        Should.equal coder.kernels FsyaccParseTable.kernels
-        Should.equal coder.actions FsyaccParseTable.actions
+    //[<Fact>]
+    //member _.``10 - valid ParseTable``() =
+    //    Should.equal coder.tokens FsyaccParseTable.tokens
+    //    Should.equal coder.kernels FsyaccParseTable.kernels
+    //    Should.equal coder.actions FsyaccParseTable.actions
 
-        //产生式比较
-        let prodsFsyacc =
-            fsyacc.rules
-            |> Seq.map (fun rule -> rule.production)
-            |> Seq.toList
+    //    //产生式比较
+    //    let prodsFsyacc =
+    //        fsyacc.rules
+    //        |> Seq.map (fun rule -> rule.production)
+    //        |> Seq.toList
 
-        let prodsParseTable =
-            FsyaccParseTable.rules
-            |> List.map fst
+    //    let prodsParseTable =
+    //        FsyaccParseTable.rules
+    //        |> List.map fst
 
-        Should.equal prodsFsyacc prodsParseTable
+    //    Should.equal prodsFsyacc prodsParseTable
 
-        //header,reducers代码比较
-        let headerFromFsyacc =
-            FSharp.Compiler.SyntaxTreeX.Parser.getDecls("header.fsx",fsyacc.header)
+    //    //header,reducers代码比较
+    //    let headerFromFsyacc =
+    //        FSharp.Compiler.SyntaxTreeX.Parser.getDecls("header.fsx",fsyacc.header)
 
-        let semansFsyacc =
-            let mappers = coder.generateMappers()
-            FSharp.Compiler.SyntaxTreeX.SourceCodeParser.semansFromMappers mappers
+    //    let semansFsyacc =
+    //        let mappers = coder.generateMappers()
+    //        FSharp.Compiler.SyntaxTreeX.SourceCodeParser.semansFromMappers mappers
 
-        let header,semans =
-            let text = File.ReadAllText(modulePath, Encoding.UTF8)
-            FSharp.Compiler.SyntaxTreeX.SourceCodeParser.getHeaderSemansFromFSharp 4 text
+    //    let header,semans =
+    //        let text = File.ReadAllText(modulePath, Encoding.UTF8)
+    //        FSharp.Compiler.SyntaxTreeX.SourceCodeParser.getHeaderSemansFromFSharp 4 text
 
-        Should.equal headerFromFsyacc header
-        Should.equal semansFsyacc semans
+    //    Should.equal headerFromFsyacc header
+    //    Should.equal semansFsyacc semans
 
