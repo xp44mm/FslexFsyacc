@@ -15,7 +15,7 @@ let rules : list<string list*(obj list->obj)> = [
         let s0 = unbox<TypeArgument> ss.[0]
         let s1 = unbox<SuffixType list> ss.[1]
         let result:TypeArgument =
-            TypeArgumentTools.ofApp(s0,s1)
+            TypeArgumentUtils.ofApp(s0,s1)
         box result
     ["atomtype";"(";"typeArgument";")"], fun(ss:obj list)->
         let s1 = unbox<TypeArgument> ss.[1]
@@ -39,7 +39,7 @@ let rules : list<string list*(obj list->obj)> = [
     ["atomtype";"struct";"(";"tupletype";")"], fun(ss:obj list)->
         let s2 = unbox<TypeArgument list> ss.[2]
         let result:TypeArgument =
-            match TypeArgumentTools.ofTuple s2 with Tuple(_,ls) -> Tuple(true,ls) |_->failwith""
+            match TypeArgumentUtils.ofTuple s2 with Tuple(_,ls) -> Tuple(true,ls) |_->failwith""
         box result
     ["atomtype";"struct";"anonRecordType"], fun(ss:obj list)->
         let s1 = unbox<TypeArgument> ss.[1]
@@ -49,7 +49,7 @@ let rules : list<string list*(obj list->obj)> = [
     ["atomtype";"typar"], fun(ss:obj list)->
         let s0 = unbox<Typar> ss.[0]
         let result:TypeArgument =
-            TypeArgumentTools.ofTypar s0
+            TypeArgumentUtils.ofTypar s0
         box result
     ["ctortype";"longIdent"], fun(ss:obj list)->
         let s0 = unbox<string list> ss.[0]
@@ -65,7 +65,7 @@ let rules : list<string list*(obj list->obj)> = [
     ["flexibletype";"#";"(";"apptype";")"], fun(ss:obj list)->
         let s2 = unbox<TypeArgument> ss.[2]
         let result:BaseOrInterfaceType =
-            TypeArgumentTools.toBaseOrInterfaceType s2
+            TypeArgumentUtils.toBaseOrInterfaceType s2
         box result
     ["flexibletype";"#";"_"], fun(ss:obj list)->
         let result:BaseOrInterfaceType =
@@ -124,7 +124,7 @@ let rules : list<string list*(obj list->obj)> = [
         let s0 = unbox<Typar> ss.[0]
         let s2 = unbox<TypeArgument> ss.[2]
         let result:TypeArgument =
-            Subtype(s0,TypeArgumentTools.toBaseOrInterfaceType s2)
+            Subtype(s0,TypeArgumentUtils.toBaseOrInterfaceType s2)
         box result
     ["suffixType";"ARRAY_TYPE_SUFFIX"], fun(ss:obj list)->
         let s0 = unbox<int> ss.[0]
@@ -175,7 +175,7 @@ let rules : list<string list*(obj list->obj)> = [
     ["typeArgument";"funtype"], fun(ss:obj list)->
         let s0 = unbox<TypeArgument list list> ss.[0]
         let result:TypeArgument =
-            TypeArgumentTools.ofFun s0
+            TypeArgumentUtils.ofFun s0
         box result
     ["typeArgument";"subtype"], fun(ss:obj list)->
         let s0 = unbox<TypeArgument> ss.[0]

@@ -26,7 +26,7 @@ type FsyaccParseTable2Test(output:ITestOutputHelper) =
 
     let rawFsyacc =
         text
-        |> FsyaccCompiler.compile
+        |> FsyaccCompiler2.compile
 
     let fsyacc =
         rawFsyacc
@@ -61,10 +61,12 @@ type FsyaccParseTable2Test(output:ITestOutputHelper) =
         output.WriteLine($"{stringify cp}")
 
     [<Fact(
-    //Skip="按需更新源代码"
+    Skip="按需更新源代码"
     )>]
     member _.``06 - generate FsyaccParseTable``() =
         let outp = coder.generateModule(moduleName)
+        //output.WriteLine(outp)
+        
         File.WriteAllText(modulePath, outp, Encoding.UTF8)
         output.WriteLine("output yacc:")
         output.WriteLine(modulePath)

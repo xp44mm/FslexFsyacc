@@ -2,26 +2,29 @@
 
 open System
 open FSharp.Idioms
+open FslexFsyacc.TypeArguments
 
-let reducerBody (typeAnnotations:Map<string,string>) (production:string list) (reducer:string) =
+let reducerBody (typeAnnotations:Map<string,TypeArgument>) (production:string list) (reducer:string) =
     let bodySymbols =
         production
         |> List.tail
         |> List.mapi(fun i s -> i,s)
-        |> List.filter(fun(i,s)-> typeAnnotations.ContainsKey s && s <> "unit")
+        |> List.filter(fun(i,s)-> 
+            typeAnnotations.ContainsKey s && 
+            typeAnnotations.[s] <> Ctor(["unit"],[]))
 
     let mainLines =
         [
             for (i,sym) in bodySymbols do
                 if typeAnnotations.ContainsKey sym then
-                    $"let s{i} = unbox<{typeAnnotations.[sym]}> ss.[{i}]"
+                    $"let s{i} = unbox<{typeAnnotations.[sym].toString()}> ss.[{i}]"
                 else 
                     failwith $"type annot `{sym}` is required."
 
             if typeAnnotations.ContainsKey production.Head && 
-                typeAnnotations.[production.Head] <> "unit" then
+                typeAnnotations.[production.Head] <> Ctor(["unit"],[]) then
 
-                $"let result:{typeAnnotations.[production.Head]} ="
+                $"let result:{typeAnnotations.[production.Head].toString()} ="
                 reducer |> Line.indentCodeBlock (4)
                 $"box result"
             else
@@ -38,7 +41,7 @@ let reducerBody (typeAnnotations:Map<string,string>) (production:string list) (r
         mainLines
 
 // 生成semantic函数的定义
-let decorateReducer (typeAnnotations:Map<string,string>) (production: string list) (reducer:string) =
+let decorateReducer (typeAnnotations:Map<string,TypeArgument>) (production: string list) (reducer:string) =
     let body = reducerBody typeAnnotations production reducer
     let funcDef =
         [

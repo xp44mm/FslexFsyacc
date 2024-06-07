@@ -1,4 +1,4 @@
-﻿module FslexFsyacc.YACCs.Operators
+﻿module FslexFsyacc.Fsyacc.Operators
 
 open FSharp.Idioms
 open FSharp.Idioms.Literal

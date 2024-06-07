@@ -4,6 +4,7 @@ open Xunit
 open Xunit.Abstractions
 open FSharp.xUnit
 open FSharp.Idioms
+open FslexFsyacc.TypeArguments
 
 type SemanticGeneratorTest(output:ITestOutputHelper) =
     let show res =
@@ -13,8 +14,8 @@ type SemanticGeneratorTest(output:ITestOutputHelper) =
 
     [<Fact>]
     member _.``semantic actions``() =
-        let typeAnnotations = Map[
-            "expr", "float"
+        let typeAnnotations = Map [
+            "expr", Ctor(["float"],[])
         ]
         let prodSymbols = [ "expr" ; "expr" ; "+"; "expr"]
         let semantic = "s0 + s3"

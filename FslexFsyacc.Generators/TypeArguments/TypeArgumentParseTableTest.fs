@@ -3,7 +3,6 @@
 open FslexFsyacc.Fsyacc
 open FslexFsyacc.YACCs
 open FslexFsyacc
-open FslexFsyacc
 
 open Xunit
 open Xunit.Abstractions
@@ -31,7 +30,7 @@ type TypeArgumentParseTableTest (output:ITestOutputHelper) =
 
     let fsyacc =
         rawFsyacc
-        |> FslexFsyacc.YACCs.FlatFsyaccFile.from
+        |> FlatFsyaccFile.from
 
     let coder = FsyaccParseTableCoder.from fsyacc
 

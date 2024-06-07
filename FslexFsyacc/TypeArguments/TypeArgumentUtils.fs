@@ -1,4 +1,4 @@
-﻿module FslexFsyacc.TypeArguments.TypeArgumentTools
+﻿module FslexFsyacc.TypeArguments.TypeArgumentUtils
 
 //本模块中的函数用于fsyacc中的代码块使用。
 

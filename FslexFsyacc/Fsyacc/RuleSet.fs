@@ -1,4 +1,4 @@
-﻿module FslexFsyacc.YACCs.RuleSet
+﻿module FslexFsyacc.Fsyacc.RuleSet
 
 open System
 open FSharp.Idioms

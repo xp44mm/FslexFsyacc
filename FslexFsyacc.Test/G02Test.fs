@@ -33,7 +33,7 @@ type G02Test(output:ITestOutputHelper) =
 
     let fsyacc =
         rawFsyacc
-        |> FslexFsyacc.YACCs.FlatFsyaccFile.from
+        |> FlatFsyaccFile.from
 
     let tbl =
         fsyacc.getYacc()

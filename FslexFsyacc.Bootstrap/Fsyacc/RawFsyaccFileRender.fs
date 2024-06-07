@@ -5,6 +5,7 @@ open System.Text.RegularExpressions
 
 open FSharp.Idioms
 open FSharp.Idioms.Line
+open FslexFsyacc.TypeArguments
 
 let renderHeader (header:string) =
     if String.IsNullOrWhiteSpace(header) then
@@ -80,9 +81,9 @@ let renderDec (symbol:string, typeD:string) =
     |> List.map renderSymbol
     |> String.concat " : "
 
-let renderTypeLine (typeArg:string, symbols:string list) =
+let renderTypeLine (typeArg:TypeArgument, symbols:string list) =
     let symbols =
         symbols
         |> List.map renderSymbol
         |> String.concat " "
-    $"%%type<{typeArg}> {symbols}"
+    $"%%type<{typeArg.toString()}> {symbols}"

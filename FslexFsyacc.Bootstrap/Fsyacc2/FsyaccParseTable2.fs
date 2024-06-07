@@ -5,6 +5,8 @@ let kernelSymbols = ["";"file";"%left";"%nonassoc";"%right";"ID";"LITERAL";"[";"
 let actions = [["HEADER",15;"file",1];["",0];["%prec",-1;"(",-1;"ID",-1;"LITERAL",-1;"REDUCER",-1;"[",-1];["%prec",-2;"(",-2;"ID",-2;"LITERAL",-2;"REDUCER",-2;"[",-2];["%prec",-3;"(",-3;"ID",-3;"LITERAL",-3;"REDUCER",-3;"[",-3];["",-4;"%%",-4;"%left",-4;"%nonassoc",-4;"%prec",-4;"%right",-4;"%type",-4;"(",-4;")",-4;"*",-4;"+",-4;":",-4;"?",-4;"ID",-4;"LITERAL",-4;"REDUCER",-4;"[",-4;"]",-4];["",-5;"%%",-5;"%left",-5;"%nonassoc",-5;"%prec",-5;"%right",-5;"%type",-5;"(",-5;")",-5;"*",-5;"+",-5;":",-5;"?",-5;"ID",-5;"LITERAL",-5;"REDUCER",-5;"[",-5;"]",-5];["(",28;"ID",5;"LITERAL",6;"[",7;"atomic",44;"brackets",45;"parens",46;"repetition",47;"symbol",35;"{symbol+}",8];["(",28;"ID",5;"LITERAL",6;"[",7;"]",9;"atomic",44;"brackets",45;"parens",46;"repetition",47;"symbol",36];["",-6;"%%",-6;"%left",-6;"%nonassoc",-6;"%prec",-6;"%right",-6;"%type",-6;"(",-6;")",-6;"*",-6;"+",-6;":",-6;"?",-6;"ID",-6;"LITERAL",-6;"REDUCER",-6;"[",-6;"]",-6];["<",11];["TYPE_ARGUMENT",12];[">",13];["(",28;"ID",5;"LITERAL",6;"[",7;"atomic",44;"brackets",45;"parens",46;"repetition",47;"symbol",35;"{symbol+}",14];["",-7;"%%",-7;"%type",-7;"(",28;"ID",5;"LITERAL",6;"[",7;"atomic",44;"brackets",45;"parens",46;"repetition",47;"symbol",36];["(",28;"ID",5;"LITERAL",6;"[",7;"atomic",44;"brackets",45;"parens",46;"repetition",47;"ruleGroup",59;"symbol",34;"{ruleGroup+}",16];["",-24;"%%",17;"(",28;"ID",5;"LITERAL",6;"[",7;"atomic",44;"brackets",45;"parens",46;"repetition",47;"ruleGroup",60;"symbol",34;"{\"%%\"?}",25];["",-25;"%left",2;"%nonassoc",3;"%right",4;"%type",10;"assoc",26;"declaration",50;"operatorsLine",52;"{declaration+}",18;"{operatorsLine+}",20];["",-24;"%%",48;"%type",10;"declaration",51;"{\"%%\"?}",19];["",-8];["",-24;"%%",21;"%left",2;"%nonassoc",3;"%right",4;"assoc",26;"operatorsLine",53;"{\"%%\"?}",24];["",-25;"%type",10;"declaration",50;"{declaration+}",22];["",-24;"%%",48;"%type",10;"declaration",51;"{\"%%\"?}",23];["",-9];["",-10];["",-11];["(",28;"ID",5;"LITERAL",6;"[",7;"atomic",44;"brackets",45;"parens",46;"repetition",47;"symbol",35;"{symbol+}",27];["",-12;"%%",-12;"%left",-12;"%nonassoc",-12;"%right",-12;"(",28;"ID",5;"LITERAL",6;"[",7;"atomic",44;"brackets",45;"parens",46;"repetition",47;"symbol",36];["(",28;"ID",5;"LITERAL",6;"[",7;"atomic",44;"brackets",45;"parens",46;"repetition",47;"symbol",35;"{symbol+}",29];["(",28;")",30;"ID",5;"LITERAL",6;"[",7;"atomic",44;"brackets",45;"parens",46;"repetition",47;"symbol",36];["",-13;"%%",-13;"%left",-13;"%nonassoc",-13;"%prec",-13;"%right",-13;"%type",-13;"(",-13;")",-13;"*",-13;"+",-13;":",-13;"?",-13;"ID",-13;"LITERAL",-13;"REDUCER",-13;"[",-13;"]",-13];["",-14;"%%",-14;"%left",-14;"%nonassoc",-14;"%prec",-14;"%right",-14;"%type",-14;"(",-14;")",-14;"*",-14;"+",-14;":",-14;"?",-14;"ID",-14;"LITERAL",-14;"REDUCER",-14;"[",-14;"]",-14];["",-15;"%%",-15;"%left",-15;"%nonassoc",-15;"%prec",-15;"%right",-15;"%type",-15;"(",-15;")",-15;"*",-15;"+",-15;":",-15;"?",-15;"ID",-15;"LITERAL",-15;"REDUCER",-15;"[",-15;"]",-15];["",-16;"%%",-16;"%left",-16;"%nonassoc",-16;"%prec",-16;"%right",-16;"%type",-16;"(",-16;")",-16;"*",-16;"+",-16;":",-16;"?",-16;"ID",-16;"LITERAL",-16;"REDUCER",-16;"[",-16;"]",-16];["*",31;"+",32;":",41;"?",33;"quantifier",37];["",-40;"%%",-40;"%left",-40;"%nonassoc",-40;"%prec",-40;"%right",-40;"%type",-40;"(",-40;")",-40;"*",31;"+",32;"?",33;"ID",-40;"LITERAL",-40;"REDUCER",-40;"[",-40;"]",-40;"quantifier",37];["",-41;"%%",-41;"%left",-41;"%nonassoc",-41;"%prec",-41;"%right",-41;"%type",-41;"(",-41;")",-41;"*",31;"+",32;"?",33;"ID",-41;"LITERAL",-41;"REDUCER",-41;"[",-41;"]",-41;"quantifier",37];["",-17;"%%",-17;"%left",-17;"%nonassoc",-17;"%prec",-17;"%right",-17;"%type",-17;"(",-17;")",-17;"*",-17;"+",-17;":",-17;"?",-17;"ID",-17;"LITERAL",-17;"REDUCER",-17;"[",-17;"]",-17];["%prec",54;"REDUCER",-32;"{precToken?}",39];["REDUCER",40];["",-18;"%%",-18;"%prec",-18;"(",-18;"ID",-18;"LITERAL",-18;"REDUCER",-18;"[",-18;"|",-18];["%prec",-26;"(",-26;"ID",-26;"LITERAL",-26;"REDUCER",-26;"[",-26;"{\"|\"?}",42;"|",49];["%prec",-38;"(",28;"ID",5;"LITERAL",6;"REDUCER",-38;"[",7;"atomic",44;"brackets",45;"parens",46;"repetition",47;"ruleBody",56;"symbol",35;"{ruleBody+}",43;"{symbol*}",38;"{symbol+}",61];["",-19;"%%",-19;"%prec",-19;"(",-19;"ID",-19;"LITERAL",-19;"REDUCER",-19;"[",-19;"|",57];["",-20;"%%",-20;"%left",-20;"%nonassoc",-20;"%prec",-20;"%right",-20;"%type",-20;"(",-20;")",-20;"*",-20;"+",-20;":",-20;"?",-20;"ID",-20;"LITERAL",-20;"REDUCER",-20;"[",-20;"]",-20];["",-21;"%%",-21;"%left",-21;"%nonassoc",-21;"%prec",-21;"%right",-21;"%type",-21;"(",-21;")",-21;"*",-21;"+",-21;":",-21;"?",-21;"ID",-21;"LITERAL",-21;"REDUCER",-21;"[",-21;"]",-21];["",-22;"%%",-22;"%left",-22;"%nonassoc",-22;"%prec",-22;"%right",-22;"%type",-22;"(",-22;")",-22;"*",-22;"+",-22;":",-22;"?",-22;"ID",-22;"LITERAL",-22;"REDUCER",-22;"[",-22;"]",-22];["",-23;"%%",-23;"%left",-23;"%nonassoc",-23;"%prec",-23;"%right",-23;"%type",-23;"(",-23;")",-23;"*",-23;"+",-23;":",-23;"?",-23;"ID",-23;"LITERAL",-23;"REDUCER",-23;"[",-23;"]",-23];["",-25];["%prec",-27;"(",-27;"ID",-27;"LITERAL",-27;"REDUCER",-27;"[",-27];["",-28;"%%",-28;"%type",-28];["",-29;"%%",-29;"%type",-29];["",-30;"%%",-30;"%left",-30;"%nonassoc",-30;"%right",-30];["",-31;"%%",-31;"%left",-31;"%nonassoc",-31;"%right",-31];["ID",55];["REDUCER",-33];["",-34;"%%",-34;"%prec",-34;"(",-34;"ID",-34;"LITERAL",-34;"REDUCER",-34;"[",-34;"|",-34];["%prec",-38;"(",28;"ID",5;"LITERAL",6;"REDUCER",-38;"[",7;"atomic",44;"brackets",45;"parens",46;"repetition",47;"ruleBody",58;"symbol",35;"{symbol*}",38;"{symbol+}",61];["",-35;"%%",-35;"%prec",-35;"(",-35;"ID",-35;"LITERAL",-35;"REDUCER",-35;"[",-35;"|",-35];["",-36;"%%",-36;"%prec",-36;"(",-36;"ID",-36;"LITERAL",-36;"REDUCER",-36;"[",-36];["",-37;"%%",-37;"%prec",-37;"(",-37;"ID",-37;"LITERAL",-37;"REDUCER",-37;"[",-37];["%prec",-39;"(",28;"ID",5;"LITERAL",6;"REDUCER",-39;"[",7;"atomic",44;"brackets",45;"parens",46;"repetition",47;"symbol",36]]
 open FslexFsyacc.Precedences
 open FslexFsyacc.YACCs
+open FslexFsyacc.TypeArguments
+
 let rules : list<string list*(obj list->obj)> = [
     ["";"file"], fun(ss:obj list)-> ss.[0]
     ["assoc";"%left"], fun(ss:obj list)->
@@ -35,9 +37,9 @@ let rules : list<string list*(obj list->obj)> = [
             List.rev s1
         box result
     ["declaration";"%type";"<";"TYPE_ARGUMENT";">";"{symbol+}"], fun(ss:obj list)->
-        let s2 = unbox<string> ss.[2]
+        let s2 = unbox<TypeArgument> ss.[2]
         let s4 = unbox<RegularSymbol list> ss.[4]
-        let result:string*string list =
+        let result:TypeArgument*string list =
             let symbols =
                 s4
                 |> List.map RegularSymbolUtils.innerSymbol
@@ -47,7 +49,7 @@ let rules : list<string list*(obj list->obj)> = [
     ["file";"HEADER";"{ruleGroup+}";"%%";"{declaration+}";"{\"%%\"?}"], fun(ss:obj list)->
         let s0 = unbox<string> ss.[0]
         let s1 = unbox<RuleGroup list> ss.[1]
-        let s3 = unbox<(string*string list)list> ss.[3]
+        let s3 = unbox<(TypeArgument*string list)list> ss.[3]
         let result:RawFsyaccFile =
             {
                 header = s0
@@ -60,7 +62,7 @@ let rules : list<string list*(obj list->obj)> = [
         let s0 = unbox<string> ss.[0]
         let s1 = unbox<RuleGroup list> ss.[1]
         let s3 = unbox<(Associativity*string list)list> ss.[3]
-        let s5 = unbox<(string*string list)list> ss.[5]
+        let s5 = unbox<(TypeArgument*string list)list> ss.[5]
         let result:RawFsyaccFile =
             {
                 header = s0
@@ -168,14 +170,14 @@ let rules : list<string list*(obj list->obj)> = [
     ["{\"|\"?}";"|"], fun(ss:obj list)->
         null
     ["{declaration+}";"declaration"], fun(ss:obj list)->
-        let s0 = unbox<string*string list> ss.[0]
-        let result:(string*string list)list =
+        let s0 = unbox<TypeArgument*string list> ss.[0]
+        let result:(TypeArgument*string list)list =
             [s0]
         box result
     ["{declaration+}";"{declaration+}";"declaration"], fun(ss:obj list)->
-        let s0 = unbox<(string*string list)list> ss.[0]
-        let s1 = unbox<string*string list> ss.[1]
-        let result:(string*string list)list =
+        let s0 = unbox<(TypeArgument*string list)list> ss.[0]
+        let s1 = unbox<TypeArgument*string list> ss.[1]
+        let result:(TypeArgument*string list)list =
             s1::s0
         box result
     ["{operatorsLine+}";"operatorsLine"], fun(ss:obj list)->

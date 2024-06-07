@@ -1,7 +1,8 @@
-﻿module FslexFsyacc.YACCs.Declaration
+﻿module FslexFsyacc.Fsyacc.Declaration
+open FslexFsyacc.TypeArguments
 
 /// 
-let types (declarationLines:Map<string, Set<string>>) = 
+let types (declarationLines:Map<TypeArgument, Set<string>>) = 
     // todo 检测符号重复
     declarationLines
     |> Seq.collect(fun(KeyValue (tp,symbols)) ->
@@ -9,7 +10,7 @@ let types (declarationLines:Map<string, Set<string>>) =
         |> Seq.map(fun sym -> sym,tp))
     |> Map.ofSeq
 
-let lines (declarations:Map<string,string>) = 
+let lines (declarations:Map<string,TypeArgument>) = 
     declarations
     |> Seq.groupBy(fun (KeyValue(sym,tp)) -> tp)
     |> Seq.map(fun (tp,groups) ->

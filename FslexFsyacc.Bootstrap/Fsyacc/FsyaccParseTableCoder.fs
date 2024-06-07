@@ -8,6 +8,7 @@ open FslexFsyacc
 open FslexFsyacc.YACCs
 open FslexFsyacc.BNFs
 open FslexFsyacc.ItemCores
+open FslexFsyacc.TypeArguments
 
 /// 表示*.fsyacc生成的模块。
 type FsyaccParseTableCoder =
@@ -18,7 +19,7 @@ type FsyaccParseTableCoder =
         kernels: list<list<int*int>> // Set<Set<ItemCore>>
         kernelSymbols: list<string>
         actions: (string*int)list list // kernel -> symbol -> kernel
-        declarations: Map<string,string> // symbol -> type of symbol
+        declarations: Map<string,TypeArgument> // symbol -> type of symbol
     }
 
     static member from (fsyacc:FlatFsyaccFile) =
@@ -97,7 +98,7 @@ type FsyaccParseTableCoder =
             "]"
 
             "let unboxRoot ="
-            $"    unbox<{this.declarations.[this.startSymbol]}>"
+            $"    unbox<{this.declarations.[this.startSymbol].toString()}>"
 
             "let app: FslexFsyacc.ParseTableApp = {"
             "    tokens        = tokens"

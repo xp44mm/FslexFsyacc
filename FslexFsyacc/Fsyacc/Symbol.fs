@@ -1,4 +1,4 @@
-﻿module FslexFsyacc.YACCs.Symbol
+﻿module FslexFsyacc.Fsyacc.Symbol
 open FslexFsyacc.Precedences
 
 ///获取重复的符号
@@ -23,7 +23,7 @@ let duplOperators (operatorsLines: list<Associativity*string list>) =
     | [] -> ()
     | ls -> failwith $"操作符优先级有重复：{ls}"
 
-let duplDeclar (declarationsLines: list<string*string list>) =
+let duplDeclar<'a> (declarationsLines: list<'a*string list>) =
     match
         declarationsLines
         |> List.collect snd

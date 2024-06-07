@@ -1,4 +1,4 @@
-﻿namespace FslexFsyacc.YACCs
+﻿namespace FslexFsyacc.Fsyacc
 
 open System
 open FSharp.Idioms
@@ -8,13 +8,14 @@ open FslexFsyacc.Grammars
 open FslexFsyacc.Precedences
 open FslexFsyacc.BNFs
 open FslexFsyacc.YACCs
+open FslexFsyacc.TypeArguments
 
 type FlatFsyaccFile =
     {
         header: string        
         rules: Rule Set //augment Rules
         operatorsLines: list<Associativity * Set<string>> // symbol -> prec level
-        declarationsLines: Map<string, Set<string>>
+        declarationsLines: Map<TypeArgument, Set<string>>
     }
 
     /// 带有重复检查

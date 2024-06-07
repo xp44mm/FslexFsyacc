@@ -8,6 +8,7 @@ open FslexFsyacc
 open FslexFsyacc.YACCs
 open FslexFsyacc.BNFs
 open FslexFsyacc.ItemCores
+open FslexFsyacc.TypeArguments
 
 /// 表示*.fsyacc生成的模块。
 [<Obsolete("FsyaccParseTableCoder")>]
@@ -19,7 +20,7 @@ type FsyaccParseTableFile =
         kernels: list<list<int*int>> // Set<Set<ItemCore>>
         actions: (string*int)list list // kernel -> symbol -> kernel
         closures: (int*int*string list)list list
-        declarations: Map<string,string> // symbol -> type of symbol
+        declarations: Map<string,TypeArgument> // symbol -> type of symbol
     }
 
     static member from (fsyacc:FlatFsyaccFile) =

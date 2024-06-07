@@ -1,6 +1,7 @@
 %{
 open FslexFsyacc.Precedences
 open FslexFsyacc.YACCs
+open FslexFsyacc.TypeArguments
 %}
 
 file :
@@ -115,7 +116,8 @@ declaration :
 
 %%
 
-%type<string> HEADER ID LITERAL REDUCER TYPE_ARGUMENT precToken? atomic quantifier
+%type<string> HEADER ID LITERAL REDUCER precToken? atomic quantifier
+%type<TypeArgument> TYPE_ARGUMENT
 %type<Associativity> assoc
 %type<RuleBody list> ruleBody+
 %type<RuleBody> ruleBody
@@ -124,8 +126,8 @@ declaration :
 %type<RuleGroup list> ruleGroup+
 %type<Associativity*string list> operatorsLine
 %type<(Associativity*string list)list> operatorsLine+
-%type<string*string list> declaration
-%type<(string*string list)list> declaration+
+%type<TypeArgument*string list> declaration
+%type<(TypeArgument*string list)list> declaration+
 %type<RegularSymbol> symbol
 %type<RegularSymbol list> symbol+ symbol* brackets parens
 %type<RegularSymbol*string> repetition

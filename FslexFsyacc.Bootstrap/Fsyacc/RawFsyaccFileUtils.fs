@@ -1,5 +1,6 @@
 ﻿module FslexFsyacc.Fsyacc.RawFsyaccFileUtils
 open FslexFsyacc.YACCs
+open FslexFsyacc.TypeArguments
 
 ///从`*.fsyacc`文件中解析成本类型的数据
 //let parse text =

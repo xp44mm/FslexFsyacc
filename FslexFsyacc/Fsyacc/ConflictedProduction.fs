@@ -1,5 +1,5 @@
 ﻿
-namespace FslexFsyacc.YACCs
+namespace FslexFsyacc.Fsyacc
 
 open System
 open FSharp.Idioms

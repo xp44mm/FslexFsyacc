@@ -24,10 +24,6 @@
     <Compile Include="TypeArguments\FSharpTokenScratch.fs" />
     <Compile Include="TypeArguments\TypeArgumentToken.fs" />
     <Compile Include="TypeArguments\TypeArgumentTokenUtils.fs" />
-    <Compile Include="TypeArguments\Typar.fs" />
-    <Compile Include="TypeArguments\SuffixType.fs" />
-    <Compile Include="TypeArguments\TypeArgument.fs" />
-    <Compile Include="TypeArguments\TypeArgumentTools.fs" />
     <Compile Include="TypeArguments\TypeArgumentParseTable.fs" />
     <Compile Include="TypeArguments\TypeArgumentCompiler.fs" />
     <Compile Include="Brackets\Band.fs" />

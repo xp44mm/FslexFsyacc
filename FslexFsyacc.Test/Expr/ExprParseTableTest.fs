@@ -68,9 +68,10 @@ type ExprParseTableTest(output:ITestOutputHelper) =
     )>]
     member _.``02 - generate Parse Table``() =
         let outp = coder.generateModule(parseTblModule)
+        //output.WriteLine(outp)
         File.WriteAllText(parseTblPath, outp, Encoding.UTF8)
-        output.WriteLine($"output yacc:\r\n{parseTblPath}")
-
+        output.WriteLine("output yacc:")
+        output.WriteLine(parseTblPath)
     [<Fact>]
     member _.``10 - valid ParseTable``() =
         Should.equal coder.tokens ExprParseTable.tokens
