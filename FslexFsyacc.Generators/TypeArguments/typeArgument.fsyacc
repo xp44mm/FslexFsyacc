@@ -18,7 +18,7 @@ atomtype :
     | namedtype {match s0 with a,b -> Ctor(a,b)}
     | anonRecordType {s0}
     | "(" typeArgument ")" {s1}
-    | struct "(" tupletype ")" {match TypeArgumentTools.ofTuple s2 with Tuple(_,ls) -> Tuple(true,ls) |_->failwith""}
+    | struct "(" tupletype ")" {match TypeArgumentTools.ofTuple s2 with Tuple(_,ls) -> Tuple(true,ls) | _ -> failwith "" }
     | struct anonRecordType {match s1 with AnonRecd(_,ls) -> AnonRecd(true,ls) |_->failwith""}
 namedtype :
     | ctortype {s0,[]}

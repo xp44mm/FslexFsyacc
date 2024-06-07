@@ -30,7 +30,7 @@ type FsyaccParseTable2Test(output:ITestOutputHelper) =
 
     let fsyacc =
         rawFsyacc
-        |> FslexFsyacc.YACCs.FlatFsyaccFile.from
+        |> FlatFsyaccFile.from
 
     let coder = FsyaccParseTableCoder.from fsyacc
 

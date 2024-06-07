@@ -62,7 +62,7 @@ type TypeArgumentCompilerTest(output:ITestOutputHelper) =
 
         let y = 
             ls.[i]
-            |> TypeArgumentUtils.tokenize 0
+            |> TypeArgumentTokenUtils.tokenize 0
             |> Seq.head
             |> (fun x -> x.value)
 

@@ -1,27 +1,4 @@
-﻿namespace rec FslexFsyacc.TypeArguments
-
-/// 又名：signature syntax
-type Typar =
-    | AnonTypar
-    | NamedTypar of isInline:bool * string // todo '\'' '^'
-
-    member this.toString() = 
-        match this with
-        | AnonTypar -> "_"
-        | NamedTypar (isInline, id) -> 
-            let p = if isInline then "^" else "'"
-            $"{p}{id}"
-
-type SuffixType =
-    | LongIdent of string list
-    | ArrayTypeSuffix of int
-
-    member this.toString() = 
-        match this with
-        | LongIdent ids -> ids |> String.concat "."
-        | ArrayTypeSuffix rank -> 
-            let cs = String.replicate rank ","
-            $"[{cs}]"
+﻿namespace FslexFsyacc.TypeArguments
 
 type TypeArgument =
     | Anon
@@ -37,19 +14,76 @@ type TypeArgument =
     member this.toString() = 
         match this with
         | Anon -> "_"
-        | Fun ls -> sprintf ""
-        | Tuple (isStruct, ls: TypeArgument list) -> ""
-        | App (atomtype:TypeArgument , suffixTypes:SuffixType list) -> sprintf ""
+        | Fun ls -> 
+            ls
+            |> List.map (fun e -> e.toString())
+            |> String.concat "->"
+        | Tuple (isStruct, ls: TypeArgument list) -> 
+            let m =
+                ls
+                |> List.map (fun e -> e.toString())
+                |> String.concat "*"
+            if isStruct then
+                $"struct({m})"
+            else
+                m
+        | App (atomtype:TypeArgument , suffixTypes:SuffixType list) -> 
+            [
+                atomtype.toString()
+                yield! suffixTypes |> List.map(fun t -> t.toString())
+            ]
+            |> String.concat " "
         | TypeParam ( isInline:bool , nm: string) -> 
             let p = if isInline then "^" else "'"
             $"{p}{nm}"
-        | Ctor (longIdent:string list , ls: TypeArgument list) -> ""
-        | AnonRecd ( isStruct: bool, fields: (string * TypeArgument) list) -> ""
-        | Flexible (tp: BaseOrInterfaceType) -> ""
-        | Subtype (tp: Typar , it: BaseOrInterfaceType) -> ""
+        | Ctor (longIdent:string list , ls: TypeArgument list) ->
+            let h = String.concat "." longIdent
+            if ls.IsEmpty then
+                h
+            else
+                let aa = ls |> List.map(fun a -> a.toString()) |> String.concat ","
+                $"{h}<{aa}>"
+        | AnonRecd (isStruct: bool, fields: (string * TypeArgument) list) -> 
+            let cc =
+                fields
+                |> List.map(fun(n,t) -> $"{n}:{t.toString()}" )
+                |> String.concat ";"
+            [
+                if isStruct then yield "struct" else ()
+                yield cc
+            ]
+            |> String.concat " "
 
-type BaseOrInterfaceType =
+        | Flexible (tp: BaseOrInterfaceType) -> tp.toString()
+            
+            
+        | Subtype (tp: Typar, it: BaseOrInterfaceType) -> 
+            $"{tp.toString()}:>{it.toString()}"
+
+and BaseOrInterfaceType =
     | FlexibleAnon
-    | FlexibleApp of atomtype:TypeArgument * suffixTypes:SuffixType list
+    | FlexibleApp of atomtype: TypeArgument * suffixTypes: SuffixType list
     | FlexibleCtor of string list * TypeArgument list
 
+    member this.toString() = 
+        match this with
+        | FlexibleAnon -> "#_"
+
+        | FlexibleApp (atomtype: TypeArgument , suffixTypes: SuffixType list) ->
+            let app =
+                [
+                    atomtype.toString()
+                    yield! suffixTypes |> List.map(fun t -> t.toString())
+                ]
+                |> String.concat " "
+            $"#({app})"
+
+        | FlexibleCtor (longIdent: string list , ls: TypeArgument list) ->
+            let ctor =
+                let h = String.concat "." longIdent
+                if ls.IsEmpty then
+                    h
+                else
+                    let aa = ls |> List.map(fun a -> a.toString()) |> String.concat ","
+                    $"{h}<{aa}>"
+            $"#{ctor}"

@@ -1,10 +1,10 @@
 ﻿namespace FslexFsyacc.TypeArguments
 
-type FSharpToken =
+type TypeArgumentToken =
     | EOF
 
     | HASH
-    | LPAREN 
+    | LPAREN
     | RPAREN
     | STAR
     | COMMA
@@ -13,7 +13,7 @@ type FSharpToken =
     | COLON
     | COLON_GREATER
     | SEMICOLON
-    | LBRACK 
+    | LBRACK
     | RBRACK
     | ARRAY_TYPE_SUFFIX of rank:int
     | HTYPAR of string
@@ -22,10 +22,10 @@ type FSharpToken =
     | QTYPAR of string
     | UNDERSCORE
 
-    | LBRACE_BAR 
+    | LBRACE_BAR
     | BAR_RBRACE
-    | LESS
-    | GREATER
+    | LANGLE
+    | RANGLE
 
     | WHITESPACE of string
     | COMMENT of string
@@ -45,6 +45,6 @@ type FSharpToken =
     | UNMANAGED
     | WHEN
 
-    | TYPE_ARGUMENT of TypeArgument
+    //| TYPE_ARGUMENT of TypeArgument
 
 

@@ -1,4 +1,4 @@
-﻿module FslexFsyacc.TypeArguments.TypeArgumentUtils
+﻿module FslexFsyacc.TypeArguments.TypeArgumentTokenUtils
 
 open FslexFsyacc.TypeArguments.FSharpTokenScratch
 open FslexFsyacc
@@ -22,8 +22,8 @@ let ops = Map [
     ":",COLON;
     ":>",COLON_GREATER;
     ";",SEMICOLON;
-    "<",LESS;
-    ">",GREATER;
+    "<",LANGLE;
+    ">",RANGLE;
     "[",LBRACK
     "]",RBRACK
     "{|",LBRACE_BAR;
@@ -44,7 +44,7 @@ let kws_inverse =
     |> Map.inverse 
     |> Map.map(fun k v -> Seq.exactlyOne v)
 
-let getTag (token:Position<FSharpToken>) =
+let getTag (token:Position<TypeArgumentToken>) =
     match token.value with
     | x when ops_inverse.ContainsKey x -> ops_inverse.[x]
     | x when kws_inverse.ContainsKey x -> kws_inverse.[x]
@@ -57,7 +57,7 @@ let getTag (token:Position<FSharpToken>) =
     | ARRAY_TYPE_SUFFIX _ -> "ARRAY_TYPE_SUFFIX"
     | x -> failwith $"{stringify x}"
 
-let getLexeme (token:Position<FSharpToken>) =
+let getLexeme (token:Position<TypeArgumentToken>) =
     match token.value with
     | IDENT             x -> box x
     | QTYPAR            x -> box x
