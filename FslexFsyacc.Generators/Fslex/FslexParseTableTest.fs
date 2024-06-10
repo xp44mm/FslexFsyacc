@@ -119,7 +119,7 @@ type FslexParseTableTest(output: ITestOutputHelper) =
     //    output.WriteLine(src)
 
     [<Fact(
-    //Skip="按需更新源代码"
+    Skip="按需更新源代码"
     )>]
     member _.``06 - generate ParseTable``() =
         let outp = coder.generateModule(moduleName)

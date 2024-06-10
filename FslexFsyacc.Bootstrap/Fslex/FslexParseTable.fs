@@ -35,7 +35,7 @@ let rules : list<string list*(obj list->obj)> = [
             Hole s0
         box result
     ["expr";"[";"{atomic+}";"]"], fun(ss:obj list)->
-        let s1 = unbox<RegularExpression<string> list> ss.[1]
+        let s1 = unbox<list<RegularExpression<string>>> ss.[1]
         let result:RegularExpression<string> =
             clazz s1
         box result
@@ -73,66 +73,66 @@ let rules : list<string list*(obj list->obj)> = [
         box result
     ["file";"HEADER";"{definition+}";"%%";"{rule+}"], fun(ss:obj list)->
         let s0 = unbox<string> ss.[0]
-        let s1 = unbox<(string*RegularExpression<string>)list> ss.[1]
-        let s3 = unbox<(RegularExpression<string>list*string)list> ss.[3]
-        let result:string*(string*RegularExpression<string>)list*(RegularExpression<string>list*string)list =
+        let s1 = unbox<list<string*RegularExpression<string>>> ss.[1]
+        let s3 = unbox<list<list<RegularExpression<string>>*string>> ss.[3]
+        let result:string*list<string*RegularExpression<string>>*list<list<RegularExpression<string>>*string> =
             s0,List.rev s1,List.rev s3
         box result
     ["file";"HEADER";"{rule+}"], fun(ss:obj list)->
         let s0 = unbox<string> ss.[0]
-        let s1 = unbox<(RegularExpression<string>list*string)list> ss.[1]
-        let result:string*(string*RegularExpression<string>)list*(RegularExpression<string>list*string)list =
+        let s1 = unbox<list<list<RegularExpression<string>>*string>> ss.[1]
+        let result:string*list<string*RegularExpression<string>>*list<list<RegularExpression<string>>*string> =
             s0,[],List.rev s1
         box result
     ["rule";"expr";"/";"expr";"REDUCER"], fun(ss:obj list)->
         let s0 = unbox<RegularExpression<string>> ss.[0]
         let s2 = unbox<RegularExpression<string>> ss.[2]
         let s3 = unbox<string> ss.[3]
-        let result:RegularExpression<string>list*string =
+        let result:list<RegularExpression<string>>*string =
             [s0;s2],s3
         box result
     ["rule";"expr";"REDUCER"], fun(ss:obj list)->
         let s0 = unbox<RegularExpression<string>> ss.[0]
         let s1 = unbox<string> ss.[1]
-        let result:RegularExpression<string>list*string =
+        let result:list<RegularExpression<string>>*string =
             [s0],s1
         box result
     ["{atomic+}";"atomic"], fun(ss:obj list)->
         let s0 = unbox<RegularExpression<string>> ss.[0]
-        let result:RegularExpression<string> list =
+        let result:list<RegularExpression<string>> =
             [s0]
         box result
     ["{atomic+}";"{atomic+}";"&";"atomic"], fun(ss:obj list)->
-        let s0 = unbox<RegularExpression<string> list> ss.[0]
+        let s0 = unbox<list<RegularExpression<string>>> ss.[0]
         let s2 = unbox<RegularExpression<string>> ss.[2]
-        let result:RegularExpression<string> list =
+        let result:list<RegularExpression<string>> =
             s2::s0
         box result
     ["{definition+}";"definition"], fun(ss:obj list)->
         let s0 = unbox<string*RegularExpression<string>> ss.[0]
-        let result:(string*RegularExpression<string>)list =
+        let result:list<string*RegularExpression<string>> =
             [s0]
         box result
     ["{definition+}";"{definition+}";"definition"], fun(ss:obj list)->
-        let s0 = unbox<(string*RegularExpression<string>)list> ss.[0]
+        let s0 = unbox<list<string*RegularExpression<string>>> ss.[0]
         let s1 = unbox<string*RegularExpression<string>> ss.[1]
-        let result:(string*RegularExpression<string>)list =
+        let result:list<string*RegularExpression<string>> =
             s1::s0
         box result
     ["{rule+}";"rule"], fun(ss:obj list)->
-        let s0 = unbox<RegularExpression<string>list*string> ss.[0]
-        let result:(RegularExpression<string>list*string)list =
+        let s0 = unbox<list<RegularExpression<string>>*string> ss.[0]
+        let result:list<list<RegularExpression<string>>*string> =
             [s0]
         box result
     ["{rule+}";"{rule+}";"rule"], fun(ss:obj list)->
-        let s0 = unbox<(RegularExpression<string>list*string)list> ss.[0]
-        let s1 = unbox<RegularExpression<string>list*string> ss.[1]
-        let result:(RegularExpression<string>list*string)list =
+        let s0 = unbox<list<list<RegularExpression<string>>*string>> ss.[0]
+        let s1 = unbox<list<RegularExpression<string>>*string> ss.[1]
+        let result:list<list<RegularExpression<string>>*string> =
             s1::s0
         box result
 ]
 let unboxRoot =
-    unbox<string*(string*RegularExpression<string>)list*(RegularExpression<string>list*string)list>
+    unbox<string*list<string*RegularExpression<string>>*list<list<RegularExpression<string>>*string>>
 let app: FslexFsyacc.ParseTableApp = {
     tokens        = tokens
     kernels       = kernels
