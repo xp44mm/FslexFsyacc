@@ -61,15 +61,15 @@ type FsyaccParseTable2Test(output:ITestOutputHelper) =
         output.WriteLine($"{stringify cp}")
 
     [<Fact(
-    Skip="按需更新源代码"
+    //Skip="按需更新源代码"
     )>]
     member _.``06 - generate FsyaccParseTable``() =
         let outp = coder.generateModule(moduleName)
-        //output.WriteLine(outp)
+        output.WriteLine(outp)
         
-        File.WriteAllText(modulePath, outp, Encoding.UTF8)
-        output.WriteLine("output yacc:")
-        output.WriteLine(modulePath)
+        //File.WriteAllText(modulePath, outp, Encoding.UTF8)
+        //output.WriteLine("output yacc:")
+        //output.WriteLine(modulePath)
 
     [<Fact>]
     member _.``10 - valid ParseTable``() =

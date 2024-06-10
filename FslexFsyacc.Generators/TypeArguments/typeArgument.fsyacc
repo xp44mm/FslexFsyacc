@@ -1,7 +1,7 @@
 ﻿%{
 %}
 typeArgument :
-    | funtype {TypeArgumentTools.ofFun s0}
+    | funtype {TypeArgumentUtils.ofFun s0}
     | flexibletype {Flexible s0}
     | subtype {s0}
 funtype :
@@ -11,20 +11,20 @@ tupletype :
     | apptype "*" tupletype {s0::s2}
     | apptype {[s0]}
 apptype :
-    | atomtype suffixTypes {TypeArgumentTools.ofApp(s0,s1)}
+    | atomtype suffixTypes {TypeArgumentUtils.ofApp(s0,s1)}
 atomtype :
     | "_" {Anon}
-    | typar { TypeArgumentTools.ofTypar s0 }
+    | typar { TypeArgumentUtils.ofTypar s0 }
     | namedtype {match s0 with a,b -> Ctor(a,b)}
     | anonRecordType {s0}
     | "(" typeArgument ")" {s1}
-    | struct "(" tupletype ")" {match TypeArgumentTools.ofTuple s2 with Tuple(_,ls) -> Tuple(true,ls) | _ -> failwith "" }
+    | struct "(" tupletype ")" {match TypeArgumentUtils.ofTuple s2 with Tuple(_,ls) -> Tuple(true,ls) | _ -> failwith "" }
     | struct anonRecordType {match s1 with AnonRecd(_,ls) -> AnonRecd(true,ls) |_->failwith""}
 namedtype :
     | ctortype {s0,[]}
-    | ctortype "<" typeArguments ">" {s0,List.rev s2}
+    | ctortype "<" typeArguments ">" {s0, s2}
 ctortype :
-    | longIdent {List.rev s0}
+    | longIdent { s0 }
 suffixType:
     | ctortype {LongIdent s0}
     | ARRAY_TYPE_SUFFIX {ArrayTypeSuffix s0}
@@ -32,7 +32,7 @@ typeArguments :
     | typeArgument "," typeArguments {s0::s2}
     | typeArgument {[s0]}
 anonRecordType :
-    | "{|" recdFieldDeclList "|}" {AnonRecd(false,List.rev s1)}
+    | "{|" recdFieldDeclList "|}" {AnonRecd(false, s1)}
 recdFieldDeclList :
     | fieldDecl ";" recdFieldDeclList {s0::s2}
     | fieldDecl ";"? {[s0]}
@@ -43,10 +43,10 @@ suffixTypes :
     | (*empty*) {[]}
 flexibletype :
     | "#" namedtype {match s1 with ctor,targs -> FlexibleCtor(ctor,targs)}
-    | "#" "(" apptype ")" {TypeArgumentTools.toBaseOrInterfaceType s2}
+    | "#" "(" apptype ")" {TypeArgumentUtils.toBaseOrInterfaceType s2}
     | "#" "_" {FlexibleAnon}
 subtype :
-    | variabletype ":>" apptype { Subtype(s0,TypeArgumentTools.toBaseOrInterfaceType s2) }
+    | variabletype ":>" apptype { Subtype(s0,TypeArgumentUtils.toBaseOrInterfaceType s2) }
 variabletype :
     | "_" {AnonTypar}
     | typar {s0}

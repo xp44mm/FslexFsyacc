@@ -17,14 +17,14 @@ let reducerBody (typeAnnotations:Map<string,TypeArgument>) (production:string li
         [
             for (i,sym) in bodySymbols do
                 if typeAnnotations.ContainsKey sym then
-                    $"let s{i} = unbox<{typeAnnotations.[sym].toString()}> ss.[{i}]"
+                    $"let s{i} = unbox<{typeAnnotations.[sym].toCode()}> ss.[{i}]"
                 else 
                     failwith $"type annot `{sym}` is required."
 
             if typeAnnotations.ContainsKey production.Head && 
                 typeAnnotations.[production.Head] <> Ctor(["unit"],[]) then
 
-                $"let result:{typeAnnotations.[production.Head].toString()} ="
+                $"let result:{typeAnnotations.[production.Head].toCode()} ="
                 reducer |> Line.indentCodeBlock (4)
                 $"box result"
             else

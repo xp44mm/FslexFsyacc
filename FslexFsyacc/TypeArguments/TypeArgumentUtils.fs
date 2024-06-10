@@ -37,32 +37,43 @@ let toBaseOrInterfaceType (apptype:TypeArgument) =
 let uniform (targ:TypeArgument) = 
     let rec app2ctor suffixs ctorArgs =
         match suffixs with
-        | [] -> ctorArgs |> Seq.exactlyOne
-        | (h:SuffixType) :: t ->
+        | [] -> 
+            ctorArgs
+            |> Seq.exactlyOne
+        | (h:SuffixType) :: t ->            
             let ctor = [Ctor(h.toLongIdent, ctorArgs)]
             app2ctor t ctor
-    match targ with
-    | Anon -> targ
-    | Fun _ -> targ
-    | Tuple _ -> targ
-    | TypeParam _ -> targ
-    | Ctor  _ -> targ
-    | AnonRecd  _ -> targ
-    | Subtype  _ -> targ
-    | App (atomtype:TypeArgument, suffixTypes:SuffixType list) ->
-        [atomtype]
-        |> app2ctor suffixTypes
 
-    | Flexible btp ->
+    let rec loop (targ:TypeArgument) =
+        match targ with
+        | Anon -> targ
+        | TypeParam _ -> targ
+        | Fun targs -> Fun (targs |> List.map loop)
+        | Tuple (isStruct,targs) -> Tuple (isStruct, targs |> List.map loop)
+        | Ctor (id,gargs) -> Ctor (id,gargs |> List.map loop)
+        | AnonRecd (isStruct,fields) -> 
+            let fields = 
+                fields
+                |> List.map(fun (nm,tp) -> nm, loop tp)
+                |> Set.ofList |> List.ofSeq
+            AnonRecd (isStruct,fields)
+        | App (atomtype:TypeArgument, suffixTypes:SuffixType list) ->
+            [loop atomtype]
+            |> app2ctor suffixTypes
+        | Subtype (typar,btp) -> Subtype (typar,flexibleLoop btp)
+        | Flexible btp -> Flexible (flexibleLoop btp)
+
+    and flexibleLoop (btp:BaseOrInterfaceType) =
         match btp with
         | FlexibleAnon
         | FlexibleCtor _ 
-            -> targ
+            -> btp
         | FlexibleApp (atomtype: TypeArgument, suffixTypes: SuffixType list) ->
             match
-                [atomtype]
+                [loop atomtype]
                 |> app2ctor suffixTypes
             with
-            | Ctor(a,b) -> Flexible(FlexibleCtor(a,b))
+            | Ctor(a,targs) -> FlexibleCtor(a,targs |> List.map loop)
             | _ -> failwith "never"
 
+    loop targ

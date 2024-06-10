@@ -9,7 +9,7 @@ let rules : list<string list*(obj list->obj)> = [
     ["anonRecordType";"{|";"recdFieldDeclList";"|}"], fun(ss:obj list)->
         let s1 = unbox<(string*TypeArgument)list> ss.[1]
         let result:TypeArgument =
-            AnonRecd(false,List.rev s1)
+            AnonRecd(false, s1)
         box result
     ["apptype";"atomtype";"suffixTypes"], fun(ss:obj list)->
         let s0 = unbox<TypeArgument> ss.[0]
@@ -54,7 +54,7 @@ let rules : list<string list*(obj list->obj)> = [
     ["ctortype";"longIdent"], fun(ss:obj list)->
         let s0 = unbox<string list> ss.[0]
         let result:string list =
-            List.rev s0
+            s0
         box result
     ["fieldDecl";"IDENT";":";"typeArgument"], fun(ss:obj list)->
         let s0 = unbox<string> ss.[0]
@@ -107,7 +107,7 @@ let rules : list<string list*(obj list->obj)> = [
         let s0 = unbox<string list> ss.[0]
         let s2 = unbox<TypeArgument list> ss.[2]
         let result:string list * TypeArgument list =
-            s0,List.rev s2
+            s0,s2
         box result
     ["recdFieldDeclList";"fieldDecl";";";"recdFieldDeclList"], fun(ss:obj list)->
         let s0 = unbox<string*TypeArgument> ss.[0]

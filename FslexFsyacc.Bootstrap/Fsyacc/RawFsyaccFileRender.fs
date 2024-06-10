@@ -86,4 +86,4 @@ let renderTypeLine (typeArg:TypeArgument, symbols:string list) =
         symbols
         |> List.map renderSymbol
         |> String.concat " "
-    $"%%type<{typeArg.toString()}> {symbols}"
+    $"%%type<{typeArg.toCode()}> {symbols}"

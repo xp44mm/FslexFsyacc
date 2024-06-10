@@ -17,18 +17,18 @@ let rules : list<string list*(obj list->obj)> = [
             s0
         box result
     ["bands"], fun(ss:obj list)->
-        let result:Band list =
+        let result:list<Band> =
             []
         box result
     ["bands";"bands";"band"], fun(ss:obj list)->
-        let s0 = unbox<Band list> ss.[0]
+        let s0 = unbox<list<Band>> ss.[0]
         let s1 = unbox<Band> ss.[1]
-        let result:Band list =
+        let result:list<Band> =
             s1::s0
         box result
     ["bounded";"LEFT";"bands";"RIGHT"], fun(ss:obj list)->
         let s0 = unbox<int> ss.[0]
-        let s1 = unbox<Band list> ss.[1]
+        let s1 = unbox<list<Band>> ss.[1]
         let s2 = unbox<int> ss.[2]
         let result:Band =
             Bounded(s0,List.rev s1,s2)

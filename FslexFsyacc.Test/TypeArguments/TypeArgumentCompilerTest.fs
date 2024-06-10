@@ -15,15 +15,15 @@ open FslexFsyacc.TypeArguments
 type TypeArgumentCompilerTest(output:ITestOutputHelper) =
     [<Theory>]
     [<Natural(17)>]
-    member _.``compile test``(i) =
+    member _.``compile test``(i:int) =
         let source = [
             "_",Anon
             "'a",TypeParam(false,"a")
             "^bc",TypeParam(true,"bc")
             "int",Ctor(["int"],[])
             "list<_>",Ctor(["list"],[Anon])
-            "Map<_,_>",Ctor(["Map"],[Anon;Anon])
-            "System.String",Ctor(["String";"System"],[])
+            "Map<int,_>",Ctor(["Map"],[Ctor(["int"],[]);Anon])
+            "System.String",Ctor(["System";"String"],[])
             "(int*float)",Tuple(false,[Ctor(["int"],[]);Ctor(["float"],[])])
             "struct(int*float)",Tuple(true,[Ctor(["int"],[]);Ctor(["float"],[])])
             "int list",App(Ctor(["int"],[]),[LongIdent ["list"]])
@@ -31,8 +31,8 @@ type TypeArgumentCompilerTest(output:ITestOutputHelper) =
             "string->int",Fun [Ctor(["string"],[]);Ctor(["int"],[])]
             "string list*int[]",Tuple(false,[App(Ctor(["string"],[]),[LongIdent ["list"]]);App(Ctor(["int"],[]),[ArrayTypeSuffix 1])])
             "string list->int list",Fun [App(Ctor(["string"],[]),[LongIdent ["list"]]);App(Ctor(["int"],[]),[LongIdent ["list"]])]
-            "{|x:int;y:int|}",AnonRecd(false,["y",Ctor(["int"],[]);"x",Ctor(["int"],[])])
-            "{|x:int;y:int;|}",AnonRecd(false,["y",Ctor(["int"],[]);"x",Ctor(["int"],[])])
+            "{|x:int;y:string|}",AnonRecd(false,["x",Ctor(["int"],[]);"y",Ctor(["string"],[])])
+            "{|x:int;y:int;|}",AnonRecd(false,["x",Ctor(["int"],[]);"y",Ctor(["int"],[])])
             "struct{|x:int|}",AnonRecd(true,["x",Ctor(["int"],[])])
             ]
 
@@ -40,13 +40,14 @@ type TypeArgumentCompilerTest(output:ITestOutputHelper) =
         Should.equal source.Length 17
         //output.WriteLine($"{}")
 
-        let exit (rest:string) = Regex.IsMatch(rest, @"^\s*\>")
         let x,e = source.[i]
-        let txt = $"{x}>"
         output.WriteLine(x)
-        let y = TypeArgumentCompiler.compile exit 99 txt
-        output.WriteLine(stringify y)
-        //Should.equal e y
+        output.WriteLine(stringify e)
+        let exit (rest:string) = Regex.IsMatch(rest, @"^\s*\>")
+        let txt = $"{x}>"
+        let ta,epos,erest = TypeArgumentCompiler.compile exit 99 txt
+        output.WriteLine(stringify ta)
+        Should.equal e ta
 
     [<Theory>]
     [<Natural(4)>]
@@ -69,3 +70,30 @@ type TypeArgumentCompilerTest(output:ITestOutputHelper) =
         let e = ARRAY_TYPE_SUFFIX (i+1)
         Should.equal e y
 
+    [<Fact>]
+    //[<Natural(37)>]
+    member _.``from types test``() =
+        let lines = 
+            let path = Path.Combine(__SOURCE_DIRECTORY__,"types.txt")
+            File.ReadLines(path, Encoding.UTF8)
+            |> Seq.toArray
+
+        //验证总次数
+        Should.equal lines.Length 37
+
+        //let x = lines.[i]
+        //output.WriteLine($"{x}")
+
+        //output.WriteLine(x)
+        //output.WriteLine(stringify ta)
+
+        //Should.equal e ta
+        //output.WriteLine(stringify uta)
+
+        for x in lines do
+        let exit (rest:string) = Regex.IsMatch(rest, @"^\s*$")
+        let ta,epos,erest = TypeArgumentCompiler.compile exit 0 x
+        let uta = TypeArgumentUtils.uniform ta
+        let utas = uta.toCode()
+
+        output.WriteLine($"typeof<{x}>,typeof<{utas}>")

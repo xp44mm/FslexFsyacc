@@ -11,69 +11,88 @@ type TypeArgument =
     | Flexible of BaseOrInterfaceType
     | Subtype of Typar * BaseOrInterfaceType
 
-    member this.toString() = 
+    member this.toCode() = 
         match this with
         | Anon -> "_"
-        | Fun ls -> 
+        | Fun ls ->
+            let last = ls.Length - 1
             ls
-            |> List.map (fun e -> e.toString())
+            |> List.mapi (fun i e -> 
+                match e with
+                | Fun _ when i < last ->
+                    $"({e.toCode()})"
+                | _ -> e.toCode()
+            )
             |> String.concat "->"
         | Tuple (isStruct, ls: TypeArgument list) -> 
             let m =
                 ls
-                |> List.map (fun e -> e.toString())
+                |> List.map (fun e -> 
+                    match e with
+                    | Fun _ | Tuple _ ->
+                        $"({e.toCode()})"
+                    | _ -> e.toCode()
+                    )
                 |> String.concat "*"
             if isStruct then
-                $"struct({m})"
+                $"struct ({m})"
             else
                 m
-        | App (atomtype:TypeArgument , suffixTypes:SuffixType list) -> 
+        | App (atomtype:TypeArgument, suffixTypes:SuffixType list) -> 
             [
-                atomtype.toString()
-                yield! suffixTypes |> List.map(fun t -> t.toString())
+                match atomtype with
+                | Fun _ | Tuple _ -> 
+                    $"({atomtype.toCode()})"
+                | _ -> atomtype.toCode()
+                yield! suffixTypes |> List.map(fun t -> t.toCode())
             ]
-            |> String.concat " "
-        | TypeParam ( isInline:bool , nm: string) -> 
+            |> String.concat " " // 如果是[]不用空格？
+
+        | TypeParam (isInline:bool, nm: string) ->
             let p = if isInline then "^" else "'"
             $"{p}{nm}"
-        | Ctor (longIdent:string list , ls: TypeArgument list) ->
+
+        | Ctor (longIdent:string list, ls: TypeArgument list) ->
             let h = String.concat "." longIdent
             if ls.IsEmpty then
                 h
             else
-                let aa = ls |> List.map(fun a -> a.toString()) |> String.concat ","
+                let aa = 
+                    ls 
+                    |> List.map(fun a -> a.toCode())
+                    |> String.concat ","
                 $"{h}<{aa}>"
+
         | AnonRecd (isStruct: bool, fields: (string * TypeArgument) list) -> 
             let cc =
                 fields
-                |> List.map(fun(n,t) -> $"{n}:{t.toString()}" )
+                |> List.map(fun(n,t) -> $"{n}:{t.toCode()}" )
                 |> String.concat ";"
+                |> sprintf "{|%s|}"
             [
                 if isStruct then yield "struct" else ()
                 yield cc
             ]
             |> String.concat " "
-
-        | Flexible (tp: BaseOrInterfaceType) -> tp.toString()
-            
-            
-        | Subtype (tp: Typar, it: BaseOrInterfaceType) -> 
-            $"{tp.toString()}:>{it.toString()}"
+        | Flexible (tp: BaseOrInterfaceType) -> 
+            tp.toCode()
+        | Subtype (tp: Typar, it: BaseOrInterfaceType) ->
+            $"{tp.toString()}:>{it.toCode()}"
 
 and BaseOrInterfaceType =
     | FlexibleAnon
     | FlexibleApp of atomtype: TypeArgument * suffixTypes: SuffixType list
     | FlexibleCtor of string list * TypeArgument list
 
-    member this.toString() = 
+    member this.toCode() = 
         match this with
         | FlexibleAnon -> "#_"
 
         | FlexibleApp (atomtype: TypeArgument , suffixTypes: SuffixType list) ->
             let app =
                 [
-                    atomtype.toString()
-                    yield! suffixTypes |> List.map(fun t -> t.toString())
+                    atomtype.toCode()
+                    yield! suffixTypes |> List.map(fun t -> t.toCode())
                 ]
                 |> String.concat " "
             $"#({app})"
@@ -84,6 +103,6 @@ and BaseOrInterfaceType =
                 if ls.IsEmpty then
                     h
                 else
-                    let aa = ls |> List.map(fun a -> a.toString()) |> String.concat ","
+                    let aa = ls |> List.map(fun a -> a.toCode()) |> String.concat ","
                     $"{h}<{aa}>"
             $"#{ctor}"

@@ -53,6 +53,8 @@
 		<Compile Include="Yacc\PrecedenceTest.fs" />
 		<Compile Include="Yacc\Section4_8_1Test.fs" />
 		<Compile Include="Yacc\Section4_8_2Test.fs" />
+		<Compile Include="TypeArguments\TypeArgumentTest.fs" />
+		<Content Include="TypeArguments\types.txt" />
 		<Compile Include="TypeArguments\TypeArgumentCompilerTest.fs" />
 		
 		<Compile Include="VanillaFSharp\FSharpSourceTextTest.fs" />
@@ -96,6 +98,8 @@
 		<Compile Include="Program.fs" />
     
 	</ItemGroup>
+
+	<ItemGroup />
 
 	<ItemGroup>
 		<PackageReference Include="FSharp.xUnit" Version="1.2.27" />

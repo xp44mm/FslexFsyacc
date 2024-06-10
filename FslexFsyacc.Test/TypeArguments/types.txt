@@ -1,0 +1,37 @@
+(Associativity*string list)list
+(RegularExpression<string>list*string)list
+(TypeArgument*string list)list
+(string*RegularExpression<string>)list
+(string*TypeArgument)list
+(string*string list)list
+Associativity
+Associativity*string list
+Band
+Band list
+BaseOrInterfaceType
+RawFsyaccFile
+RegularExpression<string>
+RegularExpression<string> list
+RegularExpression<string>list*string
+RegularSymbol
+RegularSymbol list
+RegularSymbol*string
+RuleBody
+RuleBody list
+RuleGroup
+RuleGroup list
+SuffixType
+SuffixType list
+Typar
+TypeArgument
+TypeArgument list
+TypeArgument list list
+TypeArgument*string list
+int
+string
+string list
+string list * TypeArgument list
+string*(string*RegularExpression<string>)list*(RegularExpression<string>list*string)list
+string*RegularExpression<string>
+string*TypeArgument
+string*string list

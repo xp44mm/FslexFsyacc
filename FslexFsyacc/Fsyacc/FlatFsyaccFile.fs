@@ -32,8 +32,12 @@ type FlatFsyaccFile =
 
         Symbol.duplOperators raw.operatorsLines
 
+
         let declarationsLines =
             raw.declarationsLines
+            |> List.map(fun(targ,symbols)-> 
+                TypeArgumentUtils.uniform targ, symbols
+            )
             |> List.groupBy fst
             |> List.map(fun (tp,ls) ->
                 let symbols =

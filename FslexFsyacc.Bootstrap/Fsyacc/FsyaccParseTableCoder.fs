@@ -98,7 +98,7 @@ type FsyaccParseTableCoder =
             "]"
 
             "let unboxRoot ="
-            $"    unbox<{this.declarations.[this.startSymbol].toString()}>"
+            $"    unbox<{this.declarations.[this.startSymbol].toCode()}>"
 
             "let app: FslexFsyacc.ParseTableApp = {"
             "    tokens        = tokens"

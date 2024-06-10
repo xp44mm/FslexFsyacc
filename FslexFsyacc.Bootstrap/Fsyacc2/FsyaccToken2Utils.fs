@@ -159,7 +159,6 @@ let tokenize (offset:int) (input:string) =
                     TypeArguments.TypeArgumentCompiler.compile exit pos rest
 
                 //let tas = rest.[0..epos-pos-1]
-                let targ = FslexFsyacc.TypeArguments.TypeArgumentUtils.uniform targ
                 let tta = Position.from(pos, epos-pos+1, TYPE_ARGUMENT targ)
 
                 yield tta
