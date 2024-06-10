@@ -7,13 +7,13 @@ let actions = [["#",25;"(",7;"HTYPAR",55;"IDENT",34;"QTYPAR",56;"_",11;"anonReco
 let rules : list<string list*(obj list->obj)> = [
     ["";"typeArgument"], fun(ss:obj list)-> ss.[0]
     ["anonRecordType";"{|";"recdFieldDeclList";"|}"], fun(ss:obj list)->
-        let s1 = unbox<(string*TypeArgument)list> ss.[1]
+        let s1 = unbox<list<string*TypeArgument>> ss.[1]
         let result:TypeArgument =
             AnonRecd(false, s1)
         box result
     ["apptype";"atomtype";"suffixTypes"], fun(ss:obj list)->
         let s0 = unbox<TypeArgument> ss.[0]
-        let s1 = unbox<SuffixType list> ss.[1]
+        let s1 = unbox<list<SuffixType>> ss.[1]
         let result:TypeArgument =
             TypeArgumentUtils.ofApp(s0,s1)
         box result
@@ -32,14 +32,14 @@ let rules : list<string list*(obj list->obj)> = [
             s0
         box result
     ["atomtype";"namedtype"], fun(ss:obj list)->
-        let s0 = unbox<string list * TypeArgument list> ss.[0]
+        let s0 = unbox<list<string>*list<TypeArgument>> ss.[0]
         let result:TypeArgument =
             match s0 with a,b -> Ctor(a,b)
         box result
     ["atomtype";"struct";"(";"tupletype";")"], fun(ss:obj list)->
-        let s2 = unbox<TypeArgument list> ss.[2]
+        let s2 = unbox<list<TypeArgument>> ss.[2]
         let result:TypeArgument =
-            match TypeArgumentUtils.ofTuple s2 with Tuple(_,ls) -> Tuple(true,ls) |_->failwith""
+            match TypeArgumentUtils.ofTuple s2 with Tuple(_,ls) -> Tuple(true,ls) | _ -> failwith ""
         box result
     ["atomtype";"struct";"anonRecordType"], fun(ss:obj list)->
         let s1 = unbox<TypeArgument> ss.[1]
@@ -52,8 +52,8 @@ let rules : list<string list*(obj list->obj)> = [
             TypeArgumentUtils.ofTypar s0
         box result
     ["ctortype";"longIdent"], fun(ss:obj list)->
-        let s0 = unbox<string list> ss.[0]
-        let result:string list =
+        let s0 = unbox<list<string>> ss.[0]
+        let result:list<string> =
             s0
         box result
     ["fieldDecl";"IDENT";":";"typeArgument"], fun(ss:obj list)->
@@ -72,52 +72,52 @@ let rules : list<string list*(obj list->obj)> = [
             FlexibleAnon
         box result
     ["flexibletype";"#";"namedtype"], fun(ss:obj list)->
-        let s1 = unbox<string list * TypeArgument list> ss.[1]
+        let s1 = unbox<list<string>*list<TypeArgument>> ss.[1]
         let result:BaseOrInterfaceType =
             match s1 with ctor,targs -> FlexibleCtor(ctor,targs)
         box result
     ["funtype";"tupletype"], fun(ss:obj list)->
-        let s0 = unbox<TypeArgument list> ss.[0]
-        let result:TypeArgument list list =
+        let s0 = unbox<list<TypeArgument>> ss.[0]
+        let result:list<list<TypeArgument>> =
             [s0]
         box result
     ["funtype";"tupletype";"->";"funtype"], fun(ss:obj list)->
-        let s0 = unbox<TypeArgument list> ss.[0]
-        let s2 = unbox<TypeArgument list list> ss.[2]
-        let result:TypeArgument list list =
+        let s0 = unbox<list<TypeArgument>> ss.[0]
+        let s2 = unbox<list<list<TypeArgument>>> ss.[2]
+        let result:list<list<TypeArgument>> =
             s0::s2
         box result
     ["longIdent";"IDENT"], fun(ss:obj list)->
         let s0 = unbox<string> ss.[0]
-        let result:string list =
+        let result:list<string> =
             [s0]
         box result
     ["longIdent";"IDENT";".";"longIdent"], fun(ss:obj list)->
         let s0 = unbox<string> ss.[0]
-        let s2 = unbox<string list> ss.[2]
-        let result:string list =
+        let s2 = unbox<list<string>> ss.[2]
+        let result:list<string> =
             s0::s2
         box result
     ["namedtype";"ctortype"], fun(ss:obj list)->
-        let s0 = unbox<string list> ss.[0]
-        let result:string list * TypeArgument list =
+        let s0 = unbox<list<string>> ss.[0]
+        let result:list<string>*list<TypeArgument> =
             s0,[]
         box result
     ["namedtype";"ctortype";"<";"typeArguments";">"], fun(ss:obj list)->
-        let s0 = unbox<string list> ss.[0]
-        let s2 = unbox<TypeArgument list> ss.[2]
-        let result:string list * TypeArgument list =
-            s0,s2
+        let s0 = unbox<list<string>> ss.[0]
+        let s2 = unbox<list<TypeArgument>> ss.[2]
+        let result:list<string>*list<TypeArgument> =
+            s0, s2
         box result
     ["recdFieldDeclList";"fieldDecl";";";"recdFieldDeclList"], fun(ss:obj list)->
         let s0 = unbox<string*TypeArgument> ss.[0]
-        let s2 = unbox<(string*TypeArgument)list> ss.[2]
-        let result:(string*TypeArgument)list =
+        let s2 = unbox<list<string*TypeArgument>> ss.[2]
+        let result:list<string*TypeArgument> =
             s0::s2
         box result
     ["recdFieldDeclList";"fieldDecl";"{\";\"?}"], fun(ss:obj list)->
         let s0 = unbox<string*TypeArgument> ss.[0]
-        let result:(string*TypeArgument)list =
+        let result:list<string*TypeArgument> =
             [s0]
         box result
     ["subtype";"variabletype";":>";"apptype"], fun(ss:obj list)->
@@ -132,29 +132,29 @@ let rules : list<string list*(obj list->obj)> = [
             ArrayTypeSuffix s0
         box result
     ["suffixType";"ctortype"], fun(ss:obj list)->
-        let s0 = unbox<string list> ss.[0]
+        let s0 = unbox<list<string>> ss.[0]
         let result:SuffixType =
             LongIdent s0
         box result
     ["suffixTypes"], fun(ss:obj list)->
-        let result:SuffixType list =
+        let result:list<SuffixType> =
             []
         box result
     ["suffixTypes";"suffixType";"suffixTypes"], fun(ss:obj list)->
         let s0 = unbox<SuffixType> ss.[0]
-        let s1 = unbox<SuffixType list> ss.[1]
-        let result:SuffixType list =
+        let s1 = unbox<list<SuffixType>> ss.[1]
+        let result:list<SuffixType> =
             s0::s1
         box result
     ["tupletype";"apptype"], fun(ss:obj list)->
         let s0 = unbox<TypeArgument> ss.[0]
-        let result:TypeArgument list =
+        let result:list<TypeArgument> =
             [s0]
         box result
     ["tupletype";"apptype";"*";"tupletype"], fun(ss:obj list)->
         let s0 = unbox<TypeArgument> ss.[0]
-        let s2 = unbox<TypeArgument list> ss.[2]
-        let result:TypeArgument list =
+        let s2 = unbox<list<TypeArgument>> ss.[2]
+        let result:list<TypeArgument> =
             s0::s2
         box result
     ["typar";"HTYPAR"], fun(ss:obj list)->
@@ -173,7 +173,7 @@ let rules : list<string list*(obj list->obj)> = [
             Flexible s0
         box result
     ["typeArgument";"funtype"], fun(ss:obj list)->
-        let s0 = unbox<TypeArgument list list> ss.[0]
+        let s0 = unbox<list<list<TypeArgument>>> ss.[0]
         let result:TypeArgument =
             TypeArgumentUtils.ofFun s0
         box result
@@ -184,13 +184,13 @@ let rules : list<string list*(obj list->obj)> = [
         box result
     ["typeArguments";"typeArgument"], fun(ss:obj list)->
         let s0 = unbox<TypeArgument> ss.[0]
-        let result:TypeArgument list =
+        let result:list<TypeArgument> =
             [s0]
         box result
     ["typeArguments";"typeArgument";",";"typeArguments"], fun(ss:obj list)->
         let s0 = unbox<TypeArgument> ss.[0]
-        let s2 = unbox<TypeArgument list> ss.[2]
-        let result:TypeArgument list =
+        let s2 = unbox<list<TypeArgument>> ss.[2]
+        let result:list<TypeArgument> =
             s0::s2
         box result
     ["variabletype";"_"], fun(ss:obj list)->

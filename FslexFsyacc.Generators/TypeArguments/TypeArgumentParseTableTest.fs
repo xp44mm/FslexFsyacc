@@ -116,7 +116,7 @@ type TypeArgumentParseTableTest (output:ITestOutputHelper) =
         let outp = coder.generateModule(parseTblModule)
         File.WriteAllText(parseTblPath, outp, Encoding.UTF8)
         output.WriteLine("output yacc:")
-        output.WriteLine($"{parseTblPath}")
+        output.WriteLine(parseTblPath)
         
     [<Fact>]
     member _.``10 - valid ParseTable``() =

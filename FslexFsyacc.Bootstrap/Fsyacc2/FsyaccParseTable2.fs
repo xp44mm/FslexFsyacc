@@ -6,7 +6,6 @@ let actions = [["HEADER",15;"file",1];["",0];["%prec",-1;"(",-1;"ID",-1;"LITERAL
 open FslexFsyacc.Precedences
 open FslexFsyacc.YACCs
 open FslexFsyacc.TypeArguments
-
 let rules : list<string list*(obj list->obj)> = [
     ["";"file"], fun(ss:obj list)-> ss.[0]
     ["assoc";"%left"], fun(ss:obj list)->
@@ -32,14 +31,14 @@ let rules : list<string list*(obj list->obj)> = [
             s0
         box result
     ["brackets";"[";"{symbol+}";"]"], fun(ss:obj list)->
-        let s1 = unbox<RegularSymbol list> ss.[1]
-        let result:RegularSymbol list =
+        let s1 = unbox<list<RegularSymbol>> ss.[1]
+        let result:list<RegularSymbol> =
             List.rev s1
         box result
     ["declaration";"%type";"<";"TYPE_ARGUMENT";">";"{symbol+}"], fun(ss:obj list)->
         let s2 = unbox<TypeArgument> ss.[2]
-        let s4 = unbox<RegularSymbol list> ss.[4]
-        let result:TypeArgument*string list =
+        let s4 = unbox<list<RegularSymbol>> ss.[4]
+        let result:TypeArgument*list<string> =
             let symbols =
                 s4
                 |> List.map RegularSymbolUtils.innerSymbol
@@ -48,8 +47,8 @@ let rules : list<string list*(obj list->obj)> = [
         box result
     ["file";"HEADER";"{ruleGroup+}";"%%";"{declaration+}";"{\"%%\"?}"], fun(ss:obj list)->
         let s0 = unbox<string> ss.[0]
-        let s1 = unbox<RuleGroup list> ss.[1]
-        let s3 = unbox<(TypeArgument*string list)list> ss.[3]
+        let s1 = unbox<list<RuleGroup>> ss.[1]
+        let s3 = unbox<list<TypeArgument*list<string>>> ss.[3]
         let result:RawFsyaccFile =
             {
                 header = s0
@@ -60,9 +59,9 @@ let rules : list<string list*(obj list->obj)> = [
         box result
     ["file";"HEADER";"{ruleGroup+}";"%%";"{operatorsLine+}";"%%";"{declaration+}";"{\"%%\"?}"], fun(ss:obj list)->
         let s0 = unbox<string> ss.[0]
-        let s1 = unbox<RuleGroup list> ss.[1]
-        let s3 = unbox<(Associativity*string list)list> ss.[3]
-        let s5 = unbox<(TypeArgument*string list)list> ss.[5]
+        let s1 = unbox<list<RuleGroup>> ss.[1]
+        let s3 = unbox<list<Associativity*list<string>>> ss.[3]
+        let s5 = unbox<list<TypeArgument*list<string>>> ss.[5]
         let result:RawFsyaccFile =
             {
                 header = s0
@@ -73,8 +72,8 @@ let rules : list<string list*(obj list->obj)> = [
         box result
     ["file";"HEADER";"{ruleGroup+}";"%%";"{operatorsLine+}";"{\"%%\"?}"], fun(ss:obj list)->
         let s0 = unbox<string> ss.[0]
-        let s1 = unbox<RuleGroup list> ss.[1]
-        let s3 = unbox<(Associativity*string list)list> ss.[3]
+        let s1 = unbox<list<RuleGroup>> ss.[1]
+        let s3 = unbox<list<Associativity*list<string>>> ss.[3]
         let result:RawFsyaccFile =
             {
                 header = s0
@@ -85,7 +84,7 @@ let rules : list<string list*(obj list->obj)> = [
         box result
     ["file";"HEADER";"{ruleGroup+}";"{\"%%\"?}"], fun(ss:obj list)->
         let s0 = unbox<string> ss.[0]
-        let s1 = unbox<RuleGroup list> ss.[1]
+        let s1 = unbox<list<RuleGroup>> ss.[1]
         let result:RawFsyaccFile =
             {
                 header = s0
@@ -96,14 +95,14 @@ let rules : list<string list*(obj list->obj)> = [
         box result
     ["operatorsLine";"assoc";"{symbol+}"], fun(ss:obj list)->
         let s0 = unbox<Associativity> ss.[0]
-        let s1 = unbox<RegularSymbol list> ss.[1]
-        let result:Associativity*string list =
+        let s1 = unbox<list<RegularSymbol>> ss.[1]
+        let result:Associativity*list<string> =
             let s1 = s1 |> List.map RegularSymbolUtils.innerSymbol |> List.rev
             s0,s1
         box result
     ["parens";"(";"{symbol+}";")"], fun(ss:obj list)->
-        let s1 = unbox<RegularSymbol list> ss.[1]
-        let result:RegularSymbol list =
+        let s1 = unbox<list<RegularSymbol>> ss.[1]
+        let result:list<RegularSymbol> =
             List.rev s1
         box result
     ["quantifier";"*"], fun(ss:obj list)->
@@ -125,7 +124,7 @@ let rules : list<string list*(obj list->obj)> = [
             s0,s1
         box result
     ["ruleBody";"{symbol*}";"{precToken?}";"REDUCER"], fun(ss:obj list)->
-        let s0 = unbox<RegularSymbol list> ss.[0]
+        let s0 = unbox<list<RegularSymbol>> ss.[0]
         let s1 = unbox<string> ss.[1]
         let s2 = unbox<string> ss.[2]
         let result:RuleBody =
@@ -134,7 +133,7 @@ let rules : list<string list*(obj list->obj)> = [
         box result
     ["ruleGroup";"symbol";":";"{\"|\"?}";"{ruleBody+}"], fun(ss:obj list)->
         let s0 = unbox<RegularSymbol> ss.[0]
-        let s3 = unbox<RuleBody list> ss.[3]
+        let s3 = unbox<list<RuleBody>> ss.[3]
         let result:RuleGroup =
             let lhs = RegularSymbolUtils.innerSymbol s0
             let bodies = List.rev s3
@@ -146,12 +145,12 @@ let rules : list<string list*(obj list->obj)> = [
             Atomic s0
         box result
     ["symbol";"brackets"], fun(ss:obj list)->
-        let s0 = unbox<RegularSymbol list> ss.[0]
+        let s0 = unbox<list<RegularSymbol>> ss.[0]
         let result:RegularSymbol =
             Oneof s0
         box result
     ["symbol";"parens"], fun(ss:obj list)->
-        let s0 = unbox<RegularSymbol list> ss.[0]
+        let s0 = unbox<list<RegularSymbol>> ss.[0]
         let result:RegularSymbol =
             Chain s0
         box result
@@ -170,25 +169,25 @@ let rules : list<string list*(obj list->obj)> = [
     ["{\"|\"?}";"|"], fun(ss:obj list)->
         null
     ["{declaration+}";"declaration"], fun(ss:obj list)->
-        let s0 = unbox<TypeArgument*string list> ss.[0]
-        let result:(TypeArgument*string list)list =
+        let s0 = unbox<TypeArgument*list<string>> ss.[0]
+        let result:list<TypeArgument*list<string>> =
             [s0]
         box result
     ["{declaration+}";"{declaration+}";"declaration"], fun(ss:obj list)->
-        let s0 = unbox<(TypeArgument*string list)list> ss.[0]
-        let s1 = unbox<TypeArgument*string list> ss.[1]
-        let result:(TypeArgument*string list)list =
+        let s0 = unbox<list<TypeArgument*list<string>>> ss.[0]
+        let s1 = unbox<TypeArgument*list<string>> ss.[1]
+        let result:list<TypeArgument*list<string>> =
             s1::s0
         box result
     ["{operatorsLine+}";"operatorsLine"], fun(ss:obj list)->
-        let s0 = unbox<Associativity*string list> ss.[0]
-        let result:(Associativity*string list)list =
+        let s0 = unbox<Associativity*list<string>> ss.[0]
+        let result:list<Associativity*list<string>> =
             [s0]
         box result
     ["{operatorsLine+}";"{operatorsLine+}";"operatorsLine"], fun(ss:obj list)->
-        let s0 = unbox<(Associativity*string list)list> ss.[0]
-        let s1 = unbox<Associativity*string list> ss.[1]
-        let result:(Associativity*string list)list =
+        let s0 = unbox<list<Associativity*list<string>>> ss.[0]
+        let s1 = unbox<Associativity*list<string>> ss.[1]
+        let result:list<Associativity*list<string>> =
             s1::s0
         box result
     ["{precToken?}"], fun(ss:obj list)->
@@ -202,44 +201,44 @@ let rules : list<string list*(obj list->obj)> = [
         box result
     ["{ruleBody+}";"ruleBody"], fun(ss:obj list)->
         let s0 = unbox<RuleBody> ss.[0]
-        let result:RuleBody list =
+        let result:list<RuleBody> =
             [s0]
         box result
     ["{ruleBody+}";"{ruleBody+}";"|";"ruleBody"], fun(ss:obj list)->
-        let s0 = unbox<RuleBody list> ss.[0]
+        let s0 = unbox<list<RuleBody>> ss.[0]
         let s2 = unbox<RuleBody> ss.[2]
-        let result:RuleBody list =
+        let result:list<RuleBody> =
             s2::s0
         box result
     ["{ruleGroup+}";"ruleGroup"], fun(ss:obj list)->
         let s0 = unbox<RuleGroup> ss.[0]
-        let result:RuleGroup list =
+        let result:list<RuleGroup> =
             [s0]
         box result
     ["{ruleGroup+}";"{ruleGroup+}";"ruleGroup"], fun(ss:obj list)->
-        let s0 = unbox<RuleGroup list> ss.[0]
+        let s0 = unbox<list<RuleGroup>> ss.[0]
         let s1 = unbox<RuleGroup> ss.[1]
-        let result:RuleGroup list =
+        let result:list<RuleGroup> =
             s1::s0
         box result
     ["{symbol*}"], fun(ss:obj list)->
-        let result:RegularSymbol list =
+        let result:list<RegularSymbol> =
             []
         box result
     ["{symbol*}";"{symbol+}"], fun(ss:obj list)->
-        let s0 = unbox<RegularSymbol list> ss.[0]
-        let result:RegularSymbol list =
+        let s0 = unbox<list<RegularSymbol>> ss.[0]
+        let result:list<RegularSymbol> =
             s0
         box result
     ["{symbol+}";"symbol"], fun(ss:obj list)->
         let s0 = unbox<RegularSymbol> ss.[0]
-        let result:RegularSymbol list =
+        let result:list<RegularSymbol> =
             [s0]
         box result
     ["{symbol+}";"{symbol+}";"symbol"], fun(ss:obj list)->
-        let s0 = unbox<RegularSymbol list> ss.[0]
+        let s0 = unbox<list<RegularSymbol>> ss.[0]
         let s1 = unbox<RegularSymbol> ss.[1]
-        let result:RegularSymbol list =
+        let result:list<RegularSymbol> =
             s1::s0
         box result
 ]
