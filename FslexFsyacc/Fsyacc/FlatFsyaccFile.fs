@@ -22,7 +22,7 @@ type FlatFsyaccFile =
     static member from (raw:RawFsyaccFile) =
         let rules = RuleSet.fromGroups raw.ruleGroups
             
-        RuleSet.redundantDummies rules
+        //RuleSet.redundantDummies rules
 
         let operatorsLines =
             raw.operatorsLines
@@ -30,8 +30,7 @@ type FlatFsyaccFile =
                 let operators = Set.ofList operators
                 assoc,operators)
 
-        Symbol.duplOperators raw.operatorsLines
-
+        //Symbol.duplOperators raw.operatorsLines
 
         let declarationsLines =
             raw.declarationsLines
@@ -48,7 +47,7 @@ type FlatFsyaccFile =
             )
             |> Map.ofList
 
-        Symbol.duplDeclar raw.declarationsLines
+        //Symbol.duplDeclar raw.declarationsLines
 
         {
             header = raw.header

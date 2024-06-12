@@ -5,7 +5,6 @@ open FSharp.Idioms.Literal
 open FSharp.xUnit
 open FslexFsyacc
 open FslexFsyacc.Fsyacc
-open FslexFsyacc
 open FslexFsyacc.YACCs
 open System
 open System.IO

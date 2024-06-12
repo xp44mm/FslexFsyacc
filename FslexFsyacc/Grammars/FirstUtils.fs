@@ -57,7 +57,8 @@ let first (nullables:Set<string>) (firsts:Map<string,Set<string>>) =
                     if firsts.ContainsKey x then
                         firsts.[x]
                     elif nullables.Contains x then
-                        failwithf "first alpha error: '%s' must be null" x
+                        // x in nullables not in firsts，此符号一定只有一个空产生式。
+                        Set.empty
                     else
                         // 不是文法中出现的符号，看作是终结符号，其first集合就是自己，如"$","#"
                         Set.singleton x

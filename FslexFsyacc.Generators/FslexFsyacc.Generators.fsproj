@@ -24,7 +24,10 @@
     <None Include="Fsyacc\fsyacc.fsyacc" />
     <None Include="fsyacc2\fsyacc2.fsyacc" />
     <Compile Include="Fsyacc2\FsyaccParseTable2Test.fs" />
-        
+    <None Include="RawFsharp\pars.fsyacc" />
+    <Compile Include="RawFsharp\ParsTest.fs" />
+    
+    
     <Compile Include="Program.fs" />
   </ItemGroup>
 
