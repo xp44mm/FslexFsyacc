@@ -10,7 +10,6 @@ open FslexFsyacc.ItemCores
 open FslexFsyacc.Precedences
 open FslexFsyacc.BNFs
 
-
 let fromGroups (ruleGroups: RuleGroup list) =
     let ruleList =
         ruleGroups
@@ -38,48 +37,6 @@ let fromGroups (ruleGroups: RuleGroup list) =
         let ps = repl |> List.map fst
         failwith $"输入有重复的产生式：{stringify ps}"
 
-/// 用到的符号
-let getUsedSymbols (startSymbol:string) (rules:Set<Rule>) =
-    let rec loop (rules:Set<Rule>) (symbols:Set<string>) =
-        let nextRules, remainRules =
-            rules
-            |> Set.partition(fun rule ->
-                rule.production.Head
-                |> symbols.Contains )
-        if nextRules.IsEmpty then
-            symbols
-        else
-            let nextSymbols =
-                nextRules
-                |> Set.map(fun rule -> set rule.production.Tail)
-                |> Set.unionMany
-                |> Set.union symbols
-            loop remainRules nextSymbols
-    startSymbol
-    |> Set.singleton
-    |> loop rules
-        
-let purgeRules (startSymbol:string) (rules:Set<Rule>) =
-    let symbols = getUsedSymbols startSymbol rules
-    let rules =
-        rules
-        |> Set.filter(fun rule -> 
-            rule.production.Head 
-            |> symbols.Contains
-            )
-    if startSymbol = "" then
-        rules
-    else
-        rules.Add(Rule.augment startSymbol)
-
-let removeHeads (heads:Set<string>) (rules:Set<Rule>) =
-    rules
-    |> Set.filter(fun rule ->
-        rule.production.Head 
-        |> heads.Contains
-        |> not
-        )
-
 let getProperDummies (rules: Rule Set) =
     rules
     |> Set.filter(fun rule -> rule.dummy > "")
@@ -104,3 +61,76 @@ let redundantDummies (rules: Rule Set) =
     if diff.IsEmpty then
         ()
     else failwith $"{stringify (List.ofSeq diff)}"
+
+/// 用到的符号
+let crawl (startSymbol:string) (rules:Set<Rule>) =
+    let heads =
+        rules
+        |> Set.map( fun rule -> rule.production.Head )
+
+    let rec loop (rules:Set<Rule>) (rulelist:list<Rule>) =
+        let symbols =
+            rulelist
+            |> List.collect(fun rule -> rule.production.Tail )
+            |> Set.ofList
+            |> Set.filter(heads.Contains)
+
+        let nextRules, remainRules =
+            rules
+            |> Set.partition(fun rule ->
+                symbols.Contains rule.production.Head
+                )
+        if nextRules.IsEmpty then
+            rulelist
+        else
+            let rulelist =
+                [
+                    yield! rulelist
+                    yield! nextRules
+                ]
+            loop remainRules rulelist
+
+    let nextRules, remainRules =
+        rules
+        |> Set.partition(fun rule ->
+            rule.production.Head = startSymbol
+            )
+    nextRules
+    |> List.ofSeq
+    |> loop remainRules
+
+let toGroups (rules:seq<Rule>) =
+    rules
+    |> Seq.groupBy(fun rule -> rule.production.Head)
+    |> Seq.map(fun (hd,ls)->
+        let bodies =
+            ls
+            |> Seq.map(fun rule -> {
+                rhs = rule.production.Tail
+                dummy = rule.dummy
+                reducer = rule.reducer
+            })
+            |> Seq.toList
+
+        {
+            lhs = hd
+            bodies = bodies
+        }
+    )
+    |> Seq.toList
+
+let removeHeads (heads:Set<string>) (rules:Set<Rule>) =
+    rules
+    |> Set.filter(fun rule ->
+        rule.production.Head 
+        |> heads.Contains
+        |> not
+        )
+
+let removeSymbols (symbols:Set<string>) (rules:Set<Rule>) =
+    rules
+    |> Set.filter(fun rule ->
+        rule.production
+        |> List.exists(fun s -> symbols.Contains s)
+        |> not
+        )

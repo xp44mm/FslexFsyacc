@@ -91,7 +91,7 @@ let tokenize (offset:int) (input:string) =
                 yield Position.from(pos,len,LITERAL(Json.unquote x.Value))
                 yield! loop (lpos,lrest) (pos+len,rest.[len..])
 
-            | On trySemantic x ->
+            | On tryReducer x ->
                 let len = x.Length
                 let code = x.[1..len-2]
 

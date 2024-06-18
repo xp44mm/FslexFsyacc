@@ -33,73 +33,78 @@ type ParsTest(output:ITestOutputHelper) =
     //let tbl =
     //    fsyacc.getYacc()
 
-    //[<Fact>]
+    [<Fact(
+    Skip = "very long time!"
+    )>]
     member _.``00 - file test``() =
-        let s0 = fsyacc
-        output.WriteLine(sprintf "%A" s0)
 
-    //[<Fact>]
-    //member _.``01 - norm fsyacc file``() =
-    //    let s0 = tblCrew.startSymbol
-    //    let flatedFsyacc =
-    //        fsyaccCrew
-    //        |> FlatedFsyaccFileCrewUtils.toFlatFsyaccFile
-        
-    //    let src = 
-    //        flatedFsyacc 
-    //        |> FlatFsyaccFileUtils.start s0
-    //        |> RawFsyaccFileUtils.fromFlat
-    //        |> RawFsyaccFileUtils.render
+        let robust = set [
+            "error";
+            "recover";
+            "coming_soon";"COMING_SOON";
+            "_IS_HERE"
+            "ends_coming_soon_or_recover";"ends_other_than_rparen_coming_soon_or_recover"
+            "cPrototype";"exconDefn";"HASH"
+            ]
 
-    //    output.WriteLine(src)
+        let heads = set [
+            "attributes";"opt_attributes"
+            "access";"opt_access"
+            "typar";"appType";"atomType";"tupleType";"typ"
+            "classDefnMember";"measureTypePower";
+            "declExpr";
+        ]
 
-    //[<Fact>]
-    //member _.``02 - print conflict productions``() =
-    //    let st = ConflictedProduction.from fsyacc.rules
-    //    if st.IsEmpty then
-    //        output.WriteLine("no conflict")
-    //    for cp in st do
-    //    output.WriteLine($"{stringify cp}")
+        //let s0 = rawFsyacc.ruleGroups.Head.lhs
+        let rules =
+            fsyacc.rules
+            |> RuleSet.removeSymbols robust
+            |> RuleSet.removeHeads heads
+            |> RuleSet.crawl "fileModuleImpl"
+            |> List.map(fun rule -> { rule with reducer = "" })
 
-    //[<Fact(
-    //Skip="按需更新源代码"
-    //)>]
-    //member _.``06 - generate FsyaccParseTable``() =
-    //    let outp = coder.generateModule(moduleName)        
-    //    File.WriteAllText(modulePath, outp, Encoding.UTF8)
-    //    output.WriteLine("output yacc:")
-    //    output.WriteLine(modulePath)
+        let raw = fsyacc.toRaw(rules)
 
-    //[<Fact>]
-    //member _.``10 - valid ParseTable``() =
-    //    Should.equal coder.tokens FsyaccParseTable2.tokens
-    //    Should.equal coder.kernels FsyaccParseTable2.kernels
-    //    Should.equal coder.actions FsyaccParseTable2.actions
+        let src = raw.toCode()
+        //output.WriteLine(src)
 
-    //    //产生式比较
-    //    let prodsFsyacc =
-    //        fsyacc.rules
-    //        |> Seq.map (fun rule -> rule.production)
-    //        |> Seq.toList
+        let path = Path.Combine(__SOURCE_DIRECTORY__, "pars1.fsyacc")
 
-    //    let prodsParseTable =
-    //        FsyaccParseTable2.rules
-    //        |> List.map fst
+        File.WriteAllText(path, src, Encoding.UTF8)
+        output.WriteLine("output yacc:")
+        output.WriteLine(path)
 
-    //    Should.equal prodsFsyacc prodsParseTable
+    [<Fact(
+    Skip = "very long time!"
+    )>]
+    member _.``00 - openDecl test``() =
+    //https://learn.microsoft.com/en-us/dotnet/fsharp/language-reference/import-declarations-the-open-keyword
+        let symbols = set [
+            "ends_coming_soon_or_recover";
+            "TYPE_COMING_SOON";
+            "TYPE_IS_HERE"
+            ]
 
-    //    //header,reducers代码比较
-    //    let headerFromFsyacc =
-    //        FSharp.Compiler.SyntaxTreeX.Parser.getDecls("header.fsx",fsyacc.header)
+        let heads = set [
+            "appType"
+        ]
+        let startSymbol = "openDecl"
 
-    //    let semansFsyacc =
-    //        let mappers = coder.generateMappers()
-    //        FSharp.Compiler.SyntaxTreeX.SourceCodeParser.semansFromMappers mappers
+        //let s0 = rawFsyacc.ruleGroups.Head.lhs
+        let rules =
+            fsyacc.rules
+            |> RuleSet.removeSymbols symbols
+            |> RuleSet.removeHeads heads
+            |> RuleSet.crawl startSymbol
+            |> List.map(fun rule -> { rule with reducer = "" })
 
-    //    let header,semans =
-    //        let text = File.ReadAllText(modulePath, Encoding.UTF8)
-    //        FSharp.Compiler.SyntaxTreeX.SourceCodeParser.getHeaderSemansFromFSharp 4 text
+        let raw = fsyacc.toRaw(rules)
 
-    //    Should.equal headerFromFsyacc header
-    //    Should.equal semansFsyacc semans
+        let src = raw.toCode()
+        //output.WriteLine(src)
 
+        let path = Path.Combine(__SOURCE_DIRECTORY__, $"{startSymbol}.fsyacc")
+
+        File.WriteAllText(path, src, Encoding.UTF8)
+        output.WriteLine("output yacc:")
+        output.WriteLine(path)

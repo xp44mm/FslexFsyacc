@@ -11,7 +11,6 @@ open FslexFsyacc.ItemCores
 open FslexFsyacc.TypeArguments
 
 /// 表示*.fsyacc生成的模块。
-[<Obsolete("FsyaccParseTableCoder")>]
 type FsyaccParseTableFile =
     {
         header: string

@@ -1,29 +1,35 @@
-﻿module FslexFsyacc.TypeArguments.TypeArgumentCompiler
+﻿module FslexFsyacc.ModuleOrNamespaces.ModuleDeclsCompiler
+open FslexFsyacc.ModuleOrNamespaces.ModuleDeclsParseTable
 
 open FslexFsyacc
-open FslexFsyacc.TypeArguments.TypeArgumentParseTable
 open FSharp.Idioms
 open FSharp.Idioms.Literal
 open System
 open System.Text.RegularExpressions
 
-let parser = app.getParser<Position<TypeArgumentToken>> (    
-    TypeArgumentTokenUtils.getTag,
-    TypeArgumentTokenUtils.getLexeme)
+let parser = app.getParser<Position<ModuleOrNamespaceToken>> (    
+    ModuleOrNamespaceTokenUtils.getTag,
+    ModuleOrNamespaceTokenUtils.getLexeme)
 
 let table = app.getTable parser
 
-let parse (tokens:seq<Position<TypeArgumentToken>>) =
+let parse (tokens:seq<Position<ModuleOrNamespaceToken>>) =
     tokens
     |> parser.parse
-    |> TypeArgumentParseTable.unboxRoot
+    |> unboxRoot
 
 let compile (exit:string->bool) (i:int) (txt:string) =
+    let exit rest = 
+        exit rest || 
+        Regex.IsMatch(rest,@"^\s*$")
+
     let mutable tokens = []
     let mutable states = [0,null]
-    let tokenIterator = Iterator(TypeArgumentTokenUtils.tokenize i txt)
+    let tokenIterator = 
+        ModuleOrNamespaceTokenUtils.tokenize exit i txt
+        |> Iterator
 
-    let rec loop (maybeToken:option<Position<TypeArgumentToken>>) =
+    let rec loop (maybeToken:option<Position<ModuleOrNamespaceToken>>) =
         let token = maybeToken.Value
         //Console.WriteLine($"ta:{stringify token}")
         tokens <- token::tokens
@@ -31,10 +37,10 @@ let compile (exit:string->bool) (i:int) (txt:string) =
         let offset = token.nextIndex
         let rest = txt.[offset-i..]
 
-        if exit rest || Regex.IsMatch(rest,"^\s*$") then
+        if exit rest then
             match parser.tryAccept(states) with
             | Some lxm -> 
-                (TypeArgumentParseTable.unboxRoot lxm),offset,rest
+                (unboxRoot lxm),offset,rest
             | None ->
                 tokenIterator.tryNext()
                 |> loop

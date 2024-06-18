@@ -22,15 +22,11 @@ type FlatFsyaccFile =
     static member from (raw:RawFsyaccFile) =
         let rules = RuleSet.fromGroups raw.ruleGroups
             
-        //RuleSet.redundantDummies rules
-
         let operatorsLines =
             raw.operatorsLines
             |> List.map(fun (assoc,operators) ->
                 let operators = Set.ofList operators
                 assoc,operators)
-
-        //Symbol.duplOperators raw.operatorsLines
 
         let declarationsLines =
             raw.declarationsLines
@@ -47,67 +43,12 @@ type FlatFsyaccFile =
             )
             |> Map.ofList
 
-        //Symbol.duplDeclar raw.declarationsLines
-
         {
             header = raw.header
             rules = rules
             operatorsLines = operatorsLines
             declarationsLines = declarationsLines
         }
-
-    /// 打印未使用的规则，操作符，类型声明等。
-    member this.unusedReport() =
-        let symbols = 
-            this.rules
-            |> RuleSet.getUsedSymbols ""
-
-        let usedRules, unusedRules =
-            this.rules
-            |> Set.partition(fun rule -> rule.production.Head |> symbols.Contains)
-
-        let usedProductions =
-            usedRules
-            |> Set.map(fun rule -> rule.production)
-
-        let bnf = BNF.just usedProductions
-
-        let usedDummies =
-            usedRules
-            |> Set.map(fun rule -> rule.dummy)
-            |> Set.filter(fun dummy -> dummy > "")
-
-        let operators =
-            this.operatorsLines
-            |> List.map snd
-            |> Set.unionMany
-
-        let unusedOperators =
-            operators - bnf.terminals - usedDummies
-
-        let unusedDummies =
-            usedDummies - operators
-
-        let typeDecls =
-            this.declarationsLines
-            |> Map.values
-            |> Set.unionMany
-
-        // unused operators (usedProductions, dummy)
-        let unusedTypeDecls =
-            typeDecls - bnf.symbols
-        [
-            "# unused report"
-            "## unused rules"
-            stringify unusedRules
-            "## unusedOperators"
-            stringify unusedOperators
-            "## unusedDummies"
-            stringify unusedDummies
-            "## unusedTypeDecls"
-            stringify unusedTypeDecls
-        ]
-        |> String.concat "\n"
 
     member this.rulesMap =
         this.rules
@@ -119,7 +60,12 @@ type FlatFsyaccFile =
         |> List.ofSeq
         |> List.map(fun rule -> rule.production, rule.reducer)
 
-    member this.getYacc () =
+    member this.getBNF() =
+        this.rules
+        |> Set.map(fun rule -> rule.production)
+        |> BNF.just
+
+    member this.getYacc() =
         let productions =
             this.rules
             |> Set.map(fun rule -> rule.production)
@@ -133,5 +79,23 @@ type FlatFsyaccFile =
         let precedences =
             Precedence.from this.operatorsLines
 
-        YaccRow.from( productions, dummyTokens, precedences )
+        YaccRow.from(productions, dummyTokens, precedences)
 
+    member this.toRaw(rules:Rule list) =
+        {
+            header = this.header
+
+            ruleGroups = RuleSet.toGroups rules
+
+            operatorsLines = 
+                this.operatorsLines
+                |> OperatorsLine.filterOperatorsLines rules
+                |> List.map(fun (ass, syms) -> ass, List.ofSeq syms)
+
+            declarationsLines =
+                this.declarationsLines
+                |> Declaration.filterTarg rules
+                |> List.ofSeq
+                |> List.map(fun(KeyValue(targ, syms)) -> targ, List.ofSeq syms)
+
+        }

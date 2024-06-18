@@ -8,7 +8,6 @@ open FSharp.Idioms.ActivePatterns
 
 open System.Text.RegularExpressions
 
-
 let trySingleLineComment =
     Regex @"^//[^\r\n]*"
     |> trySearch
@@ -29,9 +28,9 @@ let tryHTypar =
     Regex @"^\^\w+(?!')"
     |> trySearch
 
-let tryIdent =
-    Regex @"^[_\p{L}\p{Nl}][\p{L}\p{Mn}\p{Mc}\p{Nl}\p{Nd}\p{Pc}\p{Cf}']*"
-    |> trySearch
+//let tryIdent =
+//    Regex @"^[_\p{L}\p{Nl}][\p{L}\p{Mn}\p{Mc}\p{Nl}\p{Nd}\p{Pc}\p{Cf}']*"
+//    |> trySearch
 
 let tryChar =
     Regex @"^'(\\.|[^\\'])+'" // 转义斜杠后面紧跟着的一个字符作为整体看待。

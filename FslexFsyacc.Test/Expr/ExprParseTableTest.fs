@@ -20,7 +20,7 @@ type ExprParseTableTest(output:ITestOutputHelper) =
     let filePath = Path.Combine(__SOURCE_DIRECTORY__, @"expr.fsyacc")
     let parseTblPath = Path.Combine(__SOURCE_DIRECTORY__, $"{parseTblName}.fs")
 
-    let text = File.ReadAllText(filePath,Encoding.UTF8)
+    let text = File.ReadAllText(filePath, Encoding.UTF8)
 
     let rawFsyacc =
         text
@@ -37,20 +37,20 @@ type ExprParseTableTest(output:ITestOutputHelper) =
 
     let bnf = tbl.bnf
 
-    //[<Fact>]
-    //member _.``01 - norm fsyacc file``() =
-    //    let s0 = tblCrew.startSymbol
-    //    let flatedFsyacc =
-    //        fsyaccCrew
-    //        |> FlatedFsyaccFileCrewUtils.toFlatFsyaccFile
+    [<Fact>]
+    member _.``01 - norm fsyacc file``() =
+        let s0 = rawFsyacc.ruleGroups.Head.lhs
+        Should.equal s0 "expr"
+        let rules =
+            fsyacc.rules
+            //|> RuleSet.removeSymbols robust
+            //|> RuleSet.removeHeads heads
+            |> RuleSet.crawl s0
+            //|> List.map(fun rule -> { rule with reducer = "" })
 
-    //    let src =
-    //        flatedFsyacc
-    //        |> FlatFsyaccFileUtils.start s0
-    //        |> RawFsyaccFileUtils.fromFlat
-    //        |> RawFsyaccFileUtils.render
-
-    //    output.WriteLine(src)
+        let raw = fsyacc.toRaw(rules)
+        let src = raw.toCode()
+        output.WriteLine(src)
 
     [<Fact>]
     member _.``02 - print conflict``() =

@@ -1,7 +1,9 @@
 ﻿module FslexFsyacc.TypeArguments.TypeArgumentTokenUtils
 
 open FslexFsyacc.TypeArguments.FSharpTokenScratch
+open FslexFsyacc.SourceText
 open FslexFsyacc
+
 open FSharp.Idioms
 
 open FSharp.Idioms.ActivePatterns
@@ -86,7 +88,7 @@ let tokenize offset (input:string) =
                 yield tok
                 yield! loop tok.nextIndex rest.[tok.length..]            
 
-            | On tryIdent x ->
+            | On tryFSharpIdent x ->
                 let tok =
                     {
                         index = pos

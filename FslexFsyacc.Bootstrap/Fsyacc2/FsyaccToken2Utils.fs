@@ -95,7 +95,7 @@ let tokenize (offset:int) (input:string) =
                 yield Position.from(pos,len,LITERAL(Json.unquote x.Value))
                 yield! loop (lpos,lrest) (pos+len,rest.[len..])
 
-            | On trySemantic x ->
+            | On tryReducer x ->
                 let len = x.Length
                 let code = x.[1..len-2]
 
@@ -116,7 +116,7 @@ let tokenize (offset:int) (input:string) =
                 let code = x.[2..len-3]
 
                 let nlpos,nlinp,fcode =
-                    if System.String.IsNullOrWhiteSpace(code) then
+                    if String.IsNullOrWhiteSpace(code) then
                         lpos,lrest,""
                     else
                         let col,nlpos = Line.getColumnAndLpos (lpos,lrest) (pos+2)
@@ -152,10 +152,10 @@ let tokenize (offset:int) (input:string) =
                 let pos = langle.nextIndex
                 let rest = rest.[langle.length .. ]
 
-                Console.WriteLine(stringify (pos,rest))
+                //Console.WriteLine(stringify (pos,rest))
                                 
                 let targ, epos, erest = 
-                    let exit (x:string) = Regex.IsMatch(x, @"^\s*\>")                   
+                    let exit (x:string) = Regex.IsMatch(x, @"^\s*\>")
                     TypeArguments.TypeArgumentCompiler.compile exit pos rest
 
                 //let tas = rest.[0..epos-pos-1]

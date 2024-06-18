@@ -21,3 +21,18 @@ let lines (declarations:Map<string,TypeArgument>) =
         tp,symbols
     )
     |> Map.ofSeq
+
+let filterTarg (rules:seq<Rule>) (declarationsLines: Map<TypeArgument, Set<string>>) =
+    let productions =
+        rules
+        |> Seq.map(fun rule -> rule.production)
+
+    let st =
+        productions
+        |> Seq.concat
+        |> Set.ofSeq
+
+    declarationsLines
+    |> Map.map(fun targ symbols ->
+        Set.intersect symbols st
+    )

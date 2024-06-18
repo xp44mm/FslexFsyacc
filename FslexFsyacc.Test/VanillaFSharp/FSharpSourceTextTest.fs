@@ -145,7 +145,7 @@ type FSharpSourceTextTest(output:ITestOutputHelper) =
     [<InlineData("(*}*){}}")>]
     member _.``getNestedActionLength`` (x:string) =
         
-        let y = FSharpSourceText.getSemanticLength x
+        let y = FSharpSourceText.getReducerLength x
         let z = x.[0..y-1]
         show z
         Should.equal x z
@@ -165,7 +165,7 @@ type FSharpSourceTextTest(output:ITestOutputHelper) =
     [<InlineData("{'}'}")>]
     member _.``trySemantic`` (x:string) =
         let y = 
-            FSharpSourceText.trySemantic x
+            FSharpSourceText.tryReducer x
             |> Option.get
 
         show y

@@ -1,0 +1,597 @@
+﻿%{%}
+fileModuleImpl :
+    | moduleDefnsOrExprPossiblyEmptyOrBlock {}
+    | opt_attributes opt_access moduleIntro moduleDefnsOrExprPossiblyEmptyOrBlock {}
+moduleDefnsOrExprPossiblyEmptyOrBlock :
+    | OBLOCKBEGIN moduleDefnsOrExprPossiblyEmpty oblockend opt_OBLOCKSEP {}
+    | moduleDefnsOrExprPossiblyEmpty {}
+moduleIntro :
+    | moduleKeyword opt_attributes opt_access opt_rec path {}
+moduleDefnsOrExprPossiblyEmpty :
+    | (*empty*) {}
+    | moduleDefnsOrExpr {}
+moduleKeyword :
+    | MODULE {}
+    | MODULE_COMING_SOON moduleKeyword {}
+    | MODULE_IS_HERE {}
+oblockend :
+    | OBLOCKEND {}
+    | OBLOCKEND_COMING_SOON oblockend {}
+    | OBLOCKEND_IS_HERE {}
+opt_OBLOCKSEP :
+    | (*empty*) {}
+    | OBLOCKSEP {}
+opt_rec :
+    | (*empty*) {}
+    | REC {}
+path :
+    | GLOBAL {}
+    | ident {}
+    | path DOT ident {}
+ident :
+    | IDENT {}
+moduleDefnsOrExpr :
+    | moduleDefns {}
+    | opt_attributes opt_access declExpr {}
+    | opt_attributes opt_access declExpr topSeparators {}
+    | opt_attributes opt_access declExpr topSeparators moduleDefnsOrExpr {}
+moduleDefns :
+    | moduleDefnOrDirective {}
+    | moduleDefnOrDirective moduleDefns {}
+    | moduleDefnOrDirective topSeparators {}
+    | moduleDefnOrDirective topSeparators moduleDefnsOrExpr {}
+topSeparators :
+    | topSeparator {}
+    | topSeparator topSeparators {}
+moduleDefnOrDirective :
+    | hashDirective {}
+    | moduleDefn {}
+topSeparator :
+    | OBLOCKSEP {}
+    | SEMICOLON {}
+    | SEMICOLON_SEMICOLON {}
+moduleDefn :
+    | openDecl {}
+    | opt_attributes opt_access defnBindings %prec decl_let {}
+    | opt_attributes opt_access doBinding %prec decl_let {}
+    | opt_attributes opt_access hardwhiteLetBindings %prec decl_let {}
+    | opt_attributes opt_access moduleIntro EQUALS namedModuleDefnBlock {}
+    | opt_attributes opt_access typeKeyword tyconDefn tyconDefnList {}
+defnBindings :
+    | LET opt_rec localBindings {}
+doBinding :
+    | DO typedSequentialExprBlock {}
+hardwhiteLetBindings :
+    | OLET opt_rec localBindings hardwhiteDefnBindingsTerminator {}
+namedModuleDefnBlock :
+    | OBLOCKBEGIN moduleDefnsOrExpr oblockend {}
+    | OBLOCKBEGIN wrappedNamedModuleDefn oblockend {}
+    | path {}
+    | wrappedNamedModuleDefn {}
+openDecl :
+    | OPEN path {}
+    | OPEN typeKeyword appType {}
+tyconDefn :
+    | typeNameInfo {}
+    | typeNameInfo opt_attributes opt_access opt_HIGH_PRECEDENCE_APP simplePatterns optAsSpec EQUALS tyconDefnRhsBlock {}
+    | typeNameInfo opt_equals tyconDefnRhsBlock {}
+    | typeNameInfo tyconDefnAugmentation {}
+tyconDefnList :
+    | (*empty*) {}
+    | AND tyconDefn tyconDefnList {}
+typeKeyword :
+    | TYPE {}
+    | TYPE_COMING_SOON typeKeyword {}
+    | TYPE_IS_HERE {}
+hardwhiteDefnBindingsTerminator :
+    | ODECLEND {}
+localBindings :
+    | attr_localBinding moreLocalBindings {}
+optAsSpec :
+    | (*empty*) {}
+    | asSpec {}
+opt_HIGH_PRECEDENCE_APP :
+    | (*empty*) {}
+    | HIGH_PRECEDENCE_BRACK_APP {}
+    | HIGH_PRECEDENCE_PAREN_APP {}
+opt_equals :
+    | (*empty*) {}
+    | EQUALS {}
+simplePatterns :
+    | LPAREN rparen {}
+    | LPAREN simplePatternCommaList rparen {}
+tyconDefnAugmentation :
+    | WITH classDefnBlock declEnd {}
+tyconDefnRhsBlock :
+    | OBLOCKBEGIN tyconDefnRhs opt_OBLOCKSEP classDefnMembers opt_classDefn oblockend opt_classDefn {}
+    | tyconDefnRhs opt_classDefn {}
+typeNameInfo :
+    | opt_attributes tyconNameAndTyparDecls opt_typeConstraints {}
+typedSequentialExprBlock :
+    | OBLOCKBEGIN typedSequentialExpr oblockend {}
+    | typedSequentialExpr {}
+wrappedNamedModuleDefn :
+    | structOrBegin moduleDefnsOrExprPossiblyEmpty END {}
+asSpec :
+    | AS ident {}
+attr_localBinding :
+    | opt_attributes localBinding {}
+classDefnBlock :
+    | OBLOCKBEGIN classDefnMembers oblockend {}
+    | classDefnMembers {}
+classDefnMembers :
+    | (*empty*) {}
+    | classDefnMembersAtLeastOne {}
+declEnd :
+    | END {}
+    | ODECLEND {}
+    | OEND {}
+moreLocalBindings :
+    | (*empty*) %prec prec_no_more_attr_bindings {}
+    | AND attr_localBinding moreLocalBindings {}
+opt_classDefn :
+    | (*empty*) {}
+    | WITH classDefnBlock declEnd {}
+opt_typeConstraints :
+    | (*empty*) {}
+    | WHEN typeConstraints {}
+rparen :
+    | RPAREN {}
+    | RPAREN_COMING_SOON rparen {}
+    | RPAREN_IS_HERE {}
+simplePatternCommaList :
+    | simplePattern {}
+    | simplePattern COMMA simplePatternCommaList {}
+structOrBegin :
+    | BEGIN {}
+    | STRUCT {}
+tyconDefnRhs :
+    | DELEGATE OF topType {}
+    | tyconClassDefn {}
+    | tyconDefnOrSpfnSimpleRepr {}
+tyconNameAndTyparDecls :
+    | opt_access path {}
+    | opt_access path postfixTyparDecls {}
+    | opt_access prefixTyparDecls path {}
+typedSequentialExpr :
+    | sequentialExpr {}
+    | sequentialExpr COLON typeWithTypeConstraints {}
+classDefnMembersAtLeastOne :
+    | classDefnMember opt_seps classDefnMembers {}
+localBinding :
+    | opt_inline opt_mutable bindingPattern opt_topReturnTypeWithTypeConstraints EQUALS typedExprWithStaticOptimizationsBlock {}
+postfixTyparDecls :
+    | opt_HIGH_PRECEDENCE_TYAPP LESS typarDeclList opt_typeConstraints GREATER {}
+prefixTyparDecls :
+    | LPAREN typarDeclList rparen {}
+    | typar {}
+sequentialExpr :
+    | declExpr %prec SEMICOLON {}
+    | declExpr OTHEN OBLOCKBEGIN typedSequentialExpr oblockend %prec prec_then_before {}
+    | declExpr THEN sequentialExpr %prec prec_then_before {}
+    | declExpr seps {}
+    | declExpr seps sequentialExpr {}
+    | hardwhiteLetBindings %prec prec_args_error {}
+simplePattern :
+    | QMARK ident {}
+    | attributes simplePattern %prec paren_pat_attribs {}
+    | ident {}
+    | simplePattern COLON typeWithTypeConstraints {}
+topType :
+    | topTupleType {}
+    | topTupleType RARROW topType {}
+tyconClassDefn :
+    | classDefnBlockKindUnspecified {}
+    | classOrInterfaceOrStruct classDefnBlock END {}
+tyconDefnOrSpfnSimpleRepr :
+    | opt_attributes opt_access braceFieldDeclList {}
+    | opt_attributes opt_access typ {}
+    | opt_attributes opt_access unionTypeRepr {}
+typeConstraints :
+    | typeConstraint {}
+    | typeConstraints AND typeConstraint {}
+typeWithTypeConstraints :
+    | typ %prec prec_wheretyp_prefix {}
+    | typ WHEN typeConstraints {}
+bindingPattern :
+    | headBindingPattern {}
+braceFieldDeclList :
+    | LBRACE recdFieldDeclList rbrace {}
+classDefnBlockKindUnspecified :
+    | OBLOCKBEGIN classDefnMembers oblockend {}
+classOrInterfaceOrStruct :
+    | CLASS {}
+    | INTERFACE {}
+    | STRUCT {}
+opt_HIGH_PRECEDENCE_TYAPP :
+    | (*empty*) {}
+    | HIGH_PRECEDENCE_TYAPP {}
+opt_inline :
+    | (*empty*) {}
+    | INLINE {}
+opt_mutable :
+    | (*empty*) {}
+    | MUTABLE {}
+opt_seps :
+    | (*empty*) {}
+    | seps {}
+opt_topReturnTypeWithTypeConstraints :
+    | (*empty*) {}
+    | COLON topTypeWithTypeConstraints {}
+seps :
+    | OBLOCKSEP {}
+    | OBLOCKSEP SEMICOLON {}
+    | SEMICOLON {}
+    | SEMICOLON OBLOCKSEP {}
+topTupleType :
+    | topAppType {}
+    | topAppType STAR topTupleTypeElements {}
+typarDeclList :
+    | typarDecl {}
+    | typarDeclList COMMA typarDecl {}
+typeConstraint :
+    | DEFAULT typar COLON typ {}
+    | LPAREN typeAlts rparen COLON LPAREN classMemberSpfn rparen {}
+    | appType {}
+    | typar COLON DELEGATE typeArgsNoHpaDeprecated {}
+    | typar COLON IDENT {}
+    | typar COLON IDENT STRUCT {}
+    | typar COLON IDENT typeArgsNoHpaDeprecated {}
+    | typar COLON LPAREN classMemberSpfn rparen {}
+    | typar COLON NULL {}
+    | typar COLON STRUCT {}
+    | typar COLON_GREATER typ {}
+typedExprWithStaticOptimizationsBlock :
+    | OBLOCKBEGIN typedExprWithStaticOptimizations oblockend {}
+    | typedExprWithStaticOptimizations {}
+unionTypeRepr :
+    | barAndgrabXmlDoc attrUnionCaseDecls {}
+    | firstUnionCaseDecl {}
+    | firstUnionCaseDeclOfMany barAndgrabXmlDoc attrUnionCaseDecls {}
+attrUnionCaseDecls :
+    | attrUnionCaseDecl {}
+    | attrUnionCaseDecl barAndgrabXmlDoc attrUnionCaseDecls {}
+barAndgrabXmlDoc :
+    | BAR {}
+classMemberSpfn :
+    | opt_attributes opt_access INHERIT appType {}
+    | opt_attributes opt_access NEW COLON topTypeWithTypeConstraints {}
+    | opt_attributes opt_access STATIC VAL fieldDecl {}
+    | opt_attributes opt_access STATIC typeKeyword tyconSpfn {}
+    | opt_attributes opt_access VAL fieldDecl {}
+    | opt_attributes opt_access interfaceMember appType {}
+    | opt_attributes opt_access memberSpecFlags opt_inline opt_access nameop opt_explicitValTyparDecls COLON topTypeWithTypeConstraints classMemberSpfnGetSet optLiteralValueSpfn {}
+firstUnionCaseDecl :
+    | ident EQUALS constant opt_OBLOCKSEP {}
+    | ident OF unionCaseRepr {}
+firstUnionCaseDeclOfMany :
+    | firstUnionCaseDecl opt_OBLOCKSEP {}
+    | ident EQUALS constant opt_OBLOCKSEP {}
+    | ident opt_OBLOCKSEP {}
+headBindingPattern :
+    | conjPatternElements %prec pat_conj {}
+    | constrPattern {}
+    | headBindingPattern AS constrPattern {}
+    | headBindingPattern BAR headBindingPattern {}
+    | headBindingPattern COLON_COLON headBindingPattern {}
+    | tuplePatternElements %prec pat_tuple {}
+rbrace :
+    | RBRACE {}
+    | RBRACE_COMING_SOON rbrace {}
+    | RBRACE_IS_HERE {}
+recdFieldDeclList :
+    | recdFieldDecl opt_seps {}
+    | recdFieldDecl seps recdFieldDeclList {}
+topAppType :
+    | QMARK ident COLON appType {}
+    | appType {}
+    | appType COLON appType {}
+    | attributes QMARK ident COLON appType {}
+    | attributes appType {}
+    | attributes appType COLON appType {}
+topTupleTypeElements :
+    | topAppType %prec prec_toptuptyptail_prefix {}
+    | topAppType STAR topTupleTypeElements {}
+topTypeWithTypeConstraints :
+    | topType {}
+    | topType WHEN typeConstraints {}
+typarDecl :
+    | opt_attributes typar {}
+typeAlts :
+    | appType {}
+    | typeAlts OR appType {}
+typeArgsNoHpaDeprecated :
+    | HIGH_PRECEDENCE_TYAPP typeArgsActual {}
+    | typeArgsActual {}
+typedExprWithStaticOptimizations :
+    | typedSequentialExpr opt_staticOptimizations {}
+attrUnionCaseDecl :
+    | opt_attributes opt_access unionCaseName {}
+    | opt_attributes opt_access unionCaseName COLON topType {}
+    | opt_attributes opt_access unionCaseName EQUALS constant {}
+    | opt_attributes opt_access unionCaseName OF unionCaseRepr {}
+classMemberSpfnGetSet :
+    | (*empty*) {}
+    | OWITH classMemberSpfnGetSetElements OEND {}
+    | WITH classMemberSpfnGetSetElements {}
+conjPatternElements :
+    | conjPatternElements AMP headBindingPattern {}
+    | headBindingPattern AMP headBindingPattern {}
+constant :
+    | rawConstant {}
+    | rawConstant HIGH_PRECEDENCE_TYAPP measureTypeArg {}
+constrPattern :
+    | COLON_QMARK atomTypeOrAnonRecdType %prec pat_isinst {}
+    | atomicPattern {}
+    | atomicPatternLongIdent HIGH_PRECEDENCE_BRACK_APP atomicPatsOrNamePatPairs {}
+    | atomicPatternLongIdent HIGH_PRECEDENCE_PAREN_APP atomicPatsOrNamePatPairs {}
+    | atomicPatternLongIdent atomicPatsOrNamePatPairs %prec pat_app {}
+    | atomicPatternLongIdent explicitValTyparDecls {}
+    | atomicPatternLongIdent explicitValTyparDecls HIGH_PRECEDENCE_BRACK_APP atomicPatsOrNamePatPairs {}
+    | atomicPatternLongIdent explicitValTyparDecls HIGH_PRECEDENCE_PAREN_APP atomicPatsOrNamePatPairs {}
+    | atomicPatternLongIdent explicitValTyparDecls atomicPatsOrNamePatPairs %prec pat_app {}
+fieldDecl :
+    | opt_mutable opt_access ident COLON typ {}
+interfaceMember :
+    | INTERFACE {}
+    | OINTERFACE_MEMBER {}
+memberSpecFlags :
+    | abstractMemberFlags {}
+    | memberFlags {}
+nameop :
+    | identOrOp {}
+optLiteralValueSpfn :
+    | (*empty*) {}
+    | EQUALS OBLOCKBEGIN declExpr oblockend opt_ODECLEND {}
+    | EQUALS declExpr {}
+opt_explicitValTyparDecls :
+    | (*empty*) {}
+    | explicitValTyparDecls {}
+opt_staticOptimizations :
+    | (*empty*) {}
+    | opt_staticOptimizations staticOptimization {}
+recdFieldDecl :
+    | opt_attributes fieldDecl {}
+tuplePatternElements :
+    | COMMA headBindingPattern {}
+    | headBindingPattern COMMA headBindingPattern {}
+    | tuplePatternElements COMMA headBindingPattern {}
+tyconSpfn :
+    | typeNameInfo EQUALS tyconSpfnRhsBlock {}
+    | typeNameInfo opt_classSpfn {}
+typeArgsActual :
+    | LESS GREATER {}
+    | LESS typeArgActual GREATER {}
+    | LESS typeArgActualOrDummyIfEmpty COMMA typeArgActualOrDummyIfEmpty typeArgListElements GREATER {}
+unionCaseRepr :
+    | braceFieldDeclList {}
+    | unionCaseReprElements {}
+abstractMemberFlags :
+    | ABSTRACT {}
+    | ABSTRACT MEMBER {}
+    | STATIC ABSTRACT {}
+    | STATIC ABSTRACT MEMBER {}
+atomTypeOrAnonRecdType :
+    | anonRecdType {}
+    | atomType {}
+atomicPatsOrNamePatPairs :
+    | LPAREN namePatPairs rparen {}
+    | atomicPatterns {}
+atomicPattern :
+    | CHAR DOT_DOT CHAR {}
+    | FALSE {}
+    | LBRACE recordPatternElementsAux rbrace {}
+    | LBRACK listPatternElements RBRACK {}
+    | LBRACK_BAR listPatternElements BAR_RBRACK {}
+    | LPAREN parenPatternBody rparen {}
+    | NULL {}
+    | QMARK ident {}
+    | STRUCT LPAREN tupleParenPatternElements rparen {}
+    | TRUE {}
+    | UNDERSCORE {}
+    | atomicPatternLongIdent %prec prec_atompat_pathop {}
+    | constant {}
+    | quoteExpr {}
+atomicPatternLongIdent :
+    | GLOBAL DOT pathOp {}
+    | UNDERSCORE DOT pathOp {}
+    | access UNDERSCORE DOT pathOp {}
+    | access pathOp {}
+    | pathOp {}
+classMemberSpfnGetSetElements :
+    | nameop {}
+    | nameop COMMA nameop {}
+explicitValTyparDecls :
+    | opt_HIGH_PRECEDENCE_TYAPP LESS explicitValTyparDeclsCore opt_typeConstraints GREATER {}
+identOrOp :
+    | ident {}
+    | opName {}
+measureTypeArg :
+    | LESS UNDERSCORE GREATER {}
+    | LESS measureTypeExpr GREATER {}
+memberFlags :
+    | DEFAULT {}
+    | MEMBER {}
+    | OVERRIDE {}
+    | STATIC MEMBER {}
+opt_ODECLEND :
+    | (*empty*) {}
+    | ODECLEND {}
+opt_classSpfn :
+    | (*empty*) {}
+    | WITH classSpfnBlock declEnd {}
+rawConstant :
+    | BIGNUM {}
+    | BYTEARRAY {}
+    | CHAR {}
+    | DECIMAL {}
+    | IEEE32 {}
+    | IEEE64 {}
+    | INT16 {}
+    | INT32 {}
+    | INT64 {}
+    | INT8 {}
+    | NATIVEINT {}
+    | UINT16 {}
+    | UINT32 {}
+    | UINT64 {}
+    | UINT8 {}
+    | UNATIVEINT {}
+    | sourceIdentifier {}
+    | string {}
+staticOptimization :
+    | WHEN staticOptimizationConditions EQUALS typedSequentialExprBlock {}
+tyconSpfnRhsBlock :
+    | OBLOCKBEGIN tyconSpfnRhs opt_OBLOCKSEP classSpfnMembers opt_classSpfn oblockend opt_classSpfn {}
+    | tyconSpfnRhs opt_classSpfn {}
+typeArgActual :
+    | typ {}
+    | typ EQUALS {}
+    | typ EQUALS typ {}
+typeArgActualOrDummyIfEmpty :
+    | dummyTypeArg {}
+    | typeArgActual {}
+typeArgListElements :
+    | (*empty*) {}
+    | typeArgListElements COMMA dummyTypeArg %prec prec_args_error {}
+    | typeArgListElements COMMA typeArgActual {}
+unionCaseName :
+    | LPAREN COLON_COLON rparen {}
+    | LPAREN LBRACK RBRACK rparen {}
+    | nameop {}
+unionCaseReprElements :
+    | unionCaseReprElement %prec prec_toptuptyptail_prefix {}
+    | unionCaseReprElement STAR unionCaseReprElements {}
+anonRecdType :
+    | STRUCT braceBarFieldDeclListCore {}
+    | braceBarFieldDeclListCore {}
+atomicPatterns :
+    | atomicPattern {}
+    | atomicPattern HIGH_PRECEDENCE_BRACK_APP atomicPatterns {}
+    | atomicPattern HIGH_PRECEDENCE_PAREN_APP atomicPatterns {}
+    | atomicPattern atomicPatterns %prec pat_args {}
+classSpfnBlock :
+    | OBLOCKBEGIN classSpfnMembers oblockend {}
+    | classSpfnMembers {}
+classSpfnMembers :
+    | (*empty*) {}
+    | classSpfnMembersAtLeastOne {}
+dummyTypeArg :
+    | (*empty*) {}
+explicitValTyparDeclsCore :
+    | (*empty*) {}
+    | typarDeclList {}
+    | typarDeclList COMMA DOT_DOT {}
+listPatternElements :
+    | (*empty*) {}
+    | parenPattern opt_seps {}
+    | parenPattern seps listPatternElements {}
+measureTypeExpr :
+    | INFIX_STAR_DIV_MOD_OP measureTypeExpr {}
+    | measureTypeExpr INFIX_STAR_DIV_MOD_OP measureTypeExpr {}
+    | measureTypeExpr STAR measureTypeExpr {}
+    | measureTypeSeq {}
+namePatPairs :
+    | namePatPair opt_seps {}
+    | namePatPair seps namePatPairs {}
+opName :
+    | LPAREN activePatternCaseNames BAR UNDERSCORE BAR rparen {}
+    | LPAREN activePatternCaseNames BAR rparen {}
+    | LPAREN operatorName rparen {}
+    | LPAREN_STAR_RPAREN {}
+parenPatternBody :
+    | (*empty*) {}
+    | parenPattern {}
+pathOp :
+    | ident {}
+    | ident DOT pathOp {}
+    | opName {}
+quoteExpr :
+    | LQUOTE typedSequentialExpr RQUOTE {}
+recordPatternElementsAux :
+    | recordPatternElement opt_seps {}
+    | recordPatternElement seps recordPatternElementsAux {}
+sourceIdentifier :
+    | KEYWORD_STRING {}
+staticOptimizationConditions :
+    | staticOptimizationCondition {}
+    | staticOptimizationConditions AND staticOptimizationCondition {}
+string :
+    | STRING {}
+tupleParenPatternElements :
+    | COMMA parenPattern {}
+    | parenPattern COMMA parenPattern {}
+    | tupleParenPatternElements COMMA parenPattern {}
+tyconSpfnRhs :
+    | DELEGATE OF topType {}
+    | tyconClassSpfn {}
+    | tyconDefnOrSpfnSimpleRepr {}
+unionCaseReprElement :
+    | appType {}
+    | ident COLON appType {}
+activePatternCaseNames :
+    | BAR activePatternCaseName {}
+    | activePatternCaseNames BAR activePatternCaseName {}
+braceBarFieldDeclListCore :
+    | LBRACE_BAR recdFieldDeclList bar_rbrace {}
+classSpfnMembersAtLeastOne :
+    | classMemberSpfn opt_seps classSpfnMembers {}
+measureTypeSeq :
+    | measureTypePower {}
+    | measureTypePower measureTypeSeq {}
+namePatPair :
+    | ident EQUALS parenPattern {}
+operatorName :
+    | ADJACENT_PREFIX_OP {}
+    | AMP {}
+    | AMP_AMP {}
+    | BAR_BAR {}
+    | COLON_EQUALS {}
+    | DOLLAR {}
+    | DOT_DOT {}
+    | DOT_DOT DOT_DOT {}
+    | EQUALS {}
+    | FUNKY_OPERATOR_NAME {}
+    | GREATER {}
+    | INFIX_AMP_OP {}
+    | INFIX_AT_HAT_OP {}
+    | INFIX_BAR_OP {}
+    | INFIX_COMPARE_OP {}
+    | INFIX_STAR_DIV_MOD_OP {}
+    | INFIX_STAR_STAR_OP {}
+    | LESS {}
+    | LQUOTE RQUOTE {}
+    | MINUS {}
+    | OR {}
+    | PERCENT_OP {}
+    | PLUS_MINUS_OP {}
+    | PREFIX_OP {}
+    | QMARK {}
+    | STAR {}
+parenPattern :
+    | attributes parenPattern %prec paren_pat_attribs {}
+    | conjParenPatternElements {}
+    | constrPattern {}
+    | parenPattern AS constrPattern {}
+    | parenPattern BAR parenPattern {}
+    | parenPattern COLON typeWithTypeConstraints %prec paren_pat_colon {}
+    | parenPattern COLON_COLON parenPattern {}
+    | tupleParenPatternElements {}
+recordPatternElement :
+    | path EQUALS parenPattern {}
+staticOptimizationCondition :
+    | typar COLON typ {}
+    | typar STRUCT {}
+tyconClassSpfn :
+    | classOrInterfaceOrStruct classSpfnBlock END {}
+    | classSpfnBlockKindUnspecified {}
+activePatternCaseName :
+    | IDENT {}
+bar_rbrace :
+    | BAR_RBRACE {}
+classSpfnBlockKindUnspecified :
+    | BEGIN classSpfnBlock END {}
+    | OBLOCKBEGIN classSpfnMembers oblockend {}
+conjParenPatternElements :
+    | conjParenPatternElements AMP parenPattern {}
+    | parenPattern AMP parenPattern {}

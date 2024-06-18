@@ -16,3 +16,7 @@ let tryWS =
 let tryWord =
     Regex @"^\w+"
     |> trySearch
+
+let tryFSharpIdent =
+    Regex @"^[_\p{L}\p{Nl}][\p{L}\p{Mn}\p{Mc}\p{Nl}\p{Nd}\p{Pc}\p{Cf}']*"
+    |> trySearch

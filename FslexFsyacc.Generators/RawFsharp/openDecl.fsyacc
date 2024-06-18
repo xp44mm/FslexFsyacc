@@ -1,0 +1,12 @@
+﻿%{%}
+openDecl :
+    | OPEN path {}
+    | OPEN typeKeyword appType {}
+path :
+    | GLOBAL {}
+    | ident {}
+    | path DOT ident {}
+typeKeyword :
+    | TYPE {}
+ident :
+    | IDENT {}

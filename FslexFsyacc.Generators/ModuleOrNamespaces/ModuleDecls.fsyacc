@@ -1,0 +1,26 @@
+%{
+open FslexFsyacc.TypeArguments
+%}
+
+moduleDecls :
+    | moduleDecl moduleDecls {s0::s1}
+    | moduleDecl {[s0]}
+
+moduleDecl :
+    | openDecl {s0}
+
+openDecl :
+    | OPEN path {Open(List.rev s1)}
+    | OPEN TYPE TARG {OpenType(s2)}
+
+path :
+    | path "." IDENT {s2::s0}
+    | IDENT {[s0]}
+
+%%
+
+%type<ModuleDecl list> moduleDecls
+%type<ModuleDecl> moduleDecl openDecl
+%type<string list> path
+%type<TypeArgument> TARG
+%type<string> IDENT

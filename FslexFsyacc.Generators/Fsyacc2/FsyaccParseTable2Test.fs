@@ -37,20 +37,20 @@ type FsyaccParseTable2Test(output:ITestOutputHelper) =
     let tbl =
         fsyacc.getYacc()
 
-    //[<Fact>]
-    //member _.``01 - norm fsyacc file``() =
-    //    let s0 = tblCrew.startSymbol
-    //    let flatedFsyacc =
-    //        fsyaccCrew
-    //        |> FlatedFsyaccFileCrewUtils.toFlatFsyaccFile
-        
-    //    let src = 
-    //        flatedFsyacc 
-    //        |> FlatFsyaccFileUtils.start s0
-    //        |> RawFsyaccFileUtils.fromFlat
-    //        |> RawFsyaccFileUtils.render
+    [<Fact>]
+    member _.``01 - norm fsyacc file``() =
+        let s0 = rawFsyacc.ruleGroups.Head.lhs
+        let rules =
+            fsyacc.rules
+            //|> RuleSet.removeSymbols robust
+            //|> RuleSet.removeHeads heads
+            |> RuleSet.crawl s0
+            //|> List.map(fun rule -> { rule with reducer = "" })
 
-    //    output.WriteLine(src)
+        let raw = fsyacc.toRaw(rules)
+        let src = raw.toCode()
+
+        output.WriteLine(src)
 
     [<Fact>]
     member _.``02 - print conflict productions``() =

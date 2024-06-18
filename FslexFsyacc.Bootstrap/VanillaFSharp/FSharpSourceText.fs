@@ -56,7 +56,7 @@ let tryHTypar =
     |> trySearch
 
 // 不终止循环的消费者 fsharpCodeCommonTries
-let tries = 
+let tries =
     [
         SourceText.tryWS
         trySingleLineComment
@@ -70,15 +70,15 @@ let tries =
         tryWord
         Regex @"^\S" |> trySearch
     ]
-    |> List.map(fun f -> 
-        f 
-        >> Option.map(fun mat -> 
+    |> List.map(fun f ->
+        f
+        >> Option.map(fun mat ->
             // 0代表不终止循环标记，%}出现的次数
             0,mat.Value)
         )
 
-let tryPercentRBrace = 
-    StringOps.tryStartsWith "%}" 
+let tryPercentRBrace =
+    StringOps.tryStartsWith "%}"
     // 1代表终止循环标记，%}出现的次数
     >> Option.map(fun capt -> 1,capt) // capt = "%}"
 
@@ -105,9 +105,9 @@ let tryRBrace = StringOps.tryFirst '}' >> Option.map(fun capt -> 1,string capt)
 let trySemanticTokens = tryLBrace :: tryRBrace :: tries
 
 //匹配{}
-let getSemanticLength(inp:string) =
+let getReducerLength(inp:string) =
     let rec loop depth len =
-        if len > inp.Length-1 then 
+        if len > inp.Length-1 then
             failwith $"depth:{depth};len:{len}"
         let d,capt =
             trySemanticTokens
@@ -123,7 +123,7 @@ let getSemanticLength(inp:string) =
     loop -1 0
 
 let tryHeader(inp:string) =
-    inp 
+    inp
     |> StringOps.tryStartsWith "%{"
     |> Option.map(fun capt ->
         let rest = inp.[capt.Length..]
@@ -132,12 +132,12 @@ let tryHeader(inp:string) =
         hdr
     )
 
-let trySemantic(inp:string) =
-    inp 
+let tryReducer(inp:string) =
+    inp
     |> StringOps.tryStartsWith "{"
     |> Option.map(fun capt ->
         let rest = inp.[capt.Length..]
-        let len = capt.Length+getSemanticLength rest
+        let len = capt.Length+getReducerLength rest
         let hdr = inp.Substring(0,len)
         hdr//,capt.[len..]
     )

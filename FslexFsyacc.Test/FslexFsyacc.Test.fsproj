@@ -56,6 +56,11 @@
 		<Compile Include="TypeArguments\TypeArgumentTest.fs" />
 		<Content Include="TypeArguments\types.txt" />
 		<Compile Include="TypeArguments\TypeArgumentCompilerTest.fs" />
+		<Compile Include="ModuleOrNamespaces\ModuleOrNamespaceTokenTest.fs" />
+		<Compile Include="ModuleOrNamespaces\ModuleDeclsCompilerTest.fs" />
+    
+    
+    
 		
 		<Compile Include="VanillaFSharp\FSharpSourceTextTest.fs" />
 		

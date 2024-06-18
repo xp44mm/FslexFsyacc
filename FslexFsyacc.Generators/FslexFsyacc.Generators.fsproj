@@ -11,8 +11,13 @@
   <ItemGroup>
     <Compile Include="Dir.fs" />
     <Compile Include="DirTest.fs" />
+    
     <None Include="TypeArguments\typeArgument.fsyacc" />
     <Compile Include="TypeArguments\TypeArgumentParseTableTest.fs" />
+    <None Include="moduleornamespaces\ModuleDecls.fsyacc" />
+    <Compile Include="ModuleOrNamespaces\ModuleDeclsParseTableTest.fs" />
+    
+    
     <None Include="Brackets\bounded.fsyacc" />
     <Compile Include="Brackets\BoundedParseTableTest.fs" />
     <None Include="Fslex\fslex.fslex" />

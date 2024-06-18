@@ -21,6 +21,11 @@
   <ItemGroup>
     <Compile Include="Position.fs" />
     <Compile Include="RenderUtils.fs" />
+    <Compile Include="TypeArguments\SuffixType.fs" />
+    <Compile Include="TypeArguments\Typar.fs" />
+    <Compile Include="TypeArguments\TypeArgument.fs" />
+    <Compile Include="TypeArguments\TypeArgumentUtils.fs" />
+    <Compile Include="ModuleOrNamespaces\ModuleDecl.fs" />
     <Compile Include="Lex\RegularExpression.fs" />
     <Compile Include="Lex\RegularNFA.fs" />
     <Compile Include="Lex\PatternNFA.fs" />
@@ -73,17 +78,14 @@
     <Compile Include="YACCs\YaccRow.fs" />
     <Compile Include="YACCs\YaccRowUtils.fs" />
     <Compile Include="YACCs\Yacc.fs" />
-    <Compile Include="TypeArguments\SuffixType.fs" />
-    <Compile Include="TypeArguments\Typar.fs" />
-    <Compile Include="TypeArguments\TypeArgument.fs" />
-    <Compile Include="TypeArguments\TypeArgumentUtils.fs" />
+    <Compile Include="Fsyacc\RawFsyaccFileRender.fs" />
     <Compile Include="Fsyacc\RuleBody.fs" />
     <Compile Include="Fsyacc\RuleGroup.fs" />
     <Compile Include="Fsyacc\RawFsyaccFile.fs" />
     <Compile Include="Fsyacc\Rule.fs" />
     <Compile Include="Fsyacc\RuleSet.fs" />
     <Compile Include="Fsyacc\ConflictedProduction.fs" />
-    <Compile Include="Fsyacc\Operators.fs" />
+    <Compile Include="Fsyacc\OperatorsLine.fs" />
     <Compile Include="Fsyacc\Declaration.fs" />
     <Compile Include="Fsyacc\Symbol.fs" />
     
