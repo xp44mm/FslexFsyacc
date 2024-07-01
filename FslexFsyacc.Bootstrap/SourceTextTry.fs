@@ -1,4 +1,4 @@
-﻿module FslexFsyacc.SourceText
+﻿module FslexFsyacc.SourceTextTry
 
 open System
 open FSharp.Idioms
@@ -7,7 +7,6 @@ open FSharp.Idioms.RegularExpressions
 open FSharp.Idioms.ActivePatterns
 
 open System.Text.RegularExpressions
-
 
 let tryWS =
     Regex @"^\s+"
@@ -20,3 +19,8 @@ let tryWord =
 let tryFSharpIdent =
     Regex @"^[_\p{L}\p{Nl}][\p{L}\p{Mn}\p{Mc}\p{Nl}\p{Nd}\p{Pc}\p{Cf}']*"
     |> trySearch
+
+let tryFSharpTypar =
+    Regex @"^['^]\w+(?!')"
+    |> trySearch
+

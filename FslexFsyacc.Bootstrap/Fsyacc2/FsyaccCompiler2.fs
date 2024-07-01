@@ -8,7 +8,7 @@ open FslexFsyacc.Grammars
 open FSharp.Idioms.Literal
 open FslexFsyacc.Fsyacc
 
-let parser = FsyaccParseTable2.app.getParser<Position<FsyaccToken2>>(
+let parser = FsyaccParseTable2.app.getParser<PositionWith<FsyaccToken2>>(
                 FsyaccToken2Utils.getTag,
                 FsyaccToken2Utils.getLexeme)
 
@@ -19,8 +19,8 @@ let compile (input:string) =
     let mutable tokens = []
     let mutable states = [0,null]
 
-    input
-    |> FsyaccToken2Utils.tokenize 0
+    SourceText.just(0, input)
+    |> FsyaccToken2Utils.tokenize
     |> Seq.map(fun tok ->
         tokens <- tok::tokens
         tok

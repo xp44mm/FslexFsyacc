@@ -28,6 +28,7 @@ let tryHTypar =
     Regex @"^\^\w+(?!')"
     |> trySearch
 
+
 //let tryIdent =
 //    Regex @"^[_\p{L}\p{Nl}][\p{L}\p{Mn}\p{Mc}\p{Nl}\p{Nd}\p{Pc}\p{Cf}']*"
 //    |> trySearch

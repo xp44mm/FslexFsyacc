@@ -10,7 +10,7 @@ open Xunit.Abstractions
 
 open FSharp.Idioms.Literal
 open FSharp.xUnit
-//open FslexFsyacc.TypeArguments
+open FslexFsyacc
 
 type ModuleOrNamespaceTokenTest(output:ITestOutputHelper) =
     let exit (rest:string) = Regex.IsMatch(rest,@"^\s*%\}$")
@@ -18,31 +18,33 @@ type ModuleOrNamespaceTokenTest(output:ITestOutputHelper) =
     [<Fact>]
     member _.``01 - first test``() =
 
-        let x = "open System.IO"
+        let x = SourceText.just(9, "open System.IO")
         let y = 
-            ModuleOrNamespaceTokenUtils.tokenize exit 9 x
+            ModuleOrNamespaceTokenUtils.tokenize exit x
             |> Seq.toList
         output.WriteLine(stringify y)
 
     [<Fact>]
     member _.``02 - second test``() =
-        let x = "open type System.Math"
+        let x = SourceText.just(9, "open type System.Math")
         let y = 
-            ModuleOrNamespaceTokenUtils.tokenize exit 9 x
+            ModuleOrNamespaceTokenUtils.tokenize exit x
             |> Seq.toList
         output.WriteLine(stringify y)
 
     [<Fact>]
     member _.``03 - multi lines test``() =
         let x = 
-            [
+            SourceText.just(9, [
             "open System.IO"
             "open type System.Math"
+            "type SizeType = uint32"
+            "type Transform<'a> = 'a -> 'a"
             ]
-            |> String.concat "\r\n"
+            |> String.concat "\r\n")
 
         let y = 
-            ModuleOrNamespaceTokenUtils.tokenize exit 9 x
+            ModuleOrNamespaceTokenUtils.tokenize exit x
             |> Seq.toList
         output.WriteLine(stringify y)
 

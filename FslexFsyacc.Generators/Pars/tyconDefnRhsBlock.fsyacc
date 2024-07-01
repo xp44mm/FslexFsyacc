@@ -1,0 +1,1242 @@
+﻿%{%}
+tyconDefnRhsBlock :
+    | OBLOCKBEGIN tyconDefnRhs opt_OBLOCKSEP classDefnMembers opt_classDefn oblockend opt_classDefn {}
+    | OBLOCKBEGIN tyconDefnRhs opt_OBLOCKSEP classDefnMembers opt_classDefn recover {}
+    | tyconDefnRhs opt_classDefn {}
+classDefnMembers :
+    | (*empty*) {}
+    | classDefnMembersAtLeastOne {}
+    | error classDefnMembers {}
+oblockend :
+    | OBLOCKEND {}
+    | OBLOCKEND_COMING_SOON oblockend {}
+    | OBLOCKEND_IS_HERE {}
+opt_OBLOCKSEP :
+    | (*empty*) {}
+    | OBLOCKSEP {}
+opt_classDefn :
+    | (*empty*) {}
+    | WITH classDefnBlock declEnd {}
+recover :
+    | EOF {}
+    | error {}
+tyconDefnRhs :
+    | DELEGATE OF topType {}
+    | tyconClassDefn {}
+    | tyconDefnOrSpfnSimpleRepr {}
+classDefnBlock :
+    | OBLOCKBEGIN classDefnMembers oblockend {}
+    | OBLOCKBEGIN classDefnMembers recover {}
+    | classDefnMembers {}
+classDefnMembersAtLeastOne :
+    | classDefnMember opt_seps classDefnMembers {}
+declEnd :
+    | END {}
+    | ODECLEND {}
+    | OEND {}
+topType :
+    | topTupleType {}
+    | topTupleType RARROW topType {}
+tyconClassDefn :
+    | classDefnBlockKindUnspecified {}
+    | classOrInterfaceOrStruct classDefnBlock END {}
+    | classOrInterfaceOrStruct classDefnBlock recover {}
+    | classOrInterfaceOrStruct error END {}
+tyconDefnOrSpfnSimpleRepr :
+    | opt_attributes opt_access LPAREN HASH string HASH rparen {}
+    | opt_attributes opt_access braceFieldDeclList {}
+    | opt_attributes opt_access path LQUOTE STRING recover {}
+    | opt_attributes opt_access typ {}
+    | opt_attributes opt_access unionTypeRepr {}
+braceFieldDeclList :
+    | LBRACE error rbrace {}
+    | LBRACE recdFieldDeclList rbrace {}
+    | LBRACE recdFieldDeclList recover {}
+classDefnBlockKindUnspecified :
+    | OBLOCKBEGIN classDefnMembers oblockend {}
+    | OBLOCKBEGIN classDefnMembers recover {}
+classDefnMember :
+    | opt_attributes opt_access NEW atomicPattern optAsSpec EQUALS typedSequentialExprBlock opt_ODECLEND {}
+    | opt_attributes opt_access STATIC classDefnBindings {}
+    | opt_attributes opt_access STATIC typeKeyword tyconDefn {}
+    | opt_attributes opt_access STATIC valDefnDecl opt_ODECLEND {}
+    | opt_attributes opt_access abstractMemberFlags opt_inline nameop opt_explicitValTyparDecls COLON topTypeWithTypeConstraints classMemberSpfnGetSet opt_ODECLEND {}
+    | opt_attributes opt_access classDefnBindings {}
+    | opt_attributes opt_access inheritsDefn {}
+    | opt_attributes opt_access interfaceMember appType opt_interfaceImplDefn {}
+    | opt_attributes opt_access memberFlags autoPropsDefnDecl opt_ODECLEND {}
+    | opt_attributes opt_access memberFlags memberCore opt_ODECLEND {}
+    | opt_attributes opt_access valDefnDecl opt_ODECLEND {}
+classOrInterfaceOrStruct :
+    | CLASS {}
+    | INTERFACE {}
+    | STRUCT {}
+opt_access :
+    | (*empty*) {}
+    | access {}
+opt_attributes :
+    | (*empty*) %prec prec_opt_attributes_none {}
+    | attributes {}
+opt_seps :
+    | (*empty*) {}
+    | seps {}
+path :
+    | GLOBAL {}
+    | ident {}
+    | path DOT ends_coming_soon_or_recover {}
+    | path DOT ident {}
+rparen :
+    | RPAREN {}
+    | RPAREN_COMING_SOON rparen {}
+    | RPAREN_IS_HERE {}
+string :
+    | STRING {}
+topTupleType :
+    | topAppType {}
+    | topAppType STAR topTupleTypeElements {}
+typ :
+    | tupleType %prec prec_typ_prefix {}
+    | tupleType RARROW typ {}
+unionTypeRepr :
+    | barAndgrabXmlDoc attrUnionCaseDecls {}
+    | firstUnionCaseDecl {}
+    | firstUnionCaseDeclOfMany barAndgrabXmlDoc attrUnionCaseDecls {}
+abstractMemberFlags :
+    | ABSTRACT {}
+    | ABSTRACT MEMBER {}
+    | STATIC ABSTRACT {}
+    | STATIC ABSTRACT MEMBER {}
+access :
+    | INTERNAL {}
+    | PRIVATE {}
+    | PUBLIC {}
+appType :
+    | LPAREN appTypePrefixArguments rparen appTypeConPower {}
+    | UNDERSCORE COLON_GREATER typ %prec COLON_GREATER {}
+    | appType HIGH_PRECEDENCE_BRACK_APP arrayTypeSuffix {}
+    | appType appTypeConPower {}
+    | appType arrayTypeSuffix {}
+    | powerType {}
+    | typar COLON_GREATER typ {}
+atomicPattern :
+    | CHAR DOT_DOT CHAR {}
+    | FALSE {}
+    | LBRACE recordPatternElementsAux rbrace {}
+    | LBRACK listPatternElements RBRACK {}
+    | LBRACK_BAR listPatternElements BAR_RBRACK {}
+    | LPAREN error rparen {}
+    | LPAREN parenPatternBody recover {}
+    | LPAREN parenPatternBody rparen {}
+    | LPAREN recover {}
+    | NULL {}
+    | QMARK ident {}
+    | STRUCT LPAREN error rparen {}
+    | STRUCT LPAREN recover {}
+    | STRUCT LPAREN tupleParenPatternElements recover {}
+    | STRUCT LPAREN tupleParenPatternElements rparen {}
+    | TRUE {}
+    | UNDERSCORE {}
+    | atomicPatternLongIdent %prec prec_atompat_pathop {}
+    | constant {}
+    | quoteExpr {}
+attrUnionCaseDecls :
+    | attrUnionCaseDecl {}
+    | attrUnionCaseDecl barAndgrabXmlDoc attrUnionCaseDecls {}
+attributes :
+    | attributeList {}
+    | attributeList attributes {}
+autoPropsDefnDecl :
+    | VAL opt_mutable opt_access ident opt_typ EQUALS typedSequentialExprBlock classMemberSpfnGetSet {}
+barAndgrabXmlDoc :
+    | BAR {}
+classDefnBindings :
+    | defnBindings {}
+    | doBinding {}
+    | hardwhiteDoBinding {}
+    | hardwhiteLetBindings {}
+classMemberSpfnGetSet :
+    | (*empty*) {}
+    | OWITH classMemberSpfnGetSetElements OEND {}
+    | OWITH classMemberSpfnGetSetElements error {}
+    | WITH classMemberSpfnGetSetElements {}
+ends_coming_soon_or_recover :
+    | MODULE_COMING_SOON {}
+    | OBLOCKEND_COMING_SOON {}
+    | RBRACE_COMING_SOON {}
+    | RPAREN_COMING_SOON {}
+    | TYPE_COMING_SOON {}
+    | recover {}
+firstUnionCaseDecl :
+    | ident EQUALS constant opt_OBLOCKSEP {}
+    | ident OF unionCaseRepr {}
+firstUnionCaseDeclOfMany :
+    | firstUnionCaseDecl opt_OBLOCKSEP {}
+    | ident EQUALS constant opt_OBLOCKSEP {}
+    | ident opt_OBLOCKSEP {}
+ident :
+    | IDENT {}
+inheritsDefn :
+    | INHERIT atomTypeNonAtomicDeprecated optBaseSpec {}
+    | INHERIT atomTypeNonAtomicDeprecated opt_HIGH_PRECEDENCE_APP atomicExprAfterType optBaseSpec {}
+    | INHERIT ends_coming_soon_or_recover {}
+interfaceMember :
+    | INTERFACE {}
+    | OINTERFACE_MEMBER {}
+memberCore :
+    | opt_inline bindingPattern opt_topReturnTypeWithTypeConstraints EQUALS typedSequentialExprBlock {}
+    | opt_inline bindingPattern opt_topReturnTypeWithTypeConstraints classDefnMemberGetSet {}
+memberFlags :
+    | DEFAULT {}
+    | MEMBER {}
+    | OVERRIDE {}
+    | STATIC MEMBER {}
+nameop :
+    | identOrOp {}
+optAsSpec :
+    | (*empty*) {}
+    | asSpec {}
+opt_ODECLEND :
+    | (*empty*) {}
+    | ODECLEND {}
+opt_explicitValTyparDecls :
+    | (*empty*) {}
+    | explicitValTyparDecls {}
+opt_inline :
+    | (*empty*) {}
+    | INLINE {}
+opt_interfaceImplDefn :
+    | (*empty*) {}
+    | WITH {}
+    | WITH objectImplementationBlock declEnd {}
+rbrace :
+    | RBRACE {}
+    | RBRACE_COMING_SOON rbrace {}
+    | RBRACE_IS_HERE {}
+recdFieldDeclList :
+    | recdFieldDecl opt_seps {}
+    | recdFieldDecl seps recdFieldDeclList {}
+seps :
+    | OBLOCKSEP {}
+    | OBLOCKSEP SEMICOLON {}
+    | SEMICOLON {}
+    | SEMICOLON OBLOCKSEP {}
+topAppType :
+    | QMARK ident COLON appType {}
+    | appType {}
+    | appType COLON appType {}
+    | attributes QMARK ident COLON appType {}
+    | attributes appType {}
+    | attributes appType COLON appType {}
+topTupleTypeElements :
+    | topAppType %prec prec_toptuptyptail_prefix {}
+    | topAppType STAR topTupleTypeElements {}
+topTypeWithTypeConstraints :
+    | topType {}
+    | topType WHEN typeConstraints {}
+tupleType :
+    | INFIX_STAR_DIV_MOD_OP tupleOrQuotTypeElements {}
+    | appType %prec prec_tuptyp_prefix {}
+    | appType INFIX_STAR_DIV_MOD_OP tupleOrQuotTypeElements {}
+    | appType STAR tupleOrQuotTypeElements {}
+tyconDefn :
+    | typeNameInfo {}
+    | typeNameInfo opt_attributes opt_access opt_HIGH_PRECEDENCE_APP simplePatterns optAsSpec EQUALS tyconDefnRhsBlock {}
+    | typeNameInfo opt_equals tyconDefnRhsBlock {}
+    | typeNameInfo tyconDefnAugmentation {}
+typeKeyword :
+    | TYPE {}
+    | TYPE_COMING_SOON typeKeyword {}
+    | TYPE_IS_HERE {}
+typedSequentialExprBlock :
+    | OBLOCKBEGIN typedSequentialExpr oblockend {}
+    | OBLOCKBEGIN typedSequentialExpr recover {}
+    | typedSequentialExpr {}
+valDefnDecl :
+    | VAL opt_mutable opt_access ident COLON typ {}
+appTypeConPower :
+    | appTypeCon {}
+    | appTypeCon INFIX_AT_HAT_OP atomicRationalConstant {}
+appTypePrefixArguments :
+    | typeArgActual COMMA typeArgActual typeArgListElements {}
+arrayTypeSuffix :
+    | LBRACK COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA COMMA RBRACK {}
+    | LBRACK COMMA COMMA RBRACK {}
+    | LBRACK COMMA RBRACK {}
+    | LBRACK RBRACK {}
+asSpec :
+    | AS ident {}
+atomTypeNonAtomicDeprecated :
+    | LPAREN appTypePrefixArguments rparen appTypeConPower {}
+    | atomType {}
+atomicExprAfterType :
+    | FALSE {}
+    | NULL {}
+    | TRUE {}
+    | arrayExpr {}
+    | beginEndExpr {}
+    | braceBarExpr {}
+    | braceExpr {}
+    | constant {}
+    | interpolatedString {}
+    | parenExpr {}
+    | quoteExpr {}
+atomicPatternLongIdent :
+    | GLOBAL DOT pathOp {}
+    | UNDERSCORE DOT pathOp {}
+    | access UNDERSCORE DOT pathOp {}
+    | access pathOp {}
+    | pathOp {}
+attrUnionCaseDecl :
+    | opt_attributes opt_access unionCaseName {}
+    | opt_attributes opt_access unionCaseName COLON topType {}
+    | opt_attributes opt_access unionCaseName EQUALS constant {}
+    | opt_attributes opt_access unionCaseName OF recover {}
+    | opt_attributes opt_access unionCaseName OF unionCaseRepr {}
+attributeList :
+    | LBRACK_LESS attributeListElements opt_seps GREATER_RBRACK opt_OBLOCKSEP {}
+    | LBRACK_LESS attributeListElements opt_seps ends_coming_soon_or_recover {}
+    | LBRACK_LESS ends_coming_soon_or_recover {}
+    | LBRACK_LESS error GREATER_RBRACK opt_OBLOCKSEP {}
+bindingPattern :
+    | headBindingPattern {}
+classDefnMemberGetSet :
+    | OWITH classDefnMemberGetSetElements OEND {}
+    | OWITH classDefnMemberGetSetElements error {}
+    | WITH classDefnMemberGetSetElements {}
+classMemberSpfnGetSetElements :
+    | nameop {}
+    | nameop COMMA nameop {}
+constant :
+    | rawConstant {}
+    | rawConstant HIGH_PRECEDENCE_TYAPP measureTypeArg {}
+defnBindings :
+    | LET opt_rec localBindings {}
+    | cPrototype {}
+doBinding :
+    | DO typedSequentialExprBlock {}
+explicitValTyparDecls :
+    | opt_HIGH_PRECEDENCE_TYAPP LESS explicitValTyparDeclsCore opt_typeConstraints GREATER {}
+hardwhiteDoBinding :
+    | ODO typedSequentialExprBlock hardwhiteDefnBindingsTerminator {}
+hardwhiteLetBindings :
+    | OLET opt_rec localBindings hardwhiteDefnBindingsTerminator {}
+identOrOp :
+    | ident {}
+    | opName {}
+listPatternElements :
+    | (*empty*) {}
+    | parenPattern opt_seps {}
+    | parenPattern seps listPatternElements {}
+objectImplementationBlock :
+    | OBLOCKBEGIN objectImplementationMembers oblockend {}
+    | OBLOCKBEGIN objectImplementationMembers recover {}
+    | objectImplementationMembers {}
+optBaseSpec :
+    | (*empty*) {}
+    | baseSpec {}
+opt_HIGH_PRECEDENCE_APP :
+    | (*empty*) {}
+    | HIGH_PRECEDENCE_BRACK_APP {}
+    | HIGH_PRECEDENCE_PAREN_APP {}
+opt_equals :
+    | (*empty*) {}
+    | EQUALS {}
+opt_mutable :
+    | (*empty*) {}
+    | MUTABLE {}
+opt_topReturnTypeWithTypeConstraints :
+    | (*empty*) {}
+    | COLON topTypeWithTypeConstraints {}
+opt_typ :
+    | (*empty*) {}
+    | COLON typ {}
+parenPatternBody :
+    | (*empty*) {}
+    | parenPattern {}
+powerType :
+    | atomTypeOrAnonRecdType {}
+    | atomTypeOrAnonRecdType INFIX_AT_HAT_OP atomicRationalConstant {}
+quoteExpr :
+    | LQUOTE error RQUOTE {}
+    | LQUOTE recover {}
+    | LQUOTE typedSequentialExpr RQUOTE {}
+    | LQUOTE typedSequentialExpr recover {}
+recdFieldDecl :
+    | opt_attributes fieldDecl {}
+recordPatternElementsAux :
+    | recordPatternElement opt_seps {}
+    | recordPatternElement seps recordPatternElementsAux {}
+simplePatterns :
+    | LPAREN error rparen {}
+    | LPAREN recover {}
+    | LPAREN rparen {}
+    | LPAREN simplePatternCommaList recover {}
+    | LPAREN simplePatternCommaList rparen {}
+tupleOrQuotTypeElements :
+    | appType %prec prec_tuptyptail_prefix {}
+    | appType INFIX_STAR_DIV_MOD_OP tupleOrQuotTypeElements {}
+    | appType STAR tupleOrQuotTypeElements {}
+tupleParenPatternElements :
+    | COMMA ends_coming_soon_or_recover {}
+    | COMMA parenPattern {}
+    | parenPattern COMMA ends_coming_soon_or_recover {}
+    | parenPattern COMMA parenPattern {}
+    | tupleParenPatternElements COMMA ends_coming_soon_or_recover {}
+    | tupleParenPatternElements COMMA parenPattern {}
+tyconDefnAugmentation :
+    | WITH classDefnBlock declEnd {}
+typar :
+    | INFIX_AT_HAT_OP ident {}
+    | QUOTE ident {}
+typeConstraints :
+    | typeConstraint {}
+    | typeConstraints AND typeConstraint {}
+typeNameInfo :
+    | opt_attributes tyconNameAndTyparDecls opt_typeConstraints {}
+typedSequentialExpr :
+    | sequentialExpr {}
+    | sequentialExpr COLON typeWithTypeConstraints {}
+unionCaseRepr :
+    | braceFieldDeclList {}
+    | unionCaseReprElements {}
+appTypeCon :
+    | path %prec prec_atomtyp_path {}
+    | typar {}
+arrayExpr :
+    | LBRACK_BAR arrayExprElements BAR_RBRACK {}
+    | LBRACK_BAR arrayExprElements recover {}
+    | LBRACK_BAR error BAR_RBRACK {}
+    | LBRACK_BAR recover {}
+atomType :
+    | CONST atomicExpr {}
+    | FALSE {}
+    | HASH atomType {}
+    | LPAREN error rparen {}
+    | LPAREN typ recover {}
+    | LPAREN typ rparen {}
+    | NULL {}
+    | STRUCT LPAREN appType STAR recover {}
+    | STRUCT LPAREN appType STAR tupleOrQuotTypeElements recover {}
+    | STRUCT LPAREN appType STAR tupleOrQuotTypeElements rparen {}
+    | STRUCT LPAREN appType recover {}
+    | STRUCT LPAREN recover {}
+    | TRUE {}
+    | UNDERSCORE {}
+    | appTypeCon DOT ends_coming_soon_or_recover {}
+    | appTypeCon typeArgsNoHpaDeprecated %prec prec_atomtyp_path {}
+    | appTypeConPower %prec prec_atomtyp_path {}
+    | atomType DOT path %prec prec_atomtyp_get_path {}
+    | atomType DOT path typeArgsNoHpaDeprecated %prec prec_atomtyp_get_path {}
+    | rawConstant {}
+atomTypeOrAnonRecdType :
+    | anonRecdType {}
+    | atomType {}
+atomicRationalConstant :
+    | MINUS atomicUnsignedRationalConstant {}
+    | atomicUnsignedRationalConstant {}
+attributeListElements :
+    | attribute {}
+    | attributeListElements seps attribute {}
+baseSpec :
+    | AS BASE {}
+    | AS ident {}
+beginEndExpr :
+    | BEGIN END {}
+    | BEGIN error END {}
+    | BEGIN typedSequentialExpr END {}
+    | BEGIN typedSequentialExpr recover {}
+braceBarExpr :
+    | STRUCT braceBarExprCore {}
+    | braceBarExprCore {}
+braceExpr :
+    | LBRACE braceExprBody rbrace {}
+    | LBRACE braceExprBody recover {}
+    | LBRACE error rbrace {}
+    | LBRACE rbrace {}
+    | LBRACE recover {}
+cPrototype :
+    | EXTERN cRetType opt_access ident opt_HIGH_PRECEDENCE_APP LPAREN externArgs rparen {}
+classDefnMemberGetSetElements :
+    | classDefnMemberGetSetElement {}
+    | classDefnMemberGetSetElement AND classDefnMemberGetSetElement {}
+explicitValTyparDeclsCore :
+    | (*empty*) {}
+    | typarDeclList {}
+    | typarDeclList COMMA DOT_DOT {}
+fieldDecl :
+    | opt_mutable opt_access ident COLON typ {}
+hardwhiteDefnBindingsTerminator :
+    | ODECLEND {}
+    | recover {}
+headBindingPattern :
+    | conjPatternElements %prec pat_conj {}
+    | constrPattern {}
+    | headBindingPattern AS constrPattern {}
+    | headBindingPattern BAR headBindingPattern {}
+    | headBindingPattern COLON_COLON headBindingPattern {}
+    | tuplePatternElements %prec pat_tuple {}
+interpolatedString :
+    | INTERP_STRING_BEGIN_END {}
+    | INTERP_STRING_BEGIN_PART interpolatedStringFill interpolatedStringParts {}
+    | INTERP_STRING_BEGIN_PART interpolatedStringParts {}
+localBindings :
+    | attr_localBinding moreLocalBindings {}
+measureTypeArg :
+    | LESS UNDERSCORE GREATER {}
+    | LESS measureTypeExpr GREATER {}
+objectImplementationMembers :
+    | objectImplementationMember opt_seps {}
+    | objectImplementationMember opt_seps objectImplementationMembers {}
+opName :
+    | LPAREN activePatternCaseNames BAR UNDERSCORE BAR rparen {}
+    | LPAREN activePatternCaseNames BAR rparen {}
+    | LPAREN error rparen {}
+    | LPAREN operatorName rparen {}
+    | LPAREN_STAR_RPAREN {}
+opt_HIGH_PRECEDENCE_TYAPP :
+    | (*empty*) {}
+    | HIGH_PRECEDENCE_TYAPP {}
+opt_rec :
+    | (*empty*) {}
+    | REC {}
+opt_typeConstraints :
+    | (*empty*) {}
+    | WHEN typeConstraints {}
+parenExpr :
+    | LPAREN MODULE_COMING_SOON {}
+    | LPAREN OBLOCKEND_COMING_SOON {}
+    | LPAREN RBRACE_COMING_SOON {}
+    | LPAREN TYPE_COMING_SOON {}
+    | LPAREN error rparen {}
+    | LPAREN parenExprBody ends_other_than_rparen_coming_soon_or_recover {}
+    | LPAREN parenExprBody rparen {}
+    | LPAREN recover %prec prec_atomexpr_lparen_error {}
+    | LPAREN rparen {}
+parenPattern :
+    | attributes parenPattern %prec paren_pat_attribs {}
+    | conjParenPatternElements {}
+    | constrPattern {}
+    | parenPattern AS constrPattern {}
+    | parenPattern BAR parenPattern {}
+    | parenPattern COLON typeWithTypeConstraints %prec paren_pat_colon {}
+    | parenPattern COLON_COLON parenPattern {}
+    | tupleParenPatternElements {}
+pathOp :
+    | ident {}
+    | ident DOT error {}
+    | ident DOT pathOp {}
+    | opName {}
+rawConstant :
+    | BIGNUM {}
+    | BYTEARRAY {}
+    | CHAR {}
+    | DECIMAL {}
+    | IEEE32 {}
+    | IEEE64 {}
+    | INT16 {}
+    | INT32 {}
+    | INT64 {}
+    | INT8 {}
+    | NATIVEINT {}
+    | UINT16 {}
+    | UINT32 {}
+    | UINT64 {}
+    | UINT8 {}
+    | UNATIVEINT {}
+    | sourceIdentifier {}
+    | string {}
+recordPatternElement :
+    | path EQUALS parenPattern {}
+sequentialExpr :
+    | declExpr %prec SEMICOLON {}
+    | declExpr OTHEN OBLOCKBEGIN typedSequentialExpr oblockend %prec prec_then_before {}
+    | declExpr THEN sequentialExpr %prec prec_then_before {}
+    | declExpr seps {}
+    | declExpr seps sequentialExpr {}
+    | hardwhiteLetBindings %prec prec_args_error {}
+simplePatternCommaList :
+    | simplePattern {}
+    | simplePattern COMMA simplePatternCommaList {}
+tyconNameAndTyparDecls :
+    | opt_access path {}
+    | opt_access path postfixTyparDecls {}
+    | opt_access prefixTyparDecls path {}
+typeArgActual :
+    | typ {}
+    | typ EQUALS {}
+    | typ EQUALS typ {}
+typeArgListElements :
+    | (*empty*) {}
+    | typeArgListElements COMMA dummyTypeArg %prec prec_args_error {}
+    | typeArgListElements COMMA typeArgActual {}
+typeConstraint :
+    | DEFAULT typar COLON typ {}
+    | LPAREN typeAlts rparen COLON LPAREN classMemberSpfn rparen {}
+    | appType {}
+    | typar COLON DELEGATE typeArgsNoHpaDeprecated {}
+    | typar COLON IDENT {}
+    | typar COLON IDENT STRUCT {}
+    | typar COLON IDENT typeArgsNoHpaDeprecated {}
+    | typar COLON LPAREN classMemberSpfn rparen {}
+    | typar COLON NULL {}
+    | typar COLON STRUCT {}
+    | typar COLON_GREATER typ {}
+typeWithTypeConstraints :
+    | typ %prec prec_wheretyp_prefix {}
+    | typ WHEN typeConstraints {}
+unionCaseName :
+    | LPAREN COLON_COLON rparen {}
+    | LPAREN LBRACK RBRACK rparen {}
+    | nameop {}
+unionCaseReprElements :
+    | unionCaseReprElement %prec prec_toptuptyptail_prefix {}
+    | unionCaseReprElement STAR unionCaseReprElements {}
+activePatternCaseNames :
+    | BAR activePatternCaseName {}
+    | activePatternCaseNames BAR activePatternCaseName {}
+anonRecdType :
+    | STRUCT braceBarFieldDeclListCore {}
+    | braceBarFieldDeclListCore {}
+arrayExprElements :
+    | (*empty*) {}
+    | sequentialExpr {}
+atomicExpr :
+    | BASE DOT atomicExprQualification {}
+    | GLOBAL {}
+    | LBRACK error RBRACK {}
+    | LBRACK listExprElements RBRACK {}
+    | LBRACK listExprElements recover {}
+    | LBRACK recover {}
+    | PREFIX_OP atomicExpr {}
+    | QMARK nameop {}
+    | QUOTE ident {}
+    | STRUCT LPAREN tupleExpr recover {}
+    | STRUCT LPAREN tupleExpr rparen {}
+    | atomicExpr DOT atomicExprQualification {}
+    | atomicExpr HIGH_PRECEDENCE_BRACK_APP atomicExpr {}
+    | atomicExpr HIGH_PRECEDENCE_PAREN_APP atomicExpr {}
+    | atomicExpr HIGH_PRECEDENCE_TYAPP typeArgsActual {}
+    | atomicExpr QMARK dynamicArg {}
+    | atomicExprAfterType {}
+    | identExpr {}
+atomicUnsignedRationalConstant :
+    | INT32 {}
+    | LPAREN rationalConstant rparen {}
+attr_localBinding :
+    | error {}
+    | opt_attributes localBinding {}
+attribute :
+    | attributeTarget OBLOCKBEGIN path oblockend opt_HIGH_PRECEDENCE_APP opt_atomicExprAfterType {}
+    | attributeTarget path opt_HIGH_PRECEDENCE_APP opt_atomicExprAfterType {}
+    | path opt_HIGH_PRECEDENCE_APP opt_atomicExprAfterType {}
+braceBarExprCore :
+    | LBRACE_BAR bar_rbrace {}
+    | LBRACE_BAR error bar_rbrace {}
+    | LBRACE_BAR recdExprCore bar_rbrace {}
+    | LBRACE_BAR recdExprCore recover {}
+    | LBRACE_BAR recover {}
+braceExprBody :
+    | computationExpr {}
+    | objExpr {}
+    | recdExpr {}
+cRetType :
+    | opt_attributes VOID {}
+    | opt_attributes cType {}
+classDefnMemberGetSetElement :
+    | opt_inline opt_attributes bindingPattern opt_topReturnTypeWithTypeConstraints EQUALS typedSequentialExprBlock {}
+classMemberSpfn :
+    | opt_attributes opt_access INHERIT appType {}
+    | opt_attributes opt_access NEW COLON topTypeWithTypeConstraints {}
+    | opt_attributes opt_access STATIC VAL fieldDecl {}
+    | opt_attributes opt_access STATIC typeKeyword tyconSpfn {}
+    | opt_attributes opt_access VAL fieldDecl {}
+    | opt_attributes opt_access interfaceMember appType {}
+    | opt_attributes opt_access memberSpecFlags opt_inline opt_access nameop opt_explicitValTyparDecls COLON topTypeWithTypeConstraints classMemberSpfnGetSet optLiteralValueSpfn {}
+conjParenPatternElements :
+    | conjParenPatternElements AMP parenPattern {}
+    | parenPattern AMP parenPattern {}
+conjPatternElements :
+    | conjPatternElements AMP headBindingPattern {}
+    | headBindingPattern AMP headBindingPattern {}
+constrPattern :
+    | COLON_QMARK atomTypeOrAnonRecdType %prec pat_isinst {}
+    | atomicPattern {}
+    | atomicPatternLongIdent HIGH_PRECEDENCE_BRACK_APP atomicPatsOrNamePatPairs {}
+    | atomicPatternLongIdent HIGH_PRECEDENCE_PAREN_APP atomicPatsOrNamePatPairs {}
+    | atomicPatternLongIdent atomicPatsOrNamePatPairs %prec pat_app {}
+    | atomicPatternLongIdent explicitValTyparDecls {}
+    | atomicPatternLongIdent explicitValTyparDecls HIGH_PRECEDENCE_BRACK_APP atomicPatsOrNamePatPairs {}
+    | atomicPatternLongIdent explicitValTyparDecls HIGH_PRECEDENCE_PAREN_APP atomicPatsOrNamePatPairs {}
+    | atomicPatternLongIdent explicitValTyparDecls atomicPatsOrNamePatPairs %prec pat_app {}
+declExpr :
+    | ASSERT %prec expr_assert {}
+    | ASSERT declExpr %prec expr_assert {}
+    | BINDER headBindingPattern EQUALS typedSequentialExprBlock IN opt_OBLOCKSEP moreBinders typedSequentialExprBlock %prec expr_let {}
+    | DOT_DOT declExpr %prec open_range_expr {}
+    | DO_BANG typedSequentialExpr IN opt_OBLOCKSEP typedSequentialExprBlock %prec expr_let {}
+    | FIXED declExpr {}
+    | FOR ends_coming_soon_or_recover {}
+    | FOR error doToken typedSequentialExprBlock doneDeclEnd {}
+    | FOR forLoopBinder doToken ends_coming_soon_or_recover {}
+    | FOR forLoopBinder doToken error doneDeclEnd {}
+    | FOR forLoopBinder doToken typedSequentialExprBlock doneDeclEnd {}
+    | FOR forLoopBinder doToken typedSequentialExprBlock ends_coming_soon_or_recover {}
+    | FOR forLoopBinder ends_coming_soon_or_recover {}
+    | FOR forLoopBinder opt_OBLOCKSEP arrowThenExprR %prec expr_let {}
+    | FOR forLoopRange doToken error doneDeclEnd {}
+    | FOR forLoopRange doToken recover {}
+    | FOR forLoopRange doToken typedSequentialExprBlock doneDeclEnd {}
+    | FOR forLoopRange doToken typedSequentialExprBlock recover {}
+    | FOR forLoopRange recover {}
+    | FOR parenPattern error doneDeclEnd {}
+    | FOR parenPattern recover {}
+    | IF declExpr ifExprCases %prec expr_if {}
+    | IF declExpr recover %prec expr_if {}
+    | IF recover %prec expr_if {}
+    | LAZY declExpr %prec expr_lazy {}
+    | MATCH typedSequentialExpr recover %prec expr_match {}
+    | MATCH typedSequentialExpr withClauses %prec expr_match {}
+    | MATCH_BANG typedSequentialExpr recover %prec expr_match {}
+    | MATCH_BANG typedSequentialExpr withClauses %prec expr_match {}
+    | OASSERT %prec expr_assert {}
+    | OASSERT declExprBlock %prec expr_assert {}
+    | OBINDER headBindingPattern EQUALS typedSequentialExprBlock hardwhiteDefnBindingsTerminator opt_OBLOCKSEP error %prec expr_let {}
+    | OBINDER headBindingPattern EQUALS typedSequentialExprBlock hardwhiteDefnBindingsTerminator opt_OBLOCKSEP moreBinders typedSequentialExprBlock %prec expr_let {}
+    | ODO_BANG typedSequentialExprBlock hardwhiteDefnBindingsTerminator %prec expr_let {}
+    | OLAZY declExprBlock %prec expr_lazy {}
+    | RARROW typedSequentialExprBlockR {}
+    | STAR {}
+    | TRY typedSequentialExprBlockR FINALLY typedSequentialExprBlock %prec expr_try {}
+    | TRY typedSequentialExprBlockR recover %prec expr_try {}
+    | TRY typedSequentialExprBlockR withClauses %prec expr_try {}
+    | WHILE declExpr doToken error doneDeclEnd {}
+    | WHILE declExpr doToken typedSequentialExprBlock doneDeclEnd {}
+    | WHILE declExpr doToken typedSequentialExprBlock recover {}
+    | WHILE declExpr recover {}
+    | WHILE error doneDeclEnd {}
+    | WHILE recover {}
+    | YIELD declExpr {}
+    | YIELD recover {}
+    | YIELD_BANG declExpr {}
+    | YIELD_BANG recover {}
+    | anonLambdaExpr %prec expr_fun {}
+    | anonMatchingExpr %prec expr_function {}
+    | declExpr AMP OBLOCKEND_COMING_SOON {}
+    | declExpr AMP declExpr {}
+    | declExpr AMP_AMP OBLOCKEND_COMING_SOON {}
+    | declExpr AMP_AMP declExpr {}
+    | declExpr BAR_BAR OBLOCKEND_COMING_SOON {}
+    | declExpr BAR_BAR declExpr {}
+    | declExpr COLON_COLON OBLOCKEND_COMING_SOON {}
+    | declExpr COLON_COLON declExpr {}
+    | declExpr COLON_EQUALS declExpr {}
+    | declExpr COLON_GREATER typ {}
+    | declExpr COLON_QMARK typ {}
+    | declExpr COLON_QMARK_GREATER typ {}
+    | declExpr DOLLAR OBLOCKEND_COMING_SOON {}
+    | declExpr DOLLAR declExpr {}
+    | declExpr DOT_DOT %prec open_range_expr {}
+    | declExpr DOT_DOT declExpr {}
+    | declExpr EQUALS OBLOCKEND_COMING_SOON {}
+    | declExpr EQUALS declExpr {}
+    | declExpr GREATER OBLOCKEND_COMING_SOON {}
+    | declExpr GREATER declExpr {}
+    | declExpr INFIX_AMP_OP OBLOCKEND_COMING_SOON {}
+    | declExpr INFIX_AMP_OP declExpr {}
+    | declExpr INFIX_AT_HAT_OP OBLOCKEND_COMING_SOON %prec infix_at_hat_op_binary {}
+    | declExpr INFIX_AT_HAT_OP declExpr {}
+    | declExpr INFIX_BAR_OP OBLOCKEND_COMING_SOON {}
+    | declExpr INFIX_BAR_OP declExpr {}
+    | declExpr INFIX_COMPARE_OP OBLOCKEND_COMING_SOON {}
+    | declExpr INFIX_COMPARE_OP declExpr {}
+    | declExpr INFIX_STAR_DIV_MOD_OP OBLOCKEND_COMING_SOON {}
+    | declExpr INFIX_STAR_DIV_MOD_OP declExpr {}
+    | declExpr INFIX_STAR_STAR_OP OBLOCKEND_COMING_SOON {}
+    | declExpr INFIX_STAR_STAR_OP declExpr {}
+    | declExpr JOIN_IN OBLOCKEND_COMING_SOON {}
+    | declExpr JOIN_IN declExpr {}
+    | declExpr LESS OBLOCKEND_COMING_SOON {}
+    | declExpr LESS declExpr {}
+    | declExpr LESS recover {}
+    | declExpr MINUS OBLOCKEND_COMING_SOON {}
+    | declExpr MINUS declExpr {}
+    | declExpr OR OBLOCKEND_COMING_SOON {}
+    | declExpr OR declExpr {}
+    | declExpr PERCENT_OP OBLOCKEND_COMING_SOON {}
+    | declExpr PERCENT_OP declExpr {}
+    | declExpr PLUS_MINUS_OP OBLOCKEND_COMING_SOON {}
+    | declExpr PLUS_MINUS_OP declExpr {}
+    | declExpr STAR OBLOCKEND_COMING_SOON {}
+    | declExpr STAR declExpr {}
+    | defnBindings IN error %prec expr_let {}
+    | defnBindings IN typedSequentialExpr %prec expr_let {}
+    | hardwhiteDoBinding %prec expr_let {}
+    | hardwhiteLetBindings OBLOCKSEP error %prec expr_let {}
+    | hardwhiteLetBindings OBLOCKSEP typedSequentialExprBlock %prec expr_let {}
+    | hardwhiteLetBindings error %prec expr_let {}
+    | hardwhiteLetBindings typedSequentialExprBlock %prec expr_let {}
+    | minusExpr %prec expr_prefix_plus_minus {}
+    | minusExpr LARROW declExprBlock {}
+    | tupleExpr %prec expr_tuple {}
+dummyTypeArg :
+    | (*empty*) {}
+ends_other_than_rparen_coming_soon_or_recover :
+    | MODULE_COMING_SOON {}
+    | OBLOCKEND_COMING_SOON {}
+    | RBRACE_COMING_SOON {}
+    | TYPE_COMING_SOON {}
+    | recover {}
+externArgs :
+    | (*empty*) {}
+    | externArg {}
+    | externMoreArgs {}
+interpolatedStringFill :
+    | declExpr {}
+    | declExpr COLON ident %prec interpolation_fill {}
+interpolatedStringParts :
+    | INTERP_STRING_END {}
+    | INTERP_STRING_PART interpolatedStringFill interpolatedStringParts {}
+    | INTERP_STRING_PART interpolatedStringParts {}
+measureTypeExpr :
+    | INFIX_STAR_DIV_MOD_OP measureTypeExpr {}
+    | measureTypeExpr INFIX_STAR_DIV_MOD_OP measureTypeExpr {}
+    | measureTypeExpr STAR measureTypeExpr {}
+    | measureTypeSeq {}
+moreLocalBindings :
+    | (*empty*) %prec prec_no_more_attr_bindings {}
+    | AND attr_localBinding moreLocalBindings {}
+objectImplementationMember :
+    | opt_attributes error memberCore opt_ODECLEND {}
+    | opt_attributes staticMemberOrMemberOrOverride autoPropsDefnDecl opt_ODECLEND {}
+    | opt_attributes staticMemberOrMemberOrOverride error {}
+    | opt_attributes staticMemberOrMemberOrOverride memberCore opt_ODECLEND {}
+operatorName :
+    | ADJACENT_PREFIX_OP {}
+    | AMP {}
+    | AMP_AMP {}
+    | BAR_BAR {}
+    | COLON_EQUALS {}
+    | DOLLAR {}
+    | DOT_DOT {}
+    | DOT_DOT DOT_DOT {}
+    | EQUALS {}
+    | FUNKY_OPERATOR_NAME {}
+    | GREATER {}
+    | INFIX_AMP_OP {}
+    | INFIX_AT_HAT_OP {}
+    | INFIX_BAR_OP {}
+    | INFIX_COMPARE_OP {}
+    | INFIX_STAR_DIV_MOD_OP {}
+    | INFIX_STAR_STAR_OP {}
+    | LESS {}
+    | LQUOTE RQUOTE {}
+    | MINUS {}
+    | OR {}
+    | PERCENT_OP {}
+    | PLUS_MINUS_OP {}
+    | PREFIX_OP {}
+    | QMARK {}
+    | STAR {}
+parenExprBody :
+    | inlineAssemblyExpr {}
+    | typars COLON LPAREN classMemberSpfn rparen typedSequentialExpr {}
+    | typedSequentialExpr {}
+postfixTyparDecls :
+    | opt_HIGH_PRECEDENCE_TYAPP LESS typarDeclList opt_typeConstraints GREATER {}
+prefixTyparDecls :
+    | LPAREN typarDeclList rparen {}
+    | typar {}
+simplePattern :
+    | QMARK ident {}
+    | attributes simplePattern %prec paren_pat_attribs {}
+    | ident {}
+    | simplePattern COLON typeWithTypeConstraints {}
+sourceIdentifier :
+    | KEYWORD_STRING {}
+tuplePatternElements :
+    | COMMA ends_coming_soon_or_recover {}
+    | COMMA headBindingPattern {}
+    | headBindingPattern COMMA ends_coming_soon_or_recover {}
+    | headBindingPattern COMMA headBindingPattern {}
+    | tuplePatternElements COMMA ends_coming_soon_or_recover {}
+    | tuplePatternElements COMMA headBindingPattern {}
+typarDeclList :
+    | typarDecl {}
+    | typarDeclList COMMA typarDecl {}
+typeAlts :
+    | appType {}
+    | typeAlts OR appType {}
+typeArgsNoHpaDeprecated :
+    | HIGH_PRECEDENCE_TYAPP typeArgsActual {}
+    | typeArgsActual {}
+unionCaseReprElement :
+    | appType {}
+    | ident COLON appType {}
+activePatternCaseName :
+    | IDENT {}
+anonLambdaExpr :
+    | FUN atomicPatterns RARROW error {}
+    | FUN atomicPatterns RARROW typedSequentialExprBlock {}
+    | OFUN atomicPatterns RARROW ORIGHT_BLOCK_END OEND {}
+    | OFUN atomicPatterns RARROW recover {}
+    | OFUN atomicPatterns RARROW typedSequentialExprBlockR OEND {}
+    | OFUN atomicPatterns RARROW typedSequentialExprBlockR recover {}
+    | OFUN atomicPatterns error OEND {}
+    | OFUN error OEND {}
+anonMatchingExpr :
+    | FUNCTION withPatternClauses %prec expr_function {}
+    | OFUNCTION withPatternClauses OEND %prec expr_function {}
+arrowThenExprR :
+    | RARROW typedSequentialExprBlockR {}
+atomicExprQualification :
+    | (*empty*) {}
+    | GLOBAL {}
+    | LBRACK error RBRACK {}
+    | LBRACK recover {}
+    | LBRACK typedSequentialExpr RBRACK {}
+    | LBRACK typedSequentialExpr recover {}
+    | LPAREN COLON_COLON rparen DOT INT32 {}
+    | LPAREN typedSequentialExpr rparen {}
+    | identOrOp {}
+    | recover {}
+atomicPatsOrNamePatPairs :
+    | LPAREN namePatPairs rparen {}
+    | atomicPatterns {}
+attributeTarget :
+    | YIELD COLON {}
+    | ident COLON {}
+    | moduleKeyword COLON {}
+    | typeKeyword COLON {}
+bar_rbrace :
+    | BAR_RBRACE {}
+braceBarFieldDeclListCore :
+    | LBRACE_BAR error bar_rbrace {}
+    | LBRACE_BAR recdFieldDeclList bar_rbrace {}
+    | LBRACE_BAR recdFieldDeclList recover {}
+cType :
+    | VOID STAR {}
+    | cType AMP {}
+    | cType STAR {}
+    | cType opt_HIGH_PRECEDENCE_APP LBRACK RBRACK {}
+    | path {}
+computationExpr :
+    | sequentialExpr {}
+declExprBlock :
+    | OBLOCKBEGIN typedSequentialExpr oblockend {}
+    | declExpr {}
+doToken :
+    | DO {}
+    | ODO {}
+doneDeclEnd :
+    | DONE {}
+    | ODECLEND {}
+dynamicArg :
+    | IDENT {}
+    | LPAREN typedSequentialExpr rparen {}
+externArg :
+    | opt_attributes cType {}
+    | opt_attributes cType ident {}
+externMoreArgs :
+    | externArg COMMA externArg {}
+    | externMoreArgs COMMA externArg {}
+forLoopBinder :
+    | parenPattern IN declExpr {}
+    | parenPattern IN ends_coming_soon_or_recover {}
+    | parenPattern ends_coming_soon_or_recover {}
+forLoopRange :
+    | parenPattern EQUALS declExpr forLoopDirection declExpr {}
+identExpr :
+    | ident {}
+    | opName {}
+ifExprCases :
+    | ifExprThen ifExprElifs {}
+inlineAssemblyExpr :
+    | HASH string opt_inlineAssemblyTypeArg optCurriedArgExprs optInlineAssemblyReturnTypes HASH {}
+listExprElements :
+    | (*empty*) {}
+    | sequentialExpr {}
+localBinding :
+    | opt_inline opt_mutable bindingPattern opt_topReturnTypeWithTypeConstraints EQUALS error {}
+    | opt_inline opt_mutable bindingPattern opt_topReturnTypeWithTypeConstraints EQUALS typedExprWithStaticOptimizationsBlock {}
+    | opt_inline opt_mutable bindingPattern opt_topReturnTypeWithTypeConstraints recover {}
+measureTypeSeq :
+    | measureTypePower {}
+    | measureTypePower measureTypeSeq {}
+memberSpecFlags :
+    | abstractMemberFlags {}
+    | memberFlags {}
+minusExpr :
+    | ADJACENT_PREFIX_OP minusExpr {}
+    | AMP minusExpr {}
+    | AMP_AMP minusExpr {}
+    | DOWNCAST minusExpr {}
+    | INFIX_AT_HAT_OP minusExpr {}
+    | MINUS minusExpr %prec expr_prefix_plus_minus {}
+    | NEW atomTypeNonAtomicDeprecated opt_HIGH_PRECEDENCE_APP atomicExprAfterType {}
+    | NEW atomTypeNonAtomicDeprecated opt_HIGH_PRECEDENCE_APP atomicExprAfterType DOT atomicExprQualification {}
+    | NEW atomTypeNonAtomicDeprecated opt_HIGH_PRECEDENCE_APP error {}
+    | NEW error {}
+    | PERCENT_OP minusExpr {}
+    | PLUS_MINUS_OP minusExpr {}
+    | UPCAST minusExpr {}
+    | appExpr {}
+moreBinders :
+    | (*empty*) %prec prec_no_more_attr_bindings {}
+    | AND_BANG headBindingPattern EQUALS typedSequentialExprBlock IN moreBinders %prec expr_let {}
+    | OAND_BANG headBindingPattern EQUALS typedSequentialExprBlock hardwhiteDefnBindingsTerminator opt_OBLOCKSEP moreBinders %prec expr_let {}
+objExpr :
+    | NEW atomTypeNonAtomicDeprecated {}
+    | objExprBaseCall objExprBindings opt_OBLOCKSEP opt_objExprInterfaces {}
+    | objExprBaseCall opt_OBLOCKSEP objExprInterfaces {}
+optLiteralValueSpfn :
+    | (*empty*) {}
+    | EQUALS OBLOCKBEGIN declExpr oblockend opt_ODECLEND {}
+    | EQUALS declExpr {}
+opt_atomicExprAfterType :
+    | (*empty*) {}
+    | atomicExprAfterType {}
+rationalConstant :
+    | INT32 {}
+    | INT32 INFIX_STAR_DIV_MOD_OP INT32 {}
+    | MINUS INT32 {}
+    | MINUS INT32 INFIX_STAR_DIV_MOD_OP INT32 {}
+recdExpr :
+    | INHERIT atomTypeNonAtomicDeprecated opt_HIGH_PRECEDENCE_APP opt_atomicExprAfterType recdExprBindings opt_seps_recd {}
+    | recdExprCore {}
+recdExprCore :
+    | UNDERSCORE {}
+    | UNDERSCORE EQUALS {}
+    | UNDERSCORE EQUALS declExprBlock recdExprBindings opt_seps_recd {}
+    | appExpr EQUALS declExprBlock recdExprBindings opt_seps_recd {}
+    | appExpr OWITH opt_seps_recd OEND {}
+    | appExpr OWITH recdBinding recdExprBindings opt_seps_recd OEND {}
+    | appExpr WITH recdBinding recdExprBindings opt_seps_recd {}
+staticMemberOrMemberOrOverride :
+    | MEMBER {}
+    | OVERRIDE {}
+    | STATIC MEMBER {}
+tupleExpr :
+    | COMMA declExpr {}
+    | COMMA ends_coming_soon_or_recover {}
+    | declExpr COMMA declExpr {}
+    | declExpr COMMA ends_coming_soon_or_recover {}
+    | tupleExpr COMMA declExpr {}
+    | tupleExpr COMMA ends_coming_soon_or_recover {}
+tyconSpfn :
+    | typeNameInfo EQUALS tyconSpfnRhsBlock {}
+    | typeNameInfo opt_classSpfn {}
+typarDecl :
+    | opt_attributes typar {}
+typars :
+    | LPAREN typarAlts rparen {}
+    | typar {}
+typeArgsActual :
+    | LESS GREATER {}
+    | LESS recover {}
+    | LESS typeArgActual GREATER {}
+    | LESS typeArgActual ends_coming_soon_or_recover {}
+    | LESS typeArgActualOrDummyIfEmpty COMMA ends_coming_soon_or_recover {}
+    | LESS typeArgActualOrDummyIfEmpty COMMA typeArgActualOrDummyIfEmpty typeArgListElements GREATER {}
+    | LESS typeArgActualOrDummyIfEmpty COMMA typeArgActualOrDummyIfEmpty typeArgListElements recover {}
+typedSequentialExprBlockR :
+    | typedSequentialExpr {}
+    | typedSequentialExpr ORIGHT_BLOCK_END {}
+withClauses :
+    | OWITH withPatternClauses OEND {}
+    | OWITH withPatternClauses recover {}
+    | WITH withPatternClauses {}
+appExpr :
+    | appExpr argExpr %prec expr_app {}
+    | atomicExpr {}
+atomicPatterns :
+    | atomicPattern {}
+    | atomicPattern HIGH_PRECEDENCE_BRACK_APP atomicPatterns {}
+    | atomicPattern HIGH_PRECEDENCE_PAREN_APP atomicPatterns {}
+    | atomicPattern atomicPatterns %prec pat_args {}
+forLoopDirection :
+    | DOWNTO {}
+    | TO {}
+ifExprElifs :
+    | (*empty*) {}
+    | ELIF declExpr ifExprCases {}
+    | ELIF declExpr recover {}
+    | ELSE declExpr {}
+    | OELSE OBLOCKBEGIN typedSequentialExpr oblockend {}
+    | OELSE OBLOCKBEGIN typedSequentialExpr recover {}
+ifExprThen :
+    | OTHEN OBLOCKBEGIN typedSequentialExpr oblockend %prec prec_then_if {}
+    | OTHEN OBLOCKBEGIN typedSequentialExpr recover %prec prec_then_if {}
+    | THEN declExpr %prec prec_then_if {}
+measureTypePower :
+    | INT32 {}
+    | measureTypeAtom {}
+    | measureTypeAtom INFIX_AT_HAT_OP atomicRationalConstant {}
+moduleKeyword :
+    | MODULE {}
+    | MODULE_COMING_SOON moduleKeyword {}
+    | MODULE_IS_HERE {}
+namePatPairs :
+    | namePatPair opt_seps {}
+    | namePatPair seps namePatPairs {}
+objExprBaseCall :
+    | NEW atomTypeNonAtomicDeprecated {}
+    | NEW atomTypeNonAtomicDeprecated opt_HIGH_PRECEDENCE_APP atomicExprAfterType {}
+    | NEW atomTypeNonAtomicDeprecated opt_HIGH_PRECEDENCE_APP atomicExprAfterType baseSpec {}
+objExprBindings :
+    | OWITH localBindings OEND {}
+    | WITH localBindings {}
+    | WITH objectImplementationBlock opt_declEnd {}
+objExprInterfaces :
+    | objExprInterface opt_objExprInterfaces {}
+optCurriedArgExprs :
+    | (*empty*) {}
+    | optCurriedArgExprs argExpr %prec expr_args {}
+optInlineAssemblyReturnTypes :
+    | (*empty*) {}
+    | COLON LPAREN rparen {}
+    | COLON typ {}
+opt_classSpfn :
+    | (*empty*) {}
+    | WITH classSpfnBlock declEnd {}
+opt_inlineAssemblyTypeArg :
+    | (*empty*) {}
+    | typeKeyword LPAREN typ rparen {}
+opt_objExprInterfaces :
+    | (*empty*) %prec prec_interfaces_prefix {}
+    | error opt_objExprInterfaces {}
+    | objExprInterface opt_objExprInterfaces {}
+opt_seps_recd :
+    | (*empty*) {}
+    | seps_recd {}
+recdBinding :
+    | pathOrUnderscore {}
+    | pathOrUnderscore EQUALS {}
+    | pathOrUnderscore EQUALS declExprBlock {}
+    | pathOrUnderscore EQUALS ends_coming_soon_or_recover {}
+    | pathOrUnderscore ends_coming_soon_or_recover {}
+recdExprBindings :
+    | (*empty*) {}
+    | recdExprBindings seps_recd recdBinding {}
+tyconSpfnRhsBlock :
+    | OBLOCKBEGIN tyconSpfnRhs opt_OBLOCKSEP classSpfnMembers opt_classSpfn oblockend opt_classSpfn {}
+    | tyconSpfnRhs opt_classSpfn {}
+typarAlts :
+    | typar {}
+    | typarAlts OR appType {}
+typeArgActualOrDummyIfEmpty :
+    | dummyTypeArg {}
+    | typeArgActual {}
+typedExprWithStaticOptimizationsBlock :
+    | OBLOCKBEGIN typedExprWithStaticOptimizations oblockend {}
+    | OBLOCKBEGIN typedExprWithStaticOptimizations recover {}
+    | typedExprWithStaticOptimizations {}
+withPatternClauses :
+    | BAR error {}
+    | BAR patternClauses {}
+    | error {}
+    | patternClauses {}
+argExpr :
+    | ADJACENT_PREFIX_OP atomicExpr {}
+    | atomicExpr {}
+classSpfnBlock :
+    | OBLOCKBEGIN classSpfnMembers oblockend {}
+    | OBLOCKBEGIN classSpfnMembers recover {}
+    | classSpfnMembers {}
+classSpfnMembers :
+    | (*empty*) {}
+    | classSpfnMembersAtLeastOne {}
+measureTypeAtom :
+    | LPAREN measureTypeExpr rparen {}
+    | path {}
+    | typar {}
+namePatPair :
+    | ident EQUALS parenPattern {}
+objExprInterface :
+    | interfaceMember appType opt_objExprBindings opt_declEnd opt_OBLOCKSEP {}
+opt_declEnd :
+    | (*empty*) {}
+    | END {}
+    | ODECLEND {}
+    | OEND {}
+pathOrUnderscore :
+    | UNDERSCORE {}
+    | path {}
+patternClauses :
+    | patternAndGuard error BAR patternClauses {}
+    | patternAndGuard patternResult %prec prec_pat_pat_action {}
+    | patternAndGuard patternResult BAR patternClauses {}
+    | patternAndGuard patternResult BAR recover {}
+    | patternAndGuard patternResult recover {}
+    | patternAndGuard recover {}
+seps_recd :
+    | OBLOCKSEP {}
+    | OBLOCKSEP SEMICOLON {}
+    | SEMICOLON {}
+    | SEMICOLON OBLOCKSEP {}
+tyconSpfnRhs :
+    | DELEGATE OF topType {}
+    | tyconClassSpfn {}
+    | tyconDefnOrSpfnSimpleRepr {}
+typedExprWithStaticOptimizations :
+    | typedSequentialExpr opt_staticOptimizations {}
+classSpfnMembersAtLeastOne :
+    | classMemberSpfn opt_seps classSpfnMembers {}
+opt_objExprBindings :
+    | (*empty*) {}
+    | objExprBindings {}
+opt_staticOptimizations :
+    | (*empty*) {}
+    | opt_staticOptimizations staticOptimization {}
+patternAndGuard :
+    | parenPattern patternGuard {}
+patternResult :
+    | RARROW typedSequentialExprBlockR {}
+tyconClassSpfn :
+    | classOrInterfaceOrStruct classSpfnBlock END {}
+    | classOrInterfaceOrStruct classSpfnBlock recover {}
+    | classOrInterfaceOrStruct error END {}
+    | classSpfnBlockKindUnspecified {}
+classSpfnBlockKindUnspecified :
+    | BEGIN classSpfnBlock END {}
+    | BEGIN classSpfnBlock recover {}
+    | OBLOCKBEGIN classSpfnMembers oblockend {}
+    | OBLOCKBEGIN classSpfnMembers recover {}
+patternGuard :
+    | (*empty*) {}
+    | WHEN declExpr {}
+staticOptimization :
+    | WHEN staticOptimizationConditions EQUALS typedSequentialExprBlock {}
+staticOptimizationConditions :
+    | staticOptimizationCondition {}
+    | staticOptimizationConditions AND staticOptimizationCondition {}
+staticOptimizationCondition :
+    | typar COLON typ {}
+    | typar STRUCT {}

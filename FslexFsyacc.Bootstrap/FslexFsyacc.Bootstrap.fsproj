@@ -20,7 +20,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="SourceText.fs" />
+    <Compile Include="SourceTextTry.fs" />
     <Compile Include="TypeArguments\FSharpTokenScratch.fs" />
     <Compile Include="TypeArguments\TypeArgumentToken.fs" />
     <Compile Include="TypeArguments\TypeArgumentTokenUtils.fs" />

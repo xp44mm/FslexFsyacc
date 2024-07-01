@@ -1,7 +1,7 @@
 ﻿namespace FslexFsyacc.TypeArguments
 
 type TypeArgumentToken =
-    | EOF
+    //| EOF
 
     | HASH
     | LPAREN

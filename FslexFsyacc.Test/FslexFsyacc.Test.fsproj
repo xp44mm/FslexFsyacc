@@ -9,7 +9,7 @@
 	<ItemGroup>
 		<Compile Include="Dir.fs" />
 		<Compile Include="SourceTextTest.fs" />
-		<Compile Include="Runtime\PositionTest.fs" />
+		<Compile Include="Runtime\TokenWithPositionTest.fs" />
 		<Compile Include="Runtime\RenderUtilsTest.fs" />    
 		<Compile Include="Lex\NFACombineTest.fs" />
 		<Compile Include="Lex\RegularExpressionNFATest.fs" />

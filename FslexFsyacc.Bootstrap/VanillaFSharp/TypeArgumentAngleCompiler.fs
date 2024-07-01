@@ -6,14 +6,14 @@ open FSharp.Idioms
 open System
 open System.Diagnostics
 
-let parser = BoundedParseTable.app.getParser<Position<TypeArgumentAngleToken>>(
+let parser = BoundedParseTable.app.getParser<PositionWith<TypeArgumentAngleToken>>(
                 TypeArgumentAngleToken.getTag,
                 TypeArgumentAngleToken.getLexeme
                 )
 
 let tbl = BoundedParseTable.app.getTable parser
 
-let compile (offset) (input:string) =
+let compile (sourceText:SourceText) = //(offset) (input:string) =
     //let mutable tokens = []
     let mutable states = [0,null]
 
@@ -28,7 +28,10 @@ let compile (offset) (input:string) =
             | _ -> true
         loop acceptStates states
 
-    let tokenIterator = Iterator(TypeArgumentAngleToken.tokenize offset input)
+    let tokenIterator =
+        sourceText
+        |> TypeArgumentAngleToken.tokenize
+        |> Iterator
 
     seq {
         while ongoing() do
@@ -56,13 +59,13 @@ let compile (offset) (input:string) =
     | [1,lxm; 0,null] -> BoundedParseTable.unboxRoot lxm
     | _ -> failwith $"{stringify states}"
         
-let getRange (offset:int) (input:string) =
-    match compile offset input with
+let getRange (sourceText:SourceText) = // (offset:int) (input:string) =
+    match compile sourceText with
     | FslexFsyacc.Brackets.Band.Bounded(i,_,j) ->
-        Debug.Assert((i=offset))
+        Debug.Assert((i=sourceText.index))
         {
             index = i
             length = j-i+1
-            value = input.[1..j-i-1].Trim()
+            value = sourceText.text.[1..j-i-1].Trim()
         }
     | never -> failwith $"{never}"

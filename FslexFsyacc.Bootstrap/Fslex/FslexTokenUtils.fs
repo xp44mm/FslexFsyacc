@@ -6,12 +6,13 @@ open FSharp.Idioms.StringOps
 open FSharp.Idioms.RegularExpressions
 open FSharp.Idioms.ActivePatterns
 open FSharp.Idioms.Literal
+open FSharp.Idioms.PointFree
 
 open System
 open System.Text.RegularExpressions
 open FslexFsyacc.VanillaFSharp.FSharpSourceText
 open FslexFsyacc
-open FslexFsyacc.SourceText
+open FslexFsyacc.SourceTextTry
 
 let ops = Map [
     "%%",PERCENT;
@@ -33,7 +34,7 @@ let ops_inverse =
     |> Map.inverse
     |> Map.map(fun k v -> Seq.exactlyOne v)
 
-let getTag (token:_ Position) =
+let getTag (token: _ PositionWith) =
     match token.value with
     | x when ops_inverse.ContainsKey x -> ops_inverse.[x]
 
@@ -45,36 +46,40 @@ let getTag (token:_ Position) =
     | HOLE     _ -> "HOLE"
     | _ -> failwith "getTag Wild"
 
-let getLexeme (token:_ Position) =
+let getLexeme (token: _ PositionWith) =
     match token.value with
     | HEADER   x -> box x
     | ID       x -> box x
     | CAP      x -> box x
     | LITERAL  x -> box x
     | REDUCER x -> box x
-    | HOLE     x -> box x
+    | HOLE    x -> box x
     | _ -> null
 
-let tokenize (offset:int) (input:string) =
-    let rec loop (lpos:int,lrest:string) (pos:int,rest:string) =
+let tokenize (sourceText:SourceText) = // (offset:int) (input:string) =
+    let rec loop (lineSrc:SourceText) (src:SourceText) = // (lpos:int,lrest:string) (pos:int,rest:string) =
         seq {
-            match rest with
+            match src.text with
             | "" -> ()
             | On tryWS m ->
                 let len = m.Length
-                yield! loop (lpos,lrest) (pos+len,rest.[len..])
+                let src = src.skip len
+                yield! loop lineSrc src //(lpos,lrest) (pos+len,rest.[len..])
 
             | On trySingleLineComment m ->
                 let len = m.Length
-                yield! loop (lpos,lrest) (pos+len,rest.[len..])
+                let src = src.skip len
+                yield! loop lineSrc src // (lpos,lrest) (pos+len,rest.[len..])
 
             | On tryMultiLineComment m ->
                 let len = m.Length
-                yield! loop (lpos,lrest) (pos+len,rest.[len..])
+                let src = src.skip len
+                yield! loop lineSrc src // (pos+len,rest.[len..])
 
             | Rgx @"^\w+" m ->
-                yield Position.from(pos,m.Length,ID m.Value)
-                yield! loop (lpos,lrest) (pos+m.Length,rest.[m.Length..])
+                yield PositionWith<_>.just(src.index, m.Length, ID m.Value)
+                let src = src.skip m.Length
+                yield! loop lineSrc src // (pos+m.Length,rest.[m.Length..])
 
             | Rgx @"^<(\w+)>\s*(=)?" m ->
                 let g1 = m.Groups.[1]
@@ -84,63 +89,69 @@ let tokenize (offset:int) (input:string) =
                     else
                         HOLE g1.Value
                 let len = g1.Length+2 // '<(\w+)>' 的长度
-                yield Position.from(pos, len, tok)
-                yield! loop (lpos,lrest) (pos+len,rest.[len..])
+                yield PositionWith<_>.just(src.index, len, tok)
+                let src = src.skip len
+                yield! loop lineSrc src // (pos+len,rest.[len..])
 
             | On trySingleQuoteString m ->
                 let len = m.Length
-                yield Position.from(pos,len,LITERAL(Json.unquote m.Value))
-                yield! loop (lpos,lrest) (pos+len,rest.[len..])
+                yield PositionWith<_>.just(src.index, len,LITERAL(Json.unquote m.Value))
+                let src = src.skip len
+                yield! loop lineSrc src // (pos+len,rest.[len..])
 
             | On tryReducer capt ->
                 let len = capt.Length
                 let code = capt.[1..len-2]
 
-                let nlpos,nlinp,fcode =
+                let lineSrc,fcode =
                     if System.String.IsNullOrWhiteSpace(code) then
-                        lpos,lrest,""
+                        lineSrc,""
                     else
-                        let col,nli = Line.getColumnAndLpos (lpos,lrest) (pos+1)
-                        let nlrest = input.[offset+nli..]
+                        let col,nli = lineSrc.getColumnAndNextLine (src.index+1)
+                        let lineSrc = lineSrc.jump(nli) // input.[offset+nli..]
                         let fcode = formatNestedCode col code
-                        nli,nlrest,fcode
+                        lineSrc,fcode
 
-                yield Position.from(pos, len, REDUCER fcode)
-                yield! loop (nlpos,nlinp) (pos+len,rest.[len..])
+                yield PositionWith<_>.just(src.index, len, REDUCER fcode)
+                let src = src.skip len
+                yield! loop lineSrc src // (pos+len,rest.[len..])
 
             | On tryHeader x ->
                 let len = x.Length
                 let code = x.[2..len-3]
 
-                let nli,nlrest,fcode =
+                let lineSrc,fcode =
                     if System.String.IsNullOrWhiteSpace(code) then
-                        lpos,lrest,""
+                        lineSrc,""
                     else
-                        let col,nli = Line.getColumnAndLpos (lpos,lrest) (pos+2)
-                        let nlrest = input.[offset+nli..]
+                        let col,nli = lineSrc.getColumnAndNextLine (src.index+2)
+                        let lineSrc = lineSrc.jump(nli) // input.[offset+nli..]
                         let fcode = formatNestedCode col code
-                        nli,nlrest,fcode
+                        lineSrc,fcode
 
-                yield Position.from(pos,len,HEADER fcode)
-                yield! loop (nli,nlrest) (pos+len,rest.[len..])
+                yield PositionWith<_>.just(src.index,len,HEADER fcode)
+                let src = src.skip len
+                yield! loop lineSrc src // (pos+len,rest.[len..])
 
             | Rgx @"^%%+" m ->
-                let x = m.Value
-                yield Position.from(pos,x.Length,PERCENT)
-                yield! loop (lpos,lrest) (pos+x.Length,rest.[m.Length..])
+                //let x = m.Value
+                yield PositionWith<_>.just(src.index,m.Length,PERCENT)
+                let src = src.skip m.Length
+                yield! loop lineSrc src // (pos+m.Length,rest.[m.Length..])
 
             | LongestPrefix (Map.keys ops) x ->
                 let len = x.Length
-                yield Position.from(pos,len,ops.[x])
-                yield! loop (lpos,lrest) (pos+len,rest.[x.Length..])
+                yield PositionWith<_>.just(src.index,len,ops.[x])
+                let src = src.skip len
+                yield! loop lineSrc src // (pos+len,rest.[x.Length..])
 
-            | rest -> failwith $"tokenize:{rest}"
+            | _ -> failwith $"tokenize:{src}"
         }
 
-    loop (offset,input) (offset,input)
+    twice loop sourceText //(offset,input)
 
-let appendAMP (lexbuf: Position<FslexToken> list) =
+let appendAMP (lexbuf: PositionWith<FslexToken> list) =
     let last =
         lexbuf
         |> List.exactlyOne
-    [last;Position.from(last.nextIndex,0,AMP)]
+    [last;PositionWith<_>.just(last.index + last.length,0,AMP)]

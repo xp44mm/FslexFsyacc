@@ -103,7 +103,7 @@ type ModuleDeclsParseTableTest (output:ITestOutputHelper) =
     [<Fact(
     //Skip="once for all!"
     )>]
-    member _.``06 - generate ParseTable``() =
+    member _.``06 - generate ModuleDeclsParseTable``() =
         let outp = coder.generateModule(parseTblModule)
         File.WriteAllText(parseTblPath, outp, Encoding.UTF8)
         output.WriteLine("output yacc:")

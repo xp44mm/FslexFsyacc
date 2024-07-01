@@ -3,7 +3,7 @@ let nextStates = [0u,["%%",5u;"&",5u;"(",5u;")",3u;"*",3u;"+",3u;"/",5u;"=",5u;"
 open FslexFsyacc
 open FslexFsyacc.Fslex
 open FslexFsyacc.Fslex.FslexTokenUtils
-type token = Position<FslexToken>
+type token = PositionWith<FslexToken>
 let rules:list<uint32 list*uint32 list*(list<token>->_)> = [
     [1u],[],fun (lexbuf:list<_>) ->
         [lexbuf.Head]

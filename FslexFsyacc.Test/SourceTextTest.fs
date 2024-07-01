@@ -14,7 +14,7 @@ type SourceTextTest(output:ITestOutputHelper) =
     member _.``tryWord``() =
         let x = "xyz"
         let y = 
-            SourceText.tryWord x 
+            SourceTextTry.tryWord x 
             |> fun m -> m.Value.Value
         Should.equal y x
 
@@ -22,7 +22,7 @@ type SourceTextTest(output:ITestOutputHelper) =
     member _.``tryWS``() =
         let x = "  "
         let y = 
-            SourceText.tryWS x 
+            SourceTextTry.tryWS x 
             |> fun m -> m.Value.Value
 
         Should.equal y x

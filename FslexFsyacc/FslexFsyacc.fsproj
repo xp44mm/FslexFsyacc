@@ -19,7 +19,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Position.fs" />
+    <Compile Include="SourceText.fs" />
+    <Compile Include="PositionWith.fs" />
+    <Compile Include="Position2.fs" />
+    <Compile Include="Range.fs" />
     <Compile Include="RenderUtils.fs" />
     <Compile Include="TypeArguments\SuffixType.fs" />
     <Compile Include="TypeArguments\Typar.fs" />

@@ -1,0 +1,25 @@
+﻿%{%}
+typeNameInfo :
+    | opt_attributes tyconNameAndTyparDecls opt_typeConstraints {}
+tyconNameAndTyparDecls :
+    | opt_access path {}
+    | opt_access path postfixTyparDecls {}
+path :
+    | GLOBAL {}
+    | ident {}
+    | path DOT ident {}
+postfixTyparDecls :
+    | opt_HIGH_PRECEDENCE_TYAPP LESS typarDeclList opt_typeConstraints GREATER {}
+ident :
+    | IDENT {}
+opt_HIGH_PRECEDENCE_TYAPP :
+    | (*empty*) {}
+    | HIGH_PRECEDENCE_TYAPP {}
+typarDeclList :
+    | typarDecl {}
+    | typarDeclList COMMA typarDecl {}
+typarDecl :
+    | opt_attributes typar {}
+typar :
+    | INFIX_AT_HAT_OP ident {}
+    | QUOTE ident {}

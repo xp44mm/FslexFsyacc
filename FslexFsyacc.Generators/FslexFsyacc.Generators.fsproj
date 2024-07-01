@@ -24,13 +24,10 @@
     <Compile Include="Fslex\FslexDFATest.fs" />
     <None Include="Fslex\fslex.fsyacc" />
     <Compile Include="Fslex\FslexParseTableTest.fs" />
-    <Compile Include="Fsyacc\FsyaccToken.fs" />
-    <Compile Include="Fsyacc\FsyaccTokenUtils.fs" />
-    <None Include="Fsyacc\fsyacc.fsyacc" />
     <None Include="fsyacc2\fsyacc2.fsyacc" />
     <Compile Include="Fsyacc2\FsyaccParseTable2Test.fs" />
-    <None Include="RawFsharp\pars.fsyacc" />
-    <Compile Include="RawFsharp\ParsTest.fs" />
+    <None Include="Pars\pars.fsyacc" />
+    <Compile Include="Pars\ParsTest.fs" />
     
     
     <Compile Include="Program.fs" />

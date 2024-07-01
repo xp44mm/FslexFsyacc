@@ -21,18 +21,23 @@ open System.Text.RegularExpressions
 open Xunit
 open Xunit.Abstractions
 open FslexFsyacc.ModuleOrNamespaces
-
-//let x = [
-//    {index=9;length=4;value=KW_OPEN};
-//    {index=14;length=6;value=IDENT "System"};
-//    {index=20;length=1;value=DOT};{index=21;length=2;value=IDENT "IO"};
-//    {index=25;length=4;value=KW_OPEN};{index=30;length=4;value=KW_TYPE};
-//    {index=34;length=13;value=TYPE_ARGUMENT(Ctor(["System";"Math"],[]))}
-//    ]
-
+open FslexFsyacc.TypeArguments
 
 [<EntryPoint>]
 let main _ =
-    Console.WriteLine("")
+    let exit (rest:string) = Regex.IsMatch(rest, @"^\s*\>")
+
+    let x = "Band list"
+    let src = SourceText.just(99, $"{x}>")
+
+    //TypeArgumentTokenUtils.tokenize src
+    //|> Seq.iter(fun tok ->
+    //    Console.WriteLine(stringify tok)
+    
+    //)
+    let ta,length = TypeArgumentCompiler.compile exit src
+    Console.WriteLine(stringify ta)
+    Console.WriteLine($"length={length}")
+
 
     0

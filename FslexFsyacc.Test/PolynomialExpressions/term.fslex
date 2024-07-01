@@ -1,7 +1,7 @@
 ﻿%{
 open FslexFsyacc
 open PolynomialExpressions.Tokenizer
-type token = Position<Token>
+type token = PositionWith<Token>
 %}
 <index> = "**" INT
 <sign>  = [ "+" "-" ]

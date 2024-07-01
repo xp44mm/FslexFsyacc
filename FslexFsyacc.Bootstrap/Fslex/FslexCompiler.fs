@@ -6,10 +6,10 @@ open FslexFsyacc.Lex
 open FSharp.Idioms.Literal
 open FslexFsyacc.Fslex
 
-let analyze (tokens:seq<Position<FslexToken>>) = 
+let analyze (tokens:seq<PositionWith<FslexToken>>) = 
     FslexDFA.analyzer.analyze(tokens,FslexTokenUtils.getTag)
 
-let parser = FslexParseTable.app.getParser<FslexToken Position>(
+let parser = FslexParseTable.app.getParser<FslexToken PositionWith>(
                 FslexTokenUtils.getTag,
                 FslexTokenUtils.getLexeme)
 
@@ -41,8 +41,8 @@ let compile (txt:string) =
     let mutable tokens = []
     let mutable states = [0,null]
     //let mutable result = defaultValue<_>
-    txt
-    |> FslexTokenUtils.tokenize 0
+    SourceText.just(0, txt)
+    |> FslexTokenUtils.tokenize
     |> analyze
     |> Seq.concat
     |> Seq.map(fun tok ->

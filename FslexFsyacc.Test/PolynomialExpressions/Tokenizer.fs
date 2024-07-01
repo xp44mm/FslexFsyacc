@@ -12,7 +12,7 @@ type Token =
     | PLUS
     | MINUS
 
-let getTag(token:Position<_>) =
+let getTag(token:PositionWith<_>) =
     match token.value with
     | ID _ -> "ID"
     | INT _ -> "INT"
@@ -40,10 +40,10 @@ let tokenize (s: string) =
             value=token}
     }
 
-let toConst (lexbuf:Position<Token>list) =
+let toConst (lexbuf:PositionWith<Token>list) =
     {
         index = lexbuf.Head.index
-        length = Position.totalLength lexbuf
+        length = PositionWith.totalLength lexbuf
         value =
             match lexbuf
                 |> List.map(fun postok -> postok.value) with
@@ -53,10 +53,10 @@ let toConst (lexbuf:Position<Token>list) =
             | tokens -> failwith $"{tokens}"
     }
 
-let toTerm (lexbuf:Position<Token>list)  =
+let toTerm (lexbuf:PositionWith<Token>list)  =
     {
         index = lexbuf.Head.index
-        length = Position.totalLength lexbuf
+        length = PositionWith.totalLength lexbuf
         value =
             match lexbuf
                 |> List.map(fun postok -> postok.value) with

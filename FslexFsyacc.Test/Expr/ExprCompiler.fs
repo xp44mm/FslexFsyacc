@@ -10,10 +10,10 @@ open FslexFsyacc
 
 open FslexFsyacc.Expr.ExprParseTable
 
-let parser = app.getParser< Position<ExprToken> >(ExprToken.getTag,ExprToken.getLexeme)
+let parser = app.getParser< PositionWith<ExprToken> >(ExprToken.getTag,ExprToken.getLexeme)
 let table = app.getTable parser
 
-let parse(tokens:seq<Position<ExprToken>>) =
+let parse(tokens:seq<PositionWith<ExprToken>>) =
     tokens
     |> parser.parse
     |> ExprParseTable.unboxRoot
@@ -27,8 +27,8 @@ let compile (txt:string) =
     let mutable tokens = []
     let mutable states = [0,null]
 
-    txt
-    |> ExprToken.tokenize 0
+    SourceText.just(0, txt)
+    |> ExprToken.tokenize
     |> Seq.map(fun tok ->
         tokens <- tok::tokens
         tok

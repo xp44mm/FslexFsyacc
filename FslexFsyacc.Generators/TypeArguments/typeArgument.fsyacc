@@ -1,4 +1,4 @@
-﻿%{
+%{
 %}
 typeArgument :
     | funtype {TypeArgumentUtils.ofFun s0}

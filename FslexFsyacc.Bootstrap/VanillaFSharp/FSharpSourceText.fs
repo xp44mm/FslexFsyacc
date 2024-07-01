@@ -58,7 +58,7 @@ let tryHTypar =
 // 不终止循环的消费者 fsharpCodeCommonTries
 let tries =
     [
-        SourceText.tryWS
+        SourceTextTry.tryWS
         trySingleLineComment
         tryMultiLineComment
         tryDoubleTick

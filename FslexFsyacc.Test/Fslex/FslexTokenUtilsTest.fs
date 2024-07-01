@@ -17,7 +17,8 @@ type FslexTokenUtilsTest(output:ITestOutputHelper) =
     member _.``tryWord``() =
         let x = "xyz"
         let y = 
-            FslexTokenUtils.tokenize 0 x 
+            SourceText.just(0,x)
+            |> FslexTokenUtils.tokenize
             |> Seq.toList
         let e = [{index= 0;length= 3;value= ID "xyz"}]
         show y
@@ -27,7 +28,8 @@ type FslexTokenUtilsTest(output:ITestOutputHelper) =
     member _.``tryWS``() =
         let x = "  "
         let y = 
-            FslexTokenUtils.tokenize 0 x 
+            SourceText.just(0,x)
+            |> FslexTokenUtils.tokenize
             |> Seq.toList
 
         Should.equal y []
@@ -36,7 +38,8 @@ type FslexTokenUtilsTest(output:ITestOutputHelper) =
     member _.``trySingleLineComment``() =
         let x = "// xdfasdf\r\n   "
         let y = 
-            FslexTokenUtils.tokenize 0 x 
+            SourceText.just(0,x)
+            |> FslexTokenUtils.tokenize
             |> Seq.toList
         show y
         Should.equal y []
@@ -45,7 +48,8 @@ type FslexTokenUtilsTest(output:ITestOutputHelper) =
     [<InlineData("(* empty *) ")>]
     member _.``tryMultiLineComment``(x) =
         let y = 
-            FslexTokenUtils.tokenize 0 x 
+            SourceText.just(0,x)
+            |> FslexTokenUtils.tokenize
             |> Seq.toList
         Should.equal y []
 
@@ -59,7 +63,8 @@ type FslexTokenUtilsTest(output:ITestOutputHelper) =
         let x = x.Trim()
 
         let y = 
-            FslexTokenUtils.tokenize 0 x 
+            SourceText.just(0,x)
+            |> FslexTokenUtils.tokenize
             |> Seq.toList
         show y
 
@@ -68,7 +73,8 @@ type FslexTokenUtilsTest(output:ITestOutputHelper) =
     [<InlineData("%{open System%}")>]
     member _.``tryHeader`` (x:string) =
         let y = 
-            FslexTokenUtils.tokenize 0 x 
+            SourceText.just(0,x)
+            |> FslexTokenUtils.tokenize
             |> Seq.toList
         show y
 
@@ -78,7 +84,8 @@ type FslexTokenUtilsTest(output:ITestOutputHelper) =
     [<InlineData("{ [lexbuf.Head] }")>]
     member _.``trySemantic`` (x:string) =
         let y = 
-            FslexTokenUtils.tokenize 0 x 
+            SourceText.just(0,x)
+            |> FslexTokenUtils.tokenize
             |> Seq.toList
         show y
 

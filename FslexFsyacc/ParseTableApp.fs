@@ -25,6 +25,7 @@ type ParseTableApp =
             parser.baseParser.actions
             )
 
+//用法
 //let app: ParseTableApp = {
 //    tokens = tokens
 //    kernels = kernels

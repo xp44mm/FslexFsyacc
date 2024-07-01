@@ -7,20 +7,34 @@ moduleDecls :
     | moduleDecl {[s0]}
 
 moduleDecl :
-    | openDecl {s0}
-
-openDecl :
     | OPEN path {Open(List.rev s1)}
     | OPEN TYPE TARG {OpenType(s2)}
-
+    | typeAbbreviation { s0 }
 path :
     | path "." IDENT {s2::s0}
     | IDENT {[s0]}
 
+typeAbbreviation :
+    | TYPE IDENT genericParameters? "=" TARG { TypeAbb(s1::s2, s4) }
+
+genericParameters? :
+    | (*empty*) {[]}
+    | genericParameters { s0 }
+    
+genericParameters :
+   | "<" typars ">" { List.rev s1 }
+
+typars:
+   | typars "," TYPAR { s2::s0 }
+   | TYPAR { [s0] }
+
 %%
 
 %type<ModuleDecl list> moduleDecls
-%type<ModuleDecl> moduleDecl openDecl
-%type<string list> path
+%type<ModuleDecl> moduleDecl typeAbbreviation
+%type<string list> path typars genericParameters genericParameters?
 %type<TypeArgument> TARG
-%type<string> IDENT
+%type<string> IDENT TYPAR
+
+
+

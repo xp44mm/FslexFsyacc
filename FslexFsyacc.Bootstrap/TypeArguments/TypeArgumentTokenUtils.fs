@@ -1,7 +1,7 @@
 ﻿module FslexFsyacc.TypeArguments.TypeArgumentTokenUtils
 
 open FslexFsyacc.TypeArguments.FSharpTokenScratch
-open FslexFsyacc.SourceText
+open FslexFsyacc.SourceTextTry
 open FslexFsyacc
 
 open FSharp.Idioms
@@ -46,7 +46,7 @@ let kws_inverse =
     |> Map.inverse 
     |> Map.map(fun k v -> Seq.exactlyOne v)
 
-let getTag (token:Position<TypeArgumentToken>) =
+let getTag (token:PositionWith<TypeArgumentToken>) =
     match token.value with
     | x when ops_inverse.ContainsKey x -> ops_inverse.[x]
     | x when kws_inverse.ContainsKey x -> kws_inverse.[x]
@@ -59,7 +59,7 @@ let getTag (token:Position<TypeArgumentToken>) =
     | ARRAY_TYPE_SUFFIX _ -> "ARRAY_TYPE_SUFFIX"
     | x -> failwith $"{stringify x}"
 
-let getLexeme (token:Position<TypeArgumentToken>) =
+let getLexeme (token:PositionWith<TypeArgumentToken>) =
     match token.value with
     | IDENT             x -> box x
     | QTYPAR            x -> box x
@@ -69,29 +69,32 @@ let getLexeme (token:Position<TypeArgumentToken>) =
     | ARRAY_TYPE_SUFFIX x -> box x
     | _ -> null
 
-let tokenize offset (input:string) =
-    let rec loop pos rest =
+let tokenize (sourceText:SourceText) =
+    let rec loop src =
         seq {
-            match rest with
+            match src.text with
             | "" -> ()
 
             | Rgx @"^\s+" m ->
-                yield! loop (pos+m.Length) rest.[m.Length..]
+                let src = src.skip m.Length
+                yield! loop src
 
             | Rgx @"^\[\s*(,\s*)*\]" m ->
-                let rank = m.Groups.[1].Captures.Count+1
                 let tok = {
-                    index = pos
+                    index = src.index
                     length = m.Length
-                    value = ARRAY_TYPE_SUFFIX rank
+                    value = 
+                        let rank = m.Groups.[1].Captures.Count+1
+                        ARRAY_TYPE_SUFFIX rank
                 }
                 yield tok
-                yield! loop tok.nextIndex rest.[tok.length..]            
+                let src = src.skip tok.length
+                yield! loop src
 
             | On tryFSharpIdent x ->
                 let tok =
                     {
-                        index = pos
+                        index = src.index
                         length = x.Length
                         value =
                             if kws.ContainsKey x.Value
@@ -99,36 +102,40 @@ let tokenize offset (input:string) =
                             else IDENT x.Value
                     }
                 yield tok
-                yield! loop tok.nextIndex rest.[tok.length..]
+
+                let src = src.skip tok.length
+                yield! loop src
 
             | On tryQTypar x ->
                 let tok = {
-                    index = pos
+                    index = src.index
                     length = x.Length
                     value = QTYPAR x.Value.[1..]
                 }
                 yield tok
-                yield! loop tok.nextIndex rest.[tok.length..]
+                let src = src.skip tok.length
+                yield! loop src
 
             | On tryHTypar x ->
                 let tok = {
-                    index = pos
+                    index = src.index
                     length = x.Length
                     value = HTYPAR x.Value.[1..]
                 }
                 yield tok
-                yield! loop tok.nextIndex rest.[tok.length..]
+                let src = src.skip tok.length
+                yield! loop src
 
             | LongestPrefix (Map.keys ops) x ->
                 let tok = {
-                    index = pos
+                    index = src.index
                     length = x.Length
                     value = ops.[x]
                 }
                 yield tok
-                yield! loop tok.nextIndex rest.[tok.length..]
+                let src = src.skip tok.length
+                yield! loop src
 
-            | rest -> failwith $"unimpl tokenize case{stringify(pos,rest)}"
+            | _ -> failwith $"unimpl tokenize case{stringify src}"
         }
-
-    loop offset input
+    loop sourceText

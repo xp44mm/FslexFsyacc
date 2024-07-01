@@ -80,57 +80,60 @@ module TypeArgumentAngleToken =
         | COMMENT ct -> stringify ct
         | _ -> failwith ""
 
-    let getTag (token:Position<TypeArgumentAngleToken>) =
+    let getTag (token:PositionWith<TypeArgumentAngleToken>) =
         match token.value with
         | LANGLE -> "LEFT"
         | RANGLE -> "RIGHT"
         | _ -> "TICK"
 
-    let getLexeme (token:Position<TypeArgumentAngleToken>) =
+    let getLexeme (token:PositionWith<TypeArgumentAngleToken>) =
         match token.value with
         | LANGLE -> box token.index
         | RANGLE -> box token.index
         | tok -> box (render tok)
 
-    let tokenize offset (input:string) =
+    let tokenize (sourceText:SourceText) = // offset (input:string) =
         //无限循环
-        let rec loop pos rest =
+        let rec loop (src:SourceText) = // pos rest =
             seq {
-                match rest with
+                match src.text with
                 | Rgx @"^\s+" m ->
                     let tok =
                         {
-                            index = pos
+                            index = src.index
                             length = m.Length
                             value = WHITESPACE m.Value
                         }
                     yield tok
-                    yield! loop (pos+m.Length) rest.[m.Length..]
+                    let src = src.skip tok.length
+                    yield! loop src
 
                 | Rgx @"^//[^\r\n]*" m ->
                     let tok =
                         {
-                            index = pos
+                            index = src.index
                             length = m.Length
                             value = COMMENT m.Value
                         }
                     yield tok
-                    yield! loop (pos+m.Length) rest.[m.Length..]
+                    let src = src.skip tok.length
+                    yield! loop src
 
                 | Rgx @"^\(\*[\s\S]+\*\)" m ->
                     let tok =
                         {
-                            index = pos
+                            index = src.index
                             length = m.Length
                             value = COMMENT m.Value
                         }
                     yield tok
-                    yield! loop (pos+m.Length) rest.[m.Length..]
+                    let src = src.skip tok.length
+                    yield! loop src
 
                 | On tryIdent x ->
                     let tok =
                         {
-                            index = pos
+                            index = src.index
                             length = x.Length
                             value =
                                 if kws.ContainsKey x.Value
@@ -138,49 +141,54 @@ module TypeArgumentAngleToken =
                                 else IDENT x.Value
                         }
                     yield tok
-                    yield! loop tok.nextIndex rest.[tok.length..]
+                    let src = src.skip tok.length
+                    yield! loop src
 
                 | Rgx @"^'(\w+)(?!')" m ->
                     let tok = {
-                        index = pos
+                        index = src.index
                         length = m.Length
                         value = QTYPAR m.Groups.[1].Value
                     }
                     yield tok
-                    yield! loop tok.nextIndex rest.[tok.length..]
+                    let src = src.skip tok.length
+                    yield! loop src
 
                 | Rgx @"^\^(\w+)" m ->
                     let tok = {
-                        index = pos
+                        index = src.index
                         length = m.Length
                         value = HTYPAR m.Groups.[1].Value
                     }
                     yield tok
-                    yield! loop tok.nextIndex rest.[tok.length..]
+                    let src = src.skip tok.length
+                    yield! loop src
 
                 | Rgx @"^\[\s*(,\s*)*\]" m ->
                     let tok = {
-                        index = pos
+                        index = src.index
                         length = m.Length
                         value = 
                             let rank = m.Groups.[1].Captures.Count-1
                             ARRAY_TYPE_SUFFIX rank
                     }
                     yield tok
-                    yield! loop tok.nextIndex rest.[tok.length..]
+                    let src = src.skip tok.length
+                    yield! loop src
 
                 | LongestPrefix (Map.keys ops) capt ->
                     let tok = {
-                        index = pos
+                        index = src.index
                         length = capt.Length
                         value = ops.[capt]
                     }
                     yield tok
-                    yield! loop tok.nextIndex rest.[tok.length..]
+                    let src = src.skip tok.length
+                    yield! loop src
             
-                | rest -> failwith $"unimpl case: {stringify(pos,rest)}"
+                | _ -> failwith $"unimpl case: {stringify src}"
             }
-        loop offset input
+        loop sourceText
 
 
 

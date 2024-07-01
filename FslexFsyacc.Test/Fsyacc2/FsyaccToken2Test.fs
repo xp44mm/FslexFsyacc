@@ -15,7 +15,8 @@ type FsyaccToken2Test (output:ITestOutputHelper) =
     member _.``tryWord``() =
         let x = "xyz"
         let y = 
-            FsyaccToken2Utils.tokenize 0 x 
+            SourceText.just(0,x)
+            |> FsyaccToken2Utils.tokenize
             |> Seq.toList
         let e = [{index= 0;length= 3;value= FsyaccToken2.ID "xyz"}]
         Should.equal y e
@@ -24,7 +25,8 @@ type FsyaccToken2Test (output:ITestOutputHelper) =
     member _.``tryWS``() =
         let x = "  "
         let y = 
-            FsyaccToken2Utils.tokenize 0 x 
+            SourceText.just(0,x)
+            |> FsyaccToken2Utils.tokenize
             |> Seq.toList
 
         Should.equal y []
@@ -33,7 +35,8 @@ type FsyaccToken2Test (output:ITestOutputHelper) =
     member _.``trySingleLineComment``() =
         let x = "// xdfasdf\r\n   "
         let y = 
-            FsyaccToken2Utils.tokenize 0 x 
+            SourceText.just(0,x)
+            |> FsyaccToken2Utils.tokenize
             |> Seq.toList
         Should.equal y []
 
@@ -41,7 +44,8 @@ type FsyaccToken2Test (output:ITestOutputHelper) =
     [<InlineData("(* empty *) ")>]
     member _.``tryMultiLineComment``(x) =
         let y = 
-            FsyaccToken2Utils.tokenize 0 x 
+            SourceText.just(0,x)
+            |> FsyaccToken2Utils.tokenize
             |> Seq.toList
         Should.equal y []
 
@@ -55,7 +59,8 @@ type FsyaccToken2Test (output:ITestOutputHelper) =
         let x = x.Trim()
 
         let y = 
-            FsyaccToken2Utils.tokenize 0 x 
+            SourceText.just(0,x)
+            |> FsyaccToken2Utils.tokenize
             |> Seq.toList
         output.WriteLine(stringify y)
 
@@ -64,7 +69,8 @@ type FsyaccToken2Test (output:ITestOutputHelper) =
     [<InlineData("%{open System%}")>]
     member _.``tryHeader`` (x:string) =
         let y = 
-            FsyaccToken2Utils.tokenize 0 x 
+            SourceText.just(0,x)
+            |> FsyaccToken2Utils.tokenize
             |> Seq.toList
         output.WriteLine(stringify y)
 
@@ -74,7 +80,8 @@ type FsyaccToken2Test (output:ITestOutputHelper) =
     [<InlineData("{ [lexbuf.Head] }")>]
     member _.``trySemantic`` (x:string) =
         let y = 
-            FsyaccToken2Utils.tokenize 0 x 
+            SourceText.just(0,x)
+            |> FsyaccToken2Utils.tokenize
             |> Seq.toList
         output.WriteLine(stringify y)
 
@@ -87,9 +94,10 @@ type FsyaccToken2Test (output:ITestOutputHelper) =
             "%type <int>"
             "%type <seq<float*string>> starts"
         ]
-
+        let x = ls.[i]
         let y = 
-            FsyaccToken2Utils.tokenize 0 ls.[i]
+            SourceText.just(0,x)
+            |> FsyaccToken2Utils.tokenize
             |> Seq.map(fun tok ->
                 output.WriteLine(stringify tok)
             )

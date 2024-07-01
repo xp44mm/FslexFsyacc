@@ -56,7 +56,7 @@ let getModuleOrNamespace (m:SynModuleOrNamespace) =
         xmlDoc,
         attribs,
         accessibility,
-        range,
+        range: range,
         triva
         ) -> 
         let modifiers = [
@@ -83,7 +83,7 @@ let getModuleDecl (d:SynModuleDecl) =
         isRecursive: bool,
         decls: SynModuleDecl list,
         isContinuing: bool,
-        range: range,
+        range: FSharp.Compiler.Text.range,
         trivia: SynModuleDeclNestedModuleTrivia
         ) ->
         XModuleDecl.NestedModule(

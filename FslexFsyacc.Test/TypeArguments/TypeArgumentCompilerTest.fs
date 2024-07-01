@@ -11,6 +11,7 @@ open Xunit.Abstractions
 open FSharp.Idioms.Literal
 open FSharp.xUnit
 open FslexFsyacc.TypeArguments
+open FslexFsyacc
 
 type TypeArgumentCompilerTest(output:ITestOutputHelper) =
     [<Theory>]
@@ -44,9 +45,10 @@ type TypeArgumentCompilerTest(output:ITestOutputHelper) =
         output.WriteLine(x)
         output.WriteLine(stringify e)
         let exit (rest:string) = Regex.IsMatch(rest, @"^\s*\>")
-        let txt = $"{x}>"
-        let ta,epos,erest = TypeArgumentCompiler.compile exit 99 txt
+        let src = SourceText.just(99, $"{x}>")
+        let ta,length = TypeArgumentCompiler.compile exit src
         output.WriteLine(stringify ta)
+        output.WriteLine($"length={length}")
         Should.equal e ta
 
     [<Theory>]
@@ -62,17 +64,17 @@ type TypeArgumentCompilerTest(output:ITestOutputHelper) =
         Should.equal ls.Length 4
 
         let y = 
-            ls.[i]
-            |> TypeArgumentTokenUtils.tokenize 0
+            SourceText.just(0, ls.[i])
+            |> TypeArgumentTokenUtils.tokenize
             |> Seq.head
             |> (fun x -> x.value)
 
         let e = ARRAY_TYPE_SUFFIX (i+1)
         Should.equal e y
 
-    [<Fact>]
-    //[<Natural(37)>]
-    member _.``from types test``() =
+    [<Theory>]
+    [<Natural(37)>]
+    member _.``from types test``(i:int) =
         let lines = 
             let path = Path.Combine(__SOURCE_DIRECTORY__,"types.txt")
             File.ReadLines(path, Encoding.UTF8)
@@ -81,19 +83,20 @@ type TypeArgumentCompilerTest(output:ITestOutputHelper) =
         //验证总次数
         Should.equal lines.Length 37
 
-        //let x = lines.[i]
-        //output.WriteLine($"{x}")
+        let x = lines.[i]
 
-        //output.WriteLine(x)
-        //output.WriteLine(stringify ta)
+        output.WriteLine(x)
 
+
+        //for x in lines do
+        let exit (rest:string) = Regex.IsMatch(rest, @"^\s*$")
+        let src = SourceText.just(0,x)
+        let ta,length = TypeArgumentCompiler.compile exit src
+        output.WriteLine(stringify ta)
         //Should.equal e ta
+
+        //let uta = TypeArgumentUtils.uniform ta
+        //let utas = uta.toCode()
         //output.WriteLine(stringify uta)
 
-        for x in lines do
-        let exit (rest:string) = Regex.IsMatch(rest, @"^\s*$")
-        let ta,epos,erest = TypeArgumentCompiler.compile exit 0 x
-        let uta = TypeArgumentUtils.uniform ta
-        let utas = uta.toCode()
-
-        output.WriteLine($"typeof<{x}>,typeof<{utas}>")
+        //output.WriteLine($"typeof<{x}>,typeof<{utas}>")

@@ -8,6 +8,7 @@ open Xunit.Abstractions
 open FSharp.xUnit
 open FSharp.Idioms.Literal
 open FSharp.Idioms
+open FslexFsyacc
 open FslexFsyacc.Brackets
 
 type TypeArgumentAngleCompilerTest(output:ITestOutputHelper) =
@@ -23,7 +24,8 @@ type TypeArgumentAngleCompilerTest(output:ITestOutputHelper) =
     [<Theory>]
     [<MemberData(nameof TypeArgumentAngleCompilerTest.keys)>]
     member _.``compile``(x:string) =
-        let y = TypeArgumentAngleCompiler.compile 0 x
+        let src = SourceText.just(0,x)
+        let y = TypeArgumentAngleCompiler.compile src
         output.WriteLine(stringify y)
         let e = DataSource.[x]
         Should.equal y e

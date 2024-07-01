@@ -2,6 +2,7 @@
 
 open FslexFsyacc.Lex
 
+open FslexFsyacc
 open FslexFsyacc.Fslex
 
 open System
@@ -31,7 +32,9 @@ type TermDFATest(output:ITestOutputHelper) =
     [<Fact>]
     member _.``00 = tokenize test``() =
         let tokens = 
-            FslexTokenUtils.tokenize 0 text
+            SourceText.just(0,text)
+            |> FslexTokenUtils.tokenize
+
             //|> Seq.map(fun postok -> postok.value)
             |> Seq.map(stringify )
             |> String.concat "\r\n"

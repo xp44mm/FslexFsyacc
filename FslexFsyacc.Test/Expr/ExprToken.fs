@@ -37,47 +37,49 @@ module ExprToken =
         |> Map.inverse 
         |> Map.map(fun k v -> Seq.exactlyOne v)
 
-    let getTag (token:Position<ExprToken>) = 
+    let getTag (token:PositionWith<ExprToken>) = 
         match token.value with
         | x when ops_inverse.ContainsKey x -> ops_inverse.[x]
         | NUMBER _ -> "NUMBER"
         | EOF -> ""
         | _ -> null
 
-    let getLexeme (token:Position<ExprToken>) = 
+    let getLexeme (token:PositionWith<ExprToken>) = 
         match token.value with
         | NUMBER n -> box n
         | _   -> null
 
-    let tokenize offset (input:string) =
-        let rec loop pos rest =
+    let tokenize (sourceText:SourceText) = // offset (input:string) =
+        let rec loop (src:SourceText) =
             seq {
-                match rest with
+                match src.text with
                 | "" -> ()
 
                 | Rgx @"^\s+" m ->
-                    yield! loop (pos + m.Length) rest.[m.Length..]
+                    let src = src.skip(m.Length)
+                    yield! loop src
 
                 | Rgx @"^\d+(\.\d+)?" m ->
                     let tok =
                         {
-                            index = pos
+                            index = src.index
                             length = m.Length
                             value = NUMBER(Double.Parse(m.Value))
                         }
                     yield tok
-                    yield! loop tok.nextIndex rest.[m.Length..]
+                    yield! loop <| src.skip(tok.length)
 
                 | LongestPrefix (Map.keys ops) x ->
                     let tok =
                         {
-                            index = pos
+                            index = src.index
                             length = x.Length
                             value = ops.[x]
                         }
                     yield tok
-                    yield! loop tok.nextIndex rest.[x.Length..]
+                    yield! loop <| src.skip(tok.length) // tok.nextIndex rest.[x.Length..]
 
                 | never -> failwith never
             }
-        loop offset input
+        //SourceText.just(offset, input)
+        loop sourceText
