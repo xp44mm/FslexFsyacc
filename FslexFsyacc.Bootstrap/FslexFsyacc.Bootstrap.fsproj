@@ -11,10 +11,10 @@
     <PackageProjectUrl>https://github.com/xp44mm/FslexFsyacc</PackageProjectUrl>
     <RepositoryUrl>https://github.com/xp44mm/FslexFsyacc</RepositoryUrl>
     <PackageTags>lex;yacc;compiler;parser;analyzer</PackageTags>
-    <PackageReleaseNotes>type argument</PackageReleaseNotes>
+    <PackageReleaseNotes>SourceText</PackageReleaseNotes>
     <Company>34696643@qq.com</Company>
     <Authors>xp44m</Authors>
-    <Version>1.5.1</Version>
+    <Version>1.5.2</Version>
     <IsPublishable>True</IsPublishable>
     <PackageReadmeFile>readme.md</PackageReadmeFile>
   </PropertyGroup>
