@@ -9,8 +9,9 @@
 	<ItemGroup>
 		<Compile Include="Dir.fs" />
 		<Compile Include="SourceTextTest.fs" />
-		<Compile Include="Runtime\TokenWithPositionTest.fs" />
-		<Compile Include="Runtime\RenderUtilsTest.fs" />    
+		<Compile Include="PositionWithTest.fs" />
+		<Compile Include="RenderUtilsTest.fs" />
+		<Compile Include="LinesTest.fs" />    
 		<Compile Include="Lex\NFACombineTest.fs" />
 		<Compile Include="Lex\RegularExpressionNFATest.fs" />
 		<Compile Include="Lex\LookaheadTest.fs" />
@@ -103,8 +104,6 @@
 		<Compile Include="Program.fs" />
     
 	</ItemGroup>
-
-	<ItemGroup />
 
 	<ItemGroup>
 		<PackageReference Include="FSharp.xUnit" Version="1.2.27" />

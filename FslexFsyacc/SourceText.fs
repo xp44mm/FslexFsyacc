@@ -29,11 +29,15 @@ type SourceText =
     member this.skip(length:int) =
         SourceText.just(this.index + length, this.text.[length..])
 
+    member this.take(length:int) =
+        SourceText.just(this.index, this.text.[..length-1])
+
     /// 从新的索引位置开始截取剩余文本: Hopping hop jump
     member this.jump(index:int) =
         if index < this.index || this.adjacent < index then
             raise <| ArgumentOutOfRangeException("start < index < adjacent")
         this.skip(index - this.index)
-
+    [<Obsolete("Lines")>]
     member line.getColumnAndNextLine (index:int) = 
         Line.getColumnAndLpos (line.index,line.text) index
+

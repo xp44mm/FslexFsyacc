@@ -26,8 +26,6 @@
     <Compile Include="Fslex\FslexParseTableTest.fs" />
     <None Include="fsyacc2\fsyacc2.fsyacc" />
     <Compile Include="Fsyacc2\FsyaccParseTable2Test.fs" />
-    <None Include="Pars\pars.fsyacc" />
-    <Compile Include="Pars\ParsTest.fs" />
     
     
     <Compile Include="Program.fs" />

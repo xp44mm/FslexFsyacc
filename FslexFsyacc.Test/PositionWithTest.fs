@@ -6,7 +6,7 @@ open Xunit.Abstractions
 open FSharp.Idioms
 open FSharp.xUnit
 
-type TokenWithPositionTest(output:ITestOutputHelper) =
+type PositionWithTest(output:ITestOutputHelper) =
     let show res = 
         res
         |> Literal.stringify

@@ -2,7 +2,6 @@ module FslexFsyacc.Program
 
 open FSharp.Idioms
 open FSharp.Idioms.Literal
-open FSharp.xUnit
 
 open FslexFsyacc
 open FslexFsyacc.Brackets
@@ -18,10 +17,21 @@ open System
 open System.Reflection
 open System.Text.RegularExpressions
 
-open Xunit
-open Xunit.Abstractions
 open FslexFsyacc.ModuleOrNamespaces
 open FslexFsyacc.TypeArguments
+
+;      type 
+       PositionWith<
+   'value
+  > 
+ =
+  { index : int list 
+          list;       length: int
+          list
+    value 
+         : 'value
+    }
+
 
 [<EntryPoint>]
 let main _ =

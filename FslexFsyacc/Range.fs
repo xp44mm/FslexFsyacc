@@ -2,8 +2,8 @@
 
 type Range =
     {
-        Start: Position2
-        End: Position2
+        Start: Coordinate
+        End: Coordinate
     }
 
     /// m n
