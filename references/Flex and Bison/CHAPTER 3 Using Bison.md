@@ -657,15 +657,21 @@ list: /* nothing */ { $$ = NULL; }
 ;
 ```
 
-Our grammar distinguishes between statements (`stmt`) and expressions (`exp`). A statement is either a flow of control (if/then/else or while/do) or an expression. The `if` and `while` statements take lists of statements, with each statement in the list being followed by a semicolon. Each rule that matches a statement calls a **routine** to build an appropriate AST node.
+Our grammar distinguishes between statements (`stmt`) and expressions (`exp`). A statement is either a flow of control (`if`/`then`/`else` or `while`/`do`) or an expression. The `if` and `while` statements take lists of statements, with each statement in the list being followed by a semicolon. Each rule that matches a statement calls a **routine** to build an appropriate AST node.
 
-The design of the syntax here is largely arbitrary, and one of the nice things about using bison to build a parser is that it’s easy to experiment with variations. The interplay among bits of the syntax can be quite subtle; if, for example, the definition of list had put semicolons between rather than after each statement, the grammar would be ambiguous unless the grammar also added closing `FI` and `ENDDO` tokens to indicate the end of if/then and while/do statements.
+The design of the syntax here is largely arbitrary, and one of the nice things about using bison to build a parser is that it’s easy to experiment with variations. The interplay among bits of the syntax can be quite subtle; if, for example, the definition of list had put semicolons between rather than after each statement, the grammar would be ambiguous unless the grammar also added closing `FI` and `ENDDO` tokens to indicate the end of `if`/`then` and `while`/`do` statements.
+
+
 
 The definition of list is right recursive, that is, `stmt ; list` rather than `list stmt ;`.
 
 It doesn’t make any difference to the language recognized, but it makes it easier to build the list of statements linked from head to tail rather than from tail to head. Each time the `stmt ; list` rule is reduced, it creates a link that adds the statement to the head of the list so far. If the rule were `list stmt ;`, the statement would need to go at the tail of the list, which would require either a more complex circularly linked list or else reversing the list at the end (as we did with the list of references in Chapter 1).
 
 One disadvantage of right recursion rather than left is that right recursion puts up all of the yet-to-be-reduced statements on the parser stack and then reduces them all at the end of the list, while **left recursion** builds the list a statement at a time as the input is parsed. In a situation like this, where the list is unlikely to be more than a few items long, it doesn’t matter, but in a language where the list might be a list of thousands of items, it’s worth making the list with a left recursive rule and then reversing it to prevent parser stack overflow. Some programmers also find left recursion to be easier to debug, since it tends to produce output after each statement rather than all at once at the end.
+
+`Fsyacc`的解析器栈是`FSharpList`数据结构，没有大小限制，可以无限大。不会解析器栈溢出。
+
+经验数据是选择右递归。而不选左递归。
 
 ### Calculator Expression Syntax
 

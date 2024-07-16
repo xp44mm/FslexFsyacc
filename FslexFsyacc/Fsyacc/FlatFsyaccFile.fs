@@ -13,12 +13,12 @@ open FslexFsyacc.TypeArguments
 type FlatFsyaccFile =
     {
         header: string        
-        rules: Rule Set //augment Rules
+        rules: Rule Set // augment Rules
         operatorsLines: list<Associativity * Set<string>> // symbol -> prec level
         declarationsLines: Map<TypeArgument, Set<string>>
     }
 
-    /// 带有重复检查
+    /// 不要检查，和crawl版本比较异同
     static member from (raw:RawFsyaccFile) =
         let rules = RuleSet.fromGroups raw.ruleGroups
             

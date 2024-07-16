@@ -1,20 +1,23 @@
 %{
 %}
 expr : 
-     | expr "+" expr         { s0 + s2 }
-     | expr "-" expr         { s0 - s2 }
-     | expr "*" expr         { s0 * s2 }
-     | expr "/" expr         { s0 / s2 }
-     | "(" expr ")"    { s1 }
-     | "-" expr %prec UMINUS { -s1 }
-     | NUMBER                { s0 }
+     | expr "+" expr { s0 + s2 }
+     | expr "-" expr { s0 - s2 }
+     | expr "*" expr { s0 * s2 }
+     | expr "/" expr { s0 / s2 }
+     | "(" expr ")"  { s1 }
+     | unaryExpr     { s0 }
+     | NUMBER        { s0 }
+
+unaryExpr : 
+     | "-" expr { -s1 }
 
 %%
 
 %left "+" "-"
 %left "*" "/"
-%right UMINUS
+%right unaryExpr
 
 %%
 
-%type <float> NUMBER expr
+%type <float> NUMBER expr unaryExpr

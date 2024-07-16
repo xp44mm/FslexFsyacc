@@ -58,7 +58,7 @@ type ExprParseTableTest(output:ITestOutputHelper) =
         output.WriteLine($"{stringify acts}")
 
     [<Fact>]
-    member _.``02 - print conflict productions``() =
+    member _.``03 - print conflict productions``() =
         let st = ConflictedProduction.from fsyacc.rules
         for cp in st do
         output.WriteLine($"{stringify cp}")
@@ -66,14 +66,14 @@ type ExprParseTableTest(output:ITestOutputHelper) =
     [<Fact(
     Skip="按需更新源代码"
     )>]
-    member _.``02 - generate Parse Table``() =
+    member _.``04 - generate Parse Table``() =
         let outp = coder.generateModule(parseTblModule)
         //output.WriteLine(outp)
         File.WriteAllText(parseTblPath, outp, Encoding.UTF8)
         output.WriteLine("output yacc:")
         output.WriteLine(parseTblPath)
     [<Fact>]
-    member _.``10 - valid ParseTable``() =
+    member _.``05 - valid ParseTable``() =
         Should.equal coder.tokens ExprParseTable.tokens
         Should.equal coder.kernels ExprParseTable.kernels
         Should.equal coder.actions ExprParseTable.actions

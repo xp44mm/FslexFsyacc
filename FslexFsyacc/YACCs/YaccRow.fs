@@ -27,17 +27,11 @@ type YaccRow =
         precedences:Map<string,int * Associativity >
         ) =
         let bnf = BNF.just productions
-        let tryGetDummy = Precedence.tryGetDummy dummyTokens bnf.grammar.terminals
 
-        let tryGetPrecedence = Precedence.tryGetPrecedence tryGetDummy precedences
-
-        //let unambiguousItemCores =
-        //    bnf.conflictedItemCores
-        //    |> Map.map(fun k mp ->
-        //        mp
-        //        |> Map.map(fun s ics -> 
-        //            SLR.just(ics).disambiguate(tryGetPrecedence))
-        //    )
+        //let tryGetDummy = Precedence.tryGetDummy dummyTokens bnf.terminals
+        //let tryGetPrecedence = Precedence.tryGetPrecedence tryGetDummy precedences
+        let tryGetDummy = Precedence.DummyData.just(productions,bnf.terminals,dummyTokens).tryGetDummy 
+        let tryGetPrecedence = Precedence.tryGetPrecedence precedences
 
         let actions =
             bnf.actions
@@ -45,7 +39,10 @@ type YaccRow =
                 mp
                 |> Seq.choose(fun(KeyValue(sym, acts)) ->
                     acts
-                    |> Conflict.disambiguate tryGetPrecedence
+                    |> Conflict.disambiguate(fun prod ->
+                        let maybeDummy = tryGetDummy prod
+                        tryGetPrecedence maybeDummy                   
+                    ) 
                     |> Option.map (Pair.prepend sym)
                 )
                 |> Map.ofSeq
@@ -78,13 +75,11 @@ type YaccRow =
         let encodeClosures = encoder.encodeClosures resolvedClosures
 
         {
-        bnf         = bnf
-        dummyTokens = dummyTokens
-        precedences = precedences
-        actions     = actions             
-        encodeActions = encodeActions
-
-        //unambiguousItemCores = unambiguousItemCores
-        resolvedClosures = resolvedClosures
-        encodeClosures = encodeClosures
+            bnf         = bnf
+            dummyTokens = dummyTokens
+            precedences = precedences
+            actions     = actions             
+            encodeActions = encodeActions
+            resolvedClosures = resolvedClosures
+            encodeClosures = encodeClosures
         }

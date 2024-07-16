@@ -97,8 +97,8 @@ type BNF =
 
     member bnf.getConflictedProductions() =
         [
-        for acts in bnf.getProperConflictActions() do
-        for act in acts do
-        yield! act.getProductions()
+            for acts in bnf.getProperConflictActions() do
+            for act in acts do
+            yield! act.getProductions()
         ]
         |> Set.ofList

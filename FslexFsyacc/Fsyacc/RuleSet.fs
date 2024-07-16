@@ -23,7 +23,7 @@ let fromGroups (ruleGroups: RuleGroup list) =
                 }
             )
         )
-    //去重
+    //产生式去重
     let repl =
         ruleList
         |> List.groupBy(fun rule -> rule.production)
@@ -119,6 +119,7 @@ let toGroups (rules:seq<Rule>) =
     )
     |> Seq.toList
 
+/// 删除符号的产生式，不展开此符号
 let removeHeads (heads:Set<string>) (rules:Set<Rule>) =
     rules
     |> Set.filter(fun rule ->
@@ -127,6 +128,7 @@ let removeHeads (heads:Set<string>) (rules:Set<Rule>) =
         |> not
         )
 
+/// 删除符号所在产生式
 let removeSymbols (symbols:Set<string>) (rules:Set<Rule>) =
     rules
     |> Set.filter(fun rule ->
@@ -134,3 +136,48 @@ let removeSymbols (symbols:Set<string>) (rules:Set<Rule>) =
         |> List.exists(fun s -> symbols.Contains s)
         |> not
         )
+
+/// 从产生式中删除此符号，但保留修改后的产生式
+let deleteSymbols (symbols:Set<string>) (rules:Set<Rule>) =
+    let mapper (rule:Rule) =
+        let head, body =
+            match rule.production with
+            | head:: body -> head, body
+            | _ -> failwith "unreachable"
+        let body2 =
+            body
+            |> List.filter( 
+                symbols.Contains >> not
+            )
+        {
+            rule with production = head :: body2
+        }
+        
+    rules
+    |> Set.map( mapper )
+
+/// 冲突产生式的dummy提示
+let conflictDummies (rules:Set<Rule>) =
+    let productions = 
+        rules
+        |> Set.map(fun rule -> rule.production)
+
+    let bnf = BNF.just productions
+
+    let conflicts = bnf.getConflictedProductions()
+
+    conflicts
+    |> Set.map(fun production ->
+        let rule = 
+            rules
+            |> Seq.find(fun rule -> rule.production = production)
+        let nm =
+            match production with
+            | Precedence.HeadAsDummy productions dummy ->
+                dummy
+            | Precedence.LastTerminalAsDummy bnf.terminals dummy ->
+                dummy
+            | _ -> ""
+
+        production,nm,rule.dummy
+    )

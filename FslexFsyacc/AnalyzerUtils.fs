@@ -5,7 +5,7 @@ let skipUntilFoundIn<'a> (significants:Set<uint32>) (revStates:uint32 list) (rev
         match revStates with
         | [] -> failwith "never"
         | [0u] -> failwith "no found."
-        | state::statetail ->
+        | state :: statetail ->
             if significants.Contains state then
                 revStates,revTokens
             else

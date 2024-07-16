@@ -29,31 +29,13 @@ type PrecedenceTest (output: ITestOutputHelper) =
             None
             Some "*"
         ]
-        let y = Precedence.lastTerminal terminals productions.[i]
-        Should.equal es.[i] y
-
-    [<Theory>]
-    [<Natural(2)>]
-    member _.``tryGetDummy``(i:int) =
-        let dummyTokens = Map [
-            [ "E"; "-"; "E" ],"MINUS"
-            ]
-
-        let terminals = set ["+";"*";"-";"/"]
-
-        let productions = [
-            [ "E"; "E"; "-"; "E" ]
-            [ "E"; "-"; "E" ]
-            ]
-
-        let es = [
-            Some "-";
-            Some "MINUS"
-        ]
-
-        let y = Precedence.tryGetDummy dummyTokens terminals productions.[i]
-
-        Should.equal es.[i] y
-
+        let e = es.[i]
+        let p = productions.[i]
+        let y =
+            match p with
+            | Precedence.LastTerminalAsDummy terminals dumm ->
+                Some dumm
+            | _ -> None
+        Should.equal e y
 
 

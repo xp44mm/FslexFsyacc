@@ -9,6 +9,7 @@ type FslexToken =
     /// quote string literal(unquoted)
     | LITERAL of string
 
+    /// rename to MAPPER
     | REDUCER of string
 
     | HOLE of string
