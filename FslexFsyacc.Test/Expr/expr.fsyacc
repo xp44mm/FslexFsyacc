@@ -9,6 +9,7 @@ expr :
      | unaryExpr     { s0 }
      | NUMBER        { s0 }
 
+// unique head of production instead of %prec 
 unaryExpr : 
      | "-" expr { -s1 }
 
