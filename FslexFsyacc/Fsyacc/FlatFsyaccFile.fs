@@ -73,7 +73,7 @@ type FlatFsyaccFile =
         let dummyTokens = 
             this.rules
             |> Seq.filter(fun rule -> rule.dummy > "")
-            |> Seq.map(fun rule -> rule.production,rule.dummy)
+            |> Seq.map(fun rule -> rule.production, rule.dummy)
             |> Map.ofSeq
 
         let precedences =

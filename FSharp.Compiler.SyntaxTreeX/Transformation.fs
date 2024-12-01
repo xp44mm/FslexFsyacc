@@ -20,11 +20,17 @@ let getLongIdentFromSyn (longId:SynLongIdent) =
     match longId with
     | SynLongIdent(i,_,_) -> getLongIdent i
 
-let getAccess (accessibility:SynAccess) =
-    match accessibility with
-    | SynAccess.Public   _ -> XAccess.Public  
+let getAccess (access:SynAccess) =
+    match access with
+    | SynAccess.Public   _ -> XAccess.Public
     | SynAccess.Internal _ -> XAccess.Internal
-    | SynAccess.Private  _ -> XAccess.Private 
+    | SynAccess.Private  _ -> XAccess.Private
+
+let getValSigAccess (accessibility:SynValSigAccess) =
+    let getAccess = Option.map getAccess
+    match accessibility with
+    | SynValSigAccess.Single access -> access |> getAccess |> XValSigAccess.Single
+    | SynValSigAccess.GetSet(a,gt,st) -> XValSigAccess.GetSet(getAccess a,getAccess gt,getAccess st)
 
 let yieldAccess (accessibility:SynAccess option) =
     seq {
@@ -562,8 +568,8 @@ let getType(tp:SynType) =
     | SynType.SignatureParameter _ -> failwith ""
     | SynType.Or _ -> failwith ""
     | SynType.FromParseError _ -> failwith ""
-
-
+    | SynType.StaticConstantNull _ -> failwith ""
+    | SynType.WithNull (_, _, _, _) -> failwith ""
 let getConst (c: SynConst) =
     match c with
     | SynConst.Unit ->
@@ -934,7 +940,7 @@ let getMemberDefn (src:SynMemberDefn) =
         memberFlags: SynMemberFlags,
         memberFlagsForSet: SynMemberFlags,
         xmlDoc: PreXmlDoc,
-        accessibility: SynAccess option,
+        accessibility: SynValSigAccess,
         //_,
         synExpr: SynExpr,
         //_,
@@ -947,7 +953,7 @@ let getMemberDefn (src:SynMemberDefn) =
             ident.idText ,
             Option.map getType typeOpt ,
             getMemberKind propKind ,
-            Option.map getAccess accessibility ,
+            getValSigAccess accessibility ,
             getExpr synExpr
         )
     | SynMemberDefn.GetSetMember _ -> failwith "unimpl"
@@ -1158,7 +1164,9 @@ let getTypeConstraint(src:SynTypeConstraint) =
         range: FSharp.Compiler.Text.range
         ) ->
         XTypeConstraint.WhereTyparIsDelegate (getTypar typar ,List.map getType typeArgs)
-    | SynTypeConstraint.WhereSelfConstrained (_, _) -> failwith ""
+    | SynTypeConstraint.WhereSelfConstrained (_, _) 
+    | SynTypeConstraint.WhereTyparNotSupportsNull (_, _, _)
+        -> failwith ""
 
 let getRationalConst(src:SynRationalConst)=
     match src with
@@ -1278,9 +1286,8 @@ let getValSig(src:SynValSig) =
         isInline: bool ,
         isMutable: bool ,
         xmlDoc: FSharp.Compiler.Xml.PreXmlDoc ,
-        accessibility: SynAccess option ,
+        accessibility: SynValSigAccess,
         synExpr: SynExpr option ,
-        //withKeyword: FSharp.Compiler.Text.range option ,
         range: FSharp.Compiler.Text.range,
         trivia) ->
         XValSig (
@@ -1291,7 +1298,7 @@ let getValSig(src:SynValSig) =
             getValInfo arity ,
             isInline ,
             isMutable ,
-            Option.map getAccess accessibility ,
+            getValSigAccess accessibility ,
             Option.map getExpr synExpr
         )
 

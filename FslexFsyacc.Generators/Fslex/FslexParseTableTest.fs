@@ -35,20 +35,6 @@ type FslexParseTableTest(output: ITestOutputHelper) =
     let tbl =
         fsyacc.getYacc()
 
-    //[<Fact>]
-    //member _.``01 - norm fsyacc file``() =
-    //    let startSymbol = tblCrew.startSymbol
-    //    let flatedFsyacc =
-    //        fsyaccCrew
-    //        |> FlatedFsyaccFileCrewUtils.toFlatFsyaccFile
-
-    //    let txt = 
-    //        flatedFsyacc 
-    //        |> FlatFsyaccFileUtils.start startSymbol
-    //        |> RawFsyaccFileUtils.fromFlat
-    //        |> RawFsyaccFileUtils.render
-
-    //    output.WriteLine(txt)
 
     [<Fact>]
     member _.``02 - list all tokens``() =
@@ -73,16 +59,6 @@ type FslexParseTableTest(output: ITestOutputHelper) =
             "|" 
             ]
         Should.equal y tbl.bnf.terminals
-
-    //[<Fact>]
-    //member _.``03 - list all states``() =       
-    //    let text = 
-    //        AmbiguousCollectionUtils.render 
-    //            tblCrew.terminals
-    //            tblCrew.conflictedItemCores
-    //            (tblCrew.kernels |> Seq.mapi(fun i k -> k,i) |> Map.ofSeq)
-
-    //    output.WriteLine(text)
 
     [<Fact>]
     member _.``02 - print conflict productions``() =

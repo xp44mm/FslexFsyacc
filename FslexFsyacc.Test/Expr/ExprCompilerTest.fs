@@ -58,24 +58,25 @@ type ExprCompilerTest(output:ITestOutputHelper) =
             |> Map.toList
 
         //output.WriteLine(stringify symbols)
-        let mp = [
-            0,"";
-            1,"expr";
-            2,"(";
-            3,"expr";
-            4,")";
-            5,"-";
-            6,"expr";
-            7,"NUMBER";
-            8,"expr";
-            9,"expr";
-            10,"expr";
-            11,"expr";
-            12,"*";
-            13,"+";
-            14,"-";
-            15,"/"]
-
+        //[
+        //    0,"";
+        //    1,"expr";
+        //    2,"(";
+        //    3,"expr";
+        //    4,")";
+        //    5,"-";
+        //    6,"expr";
+        //    7,"NUMBER";
+        //    8,"expr";
+        //    9,"expr";
+        //    10,"expr";
+        //    11,"expr";
+        //    12,"*";
+        //    13,"+";
+        //    14,"-";
+        //    15,"/"]
+        let mp = 
+            [0,"";1,"expr";2,"(";3,"expr";4,")";5,"NUMBER";6,"expr";7,"expr";8,"expr";9,"expr";10,"expr";11,"*";12,"+";13,"-";14,"/";15,"unaryExpr";16,"-"]
         Should.equal mp symbols
 
 

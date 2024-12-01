@@ -29,6 +29,11 @@ type XAccess =
     | Private
 
 [<RequireQualifiedAccess>]
+type XValSigAccess =
+    | Single of XAccess option
+    | GetSet of XAccess option*XAccess option*XAccess option
+
+[<RequireQualifiedAccess>]
 type XConst =
     | Unit
     | Bool of bool
@@ -527,7 +532,7 @@ type XValSig =
         arity: XValInfo *
         isInline: bool *
         isMutable: bool *
-        accessibility: XAccess option *
+        accessibility: XValSigAccess *
         XExpr: XExpr option
 
 type XValInfo =
@@ -587,7 +592,7 @@ type XMemberDefn =
         ident: Ident *
         typeOpt: XType option *
         propKind: XMemberKind *
-        accessibility: XAccess option *
+        accessibility: XValSigAccess *
         XExpr: XExpr
 
 type XMemberDefns = XMemberDefn list

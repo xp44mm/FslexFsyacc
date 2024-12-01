@@ -45,6 +45,5 @@ type TypeArgumentToken =
     | UNMANAGED
     | WHEN
 
-    //| TYPE_ARGUMENT of TypeArgument
 
 

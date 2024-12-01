@@ -16,7 +16,6 @@ type YaccRow =
     actions: Map<Set<ItemCore>,Map<string,ParseTableAction>>
     encodeActions: list<list<string*int>>
 
-    //unambiguousItemCores: Map<Set<ItemCore>,Map<string,Set<ItemCore>>>
     resolvedClosures: Map<Set<ItemCore>,Map<ItemCore,Set<string>>>
     encodeClosures: list<list<int*int*string list>>
     }
@@ -28,8 +27,6 @@ type YaccRow =
         ) =
         let bnf = BNF.just productions
 
-        //let tryGetDummy = Precedence.tryGetDummy dummyTokens bnf.terminals
-        //let tryGetPrecedence = Precedence.tryGetPrecedence tryGetDummy precedences
         let tryGetDummy = Precedence.DummyData.just(productions,bnf.terminals,dummyTokens).tryGetDummy 
         let tryGetPrecedence = Precedence.tryGetPrecedence precedences
 
