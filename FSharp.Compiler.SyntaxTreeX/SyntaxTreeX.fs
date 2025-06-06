@@ -583,7 +583,7 @@ type XMemberDefn =
     | LetBindings of bindings: XBinding list * isStatic: bool * isRecursive: bool
     | AbstractSlot of slotSig: XValSig * flags: XMemberFlags
     | Interface of interfaceType: XType  * members: XMemberDefns option
-    | Inherit of baseType: XType * asIdent: Ident option
+    | Inherit of baseType: XType option * asIdent: Ident option
     | ValField of fieldInfo: XField
     | NestedType of typeDefn: XTypeDefn * accessibility: XAccess option
     | AutoProperty of

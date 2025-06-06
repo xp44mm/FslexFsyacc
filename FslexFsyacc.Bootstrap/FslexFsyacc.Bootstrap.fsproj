@@ -5,7 +5,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <Description>Tools for Fslex/Fsyacc analyzer/parser generation.</Description>
+    <Description>update fsharp.core 9.0.0</Description>
     <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
     <Copyright>xp44mm</Copyright>
     <PackageProjectUrl>https://github.com/xp44mm/FslexFsyacc</PackageProjectUrl>
@@ -14,7 +14,7 @@
     <PackageReleaseNotes>head or last terminal</PackageReleaseNotes>
     <Company>34696643@qq.com</Company>
     <Authors>xp44m</Authors>
-    <Version>1.5.4</Version>
+    <Version>1.5.6</Version>
     <IsPublishable>True</IsPublishable>
     <PackageReadmeFile>readme.md</PackageReadmeFile>
   </PropertyGroup>
@@ -73,7 +73,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="9.0.100" />
+    <PackageReference Update="FSharp.Core" Version="9.0.300" />
   </ItemGroup>
 
 </Project>

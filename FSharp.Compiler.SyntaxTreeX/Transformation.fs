@@ -418,9 +418,9 @@ let getExpr (expr:SynExpr) =
         XExpr.ImplicitZero
     | SynExpr.SequentialOrImplicitYield ( debugPoint: DebugPointAtSequential , expr1: SynExpr , expr2: SynExpr , ifNotStmt: SynExpr , range: range)->
         XExpr.SequentialOrImplicitYield (getExpr expr1 , getExpr expr2 , getExpr ifNotStmt)
-    | SynExpr.YieldOrReturn ( flags: (bool * bool) , expr: SynExpr , range: range)->
+    | SynExpr.YieldOrReturn ( flags: (bool * bool) , expr: SynExpr , range: range,trivia)->
         XExpr.YieldOrReturn ( flags,getExpr expr)
-    | SynExpr.YieldOrReturnFrom ( flags: (bool * bool) , expr: SynExpr , range: range)->
+    | SynExpr.YieldOrReturnFrom ( flags: (bool * bool) , expr: SynExpr , range: range,trivia)->
         XExpr.YieldOrReturnFrom ( flags ,getExpr expr)
     | SynExpr.LetOrUseBang (
         bindDebugPoint: DebugPointAtBinding ,
@@ -454,7 +454,7 @@ let getExpr (expr:SynExpr) =
             getExpr expr ,
             List.map getMatchClause clauses
         )
-    | SynExpr.DoBang ( expr: SynExpr , range: range)->
+    | SynExpr.DoBang ( expr: SynExpr , range: range,trivia)->
         XExpr.DoBang (getExpr expr)
     | SynExpr.LibraryOnlyILAssembly (
         ilCode: obj , 
@@ -869,7 +869,7 @@ let getMemberDefn (src:SynMemberDefn) =
         inheritType: SynType ,
         inheritArgs: SynExpr ,
         inheritAlias: Ident option ,
-        range: FSharp.Compiler.Text.range
+        range: FSharp.Compiler.Text.range,trivia
         ) ->
         XMemberDefn.ImplicitInherit ( 
             getType inheritType ,
@@ -908,12 +908,12 @@ let getMemberDefn (src:SynMemberDefn) =
             Option.map getMemberDefns members
         )
     | SynMemberDefn.Inherit ( 
-        baseType: SynType ,
+        baseType: SynType option,
         asIdent: Ident option ,
-        range: FSharp.Compiler.Text.range
+        range: FSharp.Compiler.Text.range,trivia
         ) ->
         XMemberDefn.Inherit ( 
-            getType baseType ,
+            Option.map getType baseType ,
             Option.map (fun(i:Ident)->i.idText) asIdent
         )
     | SynMemberDefn.ValField ( 

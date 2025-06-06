@@ -17,7 +17,7 @@
     <IsPublishable>True</IsPublishable>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Copyright>xp44mm</Copyright>
-    <Version>43.9.100</Version>
+    <Version>43.9.201</Version>
 
 
   </PropertyGroup>
@@ -38,11 +38,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FSharp.Compiler.Service" Version="43.9.100" />
+    <PackageReference Include="FSharp.Compiler.Service" Version="43.9.300" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="9.0.100" />
+    <PackageReference Update="FSharp.Core" Version="9.0.300" />
   </ItemGroup>
 
 </Project>

@@ -9,11 +9,11 @@
     <PackageProjectUrl>https://github.com/xp44mm/FslexFsyacc</PackageProjectUrl>
     <RepositoryUrl>https://github.com/xp44mm/FslexFsyacc</RepositoryUrl>
     <PackageTags>lex;yacc;compiler;parser;analyzer</PackageTags>
-    <PackageReleaseNotes>head or last terminal</PackageReleaseNotes>
+    <PackageReleaseNotes>update fsharp.core 9.0.0</PackageReleaseNotes>
     <Authors>xp44m</Authors>
     <Company>34696643@qq.com</Company>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <Version>1.5.4</Version>
+    <Version>1.5.6</Version>
     <PackageReadmeFile>readme.md</PackageReadmeFile>
     <PackAsTool>False</PackAsTool>  
   </PropertyGroup>
@@ -110,11 +110,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FSharp.Idioms" Version="1.4.25" />
+    <PackageReference Include="FSharp.Idioms" Version="1.4.30" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="9.0.100" />
+    <PackageReference Update="FSharp.Core" Version="9.0.300" />
   </ItemGroup>
 
 </Project>
