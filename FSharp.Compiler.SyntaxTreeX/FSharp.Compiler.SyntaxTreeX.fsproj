@@ -6,7 +6,7 @@
     <Authors>cuishengli</Authors>
     <Description>`FSharp.Compiler.SyntaxTreeX` is a subtree of `FSharp.Compiler.SyntaxTree`.</Description>
     <PackageReadmeFile>readme.md</PackageReadmeFile>
-    <PackageReleaseNotes>update nuget</PackageReleaseNotes>
+    <PackageReleaseNotes>update FSharp.Compiler.Service</PackageReleaseNotes>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
 
@@ -17,7 +17,7 @@
     <IsPublishable>True</IsPublishable>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Copyright>xp44mm</Copyright>
-    <Version>43.9.201</Version>
+    <Version>43.9.300</Version>
 
 
   </PropertyGroup>

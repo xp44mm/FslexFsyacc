@@ -110,7 +110,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FSharp.Idioms" Version="1.4.30" />
+    <PackageReference Include="FSharp.Idioms" Version="1.4.32" />
   </ItemGroup>
 
   <ItemGroup>
